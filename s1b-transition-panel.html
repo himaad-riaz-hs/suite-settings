@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suite Settings · New-look transition panel</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+<link rel="stylesheet" href="templates/src/suite-shell.css">
+<style>
+  html,body{margin:0;height:100%;background:var(--bento-theme-color-bg-app);}
+  .perch-back{flex:1;display:flex;flex-direction:column;filter:saturate(.96);}
+  .pback-top{height:56px;border-bottom:1px solid var(--bento-theme-color-border-subtle);background:var(--bento-theme-color-bg-surface);display:flex;align-items:center;gap:12px;padding:0 20px;}
+  .pback-top .t{font:var(--hs-type-title-sub);}
+  .pback-grid{flex:1;display:grid;grid-template-columns:repeat(7,1fr);background:var(--bento-theme-color-bg-app);}
+  .pcol{border-right:1px solid var(--bento-theme-color-border-subtle);padding:8px;}
+  .pcol .d{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);margin-bottom:8px;}
+  .pcard{background:var(--bento-system-sys-primary-50);border:1px solid var(--bento-system-sys-primary-200);border-radius:8px;padding:6px 8px;font:var(--hs-type-meta-b);color:var(--bento-system-sys-primary-700);margin-bottom:6px;}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.18);}
+  /* full-height side panel (old look) anchored to the rail */
+  .panel{position:fixed;left:80px;top:0;bottom:0;width:368px;background:var(--bento-theme-color-bg-surface);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);border-right:1px solid var(--bento-theme-color-border-subtle);display:flex;flex-direction:column;}
+  .pn-head{padding:20px 20px 12px;position:relative;}
+  .pn-close{position:absolute;top:16px;right:14px;}
+  .pn-av{width:48px;height:48px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-title-sub);}
+  .pn-name{font:var(--hs-type-title-sub);margin:12px 0 6px;}
+  .pn-plan{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border:1px solid var(--bento-theme-color-border-subtle);border-radius:999px;font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
+  .pn-plan .material-symbols-outlined{font-size:14px;}
+  .pn-body{flex:1;overflow:auto;padding:0 12px 8px;}
+  /* new-look banner */
+  .nl-box{margin:4px 8px 12px;padding:12px;background:var(--bento-theme-color-bg-discovery);border-radius:10px;}
+  .nl-row{display:flex;align-items:center;gap:10px;}
+  .nl-dot{width:16px;height:16px;border-radius:999px;background:var(--bento-system-sys-discovery-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;flex-shrink:0;}
+  .nl-dot .material-symbols-outlined{font-size:12px;}
+  .nl-title{flex:1;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+  .nl-toggle{display:inline-flex;align-items:center;gap:8px;}
+  .nl-toggle .nl-lbl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
+  .nl-toggle .nl-lbl.on{color:var(--bento-theme-color-text-base);}
+  .pn-group{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);text-transform:none;padding:14px 12px 6px;}
+  .pn-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;color:var(--bento-theme-color-text-base);text-decoration:none;cursor:pointer;font:var(--hs-type-body-md);}
+  .pn-item:hover{background:var(--bento-component-list-item-fill-hovered);}
+  .pn-item .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-base);}
+  .pn-foot{border-top:1px solid var(--bento-theme-color-border-subtle);padding:8px 12px;}
+  /* "New look available" notification card */
+  .nl-card{position:fixed;right:24px;top:80px;width:320px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:14px;}
+  .nl-card .sub{display:flex;gap:10px;margin-top:10px;}
+  .nl-card .sub .lbl-2{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
+</style>
+</head>
+<body>
+<div class="suite-app">
+  <aside class="suite-rail">
+    <a class="suite-brand" href="index.html" aria-label="Home"><img src="assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+    <div class="main">
+      <a class="suite-navbtn is-selected" href="#" aria-label="Perch"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+      <a class="suite-navbtn" href="#" aria-label="Nest"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
+      <a class="suite-navbtn" href="#" aria-label="Lumen"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
+      <a class="suite-navbtn" href="#" aria-label="Parliament"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
+      <a class="suite-navbtn" href="#" aria-label="Wisdom"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+      <a class="suite-navbtn" href="#" aria-label="Vigil"><span class="circle"><span class="material-symbols-outlined">gpp_good</span></span><span class="lbl">Vigil</span></a>
+    </div>
+    <div class="others">
+      <a class="suite-navbtn util" href="#" aria-label="Analytics" title="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></a>
+      <a class="suite-navbtn util" href="#" aria-label="Notifications" title="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></a>
+      <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
+      <a class="suite-navbtn util" href="#" aria-label="Account" title="Melanie Wilkins"><span class="circle"><span class="pn-av" style="width:36px;height:36px;font:var(--hs-type-body-sm-b)">MW</span></span></a>
+    </div>
+  </aside>
+
+  <main class="suite-main">
+    <div class="perch-back">
+      <div class="pback-top"><span class="t">Perch</span><span class="hs-tab is-active" style="margin-left:8px">Calendar</span><span class="hs-tab">Drafts</span><span class="hs-tab">Content</span><span class="hs-tab">Approvals</span><span style="margin-left:auto"><button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">add</span>Create a post</button></span></div>
+      <div class="pback-grid">
+        <div class="pcol"><div class="d">Sun 21</div></div>
+        <div class="pcol"><div class="d">Mon 22</div><div class="pcard">Summer kickoff</div></div>
+        <div class="pcol"><div class="d">Tue 23</div><div class="pcard">Public service</div></div>
+        <div class="pcol"><div class="d">Wed 24</div></div>
+        <div class="pcol"><div class="d">Thu 25</div><div class="pcard">Recommended 11:00</div></div>
+        <div class="pcol"><div class="d">Fri 26</div></div>
+        <div class="pcol"><div class="d">Sat 27</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="scrim"></div>
+
+<!-- OLD-look side panel carrying the new-look migration banner -->
+<aside class="panel" role="dialog" aria-label="Account panel">
+  <div class="pn-head">
+    <button class="hs-btn hs-btn--ghost hs-btn--icon pn-close" aria-label="Close" title="Close"><span class="material-symbols-outlined">close</span></button>
+    <span class="pn-av">MW</span>
+    <div class="pn-name">Melanie Wilkins</div>
+    <span class="pn-plan"><span class="material-symbols-outlined">lock</span>Employee plan</span>
+  </div>
+  <div class="pn-body">
+    <div class="nl-box">
+      <div class="nl-row">
+        <span class="nl-dot"><span class="material-symbols-outlined">auto_awesome</span></span>
+        <span class="nl-title">Switch to the new look</span>
+        <span class="nl-toggle"><span class="nl-lbl">New</span><span class="hs-toggle" role="switch" aria-label="Switch to the new look"></span><span class="nl-lbl on">Old</span></span>
+      </div>
+      <button class="hs-btn hs-btn--outlined hs-btn--sm" style="margin-top:12px">Enable for organization</button>
+    </div>
+
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">auto_awesome</span>What&#39;s moved</a>
+
+    <div class="pn-group">Settings</div>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined" style="color:var(--bento-theme-color-icon-warning)">warning</span>Disconnected social accounts</a>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">pause_circle</span>Suspended content</a>
+    <a class="pn-item" href="s2-account-profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
+    <a class="pn-item" href="s12-integrations.html"><span class="material-symbols-outlined">extension</span>Connectors (MCPs)</a>
+    <a class="pn-item" href="s14-account-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan and billing</a>
+    <a class="pn-item" href="s2-account-profile.html"><span class="material-symbols-outlined">settings</span>Settings</a>
+
+    <div class="pn-group">Help &amp; resources</div>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">campaign</span>What&#39;s new</a>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">help_center</span>Help center</a>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">chat</span>Contact support</a>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">alternate_email</span>Message us on X</a>
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">feedback</span>Share feedback</a>
+  </div>
+  <div class="pn-foot">
+    <a class="pn-item" href="#"><span class="material-symbols-outlined">logout</span>Sign out</a>
+  </div>
+</aside>
+
+<!-- admin: "New look available" rollout card -->
+<div class="nl-card" role="status">
+  <div class="nl-row">
+    <span class="nl-dot"><span class="material-symbols-outlined">auto_awesome</span></span>
+    <span class="nl-title" style="font:var(--hs-type-body-md-b)">New look available</span>
+    <span class="nl-toggle"><span class="nl-lbl">New</span><span class="hs-toggle" role="switch" aria-label="Preview the new look"></span><span class="nl-lbl on">Old</span></span>
+  </div>
+  <label class="sub" style="cursor:pointer">
+    <span class="hs-check"></span>
+    <span><span style="font:var(--hs-type-body-md)">Enable for organization</span><br><span class="lbl-2">Visible to all members</span></span>
+  </label>
+</div>
+<script src="app.js"></script>
+</body></html>

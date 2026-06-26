@@ -1,0 +1,57 @@
+/* Perch shell — product drawer (304px) per social-os-reboot.fig /Perch.
+   Sits between the Suite rail and the content. Bento-backed. */
+:root { --perch-icon: var(--bento-suite-perch-icon); }
+
+.perch-drawer {
+  width: 304px; flex-shrink: 0;
+  background: var(--bento-theme-color-bg-surface);
+  border-right: 1px solid var(--bento-theme-color-border-subtle);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.perch-drawer .pd-head {
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px 0 24px; flex-shrink: 0;
+  font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 26px; line-height: 32px;
+  color: var(--bento-theme-color-text-base);
+}
+.perch-drawer .pd-collapse { width: 32px; height: 32px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.perch-drawer .pd-collapse:hover { background: rgba(28,28,28,0.06); }
+.perch-drawer .pd-collapse .material-symbols-outlined { font-size: 18px; }
+
+.perch-drawer .pd-body { flex: 1; overflow: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; }
+
+/* Create-a-post split button — secondary (Figma comp-split-button / ConfigurationSecondary) */
+.pd-compose { display: flex; gap: 1px; margin: 4px 4px 8px; }
+.pd-compose .main {
+  height: 40px; padding: 0 16px; border: 0; cursor: pointer; text-decoration: none;
+  background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base);
+  border-radius: 8px 0 0 8px; font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pd-compose .main:hover { background: var(--bento-system-sys-neutral-alt-300); }
+.pd-compose .chev {
+  width: 40px; height: 40px; border: 0; cursor: pointer;
+  background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base);
+  border-radius: 0 8px 8px 0;
+  display: grid; place-items: center;
+}
+.pd-compose .chev:hover { background: var(--bento-system-sys-neutral-alt-300); }
+.pd-compose .main .material-symbols-outlined { font-size: 20px; }
+.pd-compose .chev .material-symbols-outlined { font-size: 18px; }
+
+.pd-group {
+  padding: 18px 12px 6px; font-family: var(--bento-theme-font-families-primary);
+  font-weight: 600; font-size: 14px; line-height: 20px;
+  color: var(--bento-theme-color-text-subtle);
+}
+.pd-item {
+  display: flex; align-items: center; gap: 14px; height: 48px; padding: 0 12px;
+  border-radius: 8px; cursor: pointer; text-decoration: none;
+  font-family: var(--bento-theme-font-families-primary); font-weight: 400; font-size: 16px;
+  color: var(--bento-theme-color-text-base);
+}
+.pd-item:hover { background: var(--bento-component-list-item-fill-hovered); }
+.pd-item.on { background: var(--bento-component-list-item-fill-selected); color: var(--bento-theme-color-text-base); font-weight: 600; }
+.pd-item.on .material-symbols-outlined { color: var(--bento-theme-color-icon-base); }
+.pd-item .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+.pd-item .badge { margin-left: auto; height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--bento-system-sys-neutral-alt-300); color: var(--bento-theme-color-text-base); font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }

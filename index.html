@@ -1,0 +1,85 @@
+<!doctype html>
+<!-- Suite Settings prototype - sign-in gate (per Design "GitHub Enterprise for Designers"). Soft client-side gate for sharing/testing. -->
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suite Settings prototype - sign in</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+<style>
+  html, body { margin: 0; min-height: 100vh; }
+  body { display: grid; place-items: center; padding: 24px; box-sizing: border-box;
+    background: var(--bento-system-sys-neutral-alt-200);
+    font: var(--hs-type-body-md); color: var(--bento-theme-color-text-base); -webkit-font-smoothing: antialiased; }
+  .card { width: 380px; max-width: 92%; box-sizing: border-box; padding: 28px;
+    background: var(--bento-theme-color-bg-surface);
+    border: 1px solid var(--bento-theme-color-border-subtle);
+    border-radius: var(--bento-theme-border-radii-03);
+    box-shadow: var(--bento-theme-elevation-shadow-overlay-bottom); }
+  h1 { font: var(--hs-type-title-sub); margin: 0 0 4px; }
+  .sub { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin: 0 0 20px; }
+  label { display: block; font: var(--hs-type-body-md-b); margin: 0 0 6px; }
+  .hs-input { width: 100%; box-sizing: border-box; }
+  .full { width: 100%; justify-content: center; margin-top: 16px; }
+  .gap { margin-top: 10px; }
+  .err { display: none; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 8px;
+    background: var(--bento-component-alert-warning-fill); font: var(--hs-type-body-sm); }
+  .err .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-warning); }
+  .ok { display: none; font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px; }
+  #admin { display: none; }
+  hr { border: 0; border-top: 1px solid var(--bento-theme-color-border-subtle); margin: 20px 0; }
+</style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Suite Settings prototype</h1>
+    <p class="sub">The consolidated Settings home (account, organization, integrations) with a role-adaptive nav. Enter the access password to continue.</p>
+
+    <form id="signin" autocomplete="off">
+      <label for="pw">Password</label>
+      <input id="pw" class="hs-input" type="password" autocomplete="off" aria-describedby="err">
+      <div id="err" class="err" role="alert"><span class="material-symbols-outlined" aria-hidden="true">warning</span><span>That password is not right. Try again.</span></div>
+      <button class="hs-btn hs-btn--primary full" type="submit">Enter</button>
+    </form>
+
+    <section id="admin" aria-label="Admin">
+      <hr>
+      <label for="np">Set the participant (user) password</label>
+      <input id="np" class="hs-input" type="text" autocomplete="off">
+      <button id="save" class="hs-btn hs-btn--secondary gap" type="button">Save password</button>
+      <div id="saved" class="ok" role="status">Saved.</div>
+      <button id="go" class="hs-btn hs-btn--primary full" type="button">Open prototype</button>
+    </section>
+  </main>
+
+<script>
+(function(){
+  var ADMIN = 'Hootsuite_2026_admin';
+  var DEFAULT_USER = 'publisher-demo';
+  function userPw(){ try { return localStorage.getItem('ssUserPwd') || DEFAULT_USER; } catch(e){ return DEFAULT_USER; } }
+  function enter(){ try { sessionStorage.setItem('ssAuthed','1'); } catch(e){} location.href = 'home.html'; }
+
+  var form = document.getElementById('signin');
+  var pw = document.getElementById('pw');
+  var err = document.getElementById('err');
+  var admin = document.getElementById('admin');
+  var np = document.getElementById('np');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = pw.value;
+    if (v === ADMIN) { form.style.display = 'none'; admin.style.display = 'block'; np.value = userPw(); np.focus(); return; }
+    if (v === userPw()) { enter(); return; }
+    err.style.display = 'flex'; pw.focus(); pw.select();
+  });
+  document.getElementById('save').addEventListener('click', function(){
+    var val = (np.value || '').trim(); if (!val) return;
+    try { localStorage.setItem('ssUserPwd', val); } catch(e){}
+    var ok = document.getElementById('saved'); ok.style.display = 'block';
+    setTimeout(function(){ ok.style.display = 'none'; }, 2000);
+  });
+  document.getElementById('go').addEventListener('click', enter);
+})();
+</script>
+</body></html>

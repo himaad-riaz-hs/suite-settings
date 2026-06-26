@@ -1,0 +1,108 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suite Settings · Security &amp; governance · Audit log</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+<link rel="stylesheet" href="templates/src/suite-shell.css">
+<link rel="stylesheet" href="templates/src/suite-drawer.css">
+<style>
+ html,body{margin:0;height:100%;background:var(--bento-theme-color-bg-app);}
+ .set-scroll{flex:1;overflow:auto;}
+ .set-wrap{max-width:860px;margin:0 auto;padding:32px 40px 80px;}
+ .set-head{margin:0 0 4px;font:var(--hs-type-title-screen);color:var(--bento-theme-color-text-base);}
+ .set-sub{margin:0 0 20px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);}
+ .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:20px;}
+ .pad{padding:24px;} .pad+.pad{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .sec{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);margin:0 0 6px;}
+ .secd{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 16px;}
+ .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;} .full{grid-column:1/-1;}
+ .rowflex{display:flex;align-items:center;gap:12px;}
+ .between{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+ .between+.between{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .avatar-lg{width:56px;height:56px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-title-sub);}
+ .stat{display:flex;gap:32px;} .stat .n{font:var(--hs-type-title-screen);} .stat .l{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
+ table.hs-table{width:100%;border-collapse:collapse;}
+ .hs-table th{text-align:left;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);padding:10px 12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ .hs-table td{font:var(--hs-type-body-sm);padding:12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);vertical-align:middle;}
+ .mini-av{width:28px;height:28px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-meta-b);}
+ textarea.hs-input{min-height:72px;resize:vertical;padding:8px 12px;}
+ .locked{opacity:.55;}
+ .scrim{position:fixed;inset:0;background:rgba(0,0,0,.32);display:grid;place-items:center;}
+ .modal{width:520px;background:var(--bento-theme-color-bg-surface);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
+ .hs-input.affix{display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;}
+ .hs-input.affix:focus-within{border-color:var(--hs-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
+ .hs-input.affix input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);height:100%;}
+ .hs-input.affix .lead{color:var(--bento-theme-color-icon-subtle);font-size:20px;}
+ .hs-input.affix .clr{appearance:none;border:0;background:transparent;cursor:pointer;width:28px;height:28px;border-radius:999px;display:grid;place-items:center;color:var(--bento-theme-color-icon-base);}
+ .hs-input.affix .clr:hover{background:rgba(28,28,28,0.06);}
+ .hs-input.affix .clr .material-symbols-outlined{font-size:18px;}
+ .empty{padding:56px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;}
+ .empty .material-symbols-outlined{font-size:48px;color:var(--bento-theme-color-icon-subtle);}
+ .empty .et{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);}
+ .empty .ed{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);max-width:420px;}
+ .sk{display:inline-block;background-color:var(--bento-theme-color-bg-surface-recessed);background-image:linear-gradient(90deg,var(--bento-component-skeleton-shimmer-start) 0%,var(--bento-component-skeleton-shimmer-peak) 50%,var(--bento-component-skeleton-shimmer-start) 100%);background-size:200% 100%;background-repeat:no-repeat;background-position:100% 0;animation:bento-sk 1.5s linear infinite;flex-shrink:0;}
+ .sk-circle{width:28px;height:28px;border-radius:50%;} .sk-text{height:14px;border-radius:2px;}
+ @keyframes bento-sk{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
+ .hs-tabs{border-bottom:0;}
+ .hs-tab{text-decoration:none;}
+ .hs-tab.is-active::after{bottom:0;}
+ .protobar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:999px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:5px 10px 5px 14px;display:flex;align-items:center;gap:8px;}
+ .protobar .pl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
+ .protobar select{border:0;background:transparent;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);cursor:pointer;}
+</style></head><body>
+<div class="protobar"><span class="pl">Prototype version</span>
+ <select onchange="if(this.value)location.href=this.value" aria-label="Switch prototype version">
+  <option value="s2b-account-figma.html">Figma-matched (A)</option>
+  <option value="s2-account-profile.html" selected>Original build (B)</option>
+ </select></div>
+<div class="suite-app">
+<aside class="suite-rail">
+ <a class="suite-brand" href="index.html" aria-label="Home"><img src="assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+ <div class="main">
+  <a class="suite-navbtn" href="#" aria-label="Perch"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Nest"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Lumen"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Parliament"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Wisdom"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Vigil"><span class="circle"><span class="material-symbols-outlined">gpp_good</span></span><span class="lbl">Vigil</span></a>
+ </div>
+ <div class="others">
+  <a class="suite-navbtn util" href="#" aria-label="Notifications" title="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></a>
+  <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
+  <a class="suite-navbtn util" href="s1-entry-flyout.html" aria-label="Account" title="Melanie Wilkins"><span class="circle"><span class="avatar-lg" style="width:36px;height:36px;font:var(--hs-type-body-sm-b)">MW</span></span></a>
+ </div>
+</aside>
+<aside class="suite-drawer">
+ <div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div>
+ <div class="sd-body"><div class="sd-group">Account</div>
+<a class="sd-item" href="s2-account-profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
+<a class="sd-item" href="s3-account-preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
+<a class="sd-item" href="s4-account-security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy</a>
+<a class="sd-item" href="s5-account-notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+<a class="sd-item" href="s14-account-billing.html"><span class="material-symbols-outlined">credit_card</span>Billing &amp; plan</a>
+<div class="sd-group">Organization</div>
+<a class="sd-item" href="s6-org-overview.html"><span class="material-symbols-outlined">domain</span>Overview</a>
+<a class="sd-item" href="s7-org-members.html"><span class="material-symbols-outlined">group</span>Members</a>
+<a class="sd-item" href="s8-org-teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
+<a class="sd-item" href="s9-org-social.html"><span class="material-symbols-outlined">hub</span>Social accounts</a>
+<a class="sd-item" href="s10-org-permissions.html"><span class="material-symbols-outlined">admin_panel_settings</span>Roles &amp; permissions</a>
+<div class="sd-group">Security &amp; governance</div>
+<a class="sd-item" href="s11-governance.html"><span class="material-symbols-outlined">key</span>SSO &amp; MFA</a>
+<a class="sd-item on" href="s15-audit-log.html"><span class="material-symbols-outlined">history</span>Audit log</a>
+<a class="sd-item" href="s16-data-export.html"><span class="material-symbols-outlined">download</span>Data export</a>
+<div class="sd-group">Integrations</div>
+<a class="sd-item" href="s12-integrations.html"><span class="material-symbols-outlined">extension</span>MCP connectors</a>
+<a class="sd-item" href="s12-integrations.html#apps"><span class="material-symbols-outlined">apps</span>Apps</a>
+<div class="sd-group">Product settings</div>
+<a class="sd-item" href="#"><span class="material-symbols-outlined">inbox</span>Nest (Inbox)<span class="material-symbols-outlined" style="margin-left:auto;font-size:18px;color:var(--bento-theme-color-icon-subtle)">open_in_new</span></a>
+<a class="sd-item" href="#"><span class="material-symbols-outlined">graphic_eq</span>Lumen<span class="material-symbols-outlined" style="margin-left:auto;font-size:18px;color:var(--bento-theme-color-icon-subtle)">open_in_new</span></a></div>
+</aside>
+<main class="suite-main">
+ <div class="suite-topbar"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Back" title="Back" style="margin-right:4px"><span class="material-symbols-outlined">arrow_back</span></button><h1>Settings</h1><span class="spacer"></span></div>
+ <div class="set-scroll"><div class="set-wrap"><h2 class="set-head">Audit log</h2><p class="set-sub">Who changed what, and when. Config-change and access events across the organization.</p><div class="rowflex" style="justify-content:space-between;margin-bottom:16px"><div class="hs-input affix" style="max-width:320px"><span class="material-symbols-outlined lead">search</span><input placeholder="Search events…"></div><div class="rowflex"><div class="hs-input affix" style="max-width:200px"><input value="Last 30 days" readonly><button class="clr" aria-label="Change range" title="Change range"><span class="material-symbols-outlined">expand_more</span></button></div><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">download</span>Export log</button></div></div><div class="set-card"><table class="hs-table"><thead><tr><th>Timestamp</th><th>Actor</th><th>Action</th><th>Target</th></tr></thead><tbody><tr><td style="white-space:nowrap">Jun 23, 2026 · 14:02</td><td><div class="rowflex"><span class="mini-av">AP</span><span style="font:var(--hs-type-body-sm-b)">Aisha Patel</span></div></td><td>Changed role to Admin</td><td class="secd" style="margin:0">bryn.morales@somos.com</td></tr><tr><td style="white-space:nowrap">Jun 23, 2026 · 11:47</td><td><div class="rowflex"><span class="mini-av">BM</span><span style="font:var(--hs-type-body-sm-b)">Bryn Morales</span></div></td><td>Connected social account</td><td class="secd" style="margin:0">LinkedIn · somos_li</td></tr><tr><td style="white-space:nowrap">Jun 22, 2026 · 16:20</td><td><div class="rowflex"><span class="mini-av">AP</span><span style="font:var(--hs-type-body-sm-b)">Aisha Patel</span></div></td><td>Enabled MFA enforcement</td><td class="secd" style="margin:0">Organization: Somos</td></tr><tr><td style="white-space:nowrap">Jun 22, 2026 · 09:05</td><td><div class="rowflex"><span class="mini-av">CL</span><span style="font:var(--hs-type-body-sm-b)">Chaya Levi</span></div></td><td>Exported conversation data</td><td class="secd" style="margin:0">Team: Cage Lyfe</td></tr><tr><td style="white-space:nowrap">Jun 21, 2026 · 18:33</td><td><div class="rowflex"><span class="mini-av">AP</span><span style="font:var(--hs-type-body-sm-b)">Aisha Patel</span></div></td><td>Removed member</td><td class="secd" style="margin:0">contractor@external.com</td></tr></tbody></table></div><div class="hs-alert hs-alert--info"><span class="material-symbols-outlined">info</span><div>Retention of audit events follows your organization retention policy. Enterprise plans retain 12 months.</div></div></div></div>
+</main>
+</div>
+<script src="app.js"></script>
+</body></html>

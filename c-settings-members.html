@@ -1,0 +1,244 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suite Settings · Recommended (C)</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+<link rel="stylesheet" href="templates/src/suite-shell.css">
+<link rel="stylesheet" href="templates/src/suite-drawer.css">
+<style>
+ html,body{margin:0;height:100%;background:var(--bento-theme-color-bg-app);}
+ .set-scroll{flex:1;overflow:auto;}
+ .set-wrap{max-width:860px;margin:0 auto;padding:28px 40px 80px;}
+ .set-head{margin:0 0 4px;font:var(--hs-type-title-screen);color:var(--bento-theme-color-text-base);}
+ .set-sub{margin:0 0 20px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);}
+ .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:20px;}
+ .rowflex{display:flex;align-items:center;gap:12px;}
+ .secd{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ table.hs-table{width:100%;border-collapse:collapse;}
+ .hs-table th{text-align:left;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);padding:10px 12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ .hs-table td{font:var(--hs-type-body-sm);padding:12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);vertical-align:middle;}
+ .mini-av{width:28px;height:28px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-meta-b);}
+ .hs-input.affix{display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;}
+ .hs-input.affix input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);height:100%;}
+ .hs-input.affix .lead{color:var(--bento-theme-color-icon-subtle);font-size:20px;}
+ .protobar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:999px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:5px 10px 5px 14px;display:flex;align-items:center;gap:8px;}
+ .protobar .pl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
+ .protobar select{border:0;background:transparent;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);cursor:pointer;}
+
+ /* ---------- drawer: give the sections room to breathe ---------- */
+ .suite-drawer .sd-body{padding:6px 14px 20px;}
+ .suite-drawer .sd-group{margin-top:10px;padding:14px 10px 6px;border-top:1px solid var(--bento-theme-color-border-subtle);
+   font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--bento-theme-color-text-subtle);
+   display:flex;align-items:center;}
+ .suite-drawer .sd-group.first{border-top:0;margin-top:2px;padding-top:4px;}
+ .suite-drawer .sd-item{height:44px;font-size:15px;gap:12px;margin:1px 0;}
+ .suite-drawer .sd-item .material-symbols-outlined{font-size:20px;}
+ .suite-drawer .sd-item .tag{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);white-space:nowrap;}
+ .suite-drawer .sd-item .tag.t-own{color:var(--bento-system-sys-positive-600,#0a7d2c);}
+ .suite-drawer .sd-item .ext{margin-left:8px;font-size:18px;color:var(--bento-theme-color-icon-subtle);}
+ .suite-drawer .sd-item .tag:empty{display:none;}
+ /* a row this role can't see — only shown in demo "reveal" mode */
+ .suite-drawer .sd-item.is-muted{opacity:.48;}
+ .suite-drawer .sd-item.is-muted .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);}
+ .suite-drawer .sd-item .tag.t-hidden{color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;}
+ .gated{margin-left:8px;font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;text-transform:none;letter-spacing:0;}
+
+ /* ---------- role-preview control (prototype affordance) ---------- */
+ .rolebox{background:var(--bento-theme-color-bg-surface-recessed);border:1px solid var(--bento-theme-color-border-subtle);border-radius:10px;padding:10px;margin:2px 0 2px;}
+ .rolebox .rb-cap{display:flex;align-items:center;gap:6px;font:var(--hs-type-meta-b);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--bento-theme-color-text-subtle);margin-bottom:7px;}
+ .rolebox .rb-cap .material-symbols-outlined{font-size:15px;}
+ .rolebox select{width:100%;box-sizing:border-box;border:1px solid var(--bento-theme-color-border-base);border-radius:8px;background:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);cursor:pointer;padding:9px 10px;}
+ .rolebox .rb-reveal{display:flex;align-items:center;gap:8px;margin-top:9px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);cursor:pointer;}
+ .rolebox .rb-reveal input{width:16px;height:16px;cursor:pointer;flex:none;}
+
+ /* topbar role chip */
+ .rolechip{display:inline-flex;align-items:center;gap:6px;margin-left:auto;background:var(--bento-system-sys-neutral-alt-200);border-radius:999px;padding:5px 14px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .rolechip .material-symbols-outlined{font-size:16px;color:var(--bento-theme-color-icon-subtle);}
+
+ /* annotations in content */
+ .cnote{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-left:4px solid var(--bento-system-sys-primary-500);border-radius:10px;padding:12px 16px;margin:0 0 14px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .cnote b{font:var(--hs-type-body-sm-b);}
+ .rolenote{display:flex;gap:10px;align-items:flex-start;background:var(--bento-theme-color-bg-surface-recessed);border-radius:10px;padding:12px 16px;margin:0 0 14px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .rolenote .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);}
+ .revealnote{display:none;gap:8px;align-items:flex-start;background:var(--bento-component-alert-warning-fill,#fff4d6);border-radius:8px;padding:10px 14px;margin:0 0 14px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .revealnote .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-icon-warning,#b06f00);flex:none;}
+ .noaccess{display:none;gap:10px;align-items:flex-start;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-left:4px solid var(--bento-theme-color-icon-warning,#b06f00);border-radius:10px;padding:12px 16px;margin:0 0 16px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .noaccess .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);flex:none;}
+
+ /* popover */
+ .popwrap{position:fixed;inset:0;z-index:9998;display:none;}
+ .popwrap.open{display:block;}
+ .pop{position:fixed;left:88px;bottom:14px;width:316px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);overflow:hidden;}
+ .pop .idr{display:flex;gap:12px;align-items:center;padding:16px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ .pop .idr .nm{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .pop .plan{display:inline-block;margin-top:5px;font:var(--hs-type-meta-b);background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);border-radius:6px;padding:2px 8px;}
+ .pop .pi{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;text-decoration:none;color:var(--bento-theme-color-text-base);}
+ .pop .pi:hover{background:rgba(28,28,28,0.05);}
+ .pop .pi .material-symbols-outlined{font-size:22px;color:var(--bento-theme-color-icon-base);margin-top:1px;}
+ .pop .pt{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .pop .pd{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
+ .pop .chev{margin-left:auto;color:var(--bento-theme-color-icon-subtle);}
+ .pop .div{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .suite-navbtn.is-selected .circle{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
+</style></head><body>
+<div class="protobar"><span class="pl">Prototype version</span>
+ <select onchange="if(this.value)location.href=this.value" aria-label="Switch prototype version">
+  <option value="s2b-account-figma.html">Figma-matched (A)</option>
+  <option value="s7-org-members.html">Original build (B)</option>
+  <option value="c-settings-members.html" selected>Recommended (C)</option>
+ </select></div>
+
+<div class="suite-app">
+<aside class="suite-rail">
+ <a class="suite-brand" href="index.html" aria-label="Home"><img src="assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+ <div class="main">
+  <a class="suite-navbtn" href="#" aria-label="Perch"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Nest"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Lumen"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Parliament"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Wisdom"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Vigil"><span class="circle"><span class="material-symbols-outlined">gpp_good</span></span><span class="lbl">Vigil</span></a>
+ </div>
+ <div class="others">
+  <a class="suite-navbtn util is-selected" href="c-settings-members.html" aria-label="Settings" title="Settings"><span class="circle"><span class="material-symbols-outlined">settings</span></span></a>
+  <a class="suite-navbtn util" href="#" aria-label="Notifications" title="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></a>
+  <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
+  <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><span class="mini-av" style="width:36px;height:36px;font:var(--hs-type-body-sm-b)">MW</span></span></a>
+ </div>
+</aside>
+
+<aside class="suite-drawer">
+ <div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div>
+ <div class="sd-body">
+
+  <div class="rolebox">
+   <div class="rb-cap"><span class="material-symbols-outlined">science</span>Prototype · preview a role</div>
+   <select id="roleSel" onchange="setRole(this.value)" aria-label="Preview a role">
+    <optgroup label="Organization roles">
+     <option value="sa" selected>Super Admin</option>
+     <option value="admin">Admin</option>
+     <option value="pm">Paying Member</option>
+     <option value="view">View Only</option>
+    </optgroup>
+    <optgroup label="Specialized (approx.)">
+     <option value="hootdesk">Hootdesk Settings Admin</option>
+     <option value="care">Care Agent</option>
+    </optgroup>
+    <optgroup label="Custom">
+     <option value="custom">Custom (example)</option>
+    </optgroup>
+   </select>
+   <label class="rb-reveal"><input type="checkbox" id="revealChk" onchange="setReveal(this.checked)">Show what this role can&rsquo;t see</label>
+  </div>
+
+  <div class="sd-group first" data-grp="account">Account</div>
+  <a class="sd-item" data-grp="account" data-id="profile"  data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="#"><span class="material-symbols-outlined">person</span>Profile<span class="tag"></span></a>
+  <a class="sd-item" data-grp="account" data-id="prefs"    data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="#"><span class="material-symbols-outlined">tune</span>Preferences<span class="tag"></span></a>
+  <a class="sd-item" data-grp="account" data-id="security" data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="#"><span class="material-symbols-outlined">lock</span>Security &amp; privacy<span class="tag"></span></a>
+  <a class="sd-item" data-grp="account" data-id="notifs"   data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="#"><span class="material-symbols-outlined">notifications</span>Notifications<span class="tag"></span></a>
+
+  <div class="sd-group" data-grp="org">Organization</div>
+  <a class="sd-item" data-grp="org" data-id="overview" data-acc="view:R admin:E sa:E pm:E hootdesk:R care:H custom:R" href="#"><span class="material-symbols-outlined">domain</span>Overview<span class="tag"></span></a>
+  <a class="sd-item" data-grp="org" data-id="members"  data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-settings-members.html"><span class="material-symbols-outlined">group</span>Members<span class="tag"></span></a>
+  <a class="sd-item" data-grp="org" data-id="teams"    data-acc="view:R admin:E sa:E pm:E hootdesk:R care:H custom:E" href="#"><span class="material-symbols-outlined">groups</span>Teams<span class="tag"></span></a>
+  <a class="sd-item" data-grp="org" data-id="social"   data-acc="view:R admin:E sa:E pm:E hootdesk:R care:R custom:E" href="#"><span class="material-symbols-outlined">hub</span>Social &amp; ad accounts<span class="tag"></span></a>
+  <a class="sd-item" data-grp="org" data-id="roles"    data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:H" href="#"><span class="material-symbols-outlined">admin_panel_settings</span>Roles &amp; permissions<span class="tag"></span></a>
+  <a class="sd-item" data-grp="org" data-id="billing"  data-acc="view:H admin:H sa:R pm:E hootdesk:H care:H custom:H" href="#"><span class="material-symbols-outlined">credit_card</span>Billing &amp; plan<span class="tag"></span></a>
+
+  <div class="sd-group" data-grp="sec">Security &amp; governance <span class="gated">Enterprise</span></div>
+  <a class="sd-item" data-grp="sec" data-id="sso"    data-acc="view:H admin:H sa:E pm:E hootdesk:H care:H custom:H" href="#"><span class="material-symbols-outlined">key</span>SSO &amp; MFA<span class="tag"></span></a>
+  <a class="sd-item" data-grp="sec" data-id="audit"  data-acc="view:H admin:H sa:R pm:R hootdesk:H care:H custom:H" href="#"><span class="material-symbols-outlined">history</span>Audit log<span class="tag"></span></a>
+  <a class="sd-item" data-grp="sec" data-id="export" data-acc="view:H admin:H sa:R pm:R hootdesk:H care:H custom:H" href="#"><span class="material-symbols-outlined">download</span>Data export<span class="tag"></span></a>
+
+  <div class="sd-group" data-grp="int">Integrations</div>
+  <a class="sd-item" data-grp="int" data-id="apps" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="#"><span class="material-symbols-outlined">apps</span>Apps<span class="tag"></span></a>
+  <a class="sd-item" data-grp="int" data-id="mcp"  data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="#"><span class="material-symbols-outlined">extension</span>MCP connectors<span class="tag"></span></a>
+
+  <div class="sd-group" data-grp="prod">Product settings</div>
+  <a class="sd-item" data-grp="prod" data-id="nest"  data-acc="view:H admin:E sa:E pm:E hootdesk:E care:E custom:E" href="#"><span class="material-symbols-outlined">inbox</span>Nest (Inbox)<span class="tag"></span><span class="material-symbols-outlined ext">open_in_new</span></a>
+  <a class="sd-item" data-grp="prod" data-id="lumen" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="#"><span class="material-symbols-outlined">graphic_eq</span>Lumen<span class="tag"></span><span class="material-symbols-outlined ext">open_in_new</span></a>
+ </div>
+</aside>
+
+<main class="suite-main">
+ <div class="suite-topbar"><h1>Settings</h1>
+  <span class="rolechip"><span class="material-symbols-outlined">visibility</span>Viewing as <strong id="roleChip" style="margin-left:2px">Super Admin</strong></span>
+ </div>
+ <div class="set-scroll"><div class="set-wrap">
+   <div class="cnote"><b>Recommended IA (C).</b> Nav grouped by scope (Account = you, Organization = the company), not a flat list. Use <b>Preview a role</b> in the left nav to see exactly what each role gets, and turn on <b>&ldquo;Show what this role can&rsquo;t see&rdquo;</b> to reveal the gaps. Security &amp; governance is nested under Organization and only appears when the org is entitled. Workspace is held (its items may belong to Perch). Settings now lives in the rail (left), not only behind the avatar.</div>
+   <div class="rolenote"><span class="material-symbols-outlined">visibility</span><span id="roleNote"></span></div>
+   <div class="revealnote" id="revealNote"><span class="material-symbols-outlined">info</span><span>Demo view: dimmed rows with a <b>hidden</b> tag are <b>not shown</b> to this role in the real product (we hide, we don&rsquo;t grey out). Turn the toggle off for the true experience.</span></div>
+   <div class="noaccess" id="noAccess"><span class="material-symbols-outlined">lock</span><span id="noAccessTxt"></span></div>
+   <h2 class="set-head">Members</h2><p class="set-sub">440 members · invite people and manage their access.</p>
+   <div class="rowflex" style="justify-content:space-between;margin-bottom:16px"><div class="hs-input affix" style="max-width:320px"><span class="material-symbols-outlined lead">search</span><input placeholder="Search members…"></div><div class="rowflex"><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">upload</span>Bulk upload CSV</button><button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">person_add</span>Invite members</button></div></div>
+   <div class="set-card"><table class="hs-table"><thead><tr><th>Member</th><th>Role</th><th>Access via</th><th>Added</th><th></th></tr></thead><tbody>
+    <tr><td><div class="rowflex"><span class="mini-av">AP</span><div><div style="font:var(--hs-type-body-sm-b)">Aisha Patel</div><div class="secd">aisha.patel@somos.com</div></div></div></td><td><span class="hs-badge hs-badge--info">Super Admin</span></td><td class="secd">Direct</td><td>Jun 20, 2024</td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+    <tr><td><div class="rowflex"><span class="mini-av">BM</span><div><div style="font:var(--hs-type-body-sm-b)">Bryn Morales</div><div class="secd">bryn.morales@somos.com</div></div></div></td><td><span class="hs-badge hs-badge--neutral">Admin</span></td><td class="secd">Direct</td><td>Jun 20, 2024</td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+    <tr><td><div class="rowflex"><span class="mini-av">CL</span><div><div style="font:var(--hs-type-body-sm-b)">Chaya Levi</div><div class="secd">chaya.levi@somos.com</div></div></div></td><td><span class="hs-badge hs-badge--neutral">Team Member</span></td><td class="secd">via Growth Team</td><td>Jun 20, 2024</td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+    <tr><td><div class="rowflex"><span class="mini-av">DK</span><div><div style="font:var(--hs-type-body-sm-b)">Dar Khan</div><div class="secd">dar.khan@somos.com</div></div></div></td><td><span class="hs-badge hs-badge--neutral">View Only</span></td><td class="secd">Direct</td><td>Jun 20, 2024</td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+   </tbody></table></div>
+   <div class="hs-field-hint" style="margin-top:8px">Bulk upload: up to 500 rows per file. &ldquo;Access via&rdquo; shows whether a role is held directly or through a team (provenance) — the relationship-model question Hill flagged.</div>
+ </div></div>
+</main>
+</div>
+
+<div class="popwrap" id="popwrap" onclick="togglePop()">
+ <div class="pop" onclick="event.stopPropagation()">
+  <div class="idr"><span class="mini-av" style="width:44px;height:44px;font:var(--hs-type-body-md-b)">MW</span><div><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div></div>
+  <a class="pi" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div><div class="pt">Settings</div><div class="pd">Manage profile, teams, social accounts, and more</div></div></a>
+  <a class="pi" href="#"><span class="material-symbols-outlined">help</span><div><div class="pt">Help</div><div class="pd">Tours, articles, and contact channels</div></div><span class="material-symbols-outlined chev">chevron_right</span></a>
+  <div class="div"></div>
+  <a class="pi" href="#"><span class="material-symbols-outlined">logout</span><div><div class="pt">Sign out</div></div></a>
+ </div>
+</div>
+
+<script>
+ function togglePop(){document.getElementById('popwrap').classList.toggle('open');}
+ var ROLE_LABEL={view:'View Only',admin:'Admin',sa:'Super Admin',pm:'Paying Member',hootdesk:'Hootdesk Settings Admin',care:'Care Agent',custom:'Custom (example)'};
+ var NOTES={
+  view:"View Only sees their own Account, plus read-only views of the teams and accounts they're on. All org management is hidden.",
+  admin:"Admin manages members, teams, social accounts, roles and integrations. Billing and Security & governance stay hidden. (A few cells, like MFA mandate and audit access, are still open questions for eng.)",
+  sa:"Super Admin sees everything Admin does, plus Billing (read only) and, when the org is entitled, Security & governance. Data-export scope is still an open question.",
+  pm:"Paying Member is the billing owner: same view as Super Admin, but edits Billing and is the only role that can delete the organization.",
+  hootdesk:"Hootdesk Settings Admin (approximate): a View Only baseline plus Hootdesk / Inbox settings. Confirm exact Settings visibility with eng.",
+  care:"Care Agent (approximate): Inbox-focused. Their own Account plus the accounts they respond on, and minimal org Settings. Confirm with eng.",
+  custom:"Custom (example): roles are hand-picked and plan-gated. This example shows Admin minus Billing and Governance; real configs vary."
+ };
+ var curRole='sa', reveal=false;
+ function parseAcc(s){var o={};(s||'').trim().split(/\s+/).forEach(function(p){var kv=p.split(':');if(kv[0])o[kv[0]]=kv[1];});return o;}
+ function setRole(r){curRole=r;var sel=document.getElementById('roleSel');if(sel&&sel.value!==r)sel.value=r;sync();}
+ function setReveal(b){reveal=b;sync();}
+ function sync(){
+  document.querySelectorAll('.sd-item[data-acc]').forEach(function(it){
+   var acc=parseAcc(it.dataset.acc)[curRole]||'H';
+   var tag=it.querySelector('.tag');
+   it.classList.remove('is-muted','on');
+   if(acc==='H'){
+    if(reveal){it.style.display='';it.classList.add('is-muted');if(tag){tag.className='tag t-hidden';tag.innerHTML='<span class="material-symbols-outlined" style="font-size:13px">visibility_off</span>hidden';}}
+    else{it.style.display='none';}
+   }else{
+    it.style.display='';
+    if(acc==='R'){if(tag){tag.className='tag';tag.textContent='read-only';}}
+    else{if(tag){if(it.dataset.id==='billing'&&curRole==='pm'){tag.className='tag t-own';tag.textContent='billing owner';}else{tag.className='tag';tag.textContent='';}}}
+    if(it.dataset.id==='members')it.classList.add('on');
+   }
+  });
+  document.querySelectorAll('.sd-group[data-grp]').forEach(function(g){
+   var grp=g.dataset.grp,any=false;
+   document.querySelectorAll('.sd-item[data-grp="'+grp+'"]').forEach(function(it){if(it.style.display!=='none')any=true;});
+   g.style.display=any?'':'none';
+  });
+  document.getElementById('roleChip').textContent=ROLE_LABEL[curRole];
+  document.getElementById('roleNote').textContent=NOTES[curRole];
+  document.getElementById('revealNote').style.display=reveal?'flex':'none';
+  var mItem=document.querySelector('.sd-item[data-id="members"]');
+  var mAcc=mItem?(parseAcc(mItem.dataset.acc)[curRole]||'H'):'H';
+  var na=document.getElementById('noAccess');
+  if(mAcc==='H'){na.style.display='flex';document.getElementById('noAccessTxt').innerHTML='<b>Members</b> isn’t part of what '+ROLE_LABEL[curRole]+' can access in the real product. Shown here for reference so you can compare.';}
+  else{na.style.display='none';}
+ }
+ sync();
+</script>
+<script src="app.js"></script>
+</body></html>

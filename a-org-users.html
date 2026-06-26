@@ -1,0 +1,177 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suite Settings A · Organization · Users</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+<link rel="stylesheet" href="templates/src/suite-shell.css">
+<link rel="stylesheet" href="templates/src/suite-drawer.css">
+<style>
+ html,body{margin:0;height:100%;background:var(--bento-theme-color-bg-app);}
+ /* content cards */
+ .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:20px;}
+ .pad{padding:24px;} .pad+.pad{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .sec{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);margin:0 0 6px;}
+ .secd{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 16px;}
+ .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;} .full{grid-column:1/-1;}
+ .rowflex{display:flex;align-items:center;gap:12px;}
+ .between{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+ .between+.between{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .avatar-lg{width:56px;height:56px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-title-sub);}
+ .stat{display:flex;gap:32px;} .stat .n{font:var(--hs-type-title-screen);} .stat .l{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
+ table.hs-table{width:100%;border-collapse:collapse;}
+ .hs-table th{text-align:left;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);padding:10px 12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ .hs-table td{font:var(--hs-type-body-sm);padding:12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);vertical-align:middle;}
+ .mini-av{width:28px;height:28px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-meta-b);}
+ textarea.hs-input{min-height:72px;resize:vertical;padding:8px 12px;}
+ .locked{opacity:.55;}
+ .hs-input.affix{display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;}
+ .hs-input.affix input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);height:100%;}
+ .hs-input.affix .lead{color:var(--bento-theme-color-icon-subtle);font-size:20px;}
+ /* prototype version switcher */
+ .protobar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:999px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:5px 10px 5px 14px;display:flex;align-items:center;gap:8px;}
+ .protobar .pl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
+ .protobar select{border:0;background:transparent;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);cursor:pointer;}
+ /* drawer */
+ .suite-drawer .sd-body{padding-top:0;}
+ .sd-item{padding:14px 16px;font-size:16px;}
+ /* top nav bar (section title + org switcher) */
+ .topnav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;border-bottom:1px solid var(--bento-theme-color-border-subtle);background:var(--bento-theme-color-bg-surface);flex-shrink:0;}
+ .topnav h1{font:var(--hs-type-title-section);color:var(--bento-theme-color-text-base);margin:0;}
+ .org-switch{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;cursor:pointer;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);padding:4px 8px;border-radius:8px;}
+ .org-switch:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .org-av{width:28px;height:28px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-meta-b);}
+ .org-switch .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-icon-subtle);}
+ /* tab strip */
+ .tab-strip{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;background:var(--bento-theme-color-bg-app);border-bottom:1px solid var(--bento-theme-color-border-subtle);flex-shrink:0;}
+ .tabs2{display:flex;gap:16px;flex-wrap:wrap;align-self:stretch;align-items:stretch;}
+ .tab2{display:flex;align-items:center;padding:0;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);text-decoration:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+ .tab2:hover{color:var(--bento-theme-color-text-base);}
+ .tab2.on{color:var(--bento-theme-color-text-base);border-bottom-color:var(--bento-theme-color-text-base);font:var(--hs-type-body-sm-b);}
+ .tab-tools{display:flex;align-items:center;gap:8px;}
+ .search-box{display:flex;align-items:center;gap:8px;padding:0 12px;width:280px;height:40px;border:1px solid var(--bento-theme-color-border-subtle);border-radius:8px;background:var(--bento-theme-color-bg-surface);}
+ .search-box:focus-within{border-color:var(--hs-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
+ .search-box input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);height:100%;}
+ .search-box .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-icon-subtle);}
+ /* scrollable centred content */
+ .s-scroll{flex:1;overflow:auto;background:var(--bento-theme-color-bg-surface-recessed);}
+ .s-wrap{max-width:720px;margin:0 auto;padding:32px 32px 64px;}
+ /* wide content (for data tables) */
+ .s-wide{max-width:none;margin:0;padding:32px 32px 64px;}
+
+ /* === Org flow additions (Figma 1580:160232) === */
+ /* split button */
+ .split-btn{display:inline-flex;border-radius:8px;overflow:hidden;}
+ .split-btn .main{padding:10px 16px;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-on-primary);background:var(--bento-system-sys-primary-500);border:0;cursor:pointer;}
+ .split-btn .main:hover{opacity:.9;}
+ .split-btn .drop{padding:10px 8px;background:var(--bento-system-sys-primary-500);border:0;border-left:1px solid rgba(255,255,255,.25);cursor:pointer;color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;}
+ .split-btn .drop .material-symbols-outlined{font-size:18px;}
+ /* tool button (view toggle, filter) */
+ .tool-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;height:40px;border:1px solid var(--bento-theme-color-border-subtle);border-radius:8px;background:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);cursor:pointer;white-space:nowrap;box-sizing:border-box;}
+ .tool-btn:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .tool-btn .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-icon-subtle);}
+ /* count header */
+ .dt-count{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);margin:0;}
+ .dt-sub{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:4px 0 0;}
+ /* data table */
+ .dt{width:100%;border-collapse:separate;border-spacing:0;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;overflow:hidden;}
+ .dt th{text-align:left;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);padding:14px 16px;border-bottom:1px solid var(--bento-theme-color-border-subtle);border-right:1px solid var(--bento-theme-color-border-subtle);white-space:nowrap;}
+ .dt th:last-child{border-right:0;}
+ .dt th .material-symbols-outlined{font-size:16px;vertical-align:middle;margin-left:2px;color:var(--bento-theme-color-icon-subtle);}
+ .dt td{font:var(--hs-type-body-sm);padding:16px;border-bottom:1px solid var(--bento-theme-color-border-subtle);border-right:1px solid var(--bento-theme-color-border-subtle);vertical-align:middle;}
+ .dt td:last-child{border-right:0;}
+ .dt tbody tr:last-child td{border-bottom:0;}
+ .dt .cb{width:40px;text-align:center;padding-left:16px;padding-right:0;}
+ .dt .acts{width:48px;text-align:right;padding-right:16px;}
+ .dt .ck{width:16px;height:16px;accent-color:var(--bento-system-sys-primary-500);}
+ /* status badge */
+ .st{display:inline-flex;align-items:center;gap:4px;font:var(--hs-type-body-sm-b);padding:4px 10px;border-radius:6px;}
+ .st .material-symbols-outlined{font-size:14px;}
+ .st-active{color:var(--bento-system-sys-positive-700);background:var(--bento-system-sys-positive-100);}
+ .st-pending{color:#7a5900;background:#fef3cd;}
+ .st-connected{color:var(--bento-system-sys-positive-700);background:var(--bento-system-sys-positive-100);}
+ .st-disconnected{color:#7a5900;background:#fef3cd;}
+ /* network icon */
+ .ni{width:22px;height:22px;border-radius:999px;display:inline-grid;place-items:center;font:700 11px/22px sans-serif;color:#fff;flex-shrink:0;}
+ .ni-fb{background:#1877F2;} .ni-ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);} .ni-x{background:#000;} .ni-tt{background:#000;} .ni-wa{background:#25D366;} .ni-rd{background:#FF4500;} .ni-go{background:#4285F4;} .ni-yt{background:#FF0000;} .ni-li{background:#0A66C2;} .ni-pi{background:#E60023;}
+ /* avatar stack */
+ .av-stack{display:inline-flex;vertical-align:middle;}
+ .av-stack .av{width:28px;height:28px;border-radius:999px;border:2px solid var(--bento-theme-color-bg-surface);margin-left:-8px;display:inline-grid;place-items:center;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-base);}
+ .av-stack .av:first-child{margin-left:0;}
+ .av-stack .av-more{width:28px;height:28px;border-radius:999px;border:2px solid var(--bento-theme-color-bg-surface);margin-left:-8px;background:var(--bento-system-sys-neutral-alt-300);display:inline-grid;place-items:center;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-base);}
+ /* card grid */
+ .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+ .org-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:20px;}
+ .org-card .ctop{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;}
+ .org-card .cinfo{flex:1;min-width:0;}
+ .org-card .cname{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .org-card .cemail{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .org-card .cbot{display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
+ .org-card .crole{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ .org-card .cmeta{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ /* detail page back nav */
+ .detail-nav{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+ .detail-nav .back{display:grid;place-items:center;width:40px;height:40px;border-radius:999px;border:0;background:transparent;cursor:pointer;color:var(--bento-theme-color-icon-base);}
+ .detail-nav .back:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .detail-nav h1{font:var(--hs-type-title-section);color:var(--bento-theme-color-text-base);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ /* perm dropdown */
+ .perm{display:inline-flex;align-items:center;gap:2px;font:var(--hs-type-body-sm);cursor:pointer;border:0;background:transparent;padding:0;color:var(--bento-theme-color-text-base);}
+ .perm .material-symbols-outlined{font-size:16px;color:var(--bento-theme-color-icon-subtle);}
+ /* modal */
+ .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:9000;}
+ .modal{background:var(--bento-theme-color-bg-surface);border-radius:16px;padding:32px;max-width:680px;width:calc(100% - 64px);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);position:relative;}
+ .modal h2{font:var(--hs-type-title-sub);margin:0 0 8px;}
+ .modal .mdesc{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 24px;}
+ .modal .mx{position:absolute;top:24px;right:24px;border:0;background:transparent;cursor:pointer;color:var(--bento-theme-color-icon-base);padding:0;}
+ .modal .mfoot{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .info-box{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:8px;background:#eef5ff;margin-bottom:20px;}
+ .info-box .material-symbols-outlined{color:#1a73e8;font-size:20px;flex-shrink:0;margin-top:2px;}
+ .info-box div{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .dropzone{border:2px dashed var(--bento-theme-color-border-base);border-radius:8px;padding:32px;text-align:center;}
+ .dropzone p{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);margin:0 0 12px;}
+ /* context menu */
+ .ctx{position:absolute;right:16px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);min-width:240px;padding:8px 0;z-index:100;display:none;}
+ .ctx.show{display:block;}
+ .ctx a{display:block;padding:12px 16px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);text-decoration:none;}
+ .ctx a:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .ctx a.danger{color:var(--bento-theme-color-text-negative);}
+</style></head><body>
+<div class="protobar"><span class="pl">Prototype version</span>
+ <select onchange="if(this.value)location.href=this.value" aria-label="Switch prototype version">
+  <option value="s2b-account-figma.html" selected>Figma-matched (A)</option>
+  <option value="s2-account-profile.html">Original build (B)</option>
+ </select></div>
+<div class="suite-app">
+<aside class="suite-rail">
+ <a class="suite-brand" href="index.html" aria-label="Home"><img src="assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+ <div class="main">
+  <a class="suite-navbtn" href="#" aria-label="Perch"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Nest"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Lumen"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Parliament"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Wisdom"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+  <a class="suite-navbtn" href="#" aria-label="Vigil"><span class="circle"><span class="material-symbols-outlined">gpp_good</span></span><span class="lbl">Vigil</span></a>
+ </div>
+ <div class="others">
+  <a class="suite-navbtn util" href="#" aria-label="Analytics" title="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></a>
+  <a class="suite-navbtn util" href="#" aria-label="Notifications" title="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></a>
+  <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
+  <a class="suite-navbtn util" href="s1-entry-flyout.html" aria-label="Account" title="Account"><span class="circle"><span class="org-av" style="width:36px;height:36px">AA</span></span></a>
+ </div>
+</aside>
+<aside class="suite-drawer">
+ <div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div>
+ <div class="sd-body"><a class="sd-item" href="s2b-account-figma.html"><span class="material-symbols-outlined">person</span>Account</a>
+<a class="sd-item on" href="a-org-overview.html"><span class="material-symbols-outlined">apartment</span>Organization</a>
+<a class="sd-item" href="a-workspace.html"><span class="material-symbols-outlined">hub</span>Workspace</a></div>
+</aside>
+<main class="suite-main">
+ <div class="topnav"><h1>Organization</h1><div style="display:flex;align-items:center;gap:8px"><button class="org-switch"><span class="org-av">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button><div class="split-btn"><button class="main">Create organization</button><button class="drop"><span class="material-symbols-outlined">expand_more</span></button></div></div></div>
+ <div class="tab-strip"><nav class="tabs2"><a class="tab2" href="a-org-overview.html">Overview</a><a class="tab2 on" href="a-org-users.html">Users</a><a class="tab2" href="a-org-teams.html">Teams</a><a class="tab2" href="a-org-social.html">Social accounts</a></nav><div class="tab-tools"><div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search users, teams or accounts"></div><button class="tool-btn"><span class="material-symbols-outlined">view_column</span>Column view<span class="material-symbols-outlined">expand_more</span></button><button class="tool-btn">Filter<span class="material-symbols-outlined">expand_more</span></button></div></div>
+ <div class="s-scroll"><div class="s-wide"><div style="margin-bottom:32px"><div class="dt-count">30 users in Somos</div><div class="dt-sub">25 active &middot; 5 pending</div></div><table class="dt"><thead><tr><th class="cb"><input type="checkbox" class="ck"></th><th>User name <span class="material-symbols-outlined">arrow_drop_down</span></th><th>Added on <span class="material-symbols-outlined">arrow_drop_down</span></th><th>Email <span class="material-symbols-outlined">arrow_drop_down</span></th><th>Teams <span class="material-symbols-outlined">arrow_drop_down</span></th><th>Social accounts <span class="material-symbols-outlined">arrow_drop_down</span></th><th>Status <span class="material-symbols-outlined">arrow_drop_down</span></th><th>Actions</th></tr></thead><tbody><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Aisha Patel</a></span></div></td><td>Mar 12, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">aisha.patel@somos.…</td><td>5</td><td>5</td><td><span class="st st-active"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Bryn Morales</a></span></div></td><td>Apr 5, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">bryn.morales@somos…</td><td>2</td><td>2</td><td><span class="st st-active"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Chaya Levi</a></span></div></td><td>May 20, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">chaya.levi@somos.c…</td><td>6</td><td>6</td><td><span class="st st-active"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Dar Khan</a></span></div></td><td>Jun 1, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">dar.khan@somos.com…</td><td>2</td><td>2</td><td><span class="st st-pending"><span class="material-symbols-outlined">warning</span>Pending</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Elena Sato</a></span></div></td><td>Jul 15, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">elena.sato@somos.c…</td><td>0</td><td>0</td><td><span class="st st-active"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Farid Osei</a></span></div></td><td>Aug 9, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">farid.osei@somos.c…</td><td>1</td><td>1</td><td><span class="st st-active"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Grace Lin</a></span></div></td><td>Sep 23, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">grace.lin@somos.co…</td><td>10</td><td>10</td><td><span class="st st-pending"><span class="material-symbols-outlined">warning</span>Pending</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td class="cb"><input type="checkbox" class="ck"></td><td><div class="rowflex"><span class="material-symbols-outlined" style="font-size:22px;color:var(--bento-theme-color-icon-subtle)">person</span><span style="font:var(--hs-type-body-sm-b)"><a href="a-org-user-detail.html" style="text-decoration:none;color:inherit">Hugo Fernandez</a></span></div></td><td>Oct 30, 2024</td><td style="color:var(--bento-theme-color-text-subtle)">hugo.fernandez@som…</td><td>7</td><td>7</td><td><span class="st st-active"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td class="acts"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr></tbody></table></div></div>
+</main>
+</div>
+
+<script src="app.js"></script>
+</body></html>
