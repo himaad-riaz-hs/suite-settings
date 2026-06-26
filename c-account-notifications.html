@@ -40,6 +40,16 @@
  .protobar .pl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
  .protobar select{border:0;background:transparent;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);cursor:pointer;}
 
+ /* bulk-select action bar (DX-3607: apply a role to many at once) — composed from Bento primitives */
+ .bulkbar{display:flex;align-items:center;gap:12px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:10px;padding:9px 14px;margin-bottom:16px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
+ .bulkbar .bb-count{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+ .bb-role{position:relative;}
+ .bb-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:50;min-width:184px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:10px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:6px;display:none;}
+ .bb-menu.open{display:block;}
+ .bb-menu button{display:flex;width:100%;align-items:center;border:0;background:transparent;cursor:pointer;text-align:left;padding:8px 10px;border-radius:8px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+ .bb-menu button:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .hs-table .hs-check{cursor:pointer;vertical-align:middle;}
+
  /* drawer: clean, sectioned, pure design */
  .suite-drawer .sd-body{padding:6px 14px 20px;}
  .suite-drawer .sd-group{margin-top:10px;padding:14px 10px 6px;border-top:1px solid var(--bento-theme-color-border-subtle);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--bento-theme-color-text-subtle);display:flex;align-items:center;}
@@ -220,6 +230,13 @@
 <script>
  function togglePop(){document.getElementById('popwrap').classList.toggle('open');}
  function acTog(h){h.parentElement.classList.toggle('open');}
+ function bbMenu(e){e.stopPropagation();var m=document.getElementById('bbMenu');if(m)m.classList.toggle('open');}
+ function bulkCount(){var bar=document.getElementById('bulkBar');if(!bar)return;var rows=document.querySelectorAll('.rowsel');var n=document.querySelectorAll('.rowsel.is-on').length;document.getElementById('bbN').textContent=n;bar.style.display=n?'flex':'none';var all=document.getElementById('selAll');if(all)all.classList.toggle('is-on',n>0&&n===rows.length);}
+ function bulkRow(el){el.classList.toggle('is-on');bulkCount();}
+ function bulkAll(el){var on=!el.classList.contains('is-on');document.querySelectorAll('.rowsel').forEach(function(r){r.classList.toggle('is-on',on);});bulkCount();}
+ function bulkClear(){document.querySelectorAll('.rowsel,#selAll').forEach(function(r){r.classList.remove('is-on');});var m=document.getElementById('bbMenu');if(m)m.classList.remove('open');bulkCount();}
+ function bulkApply(role){document.querySelectorAll('.rowsel.is-on').forEach(function(r){var tr=r.closest('tr');var b=tr&&tr.querySelector('.rolebadge');if(b){b.textContent=role;b.className='hs-badge '+(role==='Super Admin'?'hs-badge--info':'hs-badge--neutral')+' rolebadge';}});bulkClear();}
+ document.addEventListener('click',function(){var m=document.getElementById('bbMenu');if(m)m.classList.remove('open');});
  var ROLE_LABEL={view:'View Only',admin:'Admin',sa:'Super Admin',pm:'Paying Member',hootdesk:'Hootdesk Settings Admin',care:'Care Agent',custom:'Custom (example)'};
  var NOTES={
   view:"View Only sees their own Account, plus read-only views of the teams and accounts they're on. All org management is hidden.",
