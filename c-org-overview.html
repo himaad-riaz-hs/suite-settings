@@ -103,6 +103,7 @@
  .demodock .dd-note.warn{display:flex;gap:6px;align-items:flex-start;color:var(--bento-theme-color-text-base);}
  .demodock .dd-note.warn .material-symbols-outlined{font-size:16px;color:var(--bento-theme-color-icon-warning,#b06f00);flex:none;margin-top:1px;}
  .demodock .dd-rev-hint{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);line-height:1.45;font-style:italic;}
+ .demodock .dd-layers{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);line-height:1.5;border-top:1px solid var(--bento-theme-color-border-subtle);padding-top:9px;}
  .demodock details{border-top:1px solid var(--bento-theme-color-border-subtle);padding-top:9px;}
  .demodock summary{cursor:pointer;font:var(--hs-type-body-sm-b);color:var(--bento-system-sys-primary-600,#1f60c9);list-style:none;}
  .demodock summary::-webkit-details-marker{display:none;}
@@ -196,6 +197,7 @@
   <div class="dd-note" id="ddNote"></div>
   <div class="dd-note warn" id="ddWarn" style="display:none"><span class="material-symbols-outlined">lock</span><span id="ddWarnTxt"></span></div>
   <div class="dd-rev-hint" id="ddRevHint" style="display:none">Dimmed rows with a &ldquo;hidden&rdquo; tag aren&rsquo;t shown to this role in the real product (we hide, not grey).</div>
+  <div class="dd-layers"><b>3 permission layers.</b> This previews the <b>org</b> role (which Settings you see). <b>Team</b> and <b>social-account</b> roles are a separate layer (which teams &amp; accounts you can act on) &mdash; see a person&rsquo;s combined access in Members &rarr; a name.</div>
   <details><summary>Why this layout?</summary><div class="dd-about">Recommended IA (C). Nav grouped by scope (Account = you, Organization = the company), not a flat list. Security &amp; governance is nested under Organization and only appears when the org is entitled. Workspace is held (its items may belong to Perch). Settings now lives in the rail (left), not only behind the avatar.</div></details>
  </div>
 </div>
