@@ -9,7 +9,7 @@
 <style>
  html,body{margin:0;height:100%;background:var(--bento-theme-color-bg-app);}
  .set-scroll{flex:1;overflow:auto;}
- .set-wrap{max-width:860px;margin:0 auto;padding:28px 40px 80px;}
+ .set-wrap{max-width:860px;margin:0 auto;padding:32px 40px 80px;}
  .set-head{margin:0 0 4px;font:var(--hs-type-title-screen);color:var(--bento-theme-color-text-base);}
  .set-sub{margin:0 0 20px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);}
  .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:20px;}
@@ -54,6 +54,26 @@
  .suite-drawer .sd-item.is-muted .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);}
  .suite-drawer .sd-item .tag.t-hidden{color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;}
  .gated{margin-left:8px;font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;text-transform:none;letter-spacing:0;}
+
+ /* profile accordion (Figma-matched reboot pattern) */
+ .ucard{display:flex;align-items:center;gap:16px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:16px;margin-bottom:14px;}
+ .uav{width:56px;height:56px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-title-sub);flex-shrink:0;}
+ .uname{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);}
+ .umeta{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-top:2px;}
+ .acard{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;overflow:hidden;}
+ .ac-row{position:relative;}
+ .ac-row+.ac-row::before{content:"";position:absolute;top:0;left:60px;right:24px;height:1px;background:var(--bento-theme-color-border-subtle);}
+ .ac-head{display:flex;align-items:flex-start;gap:16px;padding:20px 24px;cursor:pointer;}
+ .ac-head:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .ac-ic{font-size:22px;color:var(--bento-theme-color-icon-base);margin-top:1px;flex-shrink:0;}
+ .ac-txt{flex:1;min-width:0;}
+ .ac-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .ac-d{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-top:3px;}
+ .ac-chev{font-size:22px;color:var(--bento-theme-color-icon-subtle);margin-top:1px;flex-shrink:0;transition:transform .15s;}
+ .ac-row.open .ac-chev{transform:rotate(180deg);}
+ .ac-body{display:none;padding:0 24px 22px 64px;}
+ .ac-row.open .ac-body{display:block;}
+ .ac-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
 
  /* floating demo dock */
  .demodock{position:fixed;right:18px;bottom:18px;z-index:9990;width:300px;max-width:calc(100vw - 36px);background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);overflow:hidden;}
@@ -139,13 +159,24 @@
 </div></aside><main class="suite-main">
  <div class="suite-topbar"><h1>Settings</h1></div>
  <div class="set-scroll"><div class="set-wrap"><h2 class="set-head">Profile</h2><p class="set-sub">Your name, picture, and personal details.</p>
-<div class="set-card"><div class="pad"><h3 class="sec">User information</h3>
-<div class="rowflex" style="gap:16px;margin:8px 0 20px"><span class="avatar-lg">MW</span><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">photo_camera</span>Change picture</button><button class="hs-btn hs-btn--ghost">Remove</button></div>
-<div class="grid2"><div class="hs-field"><label class="hs-field-label">First name</label><input class="hs-input" value="Melanie"></div><div class="hs-field"><label class="hs-field-label">Last name</label><input class="hs-input" value="Wilkins"></div><div class="hs-field"><label class="hs-field-label">Initials</label><input class="hs-input" value="MW"></div><div class="hs-field" style="justify-content:flex-end"><label class="rowflex" style="cursor:pointer"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Add initials to new posts on X</span></label></div><div class="hs-field full"><label class="hs-field-label">Bio / description</label><textarea class="hs-input">Social lead managing brand and regional teams.</textarea></div><div class="hs-field full"><label class="hs-field-label">Company name</label><input class="hs-input" value="Somos"></div></div></div>
-<div class="pad"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-body-md-b)">Time zone</div><div class="secd" style="margin:0">(GMT-08:00) Pacific Time</div></div><button class="hs-btn hs-btn--ghost">Change</button></div></div>
-<div class="pad"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-body-md-b)">Email address</div><div class="secd" style="margin:0">melanie.wilkins@somos.com</div></div><button class="hs-btn hs-btn--outlined">Change email</button></div></div>
-<div class="footer"><button class="hs-btn hs-btn--ghost">Cancel</button><button class="hs-btn hs-btn--primary">Save changes</button></div></div>
-<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-body-md-b)">Delete account</div><div class="secd" style="margin:0">Permanently remove your account and data.</div></div><button class="hs-btn hs-btn--outlined">Delete account</button></div></div></div></div></div>
+<div class="ucard"><span class="uav">MW</span><div><div class="uname">Melanie Wilkins</div><div class="umeta">melanie.wilkins@somos.com &middot; Somos</div></div></div>
+<div class="acard">
+ <div class="ac-row open"><div class="ac-head" onclick="acTog(this)"><span class="material-symbols-outlined ac-ic">person</span><div class="ac-txt"><div class="ac-t">User information</div><div class="ac-d">Your name, picture, initials, and bio.</div></div><span class="material-symbols-outlined ac-chev">keyboard_arrow_down</span></div>
+  <div class="ac-body"><div class="rowflex" style="gap:16px;margin-bottom:16px"><span class="avatar-lg">MW</span><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">photo_camera</span>Change picture</button><button class="hs-btn hs-btn--ghost">Remove</button></div><div class="grid2"><div class="hs-field"><label class="hs-field-label">First name</label><input class="hs-input" value="Melanie"></div><div class="hs-field"><label class="hs-field-label">Last name</label><input class="hs-input" value="Wilkins"></div><div class="hs-field"><label class="hs-field-label">Initials</label><input class="hs-input" value="MW"></div><div class="hs-field" style="justify-content:flex-end"><label class="rowflex" style="cursor:pointer"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Add initials to new posts on X</span></label></div><div class="hs-field full"><label class="hs-field-label">Bio / description</label><textarea class="hs-input">Social lead managing brand and regional teams.</textarea></div><div class="hs-field full"><label class="hs-field-label">Company name</label><input class="hs-input" value="Somos"></div></div><div class="ac-foot"><button class="hs-btn hs-btn--ghost">Cancel</button><button class="hs-btn hs-btn--primary">Save changes</button></div></div>
+ </div>
+ <div class="ac-row"><div class="ac-head" onclick="acTog(this)"><span class="material-symbols-outlined ac-ic">schedule</span><div class="ac-txt"><div class="ac-t">Time zone</div><div class="ac-d">(GMT-08:00) Pacific Time</div></div><span class="material-symbols-outlined ac-chev">keyboard_arrow_down</span></div>
+  <div class="ac-body"><div class="hs-field" style="max-width:360px"><div class="hs-input affix"><input value="(GMT-08:00) Pacific Time" readonly><button class="clr" aria-label="Change" title="Change"><span class="material-symbols-outlined">expand_more</span></button></div></div></div>
+ </div>
+ <div class="ac-row"><div class="ac-head" onclick="acTog(this)"><span class="material-symbols-outlined ac-ic">mail</span><div class="ac-txt"><div class="ac-t">Email address</div><div class="ac-d">melanie.wilkins@somos.com</div></div><span class="material-symbols-outlined ac-chev">keyboard_arrow_down</span></div>
+  <div class="ac-body"><div class="rowflex"><div class="hs-field" style="max-width:320px"><input class="hs-input" value="melanie.wilkins@somos.com" readonly></div><button class="hs-btn hs-btn--outlined">Change email</button></div></div>
+ </div>
+ <div class="ac-row"><div class="ac-head" onclick="acTog(this)"><span class="material-symbols-outlined ac-ic">password</span><div class="ac-txt"><div class="ac-t">Password</div><div class="ac-d">Last changed 3 months ago.</div></div><span class="material-symbols-outlined ac-chev">keyboard_arrow_down</span></div>
+  <div class="ac-body"><button class="hs-btn hs-btn--outlined">Change password</button></div>
+ </div>
+ <div class="ac-row"><div class="ac-head" onclick="acTog(this)"><span class="material-symbols-outlined ac-ic">delete</span><div class="ac-txt"><div class="ac-t">Delete account</div><div class="ac-d">Permanently remove your account and data.</div></div><span class="material-symbols-outlined ac-chev">keyboard_arrow_down</span></div>
+  <div class="ac-body"><button class="hs-btn hs-btn--outlined">Delete account</button></div>
+ </div>
+</div></div></div>
 </main>
 </div>
 <div class="demodock" id="demodock">
@@ -186,6 +217,7 @@
 </div>
 <script>
  function togglePop(){document.getElementById('popwrap').classList.toggle('open');}
+ function acTog(h){h.parentElement.classList.toggle('open');}
  var ROLE_LABEL={view:'View Only',admin:'Admin',sa:'Super Admin',pm:'Paying Member',hootdesk:'Hootdesk Settings Admin',care:'Care Agent',custom:'Custom (example)'};
  var NOTES={
   view:"View Only sees their own Account, plus read-only views of the teams and accounts they're on. All org management is hidden.",

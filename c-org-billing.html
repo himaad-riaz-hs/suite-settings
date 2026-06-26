@@ -9,7 +9,7 @@
 <style>
  html,body{margin:0;height:100%;background:var(--bento-theme-color-bg-app);}
  .set-scroll{flex:1;overflow:auto;}
- .set-wrap{max-width:860px;margin:0 auto;padding:28px 40px 80px;}
+ .set-wrap{max-width:860px;margin:0 auto;padding:32px 40px 80px;}
  .set-head{margin:0 0 4px;font:var(--hs-type-title-screen);color:var(--bento-theme-color-text-base);}
  .set-sub{margin:0 0 20px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);}
  .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:20px;}
@@ -54,6 +54,26 @@
  .suite-drawer .sd-item.is-muted .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);}
  .suite-drawer .sd-item .tag.t-hidden{color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;}
  .gated{margin-left:8px;font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;text-transform:none;letter-spacing:0;}
+
+ /* profile accordion (Figma-matched reboot pattern) */
+ .ucard{display:flex;align-items:center;gap:16px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:16px;margin-bottom:14px;}
+ .uav{width:56px;height:56px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-title-sub);flex-shrink:0;}
+ .uname{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);}
+ .umeta{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-top:2px;}
+ .acard{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;overflow:hidden;}
+ .ac-row{position:relative;}
+ .ac-row+.ac-row::before{content:"";position:absolute;top:0;left:60px;right:24px;height:1px;background:var(--bento-theme-color-border-subtle);}
+ .ac-head{display:flex;align-items:flex-start;gap:16px;padding:20px 24px;cursor:pointer;}
+ .ac-head:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .ac-ic{font-size:22px;color:var(--bento-theme-color-icon-base);margin-top:1px;flex-shrink:0;}
+ .ac-txt{flex:1;min-width:0;}
+ .ac-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .ac-d{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-top:3px;}
+ .ac-chev{font-size:22px;color:var(--bento-theme-color-icon-subtle);margin-top:1px;flex-shrink:0;transition:transform .15s;}
+ .ac-row.open .ac-chev{transform:rotate(180deg);}
+ .ac-body{display:none;padding:0 24px 22px 64px;}
+ .ac-row.open .ac-body{display:block;}
+ .ac-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
 
  /* floating demo dock */
  .demodock{position:fixed;right:18px;bottom:18px;z-index:9990;width:300px;max-width:calc(100vw - 36px);background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);overflow:hidden;}
@@ -179,6 +199,7 @@
 </div>
 <script>
  function togglePop(){document.getElementById('popwrap').classList.toggle('open');}
+ function acTog(h){h.parentElement.classList.toggle('open');}
  var ROLE_LABEL={view:'View Only',admin:'Admin',sa:'Super Admin',pm:'Paying Member',hootdesk:'Hootdesk Settings Admin',care:'Care Agent',custom:'Custom (example)'};
  var NOTES={
   view:"View Only sees their own Account, plus read-only views of the teams and accounts they're on. All org management is hidden.",
