@@ -129,7 +129,6 @@
   <a class="suite-navbtn" href="#" aria-label="Vigil"><span class="circle"><span class="material-symbols-outlined">gpp_good</span></span><span class="lbl">Vigil</span></a>
  </div>
  <div class="others">
-  <a class="suite-navbtn util is-selected" href="c-settings-members.html" aria-label="Settings" title="Settings"><span class="circle"><span class="material-symbols-outlined">settings</span></span></a>
   <a class="suite-navbtn util" href="#" aria-label="Notifications" title="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></a>
   <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
   <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><span class="mini-av" style="width:36px;height:36px;font:var(--hs-type-body-sm-b)">MW</span></span></a>
@@ -212,9 +211,10 @@
  };
  var PAGE_ID='sso', PAGE_LABEL='SSO & MFA';
  var curRole='sa', reveal=false, dockMin=false;
+ try{ var _r=sessionStorage.getItem('cRole'); if(_r)curRole=_r; reveal=sessionStorage.getItem('cReveal')==='1'; }catch(e){}
  function parseAcc(s){var o={};(s||'').trim().split(/\s+/).forEach(function(p){var kv=p.split(':');if(kv[0])o[kv[0]]=kv[1];});return o;}
- function setRole(r){curRole=r;var sel=document.getElementById('roleSel');if(sel&&sel.value!==r)sel.value=r;sync();}
- function setReveal(b){reveal=b;sync();}
+ function setRole(r){curRole=r;try{sessionStorage.setItem('cRole',r);}catch(e){}var sel=document.getElementById('roleSel');if(sel&&sel.value!==r)sel.value=r;sync();}
+ function setReveal(b){reveal=b;try{sessionStorage.setItem('cReveal',b?'1':'0');}catch(e){}sync();}
  function ddToggle(){dockMin=!dockMin;document.getElementById('demodock').classList.toggle('min',dockMin);updateHead();}
  function updateHead(){document.getElementById('ddTtl').textContent=dockMin?('Role: '+ROLE_LABEL[curRole]):'Prototype \u00b7 preview a role';document.getElementById('ddMin').textContent=dockMin?'expand_less':'expand_more';}
  function sync(){
@@ -246,7 +246,7 @@
   else{warn.style.display='none';}
   updateHead();
  }
- sync();
+ (function(){var sel=document.getElementById('roleSel');if(sel)sel.value=curRole;var rc=document.getElementById('revealChk');if(rc)rc.checked=reveal;sync();})();
 </script>
 <script src="app.js"></script>
 </body></html>
