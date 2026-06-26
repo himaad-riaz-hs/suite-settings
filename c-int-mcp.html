@@ -61,8 +61,8 @@
 
  /* drawer: clean, sectioned, pure design */
  .suite-drawer .sd-body{padding:6px 14px 20px;}
- .suite-drawer .sd-group{margin-top:10px;padding:14px 10px 6px;border-top:1px solid var(--bento-theme-color-border-subtle);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--bento-theme-color-text-subtle);display:flex;align-items:center;}
- .suite-drawer .sd-group.first{border-top:0;margin-top:2px;padding-top:4px;}
+ .suite-drawer .sd-group{margin-top:16px;padding:4px 10px 6px;font-size:12.5px;font-weight:700;color:var(--bento-theme-color-text-subtle);display:flex;align-items:center;}
+ .suite-drawer .sd-group.first{margin-top:2px;}
  .suite-drawer .sd-item{height:44px;font-size:15px;gap:12px;margin:1px 0;}
  .suite-drawer .sd-item .material-symbols-outlined{font-size:20px;}
  .suite-drawer .sd-item .tag{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);white-space:nowrap;}
@@ -72,7 +72,11 @@
  .suite-drawer .sd-item.is-muted{opacity:.48;}
  .suite-drawer .sd-item.is-muted .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);}
  .suite-drawer .sd-item .tag.t-hidden{color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;}
- .gated{margin-left:8px;font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);border:1px solid var(--bento-theme-color-border-subtle);border-radius:5px;padding:0 6px;text-transform:none;letter-spacing:0;}
+ .suite-drawer .sd-group.collapsible{appearance:none;background:none;border:0;width:100%;font-family:inherit;cursor:pointer;border-radius:8px;}
+ .suite-drawer .sd-group.collapsible:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .suite-drawer .sd-group .glabel{display:inline-flex;align-items:center;}
+ .suite-drawer .sd-group .gchev{margin-left:auto;font-size:18px;color:var(--bento-theme-color-icon-subtle);transition:transform .15s;}
+ .suite-drawer .sd-group.collapsed .gchev{transform:rotate(-90deg);}
 
  /* profile accordion (Figma-matched reboot pattern) */
  .ucard{display:flex;align-items:center;gap:16px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:16px;margin-bottom:14px;}
@@ -123,12 +127,17 @@
  .pop .idr .nm{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
  .pop .plan{display:inline-block;margin-top:5px;font:var(--hs-type-meta-b);background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);border-radius:6px;padding:2px 8px;}
  .pop .pi{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;text-decoration:none;color:var(--bento-theme-color-text-base);}
- .pop .pi:hover{background:rgba(28,28,28,0.05);}
+ .pop .pi:hover{background:var(--bento-component-list-item-fill-hovered);}
  .pop .pi .material-symbols-outlined{font-size:22px;color:var(--bento-theme-color-icon-base);margin-top:1px;}
  .pop .pt{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
  .pop .pd{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
  .pop .chev{margin-left:auto;color:var(--bento-theme-color-icon-subtle);}
  .pop .div{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .pop .seclbl{padding:12px 16px 4px;font:var(--hs-type-meta-b);font-weight:700;color:var(--bento-theme-color-text-subtle);}
+ .pop .pq{display:flex;gap:12px;align-items:center;padding:9px 16px;text-decoration:none;color:var(--bento-theme-color-text-base);}
+ .pop .pq:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .pop .pq .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-base);}
+ .pop .pq .pql{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
  .suite-navbtn.is-selected .circle{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
 </style></head><body>
 <div class="protobar"><span class="pl">Prototype version</span>
@@ -170,11 +179,11 @@
 <a class="sd-item" data-grp="overview" data-id="workspace" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-org-workspace.html"><span class="material-symbols-outlined">workspaces</span>Workspace<span class="tag"></span></a>
 <a class="sd-item" data-grp="overview" data-id="roles" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:H" href="c-org-roles.html"><span class="material-symbols-outlined">admin_panel_settings</span>Roles &amp; permissions<span class="tag"></span></a>
 <a class="sd-item" data-grp="overview" data-id="billing" data-acc="view:H admin:H sa:R pm:E hootdesk:H care:H custom:H" href="c-org-billing.html"><span class="material-symbols-outlined">credit_card</span>Billing &amp; plan<span class="tag"></span></a>
-<div class="sd-group" data-grp="sso">Security &amp; governance <span class="gated">Enterprise</span></div>
+<button type="button" class="sd-group collapsible collapsed" data-grp="sso" aria-expanded="false" onclick="grpToggle(this)"><span class="glabel">Security &amp; governance</span><span class="material-symbols-outlined gchev">expand_more</span></button>
 <a class="sd-item" data-grp="sso" data-id="sso" data-acc="view:H admin:H sa:E pm:E hootdesk:H care:H custom:H" href="c-sec-sso.html"><span class="material-symbols-outlined">key</span>SSO &amp; MFA<span class="tag"></span></a>
 <a class="sd-item" data-grp="sso" data-id="audit" data-acc="view:H admin:H sa:R pm:R hootdesk:H care:H custom:H" href="c-sec-audit.html"><span class="material-symbols-outlined">history</span>Audit log<span class="tag"></span></a>
 <a class="sd-item" data-grp="sso" data-id="export" data-acc="view:H admin:H sa:R pm:R hootdesk:H care:H custom:H" href="c-sec-export.html"><span class="material-symbols-outlined">download</span>Data export<span class="tag"></span></a>
-<div class="sd-group" data-grp="apps">Integrations</div>
+<button type="button" class="sd-group collapsible" data-grp="apps" aria-expanded="true" onclick="grpToggle(this)"><span class="glabel">Integrations</span><span class="material-symbols-outlined gchev">expand_more</span></button>
 <a class="sd-item" data-grp="apps" data-id="apps" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-int-apps.html"><span class="material-symbols-outlined">apps</span>Apps<span class="tag"></span></a>
 <a class="sd-item on" data-grp="apps" data-id="mcp" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span>MCP connectors<span class="tag"></span></a>
 </div></aside><main class="suite-main">
@@ -207,13 +216,20 @@
   <div class="dd-note warn" id="ddWarn" style="display:none"><span class="material-symbols-outlined">lock</span><span id="ddWarnTxt"></span></div>
   <div class="dd-rev-hint" id="ddRevHint" style="display:none">Dimmed rows with a &ldquo;hidden&rdquo; tag aren&rsquo;t shown to this role in the real product (we hide, not grey).</div>
   <div class="dd-layers"><b>3 permission layers.</b> This previews the <b>org</b> role (which Settings you see). <b>Team</b> and <b>social-account</b> roles are a separate layer (which teams &amp; accounts you can act on) &mdash; see a person&rsquo;s combined access in Members &rarr; a name.</div>
-  <details><summary>Why this layout?</summary><div class="dd-about">Recommended IA (C). Nav grouped by scope (Account = you, Organization = the company), not a flat list. Security &amp; governance is nested under Organization and only appears when the org is entitled. Workspace is held (its items may belong to Perch). Settings now lives in the rail (left), not only behind the avatar.</div></details>
+  <details><summary>Why this layout?</summary><div class="dd-about">Recommended IA (C). Nav grouped by scope (Account = you, Organization = the company), not a flat list. Security &amp; governance is nested under Organization and only appears when the org is entitled. Lower-traffic groups (Security &amp; governance, Integrations) collapse by default to keep the list short. Workspace is held (its items may belong to Perch). Settings opens from the avatar menu, which also keeps one-click shortcuts to your most-used destinations (parity with today&rsquo;s flyout).</div></details>
  </div>
 </div>
 <div class="popwrap" id="popwrap" onclick="togglePop()">
  <div class="pop" onclick="event.stopPropagation()">
   <div class="idr"><span class="mini-av" style="width:44px;height:44px;font:var(--hs-type-body-md-b)">MW</span><div><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div></div>
-  <a class="pi" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div><div class="pt">Settings</div><div class="pd">Manage profile, teams, social accounts, and more</div></div></a>
+  <div class="seclbl">Quick access</div>
+  <a class="pq" href="c-account-profile.html"><span class="material-symbols-outlined">person</span><span class="pql">Profile</span></a>
+  <a class="pq" href="c-org-social.html"><span class="material-symbols-outlined">hub</span><span class="pql">Social accounts &amp; teams</span></a>
+  <a class="pq" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span><span class="pql">MCP connectors</span></a>
+  <a class="pq" href="c-org-billing.html"><span class="material-symbols-outlined">credit_card</span><span class="pql">Plan &amp; billing</span></a>
+  <a class="pq" href="#"><span class="material-symbols-outlined">pause_circle</span><span class="pql">Suspend content</span></a>
+  <div class="div"></div>
+  <a class="pi" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div><div class="pt">Settings</div><div class="pd">The full, organized settings home</div></div></a>
   <a class="pi" href="#"><span class="material-symbols-outlined">help</span><div><div class="pt">Help</div><div class="pd">Tours, articles, and contact channels</div></div><span class="material-symbols-outlined chev">chevron_right</span></a>
   <div class="div"></div>
   <a class="pi" href="#"><span class="material-symbols-outlined">logout</span><div><div class="pt">Sign out</div></div></a>
@@ -247,26 +263,31 @@
  function setReveal(b){reveal=b;try{sessionStorage.setItem('cReveal',b?'1':'0');}catch(e){}sync();}
  function ddToggle(){dockMin=!dockMin;document.getElementById('demodock').classList.toggle('min',dockMin);updateHead();}
  function updateHead(){document.getElementById('ddTtl').textContent=dockMin?('Role: '+ROLE_LABEL[curRole]):'Prototype \u00b7 preview a role';document.getElementById('ddMin').textContent=dockMin?'expand_less':'expand_more';}
+ function grpToggle(btn){var c=btn.classList.toggle('collapsed');btn.setAttribute('aria-expanded',c?'false':'true');applyColl();}
+ function applyColl(){
+  document.querySelectorAll('.sd-group[data-grp]').forEach(function(g){
+   var grp=g.dataset.grp,collapsed=g.classList.contains('collapsed'),any=false;
+   document.querySelectorAll('.sd-item[data-grp="'+grp+'"]').forEach(function(it){
+    var acc=parseAcc(it.dataset.acc)[curRole]||'H';var rv=(acc!=='H')||reveal;
+    if(rv)any=true;it.style.display=(rv&&!collapsed)?'':'none';
+   });
+   g.style.display=any?'':'none';
+  });
+ }
  function sync(){
   document.querySelectorAll('.sd-item[data-acc]').forEach(function(it){
    var acc=parseAcc(it.dataset.acc)[curRole]||'H';
    var tag=it.querySelector('.tag');
    it.classList.remove('is-muted','on');
+   if(tag){tag.className='tag';tag.innerHTML='';}
    if(acc==='H'){
-    if(reveal){it.style.display='';it.classList.add('is-muted');if(tag){tag.className='tag t-hidden';tag.innerHTML='<span class="material-symbols-outlined" style="font-size:13px">visibility_off</span>hidden';}}
-    else{it.style.display='none';}
+    if(reveal){it.classList.add('is-muted');if(tag){tag.className='tag t-hidden';tag.innerHTML='<span class="material-symbols-outlined" style="font-size:13px">visibility_off</span>hidden';}}
    }else{
-    it.style.display='';
-    if(acc==='R'){if(tag){tag.className='tag';tag.textContent='read-only';}}
-    else{if(tag){if(it.dataset.id==='billing'&&curRole==='pm'){tag.className='tag t-own';tag.textContent='billing owner';}else{tag.className='tag';tag.textContent='';}}}
+    if(it.dataset.id==='billing'&&curRole==='pm'){if(tag){tag.className='tag t-own';tag.textContent='billing owner';}}
     if(it.dataset.id===PAGE_ID)it.classList.add('on');
    }
   });
-  document.querySelectorAll('.sd-group[data-grp]').forEach(function(g){
-   var grp=g.dataset.grp,any=false;
-   document.querySelectorAll('.sd-item[data-grp="'+grp+'"]').forEach(function(it){if(it.style.display!=='none')any=true;});
-   g.style.display=any?'':'none';
-  });
+  applyColl();
   document.getElementById('ddNote').textContent=NOTES[curRole];
   document.getElementById('ddRevHint').style.display=reveal?'':'none';
   var cur=document.querySelector('.sd-item[data-id="'+PAGE_ID+'"]');
