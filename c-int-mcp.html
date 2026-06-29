@@ -29,6 +29,7 @@
  .hs-table th{text-align:left;font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);padding:10px 12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
  .hs-table td{font:var(--hs-type-body-sm);padding:12px;border-bottom:1px solid var(--bento-theme-color-border-subtle);vertical-align:middle;}
  .mini-av{width:28px;height:28px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-meta-b);}
+ .rail-av{width:36px;height:36px;border-radius:999px;object-fit:cover;display:block;}
  textarea.hs-input{min-height:72px;resize:vertical;padding:8px 12px;}
  .locked{opacity:.55;}
  .hs-input.affix{display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;}
@@ -124,22 +125,25 @@
 
  /* popover */
  .popwrap{position:fixed;inset:0;z-index:9998;display:none;} .popwrap.open{display:block;}
- .pop{position:fixed;left:88px;bottom:14px;width:316px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);overflow:hidden;}
- .pop .idr{display:flex;gap:12px;align-items:center;padding:16px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
- .pop .idr .nm{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
- .pop .plan{display:inline-block;margin-top:5px;font:var(--hs-type-meta-b);background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);border-radius:6px;padding:2px 8px;}
- .pop .pi{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;text-decoration:none;color:var(--bento-theme-color-text-base);}
- .pop .pi:hover{background:var(--bento-component-list-item-fill-hovered);}
- .pop .pi .material-symbols-outlined{font-size:22px;color:var(--bento-theme-color-icon-base);margin-top:1px;}
- .pop .pt{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
- .pop .pd{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
- .pop .chev{margin-left:auto;color:var(--bento-theme-color-icon-subtle);}
+ .pop{position:fixed;left:88px;bottom:14px;width:446px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:8px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);overflow:hidden;padding:8px 0;}
+ .pop .idr{display:flex;gap:16px;align-items:flex-start;padding:8px 16px 16px;}
+ .pop .idr .av{flex:none;width:56px;height:56px;margin-top:4px;border-radius:999px;overflow:hidden;background:var(--bento-system-sys-neutral-alt-300);}
+ .pop .idr .av img{width:100%;height:100%;object-fit:cover;display:block;}
+ .pop .idr-txt{display:flex;flex-direction:column;gap:8px;min-width:0;padding-top:2px;}
+ .pop .idr .nm{font:var(--hs-type-body-md-b);line-height:24px;color:var(--bento-theme-color-text-base);}
+ .pop .plan{align-self:flex-start;box-sizing:border-box;height:28px;display:inline-flex;align-items:center;font:var(--hs-type-body-md-b);background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);border-radius:4px;padding:2px 8px;}
  .pop .div{border-top:1px solid var(--bento-theme-color-border-subtle);}
- .pop .seclbl{padding:12px 16px 4px;font:var(--hs-type-meta-b);font-weight:700;color:var(--bento-theme-color-text-subtle);}
- .pop .pq{display:flex;gap:12px;align-items:center;padding:9px 16px;text-decoration:none;color:var(--bento-theme-color-text-base);}
- .pop .pq:hover{background:var(--bento-component-list-item-fill-hovered);}
- .pop .pq .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-base);}
- .pop .pq .pql{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+ .pop .pi{display:flex;gap:16px;align-items:flex-start;padding:16px;text-decoration:none;color:var(--bento-theme-color-text-base);}
+ .pop .pi:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .pop .pi:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:-2px;background:var(--bento-component-list-item-fill-hovered);}
+ .pop .pi>.material-symbols-outlined{font-size:24px;line-height:24px;color:var(--bento-theme-color-icon-base);flex:none;}
+ .pop .pi-c{flex:1 1 0;min-width:0;display:flex;flex-direction:column;}
+ .pop .pt{font:var(--hs-type-body-md-b);line-height:24px;color:var(--bento-theme-color-text-base);}
+ .pop .pd{font:var(--hs-type-body-md);line-height:24px;color:var(--bento-theme-color-text-subtle);}
+ .pop .signout{font:var(--hs-type-body-md);line-height:24px;color:var(--bento-theme-color-text-base);}
+ .pop .chev-btn{flex:none;align-self:center;width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;color:var(--bento-theme-color-icon-base);}
+ .pop .pi:hover .chev-btn,.pop .pi:focus-visible .chev-btn{background:var(--bento-comp-button-ghost-color-fill-pressed,#e6eaeb);}
+ .pop .chev-btn .material-symbols-outlined{font-size:20px;}
  .suite-navbtn.is-selected .circle{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
  /* nav search */
  .suite-drawer .sd-search{padding:8px 14px 12px;}
@@ -214,7 +218,7 @@
  <div class="others">
   <a class="suite-navbtn util" href="#" aria-label="Notifications" title="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></a>
   <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
-  <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><span class="mini-av" style="width:36px;height:36px;font:var(--hs-type-body-sm-b)">MW</span></span></a>
+  <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><img class="rail-av" src="assets/avatar-melanie.jpg" alt=""></span></a>
  </div>
 </aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-search"><div class="hs-input affix"><span class="material-symbols-outlined lead">search</span><input id="navSearch" type="search" placeholder="Search settings&hellip;" oninput="setQuery(this.value)" aria-label="Search settings"></div></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main">
  <div class="suite-topbar"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Open settings menu" title="Menu" onclick="toggleNav()"><span class="material-symbols-outlined">menu</span></button><h1>Settings</h1></div>
@@ -271,24 +275,26 @@
  </div>
 </div>
 <div class="popwrap" id="popwrap" onclick="togglePop()">
- <div class="pop" onclick="event.stopPropagation()">
-  <div class="idr"><span class="mini-av" style="width:44px;height:44px;font:var(--hs-type-body-md-b)">MW</span><div><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div></div>
-  <div class="seclbl">Quick access</div>
-  <a class="pq" href="c-account-profile.html"><span class="material-symbols-outlined">person</span><span class="pql">Profile</span></a>
-  <a class="pq" href="c-org-social.html"><span class="material-symbols-outlined">hub</span><span class="pql">Social accounts</span></a>
-  <a class="pq" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span><span class="pql">MCP connectors</span></a>
-  <a class="pq" href="c-org-billing.html"><span class="material-symbols-outlined">credit_card</span><span class="pql">Plan &amp; billing</span></a>
-  <a class="pq" href="#"><span class="material-symbols-outlined">pause_circle</span><span class="pql">Suspend content</span></a>
+ <div class="pop" id="popPanel" role="menu" aria-label="Profile menu" onclick="event.stopPropagation()" onkeydown="popMenuKey(event)">
+  <div class="idr">
+   <span class="av"><img src="assets/avatar-melanie.jpg" alt=""></span>
+   <div class="idr-txt"><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div>
+  </div>
   <div class="div"></div>
-  <a class="pi" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div><div class="pt">Settings</div><div class="pd">The full, organized settings home</div></div></a>
-  <a class="pi" href="#"><span class="material-symbols-outlined">help</span><div><div class="pt">Help</div><div class="pd">Tours, articles, and contact channels</div></div><span class="material-symbols-outlined chev">chevron_right</span></a>
+  <a class="pi" role="menuitem" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div class="pi-c"><div class="pt">Settings</div><div class="pd">Manage profile, preferences, plan &amp; billing, etc</div></div></a>
+  <a class="pi" role="menuitem" href="c-int-mcp.html"><span class="material-symbols-outlined">hub</span><div class="pi-c"><div class="pt">MCP connectors</div><div class="pd">Connect Hootsuite to your favourite AI tools</div></div></a>
+  <a class="pi" role="menuitem" href="c-org-social.html"><span class="material-symbols-outlined">people</span><div class="pi-c"><div class="pt">Social accounts and teams</div><div class="pd">Manage social profiles, teams, members, etc</div></div></a>
+  <a class="pi" role="menuitem" href="c-int-apps.html"><span class="material-symbols-outlined">widgets</span><div class="pi-c"><div class="pt">Apps</div><div class="pd">Browse and Install integrations</div></div></a>
+  <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">help</span><div class="pi-c"><div class="pt">Help</div><div class="pd">Access tours, articles, and contact channels</div></div><span class="chev-btn" aria-hidden="true"><span class="material-symbols-outlined">keyboard_arrow_right</span></span></a>
   <div class="div"></div>
-  <a class="pi" href="#"><span class="material-symbols-outlined">logout</span><div><div class="pt">Sign out</div></div></a>
+  <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">logout</span><div class="pi-c"><div class="signout">Sign out</div></div></a>
  </div>
 </div>
 <div class="toast" id="toast"><span class="toast-msg"></span><button class="toast-undo" onclick="toastUndo()">Undo</button></div>
 <script>
- function togglePop(){document.getElementById('popwrap').classList.toggle('open');}
+ function popMenuItems(){return Array.prototype.slice.call(document.querySelectorAll('#popPanel .pi'));}
+ function popMenuKey(e){var it=popMenuItems();var i=it.indexOf(document.activeElement);if(e.key==='ArrowDown'){e.preventDefault();(it[i+1]||it[0]).focus();}else if(e.key==='ArrowUp'){e.preventDefault();(i>0?it[i-1]:it[it.length-1]).focus();}}
+ function togglePop(){var w=document.getElementById('popwrap');var willOpen=!w.classList.contains('open');w.classList.toggle('open');if(willOpen){var it=popMenuItems();if(it[0])setTimeout(function(){it[0].focus();},0);}}
  function acTog(h){h.parentElement.classList.toggle('open');}
  function bbMenu(e){e.stopPropagation();var m=document.getElementById('bbMenu');if(m)m.classList.toggle('open');}
  function bulkCount(){var bar=document.getElementById('bulkBar');if(!bar)return;var rows=document.querySelectorAll('.rowsel');var n=document.querySelectorAll('.rowsel.is-on').length;document.getElementById('bbN').textContent=n;bar.style.display=n?'flex':'none';var all=document.getElementById('selAll');if(all)all.classList.toggle('is-on',n>0&&n===rows.length);}
