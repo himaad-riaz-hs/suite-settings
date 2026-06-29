@@ -241,7 +241,13 @@
   <div class="set-card" id="ntSocial"><div class="pad"><h3 class="sec">Social activity</h3><p class="secd">Across the accounts you can access.</p>
    <label class="nrow"><div><div class="nrow-t">Comments and replies</div><div class="nrow-d">Public comments and replies on your posts.</div></div><span class="hs-toggle is-on"></span></label>
    <label class="nrow"><div><div class="nrow-t">User posts</div><div class="nrow-d">When someone posts to your pages.</div></div><span class="hs-toggle"></span></label>
-   <div class="between" style="padding-top:14px"><div class="secd" style="margin:0">Need different settings per account?</div><a class="hs-btn hs-btn--ghost hs-btn--sm" href="c-org-social.html">Choose accounts</a></div>
+   <div class="between" style="padding-top:14px"><div class="secd" style="margin:0">Need different settings per account?</div><button type="button" class="hs-btn hs-btn--ghost hs-btn--sm" onclick="toggleSocialAccts(this)">Choose accounts</button></div>
+   <div id="ntSocialAccts" hidden>
+    <label class="nrow"><div class="rowflex" style="gap:10px"><span class="material-symbols-outlined">public</span><div><div class="nrow-t">@SomosCorp</div><div class="nrow-d">X / Twitter</div></div></div><span class="hs-toggle is-on"></span></label>
+    <label class="nrow"><div class="rowflex" style="gap:10px"><span class="material-symbols-outlined">groups</span><div><div class="nrow-t">Somos (FB Page)</div><div class="nrow-d">Facebook</div></div></div><span class="hs-toggle is-on"></span></label>
+    <label class="nrow"><div class="rowflex" style="gap:10px"><span class="material-symbols-outlined">hub</span><div><div class="nrow-t">somos_li</div><div class="nrow-d">LinkedIn</div></div></div><span class="hs-toggle"></span></label>
+    <label class="nrow"><div class="rowflex" style="gap:10px"><span class="material-symbols-outlined">photo_camera</span><div><div class="nrow-t">@somos.ig</div><div class="nrow-d">Instagram</div></div></div><span class="hs-toggle is-on"></span></label>
+   </div>
   </div></div>
   <div class="set-card" id="ntOther"><div class="pad"><h3 class="sec">Other places you&rsquo;re notified</h3><p class="secd">This page controls email. These keep their own settings.</p>
    <div class="between"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">notifications</span><div><div style="font:var(--hs-type-body-md-b)">In-product Notification Center</div><div class="secd" style="margin:0">The bell menu in the top bar.</div></div></div><a class="hs-btn hs-btn--ghost" href="#">Open<span class="material-symbols-outlined" style="font-size:18px;margin-left:4px">open_in_new</span></a></div>
@@ -258,13 +264,11 @@
 </div>
 <div class="set-wrap page-state" id="stEmpty" hidden>
  <div class="empty"><span class="material-symbols-outlined" style="font-size:44px;color:var(--bento-theme-color-icon-subtle)">inbox</span>
-  <div class="eh">Nothing here yet</div>
-  <div class="ed">When there&rsquo;s something to show, it&rsquo;ll appear here. Add your first item to get started.</div>
-  <button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Get started</button>
+  <div class="eh">Nothing here yet</div><div class="ed">When there is something to show, it will appear here.</div><button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Get started</button>
  </div>
 </div>
 <div class="set-wrap page-state" id="stError" hidden>
- <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>We couldn&rsquo;t load this.</b> Something went wrong loading this page. Check your connection and try again.</div></div>
+ <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>Couldn't load this page.</b> Check your connection and try again.</div></div>
  <div style="margin-top:14px"><button class="hs-btn hs-btn--secondary" onclick="setState('default')"><span class="material-symbols-outlined">refresh</span>Retry</button></div>
 </div></div>
 </main>
@@ -404,8 +408,9 @@
  function toggleNav(){ document.body.classList.toggle('nav-open'); }
  function ddToggle(){ dockMin=!dockMin; document.getElementById('demodock').classList.toggle('min',dockMin); var m=document.getElementById('ddMin'); if(m)m.textContent=dockMin?'expand_less':'expand_more'; }
  // member access drawer (opened from a member name)
- function openMember(e){ if(e)e.preventDefault(); var w=document.getElementById('mdWrap'); if(w)w.classList.add('open'); }
+ function openMember(e){ if(e)e.preventDefault(); var tr=(e&&e.target)?e.target.closest('tr'):null; if(tr){ var nm=tr.querySelector('.mlink'),em=tr.querySelector('.secd'),rb=tr.querySelector('.rolebadge'),av=tr.querySelector('.mini-av'),tds=tr.querySelectorAll('td'); var via=(tds[3]?tds[3].textContent:'Direct').trim(),name=nm?nm.textContent:'',role=rb?rb.textContent:''; var st=function(id,t){var x=document.getElementById(id);if(x)x.textContent=t;}; st('mdAv',av?av.textContent:''); st('mdName',name); st('mdMeta',(em?em.textContent:'')+' \u00b7 '+role); var rbd=document.getElementById('mdRole'); if(rbd){rbd.textContent=role; rbd.className='hs-badge '+(/super admin/i.test(role)?'hs-badge--info':'hs-badge--neutral');} st('mdAccessNote', /direct/i.test(via)?('This role is assigned directly to '+name+'.'):('Comes '+via+'. Ends if they leave that team, and stays with the team.')); } var w=document.getElementById('mdWrap'); if(w)w.classList.add('open'); }
  function closeMember(){ var w=document.getElementById('mdWrap'); if(w)w.classList.remove('open'); }
+ function toggleSocialAccts(btn){ var el=document.getElementById('ntSocialAccts'); if(!el)return; el.hidden=!el.hidden; btn.textContent=el.hidden?'Choose accounts':'Hide accounts'; }
  // autosave + undo toast: toggles save instantly, no Save button
  var _undoTg=null, _toastT=null;
  function showToast(msg, tg){ _undoTg=tg||null; var t=document.getElementById('toast'); if(!t)return; t.querySelector('.toast-msg').textContent=msg; t.querySelector('.toast-undo').style.display=tg?'':'none'; t.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(function(){t.classList.remove('show');},4000); }

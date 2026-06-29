@@ -227,14 +227,12 @@
  </div></div>
 </div>
 <div class="set-wrap page-state" id="stEmpty" hidden>
- <div class="empty"><span class="material-symbols-outlined" style="font-size:44px;color:var(--bento-theme-color-icon-subtle)">inbox</span>
-  <div class="eh">Nothing here yet</div>
-  <div class="ed">When there&rsquo;s something to show, it&rsquo;ll appear here. Add your first item to get started.</div>
-  <button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Get started</button>
+ <div class="empty"><span class="material-symbols-outlined" style="font-size:44px;color:var(--bento-theme-color-icon-subtle)">groups</span>
+  <div class="eh">No teams yet</div><div class="ed">Create a team to group people and the social accounts they work on.</div><button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Create team</button>
  </div>
 </div>
 <div class="set-wrap page-state" id="stError" hidden>
- <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>We couldn&rsquo;t load this.</b> Something went wrong loading this page. Check your connection and try again.</div></div>
+ <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>Couldn't load your teams.</b> Check your connection and try again.</div></div>
  <div style="margin-top:14px"><button class="hs-btn hs-btn--secondary" onclick="setState('default')"><span class="material-symbols-outlined">refresh</span>Retry</button></div>
 </div></div>
 </main>
@@ -374,8 +372,9 @@
  function toggleNav(){ document.body.classList.toggle('nav-open'); }
  function ddToggle(){ dockMin=!dockMin; document.getElementById('demodock').classList.toggle('min',dockMin); var m=document.getElementById('ddMin'); if(m)m.textContent=dockMin?'expand_less':'expand_more'; }
  // member access drawer (opened from a member name)
- function openMember(e){ if(e)e.preventDefault(); var w=document.getElementById('mdWrap'); if(w)w.classList.add('open'); }
+ function openMember(e){ if(e)e.preventDefault(); var tr=(e&&e.target)?e.target.closest('tr'):null; if(tr){ var nm=tr.querySelector('.mlink'),em=tr.querySelector('.secd'),rb=tr.querySelector('.rolebadge'),av=tr.querySelector('.mini-av'),tds=tr.querySelectorAll('td'); var via=(tds[3]?tds[3].textContent:'Direct').trim(),name=nm?nm.textContent:'',role=rb?rb.textContent:''; var st=function(id,t){var x=document.getElementById(id);if(x)x.textContent=t;}; st('mdAv',av?av.textContent:''); st('mdName',name); st('mdMeta',(em?em.textContent:'')+' \u00b7 '+role); var rbd=document.getElementById('mdRole'); if(rbd){rbd.textContent=role; rbd.className='hs-badge '+(/super admin/i.test(role)?'hs-badge--info':'hs-badge--neutral');} st('mdAccessNote', /direct/i.test(via)?('This role is assigned directly to '+name+'.'):('Comes '+via+'. Ends if they leave that team, and stays with the team.')); } var w=document.getElementById('mdWrap'); if(w)w.classList.add('open'); }
  function closeMember(){ var w=document.getElementById('mdWrap'); if(w)w.classList.remove('open'); }
+ function toggleSocialAccts(btn){ var el=document.getElementById('ntSocialAccts'); if(!el)return; el.hidden=!el.hidden; btn.textContent=el.hidden?'Choose accounts':'Hide accounts'; }
  // autosave + undo toast: toggles save instantly, no Save button
  var _undoTg=null, _toastT=null;
  function showToast(msg, tg){ _undoTg=tg||null; var t=document.getElementById('toast'); if(!t)return; t.querySelector('.toast-msg').textContent=msg; t.querySelector('.toast-undo').style.display=tg?'':'none'; t.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(function(){t.classList.remove('show');},4000); }
