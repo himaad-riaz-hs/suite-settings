@@ -43,6 +43,33 @@
  .protobar .pl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
  .protobar select{border:0;background:transparent;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);cursor:pointer;}
 
+ /* Bento page-header — the standard named component (preview/header-tabs.html · patterns/Page Header.html):
+    the band at the top of every settings screen. Replaces the old custom "Settings" topbar so it matches the
+    rest of the product. Sticky inside the scroll area so it stays put and stays aligned with the content column
+    (same scroll box => same gutter), and it persists across the empty/loading/error page-states. */
+ .set-scroll>.page-header{position:sticky;top:0;z-index:5;background:var(--hs-surface);border-bottom:1px solid var(--hs-border);}
+ .page-header .ph-row{max-width:860px;margin:0 auto;padding:16px 40px;min-height:72px;display:flex;align-items:center;gap:20px;}
+ .page-header .ph-lead{display:flex;align-items:center;gap:12px;min-width:0;}
+ .page-header .ph-titles{display:flex;flex-direction:column;gap:2px;min-width:0;}
+ .page-header .ph-title{font:var(--hs-type-title-sub);color:var(--hs-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+ .page-header .ph-sub{font:var(--hs-type-body-sm);color:var(--hs-fg-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+ .page-header .ph-actions{margin-left:auto;display:flex;align-items:center;gap:10px;}
+ @media (max-width:860px){ .page-header .ph-row{padding:12px 16px;} }
+
+ /* Option B (sub-groups) gets the Teams & Orgs-style header: the global search + an add button move into the
+    page header, and the drawer search is hidden. Option A is untouched (search stays in the drawer). Toggled by
+    body.optb, set in syncControls() from the A/B control. On mobile the header is too narrow, so B falls back to
+    the drawer search inside the slide-out menu. */
+ .page-header .ph-actions-b{display:none;}
+ body.optb .page-header .ph-actions-b{display:flex;}
+ body.optb .suite-drawer .sd-search{display:none;}
+ .page-header .ph-search{width:300px;max-width:40vw;}
+ .page-header .ph-actions-b .hs-btn--icon{flex:none;}
+ @media (max-width:860px){
+  body.optb .page-header .ph-actions-b{display:none;}
+  body.optb .suite-drawer .sd-search{display:block;}
+ }
+
  /* bulk-select action bar (DX-3607: apply a role to many at once) — composed from Bento primitives */
  .bulkbar{display:flex;align-items:center;gap:12px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:10px;padding:9px 14px;margin-bottom:16px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
  .bulkbar .bb-count{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
@@ -221,8 +248,7 @@
   <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><img class="rail-av" src="assets/avatar-melanie.jpg" alt=""></span></a>
  </div>
 </aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-search"><div class="hs-input affix"><span class="material-symbols-outlined lead">search</span><input id="navSearch" type="search" placeholder="Search settings&hellip;" oninput="setQuery(this.value)" aria-label="Search settings"></div></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main">
- <div class="suite-topbar"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Open settings menu" title="Menu" onclick="toggleNav()"><span class="material-symbols-outlined">menu</span></button><h1>Settings</h1></div>
- <div class="set-scroll"><div class="set-wrap" id="pageContent"><h2 class="set-head">Security &amp; privacy</h2><p class="set-sub">How you sign in, and the org controls that apply to you.</p><div class="set-card"><div class="pad"><h3 class="sec">Authentication methods</h3><p class="secd">How you sign in to Hootsuite.</p><div class="between"><div><div style="font:var(--hs-type-body-md-b)">Password</div><div class="secd" style="margin:0">Last changed 3 months ago.</div></div><button class="hs-btn hs-btn--outlined">Change password</button></div><div class="between"><div><div style="font:var(--hs-type-body-md-b)">Connected sign-in</div><div class="secd" style="margin:0">Sign in with Google or Apple.</div></div><button class="hs-btn hs-btn--ghost">Manage</button></div></div><div class="pad"><h3 class="sec">Two-step verification</h3><div class="between"><div><div style="font:var(--hs-type-body-md-b)">Authenticator app</div><div class="secd" style="margin:0">Require a code at sign-in.</div></div><span class="hs-toggle is-on"></span></div></div><div class="pad"><h3 class="sec">Active sessions</h3><p class="secd">Devices currently signed in to your account.</p><div class="between" style="padding-top:0"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">computer</span><div><div style="font:var(--hs-type-body-md-b)">This device &middot; Chrome on macOS</div><div class="secd" style="margin:0">Vancouver, CA &middot; active now</div></div></div><span class="hs-badge hs-badge--positive">Current</span></div><div class="between"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">smartphone</span><div><div style="font:var(--hs-type-body-md-b)">iPhone &middot; Hootsuite app</div><div class="secd" style="margin:0">Vancouver, CA &middot; 2 days ago</div></div></div><button class="hs-btn hs-btn--ghost">Sign out</button></div><div style="margin-top:14px"><button class="hs-btn hs-btn--outlined">Sign out of all other sessions</button></div></div><div class="pad locked"><h3 class="sec">Organization security</h3><p class="secd">Managed by your org. You don't have access to change these.</p><div class="between"><div class="rowflex"><span class="material-symbols-outlined">key</span><div style="font:var(--hs-type-body-md-b)">Single sign-on (SSO)</div></div><span class="hs-badge hs-badge--neutral">Super-Admin only</span></div><div class="between"><div class="rowflex"><span class="material-symbols-outlined">gpp_good</span><div style="font:var(--hs-type-body-md-b)">Multi-factor authentication policy</div></div><span class="hs-badge hs-badge--neutral">Super-Admin only</span></div></div><div class="pad"><h3 class="sec">Hootsuite privacy policy</h3><div class="between"><div style="font:var(--hs-type-body-md)">Review how Hootsuite handles your data.</div><a class="hs-btn hs-btn--ghost" href="#">View policy</a></div></div></div></div>
+ <div class="set-scroll"><div class="page-header"><div class="ph-row"><div class="ph-lead"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Open settings menu" title="Menu" onclick="toggleNav()"><span class="material-symbols-outlined">menu</span></button><div class="ph-titles"><span class="ph-title">Security &amp; privacy</span><span class="ph-sub">How you sign in, and the org controls that apply to you.</span></div></div><div class="ph-actions ph-actions-b"><div class="hs-input affix ph-search"><span class="material-symbols-outlined lead">search</span><input id="navSearchHeader" type="search" placeholder="Teams, members or social accounts" oninput="filterContent(this.value)" aria-label="Search teams, members or social accounts"></div><button class="hs-btn hs-btn--secondary hs-btn--icon" aria-label="Add" title="Add"><span class="material-symbols-outlined">add</span></button></div></div></div><div class="set-wrap" id="pageContent"><div class="set-card"><div class="pad"><h3 class="sec">Authentication methods</h3><p class="secd">How you sign in to Hootsuite.</p><div class="between"><div><div style="font:var(--hs-type-body-md-b)">Password</div><div class="secd" style="margin:0">Last changed 3 months ago.</div></div><button class="hs-btn hs-btn--outlined">Change password</button></div><div class="between"><div><div style="font:var(--hs-type-body-md-b)">Connected sign-in</div><div class="secd" style="margin:0">Sign in with Google or Apple.</div></div><button class="hs-btn hs-btn--ghost">Manage</button></div></div><div class="pad"><h3 class="sec">Two-step verification</h3><div class="between"><div><div style="font:var(--hs-type-body-md-b)">Authenticator app</div><div class="secd" style="margin:0">Require a code at sign-in.</div></div><span class="hs-toggle is-on"></span></div></div><div class="pad"><h3 class="sec">Active sessions</h3><p class="secd">Devices currently signed in to your account.</p><div class="between" style="padding-top:0"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">computer</span><div><div style="font:var(--hs-type-body-md-b)">This device &middot; Chrome on macOS</div><div class="secd" style="margin:0">Vancouver, CA &middot; active now</div></div></div><span class="hs-badge hs-badge--positive">Current</span></div><div class="between"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">smartphone</span><div><div style="font:var(--hs-type-body-md-b)">iPhone &middot; Hootsuite app</div><div class="secd" style="margin:0">Vancouver, CA &middot; 2 days ago</div></div></div><button class="hs-btn hs-btn--ghost">Sign out</button></div><div style="margin-top:14px"><button class="hs-btn hs-btn--outlined">Sign out of all other sessions</button></div></div><div class="pad locked"><h3 class="sec">Organization security</h3><p class="secd">Managed by your org. You don't have access to change these.</p><div class="between"><div class="rowflex"><span class="material-symbols-outlined">key</span><div style="font:var(--hs-type-body-md-b)">Single sign-on (SSO)</div></div><span class="hs-badge hs-badge--neutral">Super-Admin only</span></div><div class="between"><div class="rowflex"><span class="material-symbols-outlined">gpp_good</span><div style="font:var(--hs-type-body-md-b)">Multi-factor authentication policy</div></div><span class="hs-badge hs-badge--neutral">Super-Admin only</span></div></div><div class="pad"><h3 class="sec">Hootsuite privacy policy</h3><div class="between"><div style="font:var(--hs-type-body-md)">Review how Hootsuite handles your data.</div><a class="hs-btn hs-btn--ghost" href="#">View policy</a></div></div></div></div>
 <div class="set-wrap page-state" id="stLoading" hidden>
  <div class="set-card"><div class="pad">
   <div class="rowflex" style="gap:12px;margin-bottom:18px"><span class="sk sk-circle" style="width:40px;height:40px"></span><span class="sk sk-text" style="width:200px;height:18px"></span></div>
@@ -252,11 +278,12 @@
    <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; Collapsible</button>
    <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; Sub-groups</button>
   </div>
+  <div class="dd-rev-hint">A (collapsible groups) is the default and primary path. B (static sub-groups) is kept here for comparison only. Heads-up: collapsible nav groups are a Bento snowflake (no native component) &mdash; pending Giancarlo&rsquo;s pattern sign-off, not final or shippable.</div>
   <label class="dd-lab" for="roleSel">Preview a role</label>
   <select id="roleSel" onchange="setRole(this.value)">
    <option value="view">View only</option>
-   <option value="admin">Admin</option>
-   <option value="sa" selected>Super admin</option>
+   <option value="admin" selected>Admin</option>
+   <option value="sa">Super admin</option>
    <option value="pm">Paying member</option>
   </select>
   <div class="dd-lab">Plan</div>
@@ -282,10 +309,12 @@
   </div>
   <div class="div"></div>
   <a class="pi" role="menuitem" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div class="pi-c"><div class="pt">Settings</div><div class="pd">Manage profile, preferences, plan &amp; billing, etc</div></div></a>
+  <a class="pi" role="menuitem" href="c-org-social.html"><span class="material-symbols-outlined">people</span><div class="pi-c"><div class="pt">Social accounts &amp; teams</div><div class="pd">Manage social profiles, teams, members, etc</div></div></a>
   <a class="pi" role="menuitem" href="c-int-mcp.html"><span class="material-symbols-outlined">hub</span><div class="pi-c"><div class="pt">MCP connectors</div><div class="pd">Connect Hootsuite to your favourite AI tools</div></div></a>
-  <a class="pi" role="menuitem" href="c-org-social.html"><span class="material-symbols-outlined">people</span><div class="pi-c"><div class="pt">Social accounts and teams</div><div class="pd">Manage social profiles, teams, members, etc</div></div></a>
-  <a class="pi" role="menuitem" href="c-int-apps.html"><span class="material-symbols-outlined">widgets</span><div class="pi-c"><div class="pt">Apps</div><div class="pd">Browse and Install integrations</div></div></a>
+  <!-- Apps: PROVISIONAL — kept for now, instrument clicks before treating as a settled flyout item. -->
+  <a class="pi" role="menuitem" href="c-int-apps.html"><span class="material-symbols-outlined">widgets</span><div class="pi-c"><div class="pt">Apps</div><div class="pd">Browse and install integrations</div></div></a>
   <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">help</span><div class="pi-c"><div class="pt">Help</div><div class="pd">Access tours, articles, and contact channels</div></div><span class="chev-btn" aria-hidden="true"><span class="material-symbols-outlined">keyboard_arrow_right</span></span></a>
+  <!-- Suspend content intentionally NOT here — removed from the flyout; permanent home TBC with Fabi (likely its publishing product-home). -->
   <div class="div"></div>
   <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">logout</span><div class="pi-c"><div class="signout">Sign out</div></div></a>
  </div>
@@ -304,14 +333,14 @@
  function bulkApply(role){document.querySelectorAll('.rowsel.is-on').forEach(function(r){var tr=r.closest('tr');var b=tr&&tr.querySelector('.rolebadge');if(b){b.textContent=role;b.className='hs-badge '+(role==='Super Admin'?'hs-badge--info':'hs-badge--neutral')+' rolebadge';}});bulkClear();}
  document.addEventListener('click',function(){var m=document.getElementById('bbMenu');if(m)m.classList.remove('open');});
  // ===== Settings nav engine: Option A (collapsible) / Option B (static sub-groups) =====
- var NAV = [{"key": "account", "label": "Account", "collapsed": false, "plan": null, "items": [{"id": "profile", "icon": "person", "label": "Profile", "href": "c-account-profile.html", "acc": "EEEE", "sub": null, "plan": null}, {"id": "notifs", "icon": "notifications", "label": "Notifications", "href": "c-account-notifications.html", "acc": "EEEE", "sub": null, "plan": null}, {"id": "security", "icon": "lock", "label": "Security & privacy", "href": "c-account-security.html", "acc": "EEEE", "sub": null, "plan": null}]}, {"key": "org", "label": "Organization", "collapsed": false, "plan": null, "items": [{"id": "overview", "icon": "domain", "label": "Overview", "href": "c-org-overview.html", "acc": "REEE", "sub": null, "plan": null}, {"id": "members", "icon": "group", "label": "Members", "href": "c-settings-members.html", "acc": "HEEE", "sub": "people", "plan": null}, {"id": "teams", "icon": "groups", "label": "Teams", "href": "c-org-teams.html", "acc": "REEE", "sub": "people", "plan": null}, {"id": "social", "icon": "hub", "label": "Social accounts", "href": "c-org-social.html", "acc": "REEE", "sub": "assets", "plan": null}, {"id": "roles", "icon": "admin_panel_settings", "label": "Roles & permissions", "href": "c-org-roles.html", "acc": "HEEE", "sub": "people", "plan": null}, {"id": "vanity", "icon": "link", "label": "Vanity URLs", "href": "c-org-vanity.html", "acc": "HEEE", "sub": "assets", "plan": "ent"}, {"id": "billing", "icon": "credit_card", "label": "Plan & billing", "href": "c-org-billing.html", "acc": "HHRE", "sub": "billing", "plan": null}]}, {"key": "sec", "label": "Security & governance", "collapsed": true, "plan": "ent", "items": [{"id": "sso", "icon": "key", "label": "SSO & MFA", "href": "c-sec-sso.html", "acc": "HHEE", "sub": null, "plan": null}, {"id": "logs", "icon": "history", "label": "Logs & exports", "href": "c-sec-logs.html", "acc": "HHRR", "sub": null, "plan": null}, {"id": "profiles", "icon": "shield", "label": "Security profiles", "href": "c-sec-profiles.html", "acc": "HHEE", "sub": null, "plan": null}]}, {"key": "int", "label": "Integrations", "collapsed": true, "plan": null, "items": [{"id": "mcp", "icon": "extension", "label": "MCP connectors", "href": "c-int-mcp.html", "acc": "HEEE", "sub": null, "plan": null}, {"id": "apps", "icon": "apps", "label": "Apps & API", "href": "c-int-apps.html", "acc": "HEEE", "sub": null, "plan": null}]}];
+ var NAV = [{"key": "account", "label": "Account", "collapsed": false, "plan": null, "items": [{"id": "profile", "icon": "person", "label": "Profile", "href": "c-account-profile.html", "acc": "EEEE", "sub": null, "plan": null}, {"id": "notifs", "icon": "notifications", "label": "Notifications", "href": "c-account-notifications.html", "acc": "EEEE", "sub": null, "plan": null}, {"id": "security", "icon": "lock", "label": "Security & privacy", "href": "c-account-security.html", "acc": "EEEE", "sub": null, "plan": null}]}, {"key": "org", "label": "Organization", "collapsed": false, "plan": null, "items": [{"id": "overview", "icon": "domain", "label": "Overview", "href": "c-org-overview.html", "acc": "REEE", "sub": null, "plan": null}, {"id": "members", "icon": "group", "label": "Members", "href": "c-settings-members.html", "acc": "HEEE", "sub": "people", "plan": null}, {"id": "teams", "icon": "groups", "label": "Teams", "href": "c-org-teams.html", "acc": "REEE", "sub": "people", "plan": null}, {"id": "social", "icon": "hub", "label": "Social accounts", "href": "c-org-social.html", "acc": "REEE", "sub": "assets", "plan": null}, {"id": "roles", "icon": "admin_panel_settings", "label": "Roles & permissions", "href": "c-org-roles.html", "acc": "HEEE", "sub": "people", "plan": null}, {"id": "vanity", "icon": "link", "label": "Vanity URLs", "href": "c-org-vanity.html", "acc": "HEEE", "sub": "assets", "plan": "ent"}, {"id": "tags", "icon": "sell", "label": "Tags", "href": "c-org-tags.html", "acc": "HEEE", "sub": "assets", "plan": null}, {"id": "billing", "icon": "credit_card", "label": "Plan & billing", "href": "c-org-billing.html", "acc": "HHRE", "sub": "billing", "plan": null}]}, {"key": "sec", "label": "Security & governance", "collapsed": true, "plan": "ent", "items": [{"id": "sso", "icon": "key", "label": "SSO & MFA", "href": "c-sec-sso.html", "acc": "HHEE", "sub": null, "plan": null}, {"id": "logs", "icon": "history", "label": "Logs & exports", "href": "c-sec-logs.html", "acc": "HHRR", "sub": null, "plan": null}, {"id": "profiles", "icon": "shield", "label": "Security profiles", "href": "c-sec-profiles.html", "acc": "HHEE", "sub": null, "plan": null}]}, {"key": "int", "label": "Integrations", "collapsed": true, "plan": null, "items": [{"id": "mcp", "icon": "extension", "label": "MCP connectors", "href": "c-int-mcp.html", "acc": "HEEE", "sub": null, "plan": null}, {"id": "apps", "icon": "apps", "label": "Apps & API", "href": "c-int-apps.html", "acc": "HEEE", "sub": null, "plan": null}]}];
  var SUBLABEL = {people:'People & roles', assets:'Accounts & assets', billing:'Billing & plan'};
  var ROLE_IDX = {view:0, admin:1, sa:2, pm:3};
  var ROLE_LABEL = {view:'View only', admin:'Admin', sa:'Super admin', pm:'Paying member'};
  var PAGE_ID = 'security';
- var OPT='a', ROLE='sa', PLAN='ent', QUERY='', COLL={}, dockMin=true;
+ var OPT='a', ROLE='admin', PLAN='ent', QUERY='', COLL={}, dockMin=true;   /* default role preview = Admin (applies to both nav options) */
  try{ OPT=sessionStorage.getItem('navOpt')||'a'; }catch(e){}
- try{ ROLE=sessionStorage.getItem('navRole')||'sa'; }catch(e){}
+ try{ ROLE=sessionStorage.getItem('navRole')||'admin'; }catch(e){}
  try{ PLAN=sessionStorage.getItem('navPlan')||'ent'; }catch(e){}
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  function el(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e;}
@@ -319,7 +348,10 @@
  function planOK(req){ return !req || req!=='ent' || PLAN==='ent'; }
  function itemVisible(it,g){ if(it.acc.charAt(ROLE_IDX[ROLE])==='H') return false; if(!planOK(g.plan)) return false; if(!planOK(it.plan)) return false; if(QUERY && it.label.toLowerCase().indexOf(QUERY)===-1) return false; return true; }
  function groupVisible(g){ return g.items.filter(function(it){return itemVisible(it,g);}); }
- /* collapse module (Option A only) — isolated; remove this block + the isCollapsed/toggleCollapse uses to drop the feature */
+ /* collapse module (Option A only) — isolated; remove this block + the isCollapsed/toggleCollapse uses to drop the feature.
+    SNOWFLAKE: collapsible nav groups have no native Bento component (checked against NavDrawer, Accordion, Tree).
+    Built on Bento tokens + APG disclosure a11y (button + aria-expanded) and FLAGGED — pending Giancarlo's pattern
+    sign-off. This is the default/primary path (Option A) but it is NOT final or shippable until that sign-off lands. */
  function isCollapsed(g, activeHere){ if(QUERY) return false; if(g.key in COLL) return COLL[g.key]; if(activeHere) return false; return g.collapsed; }
  function toggleCollapse(key){ var g; NAV.forEach(function(x){if(x.key===key)g=x;}); var cur=(key in COLL)?COLL[key]:g.collapsed; COLL[key]=!cur; try{sessionStorage.setItem('navColl',JSON.stringify(COLL));}catch(e){} renderNav(); }
  /* /collapse module */
@@ -359,6 +391,7 @@
   if(!body.children.length){ body.appendChild(el('div','sd-empty', QUERY?'No settings match: '+QUERY:'Nothing to show for this role.')); }
  }
  function syncControls(){
+  document.body.classList.toggle('optb', OPT==='b');   /* Option B: product-style header (search+add in header, drawer search hidden) */
   var a=document.getElementById('optA'), b=document.getElementById('optB');
   if(a){a.classList.toggle('on',OPT==='a'); a.setAttribute('aria-pressed',OPT==='a');}
   if(b){b.classList.toggle('on',OPT==='b'); b.setAttribute('aria-pressed',OPT==='b');}
@@ -370,10 +403,21 @@
   if(note) note.textContent='Previewing as '+ROLE_LABEL[ROLE]+' on the '+(PLAN==='ent'?'Enterprise':'Standard')+' plan'+(PLAN==='ent'?'.':' (Standard hides governance and Vanity URLs).');
   gateDanger();
  }
- function setOpt(o){ OPT=o; try{sessionStorage.setItem('navOpt',o);}catch(e){} syncControls(); renderNav(); }
+ function setOpt(o){ OPT=o; try{sessionStorage.setItem('navOpt',o);}catch(e){} QUERY=''; var ns=document.getElementById('navSearch'); if(ns)ns.value=''; var nh=document.getElementById('navSearchHeader'); if(nh)nh.value=''; filterContent(''); syncControls(); renderNav(); }   /* reset both searches on A/B switch so neither mode carries stale filter state */
  function setRole(r){ ROLE=r; try{sessionStorage.setItem('navRole',r);}catch(e){} syncControls(); renderNav(); }
  function setPlan(p){ PLAN=p; try{sessionStorage.setItem('navPlan',p);}catch(e){} syncControls(); renderNav(); }
- function setQuery(v){ QUERY=(v||'').trim().toLowerCase(); renderNav(); }
+ function setQuery(v){ QUERY=(v||'').trim().toLowerCase(); renderNav(); }   /* drawer search: filters the left nav (Option A, and Option B mobile fallback) */
+ /* Option B header search = CONTENT search: filters the current page's list rows; never touches the left nav. */
+ function filterContent(v){
+  var q=(v||'').trim().toLowerCase(); var pc=document.getElementById('pageContent'); if(!pc)return;
+  Array.prototype.forEach.call(pc.querySelectorAll('.hs-table'),function(tbl){
+   var tb=tbl.querySelector('tbody'); if(!tb)return; var shown=0;
+   Array.prototype.forEach.call(tb.querySelectorAll('tr'),function(tr){ if(tr.hasAttribute('data-nores'))return; var hit=!q||tr.textContent.toLowerCase().indexOf(q)!==-1; tr.style.display=hit?'':'none'; if(hit)shown++; });
+   var nr=tb.querySelector('tr[data-nores]');
+   if(q&&shown===0){ if(!nr){ nr=document.createElement('tr'); nr.setAttribute('data-nores',''); var td=document.createElement('td'); td.setAttribute('colspan','12'); td.className='secd'; td.style.padding='16px 12px'; nr.appendChild(td); tb.appendChild(nr); } nr.style.display=''; nr.firstChild.textContent='No matches for \u201c'+v+'\u201d'; }
+   else if(nr){ nr.style.display='none'; }
+  });
+ }
  function toggleNav(){ document.body.classList.toggle('nav-open'); }
  function ddToggle(){ dockMin=!dockMin; document.getElementById('demodock').classList.toggle('min',dockMin); var m=document.getElementById('ddMin'); if(m)m.textContent=dockMin?'expand_less':'expand_more'; }
  // member access drawer (opened from a member name)
