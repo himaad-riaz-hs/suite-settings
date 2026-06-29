@@ -192,6 +192,10 @@
  .notif-toc a{display:block;padding:7px 10px;border-radius:7px;text-decoration:none;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
  .notif-toc a:hover{background:var(--bento-component-list-item-fill-hovered);color:var(--bento-theme-color-text-base);}
  @media (max-width:860px){ .notif-layout{flex-direction:column;} .notif-toc{position:static;width:auto;flex-direction:row;flex-wrap:wrap;} }
+ /* per-page empty / loading / error states (previewable from the dock) */
+ .page-state{padding-top:4px;}
+ .empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 20px;}
+ .eh{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);margin-top:12px;}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -211,7 +215,24 @@
  </div>
 </aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-search"><div class="hs-input affix"><span class="material-symbols-outlined lead">search</span><input id="navSearch" type="search" placeholder="Search settings&hellip;" oninput="setQuery(this.value)" aria-label="Search settings"></div></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main">
  <div class="suite-topbar"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Open settings menu" title="Menu" onclick="toggleNav()"><span class="material-symbols-outlined">menu</span></button><h1>Settings</h1></div>
- <div class="set-scroll"><div class="set-wrap"><h2 class="set-head">Billing &amp; plan</h2><p class="set-sub">Your plan, seats, and invoices.</p><div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-title-sub)">Enterprise plan</div><div class="secd" style="margin:4px 0 0">Billed annually &middot; renews Mar 1, 2027</div></div><span class="hs-badge hs-badge--positive">Active</span></div></div><div class="pad"><div class="stat"><div><div class="n">440</div><div class="l">Seats used</div></div><div><div class="n">500</div><div class="l">Seats included</div></div><div><div class="n">61</div><div class="l">Social accounts</div></div></div></div><div class="pad"><h3 class="sec">Plan features</h3><div class="grid2"><div style="display:flex;flex-direction:column;gap:10px"><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Unlimited scheduling</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Advanced analytics</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Team &amp; approval workflows</span></label></div><div style="display:flex;flex-direction:column;gap:10px"><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">SSO &amp; MFA enforcement</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Audit log &amp; data export</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Priority support</span></label></div></div></div><div class="pad locked"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-body-md-b)">Plan &amp; payment changes</div><div class="secd" style="margin:0">Managed by your organization owner and billing contact.</div></div><span class="hs-badge hs-badge--neutral">Paying Member only</span></div></div></div><div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">Invoices</h3><button class="hs-btn hs-btn--ghost">View all</button></div></div><table class="hs-table"><thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody><tr><td style="font:var(--hs-type-body-sm-b)">INV-2026-003</td><td>Mar 1, 2026</td><td>$48,000.00 USD</td><td><span class="hs-badge hs-badge--positive">Paid</span></td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Download invoice" title="Download invoice"><span class="material-symbols-outlined">download</span></button></td></tr><tr><td style="font:var(--hs-type-body-sm-b)">INV-2025-002</td><td>Mar 1, 2025</td><td>$45,000.00 USD</td><td><span class="hs-badge hs-badge--positive">Paid</span></td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Download invoice" title="Download invoice"><span class="material-symbols-outlined">download</span></button></td></tr></tbody></table></div></div></div>
+ <div class="set-scroll"><div class="set-wrap" id="pageContent"><h2 class="set-head">Billing &amp; plan</h2><p class="set-sub">Your plan, seats, and invoices.</p><div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-title-sub)">Enterprise plan</div><div class="secd" style="margin:4px 0 0">Billed annually &middot; renews Mar 1, 2027</div></div><span class="hs-badge hs-badge--positive">Active</span></div></div><div class="pad"><div class="stat"><div><div class="n">440</div><div class="l">Seats used</div></div><div><div class="n">500</div><div class="l">Seats included</div></div><div><div class="n">61</div><div class="l">Social accounts</div></div></div></div><div class="pad"><h3 class="sec">Plan features</h3><div class="grid2"><div style="display:flex;flex-direction:column;gap:10px"><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Unlimited scheduling</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Advanced analytics</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Team &amp; approval workflows</span></label></div><div style="display:flex;flex-direction:column;gap:10px"><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">SSO &amp; MFA enforcement</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Audit log &amp; data export</span></label><label class="rowflex"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Priority support</span></label></div></div></div><div class="pad locked"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-body-md-b)">Plan &amp; payment changes</div><div class="secd" style="margin:0">Managed by your organization owner and billing contact.</div></div><span class="hs-badge hs-badge--neutral">Paying Member only</span></div></div></div><div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">Invoices</h3><button class="hs-btn hs-btn--ghost">View all</button></div></div><table class="hs-table"><thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody><tr><td style="font:var(--hs-type-body-sm-b)">INV-2026-003</td><td>Mar 1, 2026</td><td>$48,000.00 USD</td><td><span class="hs-badge hs-badge--positive">Paid</span></td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Download invoice" title="Download invoice"><span class="material-symbols-outlined">download</span></button></td></tr><tr><td style="font:var(--hs-type-body-sm-b)">INV-2025-002</td><td>Mar 1, 2025</td><td>$45,000.00 USD</td><td><span class="hs-badge hs-badge--positive">Paid</span></td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Download invoice" title="Download invoice"><span class="material-symbols-outlined">download</span></button></td></tr></tbody></table></div></div>
+<div class="set-wrap page-state" id="stLoading" hidden>
+ <div class="set-card"><div class="pad">
+  <div class="rowflex" style="gap:12px;margin-bottom:18px"><span class="sk sk-circle" style="width:40px;height:40px"></span><span class="sk sk-text" style="width:200px;height:18px"></span></div>
+  <div class="sk sk-text" style="width:100%;margin-bottom:12px"></div><div class="sk sk-text" style="width:92%;margin-bottom:12px"></div><div class="sk sk-text" style="width:96%;margin-bottom:12px"></div><div class="sk sk-text" style="width:78%"></div>
+ </div></div>
+</div>
+<div class="set-wrap page-state" id="stEmpty" hidden>
+ <div class="empty"><span class="material-symbols-outlined" style="font-size:44px;color:var(--bento-theme-color-icon-subtle)">inbox</span>
+  <div class="eh">Nothing here yet</div>
+  <div class="ed">When there&rsquo;s something to show, it&rsquo;ll appear here. Add your first item to get started.</div>
+  <button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Get started</button>
+ </div>
+</div>
+<div class="set-wrap page-state" id="stError" hidden>
+ <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>We couldn&rsquo;t load this.</b> Something went wrong loading this page. Check your connection and try again.</div></div>
+ <div style="margin-top:14px"><button class="hs-btn hs-btn--secondary" onclick="setState('default')"><span class="material-symbols-outlined">refresh</span>Retry</button></div>
+</div></div>
 </main>
 </div>
 <div class="demodock" id="demodock">
@@ -238,6 +259,13 @@
    <button type="button" id="planStd" class="dd-segbtn" aria-pressed="false" onclick="setPlan('std')">Standard</button>
    <button type="button" id="planEnt" class="dd-segbtn on" aria-pressed="true" onclick="setPlan('ent')">Enterprise</button>
   </div>
+  <label class="dd-lab" for="stateSel">Page state</label>
+  <select id="stateSel" onchange="setState(this.value)">
+   <option value="default" selected>Default</option>
+   <option value="loading">Loading</option>
+   <option value="empty">Empty</option>
+   <option value="error">Error</option>
+  </select>
   <div class="dd-note" id="ddNote"></div>
  </div>
 </div>
@@ -348,10 +376,23 @@
  var _undoTg=null, _toastT=null;
  function showToast(msg, tg){ _undoTg=tg||null; var t=document.getElementById('toast'); if(!t)return; t.querySelector('.toast-msg').textContent=msg; t.querySelector('.toast-undo').style.display=tg?'':'none'; t.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(function(){t.classList.remove('show');},4000); }
  function toastUndo(){ if(_undoTg)_undoTg.classList.toggle('is-on'); var t=document.getElementById('toast'); if(t)t.classList.remove('show'); }
- document.addEventListener('click',function(e){ var lab=e.target.closest('label'); if(!lab)return; var c=lab.querySelector('.hs-toggle'); if(!c && PAGE_ID==='notifs') c=lab.querySelector('.hs-check'); if(c){ c.classList.toggle('is-on'); showToast('Setting saved.', c); } });
+ // consolidated control interactivity (replaces app.js; one handler so nothing double-toggles)
+ function exclusiveRadio(rad){ var scope=rad.closest('.hs-field')||rad.closest('.grid2')||document; scope.querySelectorAll('.hs-radio').forEach(function(x){x.classList.remove('is-on');}); rad.classList.add('is-on'); }
+ document.addEventListener('click',function(e){
+  var lab=e.target.closest('label');
+  var rad=e.target.closest('.hs-radio')||(lab&&lab.querySelector('.hs-radio'));
+  var chk=e.target.closest('.hs-check')||(lab&&lab.querySelector('.hs-check'));
+  var tog=e.target.closest('.hs-toggle')||(lab&&lab.querySelector('.hs-toggle'));
+  if(chk&&chk.getAttribute('onclick'))return;            /* row-select checkboxes self-manage (bulkRow/bulkAll) */
+  if(rad){ e.preventDefault(); exclusiveRadio(rad); return; }
+  if(tog){ e.preventDefault(); tog.classList.toggle('is-on'); showToast('Setting saved.', tog); return; }   /* toggles autosave */
+  if(chk){ e.preventDefault(); chk.classList.toggle('is-on'); if(PAGE_ID==='notifs') showToast('Setting saved.', chk); return; }
+ });
+ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeMember(); var pw=document.getElementById('popwrap'); if(pw)pw.classList.remove('open'); document.body.classList.remove('nav-open'); } });
  // gate the Overview delete action to Paying member in the role preview
  function gateDanger(){ var a=document.getElementById('dzAction'), n=document.getElementById('dzNote'); if(!a)return; var pm=ROLE==='pm'; a.style.opacity=pm?'':'0.45'; a.style.pointerEvents=pm?'':'none'; if(n)n.style.display=pm?'none':''; }
+ var PAGESTATE='default';
+ function setState(s){ PAGESTATE=s; var pc=document.getElementById('pageContent'); ['stLoading','stEmpty','stError'].forEach(function(id){var e=document.getElementById(id); if(e)e.hidden=true;}); var map={loading:'stLoading',empty:'stEmpty',error:'stError'}; if(s==='default'){ if(pc)pc.style.display=''; } else { if(pc)pc.style.display='none'; var e=document.getElementById(map[s]); if(e)e.hidden=false; } var sel=document.getElementById('stateSel'); if(sel&&sel.value!==s)sel.value=s; }
  (function(){ syncControls(); renderNav(); })();
 </script>
-<script src="app.js"></script>
 </body></html>
