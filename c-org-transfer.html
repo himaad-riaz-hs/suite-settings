@@ -69,6 +69,11 @@
   body.optb .page-header .ph-actions-b{display:none;}
   body.optb .suite-drawer .sd-search{display:block;}
  }
+ /* In-content list search (members/teams/accounts/tags/events) is a content filter that sits above its list.
+    In Option B the header search already covers content, so hide the in-content one there and keep the row's
+    actions right-aligned (!important beats the inline justify-content:space-between). */
+ body.optb .csearch{display:none;}
+ body.optb .csearch-row{justify-content:flex-end !important;}
 
  /* bulk-select action bar (DX-3607: apply a role to many at once) — composed from Bento primitives */
  .bulkbar{display:flex;align-items:center;gap:12px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:10px;padding:9px 14px;margin-bottom:16px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
@@ -407,7 +412,7 @@
   if(note) note.textContent='Previewing as '+ROLE_LABEL[ROLE]+' on the '+(PLAN==='ent'?'Enterprise':'Standard')+' plan'+(PLAN==='ent'?'.':' (Standard hides governance and Vanity URLs).');
   gateDanger();
  }
- function setOpt(o){ OPT=o; try{sessionStorage.setItem('navOpt',o);}catch(e){} QUERY=''; var ns=document.getElementById('navSearch'); if(ns)ns.value=''; var nh=document.getElementById('navSearchHeader'); if(nh)nh.value=''; filterContent(''); syncControls(); renderNav(); }   /* reset both searches on A/B switch so neither mode carries stale filter state */
+ function setOpt(o){ OPT=o; try{sessionStorage.setItem('navOpt',o);}catch(e){} QUERY=''; var ns=document.getElementById('navSearch'); if(ns)ns.value=''; var nh=document.getElementById('navSearchHeader'); if(nh)nh.value=''; Array.prototype.forEach.call(document.querySelectorAll('.csearch input'),function(i){i.value='';}); filterContent(''); syncControls(); renderNav(); }   /* reset nav + content searches on A/B switch so neither mode carries stale filter state */
  function setRole(r){ ROLE=r; try{sessionStorage.setItem('navRole',r);}catch(e){} syncControls(); renderNav(); }
  function setPlan(p){ PLAN=p; try{sessionStorage.setItem('navPlan',p);}catch(e){} syncControls(); renderNav(); }
  function setQuery(v){ QUERY=(v||'').trim().toLowerCase(); renderNav(); }   /* drawer search: filters the left nav (Option A, and Option B mobile fallback) */
