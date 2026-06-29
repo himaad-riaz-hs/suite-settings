@@ -236,11 +236,11 @@
 </div></div>
 </main>
 </div>
-<div class="demodock" id="demodock">
+<div class="demodock min" id="demodock">
  <div class="dd-head" onclick="ddToggle()">
   <span class="material-symbols-outlined">tune</span>
   <span class="ttl">Prototype controls</span>
-  <span class="material-symbols-outlined min" id="ddMin">expand_more</span>
+  <span class="material-symbols-outlined min" id="ddMin">expand_less</span>
  </div>
  <div class="dd-body">
   <div class="dd-lab">Nav option</div>
@@ -303,7 +303,7 @@
  var ROLE_IDX = {view:0, admin:1, sa:2, pm:3};
  var ROLE_LABEL = {view:'View only', admin:'Admin', sa:'Super admin', pm:'Paying member'};
  var PAGE_ID = 'teams';
- var OPT='a', ROLE='sa', PLAN='ent', QUERY='', COLL={}, dockMin=false;
+ var OPT='a', ROLE='sa', PLAN='ent', QUERY='', COLL={}, dockMin=true;
  try{ OPT=sessionStorage.getItem('navOpt')||'a'; }catch(e){}
  try{ ROLE=sessionStorage.getItem('navRole')||'sa'; }catch(e){}
  try{ PLAN=sessionStorage.getItem('navPlan')||'ent'; }catch(e){}
@@ -314,7 +314,7 @@
  function itemVisible(it,g){ if(it.acc.charAt(ROLE_IDX[ROLE])==='H') return false; if(!planOK(g.plan)) return false; if(!planOK(it.plan)) return false; if(QUERY && it.label.toLowerCase().indexOf(QUERY)===-1) return false; return true; }
  function groupVisible(g){ return g.items.filter(function(it){return itemVisible(it,g);}); }
  /* collapse module (Option A only) — isolated; remove this block + the isCollapsed/toggleCollapse uses to drop the feature */
- function isCollapsed(g, activeHere){ if(QUERY) return false; if(activeHere) return false; return (g.key in COLL) ? COLL[g.key] : g.collapsed; }
+ function isCollapsed(g, activeHere){ if(QUERY) return false; if(g.key in COLL) return COLL[g.key]; if(activeHere) return false; return g.collapsed; }
  function toggleCollapse(key){ var g; NAV.forEach(function(x){if(x.key===key)g=x;}); var cur=(key in COLL)?COLL[key]:g.collapsed; COLL[key]=!cur; try{sessionStorage.setItem('navColl',JSON.stringify(COLL));}catch(e){} renderNav(); }
  /* /collapse module */
  function navItem(it){ var a=el('a','sd-item'); a.href=it.href; a.setAttribute('data-id',it.id); a.appendChild(ic(it.icon)); a.appendChild(el('span','sd-label',it.label)); if(it.id===PAGE_ID)a.classList.add('on'); return a; }
