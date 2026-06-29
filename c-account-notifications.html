@@ -187,13 +187,10 @@
   .set-wrap .hs-table td{border:0 !important;padding:5px 0;text-align:left !important;}
   .mdrawer{width:100%;}
  }
- /* notifications sticky table-of-contents */
+ /* notifications layout */
  .notif-layout{display:flex;gap:24px;align-items:flex-start;}
  .notif-cols{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;}
- .notif-toc{position:sticky;top:8px;width:200px;flex:none;display:flex;flex-direction:column;gap:2px;}
- .notif-toc a{display:block;padding:7px 10px;border-radius:7px;text-decoration:none;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
- .notif-toc a:hover{background:var(--bento-component-list-item-fill-hovered);color:var(--bento-theme-color-text-base);}
- @media (max-width:860px){ .notif-layout{flex-direction:column;} .notif-toc{position:static;width:auto;flex-direction:row;flex-wrap:wrap;} }
+ @media (max-width:860px){ .notif-layout{flex-direction:column;} }
  /* per-page empty / loading / error states (previewable from the dock) */
  .page-state{padding-top:4px;}
  .empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 20px;}
@@ -223,7 +220,6 @@
  <div class="suite-topbar"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Open settings menu" title="Menu" onclick="toggleNav()"><span class="material-symbols-outlined">menu</span></button><h1>Settings</h1></div>
  <div class="set-scroll"><div class="set-wrap" id="pageContent"><h2 class="set-head">Notifications</h2><p class="set-sub">Choose what you&rsquo;re emailed about. Changes save automatically.</p>
 <div class="notif-layout">
- <nav class="notif-toc" aria-label="Notification sections"><a href="#ntGeneral">General</a><a href="#ntApprovals">Approvals</a><a href="#ntComments">Comments &amp; mentions</a><a href="#ntSocial">Social activity</a><a href="#ntOther">Other places</a></nav>
  <div class="notif-cols">
   <div class="set-card" id="ntGeneral"><div class="pad"><h3 class="sec">General</h3>
    <label class="nrow"><div><div class="nrow-t">New messages in my streams</div><div class="nrow-d">Flash the title bar when new messages arrive.</div></div><span class="hs-toggle is-on"></span></label>
