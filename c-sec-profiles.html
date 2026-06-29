@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Suite Settings &middot; Security · Audit log</title>
+<title>Suite Settings &middot; Security & governance · Security profiles</title>
 <link rel="stylesheet" href="colors_and_type.css">
 <link rel="stylesheet" href="components.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
@@ -139,13 +139,60 @@
  .pop .pq .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-base);}
  .pop .pq .pql{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
  .suite-navbtn.is-selected .circle{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
+ /* nav search */
+ .suite-drawer .sd-search{padding:8px 14px 12px;}
+ .suite-drawer .sd-search .hs-input{width:100%;box-sizing:border-box;}
+ .suite-drawer .sd-body{overflow-y:auto;}
+ .suite-drawer .sd-empty{padding:16px 14px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ /* nav item label + group header bits */
+ .suite-drawer .sd-item .sd-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+ .suite-drawer .sd-group .glabel{flex:1;}
+ .suite-drawer .sd-group .gcount{font:var(--hs-type-meta-b);font-weight:600;color:var(--bento-theme-color-text-subtle);margin-left:6px;}
+ /* option B sub-labels: same static section-header pattern, lighter weight than group headers */
+ .suite-drawer .sd-sub{padding:10px 10px 4px 14px;font-size:12px;font-weight:500;color:var(--bento-theme-color-text-subtle);}
+ /* prototype dock: segmented A/B toggle */
+ .demodock .dd-lab{font:var(--hs-type-meta-b);font-weight:700;color:var(--bento-theme-color-text-subtle);}
+ .demodock .dd-seg{display:flex;border:1px solid var(--bento-theme-color-border-base);border-radius:8px;overflow:hidden;}
+ .demodock .dd-segbtn{flex:1;appearance:none;border:0;background:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);padding:8px 6px;cursor:pointer;}
+ .demodock .dd-segbtn+.dd-segbtn{border-left:1px solid var(--bento-theme-color-border-base);}
+ .demodock .dd-segbtn.on{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
+ /* responsive: drawer behind a menu button on small screens */
+ .navmenu-btn{display:none;margin-right:4px;}
+ .nav-backdrop{display:none;}
+ @media (max-width:860px){
+  .navmenu-btn{display:inline-flex;}
+  .suite-drawer{position:fixed;top:0;bottom:0;left:0;width:300px;max-width:86vw;transform:translateX(-105%);transition:transform .22s ease;z-index:1200;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
+  body.nav-open .suite-drawer{transform:none;}
+  .nav-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1100;}
+  body.nav-open .nav-backdrop{display:block;}
+ }
+ /* member access drawer (right-side panel) */
+ .mdrawer-wrap{position:fixed;inset:0;z-index:1300;display:none;background:rgba(1,43,58,0.28);}
+ .mdrawer-wrap.open{display:block;}
+ .mdrawer{position:absolute;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--bento-theme-color-bg-surface);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);display:flex;flex-direction:column;}
+ .mdrawer .md-head{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ .mdrawer .md-head>.rowflex{flex:1;}
+ .mdrawer .md-body{padding:18px 16px;overflow-y:auto;}
+ /* autosave undo toast */
+ .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:1400;display:flex;align-items:center;gap:14px;background:var(--bento-theme-color-text-base);color:var(--bento-theme-color-bg-surface);padding:12px 16px;border-radius:10px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;font:var(--hs-type-body-md);}
+ .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+ .toast .toast-undo{appearance:none;border:0;background:none;color:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-md-b);text-decoration:underline;cursor:pointer;}
+ /* responsive: tables reflow to stacked cards */
+ @media (max-width:860px){
+  .set-wrap .hs-table thead{display:none;}
+  .set-wrap .hs-table, .set-wrap .hs-table tbody, .set-wrap .hs-table tr, .set-wrap .hs-table td{display:block;width:auto;}
+  .set-wrap .hs-table tr{border:1px solid var(--bento-theme-color-border-subtle);border-radius:10px;margin:0 0 10px;padding:8px 12px;}
+  .set-wrap .hs-table td{border:0 !important;padding:5px 0;text-align:left !important;}
+  .mdrawer{width:100%;}
+ }
+ /* notifications sticky table-of-contents */
+ .notif-layout{display:flex;gap:24px;align-items:flex-start;}
+ .notif-cols{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;}
+ .notif-toc{position:sticky;top:8px;width:200px;flex:none;display:flex;flex-direction:column;gap:2px;}
+ .notif-toc a{display:block;padding:7px 10px;border-radius:7px;text-decoration:none;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ .notif-toc a:hover{background:var(--bento-component-list-item-fill-hovered);color:var(--bento-theme-color-text-base);}
+ @media (max-width:860px){ .notif-layout{flex-direction:column;} .notif-toc{position:static;width:auto;flex-direction:row;flex-wrap:wrap;} }
 </style></head><body>
-<div class="protobar"><span class="pl">Prototype version</span>
- <select onchange="if(this.value)location.href=this.value" aria-label="Switch prototype version">
-  <option value="s2b-account-figma.html">Figma-matched (A)</option>
-  <option value="s7-org-members.html">Original build (B)</option>
-  <option value="c-settings-members.html" selected>Recommended (C)</option>
- </select></div>
 <div class="suite-app">
 <aside class="suite-rail">
  <a class="suite-brand" href="index.html" aria-label="Home"><img src="assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
@@ -162,61 +209,38 @@
   <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
   <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><span class="mini-av" style="width:36px;height:36px;font:var(--hs-type-body-sm-b)">MW</span></span></a>
  </div>
-</aside><aside class="suite-drawer">
-<div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div>
-<div class="sd-body">
-<div class="sd-group first" data-grp="profile">Account</div>
-<a class="sd-item" data-grp="profile" data-id="profile" data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="c-account-profile.html"><span class="material-symbols-outlined">person</span>Profile<span class="tag"></span></a>
-<a class="sd-item" data-grp="profile" data-id="prefs" data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="c-account-preferences.html"><span class="material-symbols-outlined">tune</span>Preferences<span class="tag"></span></a>
-<a class="sd-item" data-grp="profile" data-id="security" data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="c-account-security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy<span class="tag"></span></a>
-<a class="sd-item" data-grp="profile" data-id="notifs" data-acc="view:E admin:E sa:E pm:E hootdesk:E care:E custom:E" href="c-account-notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications<span class="tag"></span></a>
-<div class="sd-group" data-grp="overview">Organization</div>
-<a class="sd-item" data-grp="overview" data-id="overview" data-acc="view:R admin:E sa:E pm:E hootdesk:R care:H custom:R" href="c-org-overview.html"><span class="material-symbols-outlined">domain</span>Overview<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="members" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-settings-members.html"><span class="material-symbols-outlined">group</span>Members<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="teams" data-acc="view:R admin:E sa:E pm:E hootdesk:R care:H custom:E" href="c-org-teams.html"><span class="material-symbols-outlined">groups</span>Teams<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="social" data-acc="view:R admin:E sa:E pm:E hootdesk:R care:R custom:E" href="c-org-social.html"><span class="material-symbols-outlined">hub</span>Social &amp; ad accounts<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="vanity" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:H" href="c-org-vanity.html"><span class="material-symbols-outlined">link</span>Vanity URLs<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="workspace" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-org-workspace.html"><span class="material-symbols-outlined">workspaces</span>Workspace<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="roles" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:H" href="c-org-roles.html"><span class="material-symbols-outlined">admin_panel_settings</span>Roles &amp; permissions<span class="tag"></span></a>
-<a class="sd-item" data-grp="overview" data-id="billing" data-acc="view:H admin:H sa:R pm:E hootdesk:H care:H custom:H" href="c-org-billing.html"><span class="material-symbols-outlined">credit_card</span>Billing &amp; plan<span class="tag"></span></a>
-<button type="button" class="sd-group collapsible" data-grp="sso" aria-expanded="true" onclick="grpToggle(this)"><span class="glabel">Security &amp; governance</span><span class="material-symbols-outlined gchev">expand_more</span></button>
-<a class="sd-item" data-grp="sso" data-id="sso" data-acc="view:H admin:H sa:E pm:E hootdesk:H care:H custom:H" href="c-sec-sso.html"><span class="material-symbols-outlined">key</span>SSO &amp; MFA<span class="tag"></span></a>
-<a class="sd-item on" data-grp="sso" data-id="audit" data-acc="view:H admin:H sa:R pm:R hootdesk:H care:H custom:H" href="c-sec-audit.html"><span class="material-symbols-outlined">history</span>Audit log<span class="tag"></span></a>
-<a class="sd-item" data-grp="sso" data-id="export" data-acc="view:H admin:H sa:R pm:R hootdesk:H care:H custom:H" href="c-sec-export.html"><span class="material-symbols-outlined">download</span>Data export<span class="tag"></span></a>
-<button type="button" class="sd-group collapsible collapsed" data-grp="apps" aria-expanded="false" onclick="grpToggle(this)"><span class="glabel">Integrations</span><span class="material-symbols-outlined gchev">expand_more</span></button>
-<a class="sd-item" data-grp="apps" data-id="apps" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-int-apps.html"><span class="material-symbols-outlined">apps</span>Apps<span class="tag"></span></a>
-<a class="sd-item" data-grp="apps" data-id="mcp" data-acc="view:H admin:E sa:E pm:E hootdesk:H care:H custom:E" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span>MCP connectors<span class="tag"></span></a>
-</div></aside><main class="suite-main">
- <div class="suite-topbar"><h1>Settings</h1></div>
- <div class="set-scroll"><div class="set-wrap"><h2 class="set-head">Audit log</h2><p class="set-sub">Who changed what, and when. Config-change and access events across the organization.</p><div class="rowflex" style="justify-content:space-between;margin-bottom:16px"><div class="hs-input affix" style="max-width:320px"><span class="material-symbols-outlined lead">search</span><input placeholder="Search events&hellip;"></div><div class="rowflex"><div class="hs-input affix" style="max-width:200px"><input value="Last 30 days" readonly><button class="clr" aria-label="Change range" title="Change range"><span class="material-symbols-outlined">expand_more</span></button></div><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">download</span>Export log</button></div></div><div class="set-card"><table class="hs-table"><thead><tr><th>Timestamp</th><th>Actor</th><th>Action</th><th>Target</th></tr></thead><tbody><tr><td style="white-space:nowrap">Jun 23, 2026 &middot; 14:02</td><td><div class="rowflex"><span class="mini-av">AP</span><span style="font:var(--hs-type-body-sm-b)">Aisha Patel</span></div></td><td>Changed role to Admin</td><td class="secd" style="margin:0">bryn.morales@somos.com</td></tr><tr><td style="white-space:nowrap">Jun 23, 2026 &middot; 11:47</td><td><div class="rowflex"><span class="mini-av">BM</span><span style="font:var(--hs-type-body-sm-b)">Bryn Morales</span></div></td><td>Connected social account</td><td class="secd" style="margin:0">LinkedIn &middot; somos_li</td></tr><tr><td style="white-space:nowrap">Jun 22, 2026 &middot; 16:20</td><td><div class="rowflex"><span class="mini-av">AP</span><span style="font:var(--hs-type-body-sm-b)">Aisha Patel</span></div></td><td>Enabled MFA enforcement</td><td class="secd" style="margin:0">Organization: Somos</td></tr><tr><td style="white-space:nowrap">Jun 22, 2026 &middot; 09:05</td><td><div class="rowflex"><span class="mini-av">CL</span><span style="font:var(--hs-type-body-sm-b)">Chaya Levi</span></div></td><td>Exported conversation data</td><td class="secd" style="margin:0">Team: Regional Team</td></tr><tr><td style="white-space:nowrap">Jun 21, 2026 &middot; 18:33</td><td><div class="rowflex"><span class="mini-av">AP</span><span style="font:var(--hs-type-body-sm-b)">Aisha Patel</span></div></td><td>Removed member</td><td class="secd" style="margin:0">contractor@external.com</td></tr></tbody></table></div><div class="hs-alert hs-alert--info"><span class="material-symbols-outlined">info</span><div>Retention of audit events follows your organization retention policy. Enterprise plans retain 12 months.</div></div></div></div>
+</aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse" title="Collapse"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-search"><div class="hs-input affix"><span class="material-symbols-outlined lead">search</span><input id="navSearch" type="search" placeholder="Search settings&hellip;" oninput="setQuery(this.value)" aria-label="Search settings"></div></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main">
+ <div class="suite-topbar"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Open settings menu" title="Menu" onclick="toggleNav()"><span class="material-symbols-outlined">menu</span></button><h1>Settings</h1></div>
+ <div class="set-scroll"><div class="set-wrap"><h2 class="set-head">Security profiles</h2><p class="set-sub">Compliance and security add-ons applied across the organization.</p>
+<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">shield</span><div><div style="font:var(--hs-type-body-md-b)">Security Profiles</div><div class="secd" style="margin:0">Add-on compliance controls applied to members and content.</div></div></div><span class="hs-badge hs-badge--neutral">Enterprise add-on</span></div><div class="between"><div class="rowflex" style="gap:12px"><span class="material-symbols-outlined">policy</span><div><div style="font:var(--hs-type-body-md-b)">ProofPoint</div><div class="secd" style="margin:0">Compliance archiving add-on.</div></div></div><span class="hs-badge hs-badge--neutral">Enterprise add-on</span></div></div></div>
+<div class="hs-alert hs-alert--info"><span class="material-symbols-outlined">info</span><div>Security profiles were split out of SSO &amp; MFA so each governance area has its own home in the nav.</div></div></div></div>
 </main>
 </div>
 <div class="demodock" id="demodock">
  <div class="dd-head" onclick="ddToggle()">
-  <span class="material-symbols-outlined">science</span>
-  <span class="ttl" id="ddTtl">Prototype &middot; preview a role</span>
+  <span class="material-symbols-outlined">tune</span>
+  <span class="ttl">Prototype controls</span>
   <span class="material-symbols-outlined min" id="ddMin">expand_more</span>
  </div>
  <div class="dd-body">
-  <select id="roleSel" onchange="setRole(this.value)" aria-label="Preview a role">
-   <optgroup label="Organization roles">
-    <option value="sa" selected>Super Admin</option>
-    <option value="admin">Admin</option>
-    <option value="pm">Paying Member</option>
-    <option value="view">View Only</option>
-   </optgroup>
-   <optgroup label="Specialized (approx.)">
-    <option value="hootdesk">Hootdesk Settings Admin</option>
-    <option value="care">Care Agent</option>
-   </optgroup>
-   <optgroup label="Custom"><option value="custom">Custom (example)</option></optgroup>
+  <div class="dd-lab">Nav option</div>
+  <div class="dd-seg" role="group" aria-label="Navigation option">
+   <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; Collapsible</button>
+   <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; Sub-groups</button>
+  </div>
+  <label class="dd-lab" for="roleSel">Preview a role</label>
+  <select id="roleSel" onchange="setRole(this.value)">
+   <option value="view">View only</option>
+   <option value="admin">Admin</option>
+   <option value="sa" selected>Super admin</option>
+   <option value="pm">Paying member</option>
   </select>
-  <label class="dd-reveal"><input type="checkbox" id="revealChk" onchange="setReveal(this.checked)">Show what this role can&rsquo;t see</label>
+  <div class="dd-lab">Plan</div>
+  <div class="dd-seg" role="group" aria-label="Plan">
+   <button type="button" id="planStd" class="dd-segbtn" aria-pressed="false" onclick="setPlan('std')">Standard</button>
+   <button type="button" id="planEnt" class="dd-segbtn on" aria-pressed="true" onclick="setPlan('ent')">Enterprise</button>
+  </div>
   <div class="dd-note" id="ddNote"></div>
-  <div class="dd-note warn" id="ddWarn" style="display:none"><span class="material-symbols-outlined">lock</span><span id="ddWarnTxt"></span></div>
-  <div class="dd-rev-hint" id="ddRevHint" style="display:none">Dimmed rows with a &ldquo;hidden&rdquo; tag aren&rsquo;t shown to this role in the real product (we hide, not grey).</div>
-  <div class="dd-layers"><b>3 permission layers.</b> This previews the <b>org</b> role (which Settings you see). <b>Team</b> and <b>social-account</b> roles are a separate layer (which teams &amp; accounts you can act on) &mdash; see a person&rsquo;s combined access in Members &rarr; a name.</div>
-  <details><summary>Why this layout?</summary><div class="dd-about">Recommended IA (C). Nav grouped by scope (Account = you, Organization = the company), not a flat list. Security &amp; governance is nested under Organization and only appears when the org is entitled. Lower-traffic groups (Security &amp; governance, Integrations) collapse by default to keep the list short. Workspace is held (its items may belong to Perch). Settings opens from the avatar menu, which also keeps one-click shortcuts to your most-used destinations (parity with today&rsquo;s flyout).</div></details>
  </div>
 </div>
 <div class="popwrap" id="popwrap" onclick="togglePop()">
@@ -224,7 +248,7 @@
   <div class="idr"><span class="mini-av" style="width:44px;height:44px;font:var(--hs-type-body-md-b)">MW</span><div><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div></div>
   <div class="seclbl">Quick access</div>
   <a class="pq" href="c-account-profile.html"><span class="material-symbols-outlined">person</span><span class="pql">Profile</span></a>
-  <a class="pq" href="c-org-social.html"><span class="material-symbols-outlined">hub</span><span class="pql">Social accounts &amp; teams</span></a>
+  <a class="pq" href="c-org-social.html"><span class="material-symbols-outlined">hub</span><span class="pql">Social accounts</span></a>
   <a class="pq" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span><span class="pql">MCP connectors</span></a>
   <a class="pq" href="c-org-billing.html"><span class="material-symbols-outlined">credit_card</span><span class="pql">Plan &amp; billing</span></a>
   <a class="pq" href="#"><span class="material-symbols-outlined">pause_circle</span><span class="pql">Suspend content</span></a>
@@ -235,6 +259,7 @@
   <a class="pi" href="#"><span class="material-symbols-outlined">logout</span><div><div class="pt">Sign out</div></div></a>
  </div>
 </div>
+<div class="toast" id="toast"><span class="toast-msg"></span><button class="toast-undo" onclick="toastUndo()">Undo</button></div>
 <script>
  function togglePop(){document.getElementById('popwrap').classList.toggle('open');}
  function acTog(h){h.parentElement.classList.toggle('open');}
@@ -245,59 +270,90 @@
  function bulkClear(){document.querySelectorAll('.rowsel,#selAll').forEach(function(r){r.classList.remove('is-on');});var m=document.getElementById('bbMenu');if(m)m.classList.remove('open');bulkCount();}
  function bulkApply(role){document.querySelectorAll('.rowsel.is-on').forEach(function(r){var tr=r.closest('tr');var b=tr&&tr.querySelector('.rolebadge');if(b){b.textContent=role;b.className='hs-badge '+(role==='Super Admin'?'hs-badge--info':'hs-badge--neutral')+' rolebadge';}});bulkClear();}
  document.addEventListener('click',function(){var m=document.getElementById('bbMenu');if(m)m.classList.remove('open');});
- var ROLE_LABEL={view:'View Only',admin:'Admin',sa:'Super Admin',pm:'Paying Member',hootdesk:'Hootdesk Settings Admin',care:'Care Agent',custom:'Custom (example)'};
- var NOTES={
-  view:"View Only sees their own Account, plus read-only views of the teams and accounts they're on. All org management is hidden.",
-  admin:"Admin manages members, teams, social accounts, roles and integrations. Billing and Security & governance stay hidden. (MFA mandate and audit access are still open questions for eng.)",
-  sa:"Super Admin sees everything Admin does, plus Billing (read only) and, when the org is entitled, Security & governance. Data-export scope is still an open question.",
-  pm:"Paying Member is the billing owner: same view as Super Admin, but edits Billing and is the only role that can delete the organization.",
-  hootdesk:"Hootdesk Settings Admin (approximate): a View Only baseline plus Hootdesk / Inbox settings. Confirm exact Settings visibility with eng.",
-  care:"Care Agent (approximate): Inbox-focused. Their own Account plus the accounts they respond on, and minimal org Settings. Confirm with eng.",
-  custom:"Custom (example): roles are hand-picked and plan-gated. This example shows Admin minus Billing and Governance; real configs vary."
- };
- var PAGE_ID='audit', PAGE_LABEL='Audit log';
- var curRole='sa', reveal=false, dockMin=false;
- try{ var _r=sessionStorage.getItem('cRole'); if(_r)curRole=_r; reveal=sessionStorage.getItem('cReveal')==='1'; }catch(e){}
- function parseAcc(s){var o={};(s||'').trim().split(/\s+/).forEach(function(p){var kv=p.split(':');if(kv[0])o[kv[0]]=kv[1];});return o;}
- function setRole(r){curRole=r;try{sessionStorage.setItem('cRole',r);}catch(e){}var sel=document.getElementById('roleSel');if(sel&&sel.value!==r)sel.value=r;sync();}
- function setReveal(b){reveal=b;try{sessionStorage.setItem('cReveal',b?'1':'0');}catch(e){}sync();}
- function ddToggle(){dockMin=!dockMin;document.getElementById('demodock').classList.toggle('min',dockMin);updateHead();}
- function updateHead(){document.getElementById('ddTtl').textContent=dockMin?('Role: '+ROLE_LABEL[curRole]):'Prototype \u00b7 preview a role';document.getElementById('ddMin').textContent=dockMin?'expand_less':'expand_more';}
- function grpToggle(btn){var c=btn.classList.toggle('collapsed');btn.setAttribute('aria-expanded',c?'false':'true');applyColl();}
- function applyColl(){
-  document.querySelectorAll('.sd-group[data-grp]').forEach(function(g){
-   var grp=g.dataset.grp,collapsed=g.classList.contains('collapsed'),any=false;
-   document.querySelectorAll('.sd-item[data-grp="'+grp+'"]').forEach(function(it){
-    var acc=parseAcc(it.dataset.acc)[curRole]||'H';var rv=(acc!=='H')||reveal;
-    if(rv)any=true;it.style.display=(rv&&!collapsed)?'':'none';
+ // ===== Settings nav engine: Option A (collapsible) / Option B (static sub-groups) =====
+ var NAV = [{"key": "account", "label": "Account", "collapsed": false, "plan": null, "items": [{"id": "profile", "icon": "person", "label": "Profile", "href": "c-account-profile.html", "acc": "EEEE", "sub": null, "plan": null}, {"id": "notifs", "icon": "notifications", "label": "Notifications", "href": "c-account-notifications.html", "acc": "EEEE", "sub": null, "plan": null}, {"id": "security", "icon": "lock", "label": "Security & privacy", "href": "c-account-security.html", "acc": "EEEE", "sub": null, "plan": null}]}, {"key": "org", "label": "Organization", "collapsed": false, "plan": null, "items": [{"id": "overview", "icon": "domain", "label": "Overview", "href": "c-org-overview.html", "acc": "REEE", "sub": null, "plan": null}, {"id": "members", "icon": "group", "label": "Members", "href": "c-settings-members.html", "acc": "HEEE", "sub": "people", "plan": null}, {"id": "teams", "icon": "groups", "label": "Teams", "href": "c-org-teams.html", "acc": "REEE", "sub": "people", "plan": null}, {"id": "social", "icon": "hub", "label": "Social accounts", "href": "c-org-social.html", "acc": "REEE", "sub": "assets", "plan": null}, {"id": "roles", "icon": "admin_panel_settings", "label": "Roles & permissions", "href": "c-org-roles.html", "acc": "HEEE", "sub": "people", "plan": null}, {"id": "vanity", "icon": "link", "label": "Vanity URLs", "href": "c-org-vanity.html", "acc": "HEEE", "sub": "assets", "plan": "ent"}, {"id": "billing", "icon": "credit_card", "label": "Plan & billing", "href": "c-org-billing.html", "acc": "HHRE", "sub": "billing", "plan": null}]}, {"key": "sec", "label": "Security & governance", "collapsed": true, "plan": "ent", "items": [{"id": "sso", "icon": "key", "label": "SSO & MFA", "href": "c-sec-sso.html", "acc": "HHEE", "sub": null, "plan": null}, {"id": "logs", "icon": "history", "label": "Logs & exports", "href": "c-sec-logs.html", "acc": "HHRR", "sub": null, "plan": null}, {"id": "profiles", "icon": "shield", "label": "Security profiles", "href": "c-sec-profiles.html", "acc": "HHEE", "sub": null, "plan": null}]}, {"key": "int", "label": "Integrations", "collapsed": true, "plan": null, "items": [{"id": "mcp", "icon": "extension", "label": "MCP connectors", "href": "c-int-mcp.html", "acc": "HEEE", "sub": null, "plan": null}, {"id": "apps", "icon": "apps", "label": "Apps & API", "href": "c-int-apps.html", "acc": "HEEE", "sub": null, "plan": null}]}];
+ var SUBLABEL = {people:'People & roles', assets:'Accounts & assets', billing:'Billing & plan'};
+ var ROLE_IDX = {view:0, admin:1, sa:2, pm:3};
+ var ROLE_LABEL = {view:'View only', admin:'Admin', sa:'Super admin', pm:'Paying member'};
+ var PAGE_ID = 'profiles';
+ var OPT='a', ROLE='sa', PLAN='ent', QUERY='', COLL={}, dockMin=false;
+ try{ OPT=sessionStorage.getItem('navOpt')||'a'; }catch(e){}
+ try{ ROLE=sessionStorage.getItem('navRole')||'sa'; }catch(e){}
+ try{ PLAN=sessionStorage.getItem('navPlan')||'ent'; }catch(e){}
+ try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
+ function el(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e;}
+ function ic(n){var s=document.createElement('span'); s.className='material-symbols-outlined'; s.textContent=n; return s;}
+ function planOK(req){ return !req || req!=='ent' || PLAN==='ent'; }
+ function itemVisible(it,g){ if(it.acc.charAt(ROLE_IDX[ROLE])==='H') return false; if(!planOK(g.plan)) return false; if(!planOK(it.plan)) return false; if(QUERY && it.label.toLowerCase().indexOf(QUERY)===-1) return false; return true; }
+ function groupVisible(g){ return g.items.filter(function(it){return itemVisible(it,g);}); }
+ /* collapse module (Option A only) — isolated; remove this block + the isCollapsed/toggleCollapse uses to drop the feature */
+ function isCollapsed(g, activeHere){ if(QUERY) return false; if(activeHere) return false; return (g.key in COLL) ? COLL[g.key] : g.collapsed; }
+ function toggleCollapse(key){ var g; NAV.forEach(function(x){if(x.key===key)g=x;}); var cur=(key in COLL)?COLL[key]:g.collapsed; COLL[key]=!cur; try{sessionStorage.setItem('navColl',JSON.stringify(COLL));}catch(e){} renderNav(); }
+ /* /collapse module */
+ function navItem(it){ var a=el('a','sd-item'); a.href=it.href; a.setAttribute('data-id',it.id); a.appendChild(ic(it.icon)); a.appendChild(el('span','sd-label',it.label)); if(it.id===PAGE_ID)a.classList.add('on'); return a; }
+ function appendItems(body,g,vis){
+  if(OPT==='b' && g.key==='org'){
+   vis.filter(function(it){return !it.sub;}).forEach(function(it){ body.appendChild(navItem(it)); });
+   ['people','assets','billing'].forEach(function(sub){
+    var its=vis.filter(function(it){return it.sub===sub;});
+    if(!its.length) return;
+    body.appendChild(el('div','sd-sub',SUBLABEL[sub]));
+    its.forEach(function(it){ body.appendChild(navItem(it)); });
    });
-   g.style.display=any?'':'none';
-  });
+  } else {
+   vis.forEach(function(it){ body.appendChild(navItem(it)); });
+  }
  }
- function sync(){
-  document.querySelectorAll('.sd-item[data-acc]').forEach(function(it){
-   var acc=parseAcc(it.dataset.acc)[curRole]||'H';
-   var tag=it.querySelector('.tag');
-   it.classList.remove('is-muted','on');
-   if(tag){tag.className='tag';tag.innerHTML='';}
-   if(acc==='H'){
-    if(reveal){it.classList.add('is-muted');if(tag){tag.className='tag t-hidden';tag.innerHTML='<span class="material-symbols-outlined" style="font-size:13px">visibility_off</span>hidden';}}
-   }else{
-    if(it.dataset.id==='billing'&&curRole==='pm'){if(tag){tag.className='tag t-own';tag.textContent='billing owner';}}
-    if(it.dataset.id===PAGE_ID)it.classList.add('on');
+ function renderNav(){
+  var body=document.getElementById('navBody'); if(!body)return; body.innerHTML='';
+  NAV.forEach(function(g){
+   var vis=groupVisible(g);
+   if(!vis.length) return;                       /* role-adaptive: hide group header when empty */
+   var activeHere=vis.some(function(it){return it.id===PAGE_ID;});
+   if(OPT==='a'){
+    var collapsed=isCollapsed(g, activeHere);
+    var h=el('button','sd-group collapsible'+(collapsed?' collapsed':'')); h.type='button'; h.setAttribute('data-grp',g.key); h.setAttribute('aria-expanded',collapsed?'false':'true'); h.onclick=function(){toggleCollapse(g.key);};
+    h.appendChild(el('span','glabel',g.label));
+    if(collapsed) h.appendChild(el('span','gcount',String(vis.length)));
+    h.appendChild(ic('expand_more')).classList.add('gchev');
+    body.appendChild(h);
+    if(!collapsed) appendItems(body,g,vis);
+   } else {
+    var hd=el('div','sd-group'); hd.setAttribute('data-grp',g.key); hd.appendChild(el('span','glabel',g.label)); body.appendChild(hd);
+    appendItems(body,g,vis);
    }
   });
-  applyColl();
-  document.getElementById('ddNote').textContent=NOTES[curRole];
-  document.getElementById('ddRevHint').style.display=reveal?'':'none';
-  var cur=document.querySelector('.sd-item[data-id="'+PAGE_ID+'"]');
-  var cAcc=cur?(parseAcc(cur.dataset.acc)[curRole]||'H'):'E';
-  var warn=document.getElementById('ddWarn');
-  if(cAcc==='H'){warn.style.display='';document.getElementById('ddWarnTxt').textContent=ROLE_LABEL[curRole]+' can\u2019t open '+PAGE_LABEL+'; this page is shown only for comparison.';}
-  else{warn.style.display='none';}
-  updateHead();
+  if(!body.children.length){ body.appendChild(el('div','sd-empty', QUERY?'No settings match: '+QUERY:'Nothing to show for this role.')); }
  }
- (function(){var sel=document.getElementById('roleSel');if(sel)sel.value=curRole;var rc=document.getElementById('revealChk');if(rc)rc.checked=reveal;sync();})();
+ function syncControls(){
+  var a=document.getElementById('optA'), b=document.getElementById('optB');
+  if(a){a.classList.toggle('on',OPT==='a'); a.setAttribute('aria-pressed',OPT==='a');}
+  if(b){b.classList.toggle('on',OPT==='b'); b.setAttribute('aria-pressed',OPT==='b');}
+  var ps=document.getElementById('planStd'), pe=document.getElementById('planEnt');
+  if(ps){ps.classList.toggle('on',PLAN==='std'); ps.setAttribute('aria-pressed',PLAN==='std');}
+  if(pe){pe.classList.toggle('on',PLAN==='ent'); pe.setAttribute('aria-pressed',PLAN==='ent');}
+  var sel=document.getElementById('roleSel'); if(sel&&sel.value!==ROLE)sel.value=ROLE;
+  var note=document.getElementById('ddNote');
+  if(note) note.textContent='Previewing as '+ROLE_LABEL[ROLE]+' on the '+(PLAN==='ent'?'Enterprise':'Standard')+' plan'+(PLAN==='ent'?'.':' (Standard hides governance and Vanity URLs).');
+  gateDanger();
+ }
+ function setOpt(o){ OPT=o; try{sessionStorage.setItem('navOpt',o);}catch(e){} syncControls(); renderNav(); }
+ function setRole(r){ ROLE=r; try{sessionStorage.setItem('navRole',r);}catch(e){} syncControls(); renderNav(); }
+ function setPlan(p){ PLAN=p; try{sessionStorage.setItem('navPlan',p);}catch(e){} syncControls(); renderNav(); }
+ function setQuery(v){ QUERY=(v||'').trim().toLowerCase(); renderNav(); }
+ function toggleNav(){ document.body.classList.toggle('nav-open'); }
+ function ddToggle(){ dockMin=!dockMin; document.getElementById('demodock').classList.toggle('min',dockMin); var m=document.getElementById('ddMin'); if(m)m.textContent=dockMin?'expand_less':'expand_more'; }
+ // member access drawer (opened from a member name)
+ function openMember(e){ if(e)e.preventDefault(); var w=document.getElementById('mdWrap'); if(w)w.classList.add('open'); }
+ function closeMember(){ var w=document.getElementById('mdWrap'); if(w)w.classList.remove('open'); }
+ // autosave + undo toast: toggles save instantly, no Save button
+ var _undoTg=null, _toastT=null;
+ function showToast(msg, tg){ _undoTg=tg||null; var t=document.getElementById('toast'); if(!t)return; t.querySelector('.toast-msg').textContent=msg; t.querySelector('.toast-undo').style.display=tg?'':'none'; t.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(function(){t.classList.remove('show');},4000); }
+ function toastUndo(){ if(_undoTg)_undoTg.classList.toggle('is-on'); var t=document.getElementById('toast'); if(t)t.classList.remove('show'); }
+ document.addEventListener('click',function(e){ var lab=e.target.closest('label'); if(!lab)return; var c=lab.querySelector('.hs-toggle'); if(!c && PAGE_ID==='notifs') c=lab.querySelector('.hs-check'); if(c){ c.classList.toggle('is-on'); showToast('Setting saved.', c); } });
+ // gate the Overview delete action to Paying member in the role preview
+ function gateDanger(){ var a=document.getElementById('dzAction'), n=document.getElementById('dzNote'); if(!a)return; var pm=ROLE==='pm'; a.style.opacity=pm?'':'0.45'; a.style.pointerEvents=pm?'':'none'; if(n)n.style.display=pm?'none':''; }
+ (function(){ syncControls(); renderNav(); })();
 </script>
 <script src="app.js"></script>
 </body></html>
