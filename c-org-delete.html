@@ -97,6 +97,7 @@
  .gs-empty{padding:14px 10px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
  @media (max-width:860px){
   .page-header .ph-actions-b{display:none;}
+  .set-wrap{padding:24px 16px 72px;} /* match the 16px header gutter; 40px sides are too wide on small screens */
  }
  /* In-content list search (members/teams/accounts/tags/events) is a content filter that sits above its list.
     In Option B the header search already covers content, so hide the in-content one there and keep the row's
@@ -327,6 +328,29 @@
  .set-tile .st-ic{font-size:28px;color:var(--bento-theme-color-icon-base);}
  .set-tile .st-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
  .set-tile .st-d{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);line-height:1.4;}
+ /* ===== Mobile overrides — kept LAST so they win source-order ties over the base rules above (media queries add no specificity) ===== */
+ @media (max-width:860px){
+  /* Option B's only search is the header global search, which is hidden on mobile; fall back to the in-content
+     list filter so list pages (members/teams/social/tags) stay searchable on a phone, same as Option A. */
+  body.optb .csearch{display:flex;}
+  body.optb .csearch-row{justify-content:space-between !important;}
+ }
+ @media (max-width:600px){
+  .grid2{grid-template-columns:1fr;}              /* two-up form fields stack */
+  .stat{gap:20px;flex-wrap:wrap;}                 /* stat blocks wrap instead of overflowing */
+  .footer{flex-wrap:wrap;}                         /* action buttons wrap rather than clip */
+  .bulkbar{flex-wrap:wrap;}
+  .bulkbar .rowflex{flex-wrap:wrap;}               /* the bulk action button group wraps too (4 buttons exceed a phone width) */
+  .pop{left:8px;right:8px;width:auto;bottom:8px;}  /* profile popover fits the viewport (was 446px @ left:88px) */
+  .ac-head{padding-left:16px;padding-right:16px;}  /* reclaim the profile-accordion indent */
+  .ac-body{padding-left:24px;padding-right:16px;}
+  .ac-row+.ac-row::before{left:16px;right:16px;}
+  .set-grid{grid-template-columns:1fr;}            /* category hub cards: one per row on phones */
+  .csearch-row{flex-wrap:wrap;row-gap:12px;}       /* list toolbar: search on its own row, actions wrap below (was pushing buttons off-screen) */
+  .csearch-row>.csearch{flex:1 1 100%;max-width:none;}
+  .csearch-row .rowflex{flex-wrap:wrap;}
+  .ac-body .rowflex{flex-wrap:wrap;}               /* profile accordion action rows (avatar+buttons, email+Change) wrap instead of running off-screen */
+ }
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
