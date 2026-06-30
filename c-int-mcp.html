@@ -63,12 +63,10 @@
  .page-header .bc .sep{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-subtle);}
  @media (max-width:860px){ .page-header .ph-row{padding:12px 16px;} }
 
- /* Option B (sub-groups) gets the Teams & Orgs-style header: the global search + an add button move into the
-    page header, and the drawer search is hidden. Option A is untouched (search stays in the drawer). Toggled by
-    body.optb, set in syncControls() from the A/B control. On mobile the header is too narrow, so B falls back to
-    the drawer search inside the slide-out menu. */
- .page-header .ph-actions-b{display:none;}
- body.optb .page-header .ph-actions-b{display:flex;}
+ /* Global "Search settings" lives in the page header (PH_ACTIONS_B) for BOTH options now — a global search
+    (settings / members / teams / social) with a results dropdown, the pattern the design review approved (the
+    rejected nav-filtering drawer search was removed). Hidden on mobile where the header is too narrow. */
+ .page-header .ph-actions-b{display:flex;}
  body.optb .suite-drawer .sd-search{display:none;}
  .page-header .gs-wrap{position:relative;width:320px;max-width:42vw;}
  .page-header .ph-search{width:100%;}
@@ -86,8 +84,7 @@
  .gs-d{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
  .gs-empty{padding:14px 10px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
  @media (max-width:860px){
-  body.optb .page-header .ph-actions-b{display:none;}
-  body.optb .suite-drawer .sd-search{display:block;}
+  .page-header .ph-actions-b{display:none;}
  }
  /* In-content list search (members/teams/accounts/tags/events) is a content filter that sits above its list.
     In Option B the header search already covers content, so hide the in-content one there and keep the row's
@@ -196,6 +193,10 @@
  .pop .chev-btn{flex:none;align-self:center;width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;color:var(--bento-theme-color-icon-base);}
  .pop .pi:hover .chev-btn,.pop .pi:focus-visible .chev-btn{background:var(--bento-comp-button-ghost-color-fill-pressed,#e6eaeb);}
  .pop .chev-btn .material-symbols-outlined{font-size:20px;}
+ /* A/B popover variant toggle (explicit vs simplified) */
+ .pop-simple{display:none;}
+ body.popsimple .pop-explicit{display:none;}
+ body.popsimple .pop-simple{display:block;}
  .suite-navbtn.is-selected .circle{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
  /* nav search */
  .suite-drawer .sd-search{padding:8px 14px 12px;}
@@ -307,7 +308,7 @@
  .add-item .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-base);}
  /* Option B "ALT with Grid": simple top-category nav + a card grid of sub-settings on the page (Figma 2021:26371) */
  .grid-intro{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);max-width:760px;margin:0 0 20px;}
- .set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px;align-items:start;}
+ .set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px;grid-auto-rows:1fr;}
  .set-tile{display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--hs-surface);border:1px solid var(--hs-border);border-radius:12px;text-decoration:none;color:inherit;transition:border-color .12s,box-shadow .12s;}
  .set-tile:hover{border-color:var(--bento-theme-color-border-base);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
  .set-tile:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:2px;}
@@ -375,6 +376,11 @@
    <button type="button" id="planStd" class="dd-segbtn" aria-pressed="false" onclick="setPlan('std')">Standard</button>
    <button type="button" id="planEnt" class="dd-segbtn on" aria-pressed="true" onclick="setPlan('ent')">Enterprise</button>
   </div>
+  <div class="dd-lab">Popover (avatar menu)</div>
+  <div class="dd-seg" role="group" aria-label="Popover variant">
+   <button type="button" id="popExp" class="dd-segbtn on" aria-pressed="true" onclick="setPop('explicit')">Explicit</button>
+   <button type="button" id="popSim" class="dd-segbtn" aria-pressed="false" onclick="setPop('simple')">Simplified</button>
+  </div>
   <label class="dd-lab" for="stateSel">Page state</label>
   <select id="stateSel" onchange="setState(this.value)">
    <option value="default" selected>Default</option>
@@ -386,7 +392,7 @@
  </div>
 </div>
 <div class="popwrap" id="popwrap" onclick="togglePop()">
- <div class="pop" id="popPanel" role="menu" aria-label="Profile menu" onclick="event.stopPropagation()" onkeydown="popMenuKey(event)">
+ <div class="pop pop-explicit" id="popPanelExplicit" role="menu" aria-label="Profile menu" onclick="event.stopPropagation()" onkeydown="popMenuKey(event)">
   <div class="idr">
    <span class="av"><img src="assets/avatar-melanie.jpg" alt=""></span>
    <div class="idr-txt"><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div>
@@ -395,17 +401,28 @@
   <a class="pi" role="menuitem" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div class="pi-c"><div class="pt">Settings</div><div class="pd">Manage profile, preferences, plan &amp; billing, etc</div></div></a>
   <a class="pi" role="menuitem" href="c-org-social.html"><span class="material-symbols-outlined">people</span><div class="pi-c"><div class="pt">Social accounts &amp; teams</div><div class="pd">Manage social profiles, teams, members, etc</div></div></a>
   <a class="pi" role="menuitem" href="c-int-mcp.html"><span class="material-symbols-outlined">hub</span><div class="pi-c"><div class="pt">MCP connectors</div><div class="pd">Connect Hootsuite to your favourite AI tools</div></div></a>
-  <!-- Apps: PROVISIONAL — kept for now, instrument clicks before treating as a settled flyout item. -->
   <a class="pi" role="menuitem" href="c-int-apps.html"><span class="material-symbols-outlined">widgets</span><div class="pi-c"><div class="pt">Apps</div><div class="pd">Browse and install integrations</div></div></a>
   <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">help</span><div class="pi-c"><div class="pt">Help</div><div class="pd">Access tours, articles, and contact channels</div></div><span class="chev-btn" aria-hidden="true"><span class="material-symbols-outlined">keyboard_arrow_right</span></span></a>
-  <!-- Suspend content intentionally NOT here — removed from the flyout; permanent home TBC with Fabi (likely its publishing product-home). -->
+  <div class="div"></div>
+  <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">logout</span><div class="pi-c"><div class="signout">Sign out</div></div></a>
+ </div>
+ <div class="pop pop-simple" id="popPanelSimple" role="menu" aria-label="Profile menu" onclick="event.stopPropagation()" onkeydown="popMenuKey(event)">
+  <div class="idr">
+   <span class="av"><img src="assets/avatar-melanie.jpg" alt=""></span>
+   <div class="idr-txt"><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div>
+  </div>
+  <div class="div"></div>
+  <a class="pi" role="menuitem" href="c-account-profile.html"><span class="material-symbols-outlined">account_circle</span><div class="pi-c"><div class="pt">Account settings</div><div class="pd">Profile, preferences, security, notifications, billing</div></div></a>
+  <a class="pi" role="menuitem" href="c-org-overview.html"><span class="material-symbols-outlined">domain</span><div class="pi-c"><div class="pt">Organization settings</div><div class="pd">Members, teams, social accounts, roles, governance</div></div></a>
+  <a class="pi" role="menuitem" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span><div class="pi-c"><div class="pt">Integrations</div><div class="pd">Connectors, apps, and API access</div></div></a>
+  <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">help</span><div class="pi-c"><div class="pt">Help</div><div class="pd">Access tours, articles, and contact channels</div></div><span class="chev-btn" aria-hidden="true"><span class="material-symbols-outlined">keyboard_arrow_right</span></span></a>
   <div class="div"></div>
   <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">logout</span><div class="pi-c"><div class="signout">Sign out</div></div></a>
  </div>
 </div>
 <div class="toast" id="toast"><span class="toast-msg"></span><button class="toast-undo" onclick="toastUndo()">Undo</button></div>
 <script>
- function popMenuItems(){return Array.prototype.slice.call(document.querySelectorAll('#popPanel .pi'));}
+ function popMenuItems(){var p=document.body.classList.contains('popsimple')?document.getElementById('popPanelSimple'):document.getElementById('popPanelExplicit');return p?Array.prototype.slice.call(p.querySelectorAll('.pi')):[];}
  function popMenuKey(e){var it=popMenuItems();var i=it.indexOf(document.activeElement);if(e.key==='ArrowDown'){e.preventDefault();(it[i+1]||it[0]).focus();}else if(e.key==='ArrowUp'){e.preventDefault();(i>0?it[i-1]:it[it.length-1]).focus();}}
  function togglePop(){var w=document.getElementById('popwrap');var willOpen=!w.classList.contains('open');w.classList.toggle('open');if(willOpen){var it=popMenuItems();if(it[0])setTimeout(function(){it[0].focus();},0);}}
  function acTog(h){h.parentElement.classList.toggle('open');}
@@ -424,11 +441,12 @@
  var ROLE_IDX = {view:0, admin:1, sa:2, pm:3};
  var ROLE_LABEL = {view:'View only', admin:'Admin', sa:'Super admin', pm:'Paying member'};
  var PAGE_ID = 'mcp';
- var OPT='a', ROLE='admin', PLAN='ent', QUERY='', COLL={}, dockMin=true;   /* default role preview = Admin (applies to both nav options) */
+ var OPT='a', ROLE='admin', PLAN='ent', QUERY='', COLL={}, dockMin=true, POPMODE='explicit';   /* default role preview = Admin (applies to both nav options) */
  try{ OPT=sessionStorage.getItem('navOpt')||'a'; }catch(e){}
  try{ ROLE=sessionStorage.getItem('navRole')||'admin'; }catch(e){}
  try{ PLAN=sessionStorage.getItem('navPlan')||'ent'; }catch(e){}
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
+ try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
  function el(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e;}
  function ic(n){var s=document.createElement('span'); s.className='material-symbols-outlined'; s.textContent=n; return s;}
  function planOK(req){ return !req || req!=='ent' || PLAN==='ent'; }
@@ -488,11 +506,16 @@
   var sel=document.getElementById('roleSel'); if(sel&&sel.value!==ROLE)sel.value=ROLE;
   var note=document.getElementById('ddNote');
   if(note) note.textContent='Previewing as '+ROLE_LABEL[ROLE]+' on the '+(PLAN==='ent'?'Enterprise':'Standard')+' plan'+(PLAN==='ent'?'.':' (Standard hides governance and Vanity URLs).');
+  document.body.classList.toggle('popsimple', POPMODE==='simple');
+  var pe=document.getElementById('popExp'), ps=document.getElementById('popSim');
+  if(pe){pe.classList.toggle('on',POPMODE==='explicit'); pe.setAttribute('aria-pressed',POPMODE==='explicit');}
+  if(ps){ps.classList.toggle('on',POPMODE==='simple'); ps.setAttribute('aria-pressed',POPMODE==='simple');}
   gateDanger(); applyGridGating();
  }
  function setOpt(o){ OPT=o; try{sessionStorage.setItem('navOpt',o);}catch(e){} QUERY=''; var ns=document.getElementById('navSearch'); if(ns)ns.value=''; var nh=document.getElementById('navSearchHeader'); if(nh)nh.value=''; Array.prototype.forEach.call(document.querySelectorAll('.csearch input'),function(i){i.value='';}); filterContent(''); gsClose(); syncControls(); renderNav(); }   /* reset nav + content searches on A/B switch so neither mode carries stale filter state */
  function setRole(r){ ROLE=r; try{sessionStorage.setItem('navRole',r);}catch(e){} syncControls(); renderNav(); }
  function setPlan(p){ PLAN=p; try{sessionStorage.setItem('navPlan',p);}catch(e){} syncControls(); renderNav(); }
+ function setPop(m){ POPMODE=m; try{sessionStorage.setItem('popMode',m);}catch(e){} syncControls(); }   /* A/B test: switch avatar-menu variant (explicit vs simplified) */
  function setQuery(v){ QUERY=(v||'').trim().toLowerCase(); renderNav(); }   /* drawer search: filters the left nav (Option A, and Option B mobile fallback) */
  /* Option B header search = CONTENT search: filters the current page's list rows; never touches the left nav. */
  function filterContent(v){
