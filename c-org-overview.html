@@ -249,6 +249,15 @@
  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:1400;display:flex;align-items:center;gap:14px;background:var(--bento-theme-color-text-base);color:var(--bento-theme-color-bg-surface);padding:12px 16px;border-radius:10px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;font:var(--hs-type-body-md);}
  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
  .toast .toast-undo{appearance:none;border:0;background:none;color:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-md-b);text-decoration:underline;cursor:pointer;}
+ /* edit modal (Bento dialog): focused editing for Profile sections; becomes a full-screen sheet on phones */
+ .modal-wrap{position:fixed;inset:0;z-index:1350;display:none;align-items:center;justify-content:center;background:rgba(1,43,58,0.32);padding:24px;}
+ .modal-wrap.open{display:flex;}
+ .modal{width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;background:var(--bento-theme-color-bg-surface);border-radius:14px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);overflow:hidden;}
+ .modal-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ .modal-head .mt{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);flex:1;min-width:0;}
+ .modal-head .hs-btn--icon{flex:none;}
+ .modal-body{padding:20px;overflow-y:auto;}
+ .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--bento-theme-color-border-subtle);}
  /* responsive: tables reflow to stacked cards */
  @media (max-width:860px){
   .set-wrap .hs-table thead{display:none;}
@@ -350,6 +359,8 @@
   .csearch-row>.csearch{flex:1 1 100%;max-width:none;}
   .csearch-row .rowflex{flex-wrap:wrap;}
   .ac-body .rowflex{flex-wrap:wrap;}               /* profile accordion action rows (avatar+buttons, email+Change) wrap instead of running off-screen */
+  .modal-wrap{padding:0;align-items:stretch;}      /* edit modal becomes a full-screen sheet on phones */
+  .modal{max-width:none;max-height:none;height:100%;border-radius:0;}
  }
 </style></head><body>
 <div class="suite-app">
@@ -495,7 +506,7 @@
    <div class="idr-txt"><div class="nm">Melanie Wilkins</div><span class="plan">Enterprise plan</span></div>
   </div>
   <div class="div"></div>
-  <a class="pi" role="menuitem" href="c-settings-members.html"><span class="material-symbols-outlined">settings</span><div class="pi-c"><div class="pt">Settings</div><div class="pd">Manage profile, preferences, plan &amp; billing, etc</div></div></a>
+  <a class="pi" role="menuitem" href="c-account-profile.html"><span class="material-symbols-outlined">settings</span><div class="pi-c"><div class="pt">Account settings</div><div class="pd">Profile, preferences, security, notifications, billing</div></div></a>
   <a class="pi" role="menuitem" href="c-org-social.html"><span class="material-symbols-outlined">people</span><div class="pi-c"><div class="pt">Social accounts &amp; teams</div><div class="pd">Manage social profiles, teams, members, etc</div></div></a>
   <a class="pi" role="menuitem" href="c-int-mcp.html"><span class="material-symbols-outlined">hub</span><div class="pi-c"><div class="pt">MCP connectors</div><div class="pd">Connect Hootsuite to your favourite AI tools</div></div></a>
   <a class="pi" role="menuitem" href="c-int-apps.html"><span class="material-symbols-outlined">widgets</span><div class="pi-c"><div class="pt">Apps</div><div class="pd">Browse and install integrations</div></div></a>
@@ -511,7 +522,7 @@
   <div class="div"></div>
   <a class="pi" role="menuitem" href="c-account-profile.html"><span class="material-symbols-outlined">account_circle</span><div class="pi-c"><div class="pt">Account settings</div><div class="pd">Profile, preferences, security, notifications, billing</div></div></a>
   <a class="pi" role="menuitem" href="c-org-overview.html"><span class="material-symbols-outlined">domain</span><div class="pi-c"><div class="pt">Organization settings</div><div class="pd">Members, teams, social accounts, roles, governance</div></div></a>
-  <a class="pi" role="menuitem" href="c-int-mcp.html"><span class="material-symbols-outlined">extension</span><div class="pi-c"><div class="pt">Integrations</div><div class="pd">Connectors, apps, and API access</div></div></a>
+  <a class="pi" role="menuitem" href="c-integrations.html"><span class="material-symbols-outlined">extension</span><div class="pi-c"><div class="pt">Integrations</div><div class="pd">Connectors, apps, and API access</div></div></a>
   <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">help</span><div class="pi-c"><div class="pt">Help</div><div class="pd">Access tours, articles, and contact channels</div></div><span class="chev-btn" aria-hidden="true"><span class="material-symbols-outlined">keyboard_arrow_right</span></span></a>
   <div class="div"></div>
   <a class="pi" role="menuitem" href="#"><span class="material-symbols-outlined">logout</span><div class="pi-c"><div class="signout">Sign out</div></div></a>
@@ -657,6 +668,54 @@
  // member access drawer (opened from a member name)
  function openMember(e){ if(e)e.preventDefault(); var tr=(e&&e.target)?e.target.closest('tr'):null; if(tr){ var nm=tr.querySelector('.mlink'),em=tr.querySelector('.secd'),rb=tr.querySelector('.rolebadge'),av=tr.querySelector('.mini-av'),tds=tr.querySelectorAll('td'); var via=(tds[3]?tds[3].textContent:'Direct').trim(),name=nm?nm.textContent:'',role=rb?rb.textContent:''; var st=function(id,t){var x=document.getElementById(id);if(x)x.textContent=t;}; st('mdAv',av?av.textContent:''); st('mdName',name); st('mdMeta',(em?em.textContent:'')+' \u00b7 '+role); var rbd=document.getElementById('mdRole'); if(rbd){rbd.textContent=role; rbd.className='hs-badge '+(/super admin/i.test(role)?'hs-badge--info':'hs-badge--neutral');} st('mdAccessNote', /direct/i.test(via)?('This role is assigned directly to '+name+'.'):('Comes '+via+'. Ends if they leave that team, and stays with the team.')); } var w=document.getElementById('mdWrap'); if(w)w.classList.add('open'); }
  function closeMember(){ var w=document.getElementById('mdWrap'); if(w)w.classList.remove('open'); }
+ /* Roles: open a role's rules in a right-side drawer (in-context) instead of navigating to the full page.
+    Data-driven per role so each shows its own real rules; the href stays as a no-JS fallback. */
+ var ROLE_RULES = {
+  "Super Admin": {group:"Organization role", scope:"Full control, including billing and destructive actions.", sections:[
+   {h:"Members", rows:[["Invite members",1],["Remove members",1],["Change member roles",1],["Manage Super Admins",1]]},
+   {h:"Social accounts", rows:[["Connect accounts",1],["Reconnect accounts",1],["Disconnect / transfer accounts",1]]},
+   {h:"Governance & billing", rows:[["View audit log",1],["Request data export",1],["Configure SSO / MFA",1],["Manage plan and billing",1]]}]},
+  "Admin": {group:"Organization role", scope:"Manage members, teams, and social accounts.", sections:[
+   {h:"Members", rows:[["Invite members",1],["Remove members",1],["Change member roles",1],["Manage Super Admins",0]]},
+   {h:"Social accounts", rows:[["Connect accounts",1],["Reconnect accounts",1],["Disconnect / transfer accounts",0]]},
+   {h:"Governance & billing", rows:[["View audit log",1],["Request data export",1],["Configure SSO / MFA",0],["Manage plan and billing",0]]}]},
+  "View Only": {group:"Organization role", scope:"Read-only access to org settings.", sections:[
+   {h:"Members", rows:[["Invite members",0],["Remove members",0],["Change member roles",0],["Manage Super Admins",0]]},
+   {h:"Social accounts", rows:[["Connect accounts",0],["Reconnect accounts",0],["Disconnect / transfer accounts",0]]},
+   {h:"Governance & billing", rows:[["View audit log",1],["Request data export",0],["Configure SSO / MFA",0],["Manage plan and billing",0]]}]},
+  "Compliance reviewer": {group:"Organization role", scope:"Segregation of duties: review and audit, cannot publish.", sections:[
+   {h:"Members", rows:[["Invite members",0],["Remove members",0],["Change member roles",0],["Manage Super Admins",0]]},
+   {h:"Social accounts", rows:[["Connect accounts",0],["Reconnect accounts",0],["Disconnect / transfer accounts",0]]},
+   {h:"Governance & billing", rows:[["View audit log",1],["Request data export",1],["Configure SSO / MFA",0],["Manage plan and billing",0]]}]},
+  "Team Admin": {group:"Team role", scope:"Manage the team's members and the accounts it works on.", sections:[
+   {h:"Team management", rows:[["Manage team members",1],["Manage team's social accounts",1],["Edit team settings",1]]},
+   {h:"Content", rows:[["Approve content",1],["Publish on behalf of the team",1]]}]},
+  "Team Member": {group:"Team role", scope:"Work within assigned accounts. Publishing depends on the social account role.", sections:[
+   {h:"Team management", rows:[["Manage team members",0],["Manage team's social accounts",0],["Edit team settings",0]]},
+   {h:"Content", rows:[["Approve content",0],["Publish on behalf of the team",0]]}]},
+  "Advanced": {group:"Social account role", scope:"Publish, edit, and delete others' content.", sections:[
+   {h:"Content", rows:[["Create drafts",1],["Publish own content",1],["Edit others' content",1],["Delete others' content",1],["Reply to comments and messages",1]]}]},
+  "Editor": {group:"Social account role", scope:"Publish own content.", sections:[
+   {h:"Content", rows:[["Create drafts",1],["Publish own content",1],["Edit others' content",0],["Delete others' content",0],["Reply to comments and messages",1]]}]},
+  "Limited": {group:"Social account role", scope:"Draft only, cannot publish.", sections:[
+   {h:"Content", rows:[["Create drafts",1],["Publish own content",0],["Edit others' content",0],["Delete others' content",0],["Reply to comments and messages",0]]}]}
+ };
+ function roleIconFor(g){ return g==="Team role"?"groups":(g==="Social account role"?"hub":"shield_person"); }
+ function openRole(name){ var r=ROLE_RULES[name]; if(!r) return; var st=function(id,t){var x=document.getElementById(id);if(x)x.textContent=t;}; st("roleName",name); st("roleGroup",r.group); st("roleScope",r.scope); var ic=document.getElementById("roleIcon"); if(ic)ic.textContent=roleIconFor(r.group); var html=""; r.sections.forEach(function(s){ html+='<div style="margin-bottom:18px"><h3 class="sec" style="font-size:15px;margin:0 0 6px">'+s.h+'</h3><table class="hs-table"><tbody>'; s.rows.forEach(function(row){ var ok=row[1]; html+='<tr><td>'+row[0]+'</td><td style="text-align:right;width:56px"><span class="material-symbols-outlined" title="'+(ok?'Allowed':'Not allowed')+'" style="color:var('+(ok?'--bento-theme-color-icon-positive':'--bento-theme-color-icon-subtle')+')">'+(ok?'check':'remove')+'</span></td></tr>'; }); html+='</tbody></table></div>'; }); var box=document.getElementById("roleRules"); if(box)box.innerHTML=html; var w=document.getElementById("roleWrap"); if(w)w.classList.add("open"); }
+ function openRoleFrom(el){ var b=el.closest(".between"); if(!b) return true; var nm=b.querySelector('div[style*="body-md-b"]'); var name=nm?nm.textContent.trim():""; if(ROLE_RULES[name]){ openRole(name); return false; } return true; }
+ function closeRole(){ var w=document.getElementById("roleWrap"); if(w)w.classList.remove("open"); }
+ /* Esc closes any open right-side drawer or the profile popover (a11y for the dialog panels) */
+ document.addEventListener('keydown', function(e){ if(e.key!=='Escape') return; ['roleWrap','mdWrap','editWrap'].forEach(function(id){var w=document.getElementById(id); if(w&&w.classList.contains('open'))w.classList.remove('open');}); var pw=document.getElementById('popwrap'); if(pw&&pw.classList.contains('open'))pw.classList.remove('open'); });
+ /* Profile edit-in-modal: read-only view + a focused dialog per section. One modal, body swapped by section. */
+ var EDIT_FORMS = {
+  user:{title:"Edit user information",save:"Save changes",primary:true,body:'<div class="rowflex" style="gap:16px;margin-bottom:16px"><span class="avatar-lg">MW</span><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">photo_camera</span>Change picture</button><button class="hs-btn hs-btn--ghost">Remove</button></div><div class="grid2"><div class="hs-field"><label class="hs-field-label">First name</label><input class="hs-input" value="Melanie"></div><div class="hs-field"><label class="hs-field-label">Last name</label><input class="hs-input" value="Wilkins"></div><div class="hs-field"><label class="hs-field-label">Initials</label><input class="hs-input" value="MW"></div><div class="hs-field"><label class="hs-field-label">Job title</label><input class="hs-input" value="Social Lead"></div><div class="hs-field full"><label class="hs-field-label">Bio / description</label><textarea class="hs-input">Social lead managing brand and regional teams.</textarea></div><div class="hs-field"><label class="hs-field-label">Company name</label><input class="hs-input" value="Somos"></div><div class="hs-field full"><label class="rowflex" style="cursor:pointer"><span class="hs-check is-on"></span><span style="font:var(--hs-type-body-md)">Add initials to new posts on X</span></label></div></div>'},
+  email:{title:"Change email",save:"Save changes",primary:true,body:'<div class="hs-field" style="margin-bottom:14px"><label class="hs-field-label">Current email</label><input class="hs-input" value="melanie.wilkins@somos.com" readonly></div><div class="hs-field"><label class="hs-field-label">New email</label><input class="hs-input" type="email" placeholder="you@company.com"></div>'},
+  password:{title:"Change password",save:"Update password",primary:true,body:'<div class="hs-field" style="margin-bottom:14px"><label class="hs-field-label">Current password</label><input class="hs-input" type="password" autocomplete="off"></div><div class="hs-field" style="margin-bottom:14px"><label class="hs-field-label">New password</label><input class="hs-input" type="password" autocomplete="off"></div><div class="hs-field"><label class="hs-field-label">Confirm new password</label><input class="hs-input" type="password" autocomplete="off"></div>'},
+  "delete":{title:"Delete account",save:"Delete account",primary:false,body:'<div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>This permanently removes your account and data.</b> You lose access to all teams and assigned social accounts. This cannot be undone.</div></div>'}
+ };
+ function openEdit(which){ var f=EDIT_FORMS[which]; if(!f) return; document.getElementById('editTitle').textContent=f.title; document.getElementById('editBody').innerHTML=f.body; var sv=document.getElementById('editSave'); sv.textContent=f.save; sv.className='hs-btn '+(f.primary?'hs-btn--primary':'hs-btn--secondary'); sv.setAttribute('data-kind',which); var w=document.getElementById('editWrap'); w.classList.add('open'); var fi=w.querySelector('input:not([readonly]),textarea')||sv; setTimeout(function(){fi.focus();},30); }
+ function closeEdit(){ var w=document.getElementById('editWrap'); if(w)w.classList.remove('open'); }
+ function saveEdit(){ var sv=document.getElementById('editSave'); var k=sv?sv.getAttribute('data-kind'):''; closeEdit(); showToast(k==='delete'?'Account deletion requested.':'Changes saved.'); }
  function toggleSocialAccts(btn){ var el=document.getElementById('ntSocialAccts'); if(!el)return; el.hidden=!el.hidden; btn.textContent=el.hidden?'Choose accounts':'Hide accounts'; }
  // autosave + undo toast: toggles save instantly, no Save button
  var _undoTg=null, _toastT=null;
