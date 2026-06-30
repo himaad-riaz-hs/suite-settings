@@ -22,13 +22,17 @@
  .set-wrap{max-width:860px;margin:0 auto;padding:32px 40px 80px;}
  .set-head{margin:0 0 4px;font:var(--hs-type-title-screen);color:var(--bento-theme-color-text-base);}
  .set-sub{margin:0 0 20px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);}
- .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:20px;}
+ .set-card{background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;margin-bottom:24px;}
  .pad{padding:24px;} .pad+.pad{border-top:1px solid var(--bento-theme-color-border-subtle);}
- .sec{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);margin:0 0 6px;}
- .secd{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 16px;}
- .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;} .full{grid-column:1/-1;}
+ .sec{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);margin:0 0 8px;}
+ .secd{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 20px;}
+ .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;} .full{grid-column:1/-1;}
+ /* vertical control list + sub-group label — consistent spacing and hierarchy on form pages */
+ .stack{display:flex;flex-direction:column;gap:16px;}
+ .subhead{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin:28px 0 14px;}
+ .pad>.subhead:first-child{margin-top:0;}
  .rowflex{display:flex;align-items:center;gap:12px;}
- .between{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+ .between{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;}
  .between+.between{border-top:1px solid var(--bento-theme-color-border-subtle);}
  .footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--bento-theme-color-border-subtle);}
  .avatar-lg{width:56px;height:56px;border-radius:999px;background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);display:grid;place-items:center;font:var(--hs-type-title-sub);}

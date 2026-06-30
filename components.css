@@ -484,6 +484,8 @@
 .hs-check.is-on::before  { content: "\e834"; font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; } /* check_box */
 .hs-check.indeterminate::before { content: "\e909"; font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; } /* indeterminate_check_box */
 .hs-radio.is-on::before  { content: "\e837"; font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; } /* radio_button_checked */
+/* Selected checkbox / radio fill = the same blue as the switch ON state (Bento comp-checkbox / comp-radio selected). Unchecked stays neutral icon-base. */
+.hs-check.is-on, .hs-check.indeterminate, .hs-radio.is-on { color: var(--bento-component-switch-track-on, var(--bento-theme-color-bg-nav)); }
 .hs-check[aria-disabled="true"], .hs-radio[aria-disabled="true"],
 .hs-check.is-disabled, .hs-radio.is-disabled { color: var(--bento-theme-color-icon-disabled); cursor: not-allowed; }
 
