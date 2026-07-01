@@ -84,7 +84,8 @@
  .page-header .ph-actions-b{display:flex;}
  body.optb .suite-drawer .sd-search{display:none;}
  .page-header .gs-wrap{position:relative;width:320px;max-width:42vw;}
- .page-header .ph-search{width:100%;}
+ .page-header .ph-search{width:100%;box-sizing:border-box;} /* keep the field inside its 320px wrapper so it can't overflow under the + button */
+ .page-header .ph-actions-b{gap:20px;} /* a touch more room between the search and the + */
  .page-header .ph-actions-b .hs-btn--icon{flex:none;}
  /* global-search results dropdown */
  .gs-results{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:70;max-height:64vh;overflow:auto;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:10px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:6px;display:none;}
