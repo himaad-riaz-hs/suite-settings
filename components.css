@@ -509,6 +509,7 @@
   font-family: var(--hs-font-body, var(--bento-theme-font-families-primary, "Source Sans 3", sans-serif));
   color: var(--hs-fg-secondary);
   cursor: pointer;
+  text-decoration: none;     /* tab is an <a>; never inherit the global a{underline} (the active ::after is the only indicator) */
   position: relative;        /* line-style active indicator hugs the text */
   transition: color 150ms;
 }
