@@ -438,10 +438,10 @@
  <div class="dd-body">
   <div class="dd-lab">Test version</div>
   <div class="dd-seg" role="group" aria-label="Navigation option">
-   <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; With search</button>
-   <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; No search</button>
+   <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; Collapsible + search</button>
+   <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; Flat, no search</button>
   </div>
-  <div class="dd-rev-hint">Two versions of the same settings, identical collapsible categorized nav and content; the only difference is the global &ldquo;Search settings&rdquo; box. A = search + collapsible categories; B removes the search, so B is a pure test of whether people can navigate to a setting by browsing the categories alone (and how much search was carrying). In-content list filters stay in both (they narrow a list, they don&rsquo;t find a page). Groups (collapsible): Account; Integrations; Organization; Publishing; Security &amp; governance, same role/plan gating.</div>
+  <div class="dd-rev-hint">Two nav designs, same content + groups, to see which users prefer. A = collapsible category groups + global &ldquo;Search settings&rdquo;. B = a flat, non-collapsible list with no search. Heads-up: A and B differ on TWO things (collapse and search), so this reads overall preference between the two designs, not which single feature drove it, give B a search box too if you want to isolate collapse alone. In-content list filters stay in both. Groups: Account; Integrations; Organization; Publishing; Security &amp; governance, same role/plan gating.</div>
   <label class="dd-lab" for="roleSel">Preview a role</label>
   <select id="roleSel" onchange="setRole(this.value)">
    <option value="view">View only</option>
@@ -562,9 +562,8 @@
  }
  function renderNav(){
   var body=document.getElementById('navBody'); if(!body)return; body.innerHTML='';
-  /* Collapsible categorized nav — shared by BOTH versions (Option A = search + collapsible; Option B = same nav,
-     search removed). The A/B variable is the global search only (body.nosearch, set in syncControls). renderStaticNav
-     is kept for reference but no longer used. */
+  if(OPT==='b'){ renderStaticNav(body); return; }   /* Option B = flat, NON-collapsible list (and no search) */
+  /* Option A = collapsible categorized groups + global search. A/B is a preference test: which nav do users like better? */
   NAV.forEach(function(g){
    var vis=groupVisible(g);
    if(!vis.length) return;                       /* role-adaptive: hide group header when empty */
