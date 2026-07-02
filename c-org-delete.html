@@ -432,7 +432,7 @@
    <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; With search</button>
    <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; No search</button>
   </div>
-  <div class="dd-rev-hint">Two versions of the same settings, identical flat nav and content; the only difference is the global &ldquo;Search settings&rdquo; box. A has it; B removes it, so B is a pure test of whether people can navigate to a setting by browsing alone (and how much search was carrying). In-content list filters stay in both (they narrow a list, they don&rsquo;t find a page). Groups: Account; Integrations; Organization; Publishing; Security &amp; governance, same role/plan gating.</div>
+  <div class="dd-rev-hint">Two versions of the same settings, identical collapsible categorized nav and content; the only difference is the global &ldquo;Search settings&rdquo; box. A = search + collapsible categories; B removes the search, so B is a pure test of whether people can navigate to a setting by browsing the categories alone (and how much search was carrying). In-content list filters stay in both (they narrow a list, they don&rsquo;t find a page). Groups (collapsible): Account; Integrations; Organization; Publishing; Security &amp; governance, same role/plan gating.</div>
   <label class="dd-lab" for="roleSel">Preview a role</label>
   <select id="roleSel" onchange="setRole(this.value)">
    <option value="view">View only</option>
@@ -553,7 +553,9 @@
  }
  function renderNav(){
   var body=document.getElementById('navBody'); if(!body)return; body.innerHTML='';
-  renderStaticNav(body); return;   /* nav is the static flat list in BOTH test versions; the A/B variable is now global search on (A) vs off (B) */
+  /* Collapsible categorized nav — shared by BOTH versions (Option A = search + collapsible; Option B = same nav,
+     search removed). The A/B variable is the global search only (body.nosearch, set in syncControls). renderStaticNav
+     is kept for reference but no longer used. */
   NAV.forEach(function(g){
    var vis=groupVisible(g);
    if(!vis.length) return;                       /* role-adaptive: hide group header when empty */
