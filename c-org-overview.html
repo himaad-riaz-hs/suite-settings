@@ -158,6 +158,8 @@
  .demodock .dd-body{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px;}
  .demodock.min .dd-body{display:none;}
  .demodock.min{width:auto;max-width:280px;}
+ /* User-test link (?ut=1): hide all prototype chrome so participants see only the product. */
+ body.utmode .demodock, body.utmode .protobar{display:none !important;}
  .demodock select{width:100%;box-sizing:border-box;border:1px solid var(--bento-theme-color-border-base);border-radius:8px;background:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);cursor:pointer;padding:9px 10px;}
  .demodock .dd-reveal{display:flex;align-items:center;gap:8px;cursor:pointer;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
  .demodock .dd-reveal input{width:16px;height:16px;cursor:pointer;flex:none;}
@@ -554,6 +556,12 @@
  try{ OPT=sessionStorage.getItem('navOpt')||'a'; }catch(e){}
  try{ ROLE=sessionStorage.getItem('navRole')||'admin'; }catch(e){}
  try{ PLAN=sessionStorage.getItem('navPlan')||'ent'; }catch(e){}
+ /* User-test link (?ut=1): lock to ONE clean version for usertesting.com — the flat, no-collapse, no-search nav
+    (Option B), role fixed so every find-it task target is visible, and the prototype-controls dock + version bar
+    hidden. Persisted in sessionStorage so it survives navigation between settings pages in the tab; ?ut=0 clears it. */
+ var UT=false;
+ try{ var _ut=new URLSearchParams(location.search).get('ut'); if(_ut==='1')sessionStorage.setItem('ut','1'); else if(_ut==='0')sessionStorage.removeItem('ut'); UT=(sessionStorage.getItem('ut')==='1'); }catch(e){}
+ if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
  function el(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e;}
