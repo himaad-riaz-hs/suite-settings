@@ -15,11 +15,12 @@
  .hs-tab.is-active::after{background:var(--bento-theme-color-text-base) !important;} /* active page-header tab underline = dark neutral (text-base), NOT the :root-remapped product blue — CLAUDE.md "Page header tabs" */
  .suite-main{background:var(--bento-system-sys-neutral-alt-300);} /* clearly grey canvas (#eef1f2) so white cards pop on every page; bg-app/bg-surface both resolve to near-white grey-50 */
  .set-scroll{flex:1;overflow:auto;}
- /* Top app-bar: org picker top-right (Figma "ALT with Grid" 2021:26371 places comp-inline-dropdown in the full-width header). A tier above the content page-header, which keeps the search. */
+ /* Single settings header band: title (left) + search + per-page add + org picker (right), one 64px row. Settings
+    is one level deep (Joao), so there's no breadcrumb and no separate tabs band — everything fits in one row. */
  .suite-topbar{flex:none;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:var(--hs-surface);border-bottom:1px solid var(--hs-border);}
- .suite-topbar .tb-lead{display:flex;align-items:center;gap:12px;min-width:0;}
+ .suite-topbar .tb-lead{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto;overflow:hidden;}
  .suite-topbar .tb-title{font:var(--hs-type-title-screen);color:var(--bento-theme-color-text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
- .suite-topbar .tb-right{flex:none;}
+ .suite-topbar .tb-right{flex:none;display:flex;align-items:center;gap:16px;}
  .op-trig{appearance:none;border:0;display:inline-flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:transparent;cursor:pointer;font:inherit;}
  .op-trig:hover{background:var(--bento-system-sys-neutral-alt-200);}
  .op-trig .logo{width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font:var(--hs-type-body-sm-b);background:var(--bento-system-sys-positive-100,#dfffde);color:var(--bento-system-sys-positive-700,#0a7d2c);flex:none;}
@@ -62,36 +63,14 @@
  .protobar .pl{font:var(--hs-type-meta-b);color:var(--bento-theme-color-text-subtle);}
  .protobar select{border:0;background:transparent;font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);cursor:pointer;}
 
- /* Bento page-header — the standard named component (preview/header-tabs.html · patterns/Page Header.html):
-    the band at the top of every settings screen. Replaces the old custom "Settings" topbar so it matches the
-    rest of the product. Sticky inside the scroll area so it stays put and stays aligned with the content column
-    (same scroll box => same gutter), and it persists across the empty/loading/error page-states. */
- .set-scroll>.page-header{position:sticky;top:0;z-index:5;background:var(--hs-surface);border-bottom:1px solid var(--hs-border);}
- .page-header .ph-row{padding:0 24px;min-height:64px;display:flex;align-items:center;gap:20px;}
- .page-header .ph-lead{display:flex;align-items:center;gap:12px;min-width:0;}
- .page-header .ph-titles{display:flex;flex-direction:column;gap:2px;min-width:0;}
- .page-header .ph-title{font:var(--hs-type-title-sub);color:var(--hs-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
- .page-header .ph-sub{font:var(--hs-type-body-sm);color:var(--hs-fg-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
- .page-header .ph-actions{margin-left:auto;display:flex;align-items:center;gap:16px;}
- /* Canonical Bento breadcrumb (comp-breadcrumb, figma 59494-149385): "/" separators, 16px/700, subtle -> base on hover. Same treatment on every settings page. */
- .page-header .bc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px;}
- .page-header .bc .crumb{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-subtle);text-decoration:none;white-space:nowrap;}
- .page-header .bc a.crumb:hover{color:var(--bento-theme-color-text-base);text-decoration:underline;}
- .page-header .bc a.crumb:focus-visible{color:var(--bento-theme-color-text-base);outline:2px solid var(--bento-theme-color-border-focus);outline-offset:2px;border-radius:2px;}
- .page-header .bc .crumb.current{color:var(--bento-theme-color-text-base);}
- .page-header .bc .sep{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-subtle);}
- @media (max-width:860px){ .page-header .ph-row{padding:0 24px;} }  /* band2 = 64px (min-height, no extra vertical padding) with the 24px gutter matching band1 on mobile */
-
- /* Global "Search settings" lives in the page header (PH_ACTIONS_B) for BOTH options now — a global search
-    (settings / members / teams / social) with a results dropdown, the pattern the design review approved (the
-    rejected nav-filtering drawer search was removed). Hidden on mobile where the header is too narrow. */
- .page-header .ph-actions-b{display:flex;}
- /* (removed dead body.optb rule: grid mode retired, optb never set) */
- .page-header .gs-wrap{position:relative;width:320px;max-width:42vw;}
- body.nosearch .page-header .gs-wrap{display:none;} /* test version B: no global search box (pure navigation test) */
- .page-header .ph-search{width:100%;box-sizing:border-box;} /* keep the field inside its 320px wrapper so it can't overflow under the + button */
- .page-header .ph-actions-b{gap:20px;} /* a touch more room between the search and the + */
- .page-header .ph-actions-b .hs-btn--icon{flex:none;}
+ /* Global "Search settings" (+ its results dropdown) lives in the single header band's right side, .suite-topbar
+    .tb-right — a global search (settings / members / teams / social) the design review approved. Hidden on mobile
+    where the header is too narrow (in-content filters stay reachable there), and hidden entirely in test version
+    B (body.nosearch), which is a pure navigation test. */
+ .suite-topbar .gs-wrap{position:relative;width:320px;max-width:42vw;}
+ body.nosearch .suite-topbar .gs-wrap{display:none;}
+ .suite-topbar .ph-search{width:100%;box-sizing:border-box;} /* keep the field inside its 320px wrapper so it can't overflow under the + button */
+ .suite-topbar .tb-right .hs-btn--icon{flex:none;}
  /* global-search results dropdown */
  .gs-results{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:70;max-height:64vh;overflow:auto;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:10px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:6px;display:none;}
  .gs-results.open{display:block;}
@@ -105,9 +84,8 @@
  .gs-d{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
  .gs-empty{padding:14px 10px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
  @media (max-width:860px){
-  .page-header .gs-wrap{display:none;} /* mobile: hide the wide search */
-  .page-header .ph-actions-b{min-height:0;} .page-header .gs-results{display:none;} /* stop the empty actions slot + absolute results box inflating band2 to ~88px on a single breadcrumb line */
-  .set-wrap{padding:24px 24px 72px;} /* 24px gutter matches both header bands (band1 topbar + band2 ph-row) on mobile */
+  .suite-topbar .gs-wrap{display:none;} /* mobile: hide the wide search */
+  .set-wrap{padding:24px 24px 72px;} /* 24px gutter matches the header's 24px padding on mobile */
  }
  /* In-content list FILTER (members/teams/accounts/tags/events): a LOCAL filter above each list, deliberately
     distinct from the global header Search — filter_list icon + "Filter these X" placeholder so the two never
@@ -399,7 +377,7 @@
   <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
   <a class="suite-navbtn util" href="#" id="avatarTrig" role="button" aria-haspopup="menu" aria-expanded="false" aria-controls="popPanelExplicit popPanelSimple" onclick="togglePop();return false;" onkeydown="if(event.key===' '){event.preventDefault();togglePop();}" aria-label="Account" title="Melanie Wilkins"><span class="circle"><img class="rail-av" src="assets/avatar-melanie.jpg" alt=""></span></a>
  </div>
-</aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse navigation" title="Collapse navigation" onclick="collapseDrawer()"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main"><div class="suite-topbar"><div class="tb-lead"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Show navigation" title="Show navigation" onclick="toggleNav()"><span class="material-symbols-outlined nb-menu">menu</span><span class="material-symbols-outlined nb-expand">keyboard_double_arrow_right</span></button><a class="hs-btn hs-btn--ghost hs-btn--icon" href="c-settings-members.html" aria-label="Back" title="Back"><span class="material-symbols-outlined">arrow_back</span></a><span class="tb-title">Transfer &amp; offboard</span></div><div class="tb-right"><button class="op-trig" id="orgTrig" aria-haspopup="menu" aria-expanded="false" aria-label="Switch organization: Somos" title="Switch organization"><span class="logo">S</span><span class="org">Somos</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div></div><div class="set-scroll"><div class="page-header"><div class="ph-row"><div class="ph-lead"><nav class="bc" aria-label="Breadcrumb"><span class="crumb">Settings</span><span class="sep">/</span><span class="crumb">Organization</span></nav></div><div class="ph-actions ph-actions-b"><div class="gs-wrap"><div class="hs-input affix ph-search"><span class="material-symbols-outlined lead">search</span><input id="navSearchHeader" type="search" placeholder="Search settings" autocomplete="off" role="combobox" aria-controls="gsResults" aria-expanded="false" oninput="globalSearch(this.value)" onfocus="globalSearch(this.value)" aria-label="Search settings"></div><div class="gs-results" id="gsResults" role="listbox" aria-label="Search results"></div></div></div></div></div><div class="set-wrap" id="pageContent"><p class="set-sub">Move the accounts <b>Bryn Morales</b> owns directly to someone else before removing them, so nothing gets disconnected.</p>
+</aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse navigation" title="Collapse navigation" onclick="collapseDrawer()"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main"><div class="suite-topbar"><div class="tb-lead"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Show navigation" title="Show navigation" onclick="toggleNav()"><span class="material-symbols-outlined nb-menu">menu</span><span class="material-symbols-outlined nb-expand">keyboard_double_arrow_right</span></button><a class="hs-btn hs-btn--ghost hs-btn--icon" href="c-settings-members.html" aria-label="Back" title="Back"><span class="material-symbols-outlined">arrow_back</span></a><span class="tb-title">Transfer &amp; offboard</span></div><div class="tb-right"><div class="gs-wrap"><div class="hs-input affix ph-search"><span class="material-symbols-outlined lead">search</span><input id="navSearchHeader" type="search" placeholder="Search settings" autocomplete="off" role="combobox" aria-controls="gsResults" aria-expanded="false" oninput="globalSearch(this.value)" onfocus="globalSearch(this.value)" aria-label="Search settings"></div><div class="gs-results" id="gsResults" role="listbox" aria-label="Search results"></div></div><button class="op-trig" id="orgTrig" aria-haspopup="menu" aria-expanded="false" aria-label="Switch organization: Somos" title="Switch organization"><span class="logo">S</span><span class="org">Somos</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div></div><div class="set-scroll"><div class="set-wrap" id="pageContent"><p class="set-sub">Move the accounts <b>Bryn Morales</b> owns directly to someone else before removing them, so nothing gets disconnected.</p>
 <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div>Today, changing your email or leaving can silently disconnect the accounts you own. This flow makes the handoff explicit so access is never lost.</div></div>
 <div class="set-card"><div class="pad"><h3 class="sec">1. Who receives the accounts?</h3><p class="secd">Pick the member who&rsquo;ll take over Bryn&rsquo;s directly-owned accounts.</p><div class="hs-field" style="max-width:380px"><label class="hs-field-label">Transfer to</label><div class="hs-input affix"><span class="mini-av">AP</span><input value="Aisha Patel" readonly><button class="clr" aria-label="Choose member" title="Choose member"><span class="material-symbols-outlined">expand_more</span></button></div></div></div></div>
 <div class="set-card"><div class="pad"><h3 class="sec">2. Accounts to transfer</h3><p class="secd" style="margin:0">Bryn owns this directly. Team-based access ends automatically and stays with the team &mdash; it doesn&rsquo;t transfer.</p></div><table class="hs-table"><thead><tr><th style="width:40px"></th><th>Account</th><th>Network</th><th>Role</th><th>Source</th></tr></thead><tbody><tr><td><span class="hs-check is-on"></span></td><td><div class="rowflex"><span class="material-symbols-outlined">groups</span><span style="font:var(--hs-type-body-sm-b)">Somos (FB Page)</span></div></td><td>Facebook</td><td>Editor</td><td class="secd">Direct grant</td></tr></tbody></table><div class="pad"><div class="secd" style="margin:0">3 more accounts (via Growth Team and Content Team) stay with those teams &mdash; no transfer needed.</div></div></div>
