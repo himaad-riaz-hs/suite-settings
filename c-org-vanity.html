@@ -85,6 +85,7 @@
  .page-header .ph-actions-b{display:flex;}
  /* (removed dead body.optb rule: grid mode retired, optb never set) */
  .page-header .gs-wrap{position:relative;width:320px;max-width:42vw;}
+ body.nosearch .page-header .gs-wrap{display:none;} /* test version B: no global search box (pure navigation test) */
  .page-header .ph-search{width:100%;box-sizing:border-box;} /* keep the field inside its 320px wrapper so it can't overflow under the + button */
  .page-header .ph-actions-b{gap:20px;} /* a touch more room between the search and the + */
  .page-header .ph-actions-b .hs-btn--icon{flex:none;}
@@ -422,12 +423,12 @@
   <span class="material-symbols-outlined min" id="ddMin">expand_less</span>
  </div>
  <div class="dd-body">
-  <div class="dd-lab">Nav option</div>
+  <div class="dd-lab">Test version</div>
   <div class="dd-seg" role="group" aria-label="Navigation option">
-   <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; Collapsible</button>
-   <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; No collapse</button>
+   <button type="button" id="optA" class="dd-segbtn on" aria-pressed="true" onclick="setOpt('a')">A &middot; With search</button>
+   <button type="button" id="optB" class="dd-segbtn" aria-pressed="false" onclick="setOpt('b')">B &middot; No search</button>
   </div>
-  <div class="dd-rev-hint">Two variations of the same categorized left nav, so the test isolates one thing: does the collapse affordance earn its place? A keeps the collapsible groups; B shows the same groups always open. Both use the same flat grouping (Account; Integrations; Organization; Publishing; Security &amp; governance) and the same role/plan gating, so Security &amp; governance only shows for Super admin / Enterprise. Heads-up: collapsible groups in A are a Bento snowflake pending Giancarlo&rsquo;s sign-off; B needs no new pattern.</div>
+  <div class="dd-rev-hint">Two versions of the same settings, identical flat nav and content; the only difference is the global &ldquo;Search settings&rdquo; box. A has it; B removes it, so B is a pure test of whether people can navigate to a setting by browsing alone (and how much search was carrying). In-content list filters stay in both (they narrow a list, they don&rsquo;t find a page). Groups: Account; Integrations; Organization; Publishing; Security &amp; governance, same role/plan gating.</div>
   <label class="dd-lab" for="roleSel">Preview a role</label>
   <select id="roleSel" onchange="setRole(this.value)">
    <option value="view">View only</option>
@@ -547,7 +548,7 @@
  }
  function renderNav(){
   var body=document.getElementById('navBody'); if(!body)return; body.innerHTML='';
-  if(OPT==='b'){ renderStaticNav(body); return; }   /* Option B (A2): same groups, always expanded, no collapse */
+  renderStaticNav(body); return;   /* nav is the static flat list in BOTH test versions; the A/B variable is now global search on (A) vs off (B) */
   NAV.forEach(function(g){
    var vis=groupVisible(g);
    if(!vis.length) return;                       /* role-adaptive: hide group header when empty */
@@ -563,7 +564,8 @@
   if(!body.children.length){ body.appendChild(el('div','sd-empty', QUERY?'No settings match: '+QUERY:'Nothing to show for this role.')); }
  }
  function syncControls(){
-  document.body.classList.remove('optb');   /* grid retired: both options share Option A's chrome (drawer + in-content search) */
+  document.body.classList.toggle('nosearch', OPT==='b');   /* A/B TEST VARIABLE: version B removes the global header search, forcing pure navigation */
+  document.body.classList.remove('optb');
   var a=document.getElementById('optA'), b=document.getElementById('optB');
   if(a){a.classList.toggle('on',OPT==='a'); a.setAttribute('aria-pressed',OPT==='a');}
   if(b){b.classList.toggle('on',OPT==='b'); b.setAttribute('aria-pressed',OPT==='b');}
