@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Suite Settings &middot; Organization · Overview</title>
+<title>Suite Settings &middot; Publishing · Link settings</title>
 <link rel="stylesheet" href="colors_and_type.css">
 <link rel="stylesheet" href="components.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
@@ -394,70 +394,10 @@
   <a class="suite-navbtn util" href="#" aria-label="Help" title="Help"><span class="circle"><span class="material-symbols-outlined">help</span></span></a>
   <a class="suite-navbtn util" href="#" onclick="togglePop();return false;" aria-label="Account" title="Melanie Wilkins"><span class="circle"><img class="rail-av" src="assets/avatar-melanie.jpg" alt=""></span></a>
  </div>
-</aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse navigation" title="Collapse navigation" onclick="collapseDrawer()"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main"><div class="suite-topbar"><button class="op-trig" aria-haspopup="true" aria-label="Switch organization: Somos" title="Switch organization"><span class="logo">S</span><span class="org">Somos</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div><div class="set-scroll"><div class="page-header"><div class="ph-row"><div class="ph-lead"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Show navigation" title="Show navigation" onclick="toggleNav()"><span class="material-symbols-outlined nb-menu">menu</span><span class="material-symbols-outlined nb-expand">keyboard_double_arrow_right</span></button><div class="ph-titles"><nav class="bc" aria-label="Breadcrumb"><span class="crumb">Settings</span></nav><span class="ph-title">Overview</span><span class="ph-sub">A snapshot of your organization, and the few things worth acting on.</span></div></div><div class="ph-actions ph-actions-b"><div class="gs-wrap"><div class="hs-input affix ph-search"><span class="material-symbols-outlined lead">search</span><input id="navSearchHeader" type="search" placeholder="Search settings" autocomplete="off" role="combobox" aria-controls="gsResults" aria-expanded="false" oninput="globalSearch(this.value)" onfocus="globalSearch(this.value)" aria-label="Search settings"></div><div class="gs-results" id="gsResults" role="listbox" aria-label="Search results"></div></div></div></div></div><div class="set-wrap" id="pageContent"><div class="set-card"><div class="pad"><h3 class="sec" style="margin:0 0 4px">Needs attention</h3><p class="secd">The few things worth acting on right now.</p>
- <div class="attn">
-  <div class="attn-row"><span class="material-symbols-outlined attn-ic warn">sync_problem</span><div class="attn-tx"><div class="attn-t">36 social accounts need reconnecting</div><div class="attn-d">Posts to these will fail until their tokens are refreshed.</div></div><a class="attn-link" href="c-org-social.html">Review accounts<span class="material-symbols-outlined">chevron_right</span></a></div>
-  <div class="attn-row"><span class="material-symbols-outlined attn-ic">mail</span><div class="attn-tx"><div class="attn-t">29 invitations pending</div><div class="attn-d">People invited who haven&rsquo;t accepted yet.</div></div><a class="attn-link" href="c-settings-members.html">View invites<span class="material-symbols-outlined">chevron_right</span></a></div>
-  <div class="attn-row"><span class="material-symbols-outlined attn-ic">shield_person</span><div class="attn-tx"><div class="attn-t">2 teams have no admin</div><div class="attn-d">Assign a team admin so their access stays managed.</div></div><a class="attn-link" href="c-org-teams.html">Review teams<span class="material-symbols-outlined">chevron_right</span></a></div>
- </div>
-</div></div>
-<h3 class="sec" style="margin:4px 0 12px">At a glance</h3>
-<div class="mcards" style="margin-bottom:24px">
- <a class="mcard" href="c-settings-members.html"><div class="metric-n">440</div><div class="metric-l">Members</div><div class="metric-x">411 active &middot; 29 pending</div></a>
- <a class="mcard" href="c-org-teams.html"><div class="metric-n">52</div><div class="metric-l">Teams</div><div class="metric-x">5 created this month</div></a>
- <a class="mcard" href="c-org-social.html"><div class="metric-n">61</div><div class="metric-l">Social accounts</div><div class="metric-x">25 connected &middot; <span class="warn">36 reconnect</span></div></a>
- <div class="mcard"><div class="metric-n">440<span class="metric-of">/500</span></div><div class="metric-l">Seats used</div><div class="bar"><span class="bar-fill" style="width:88%"></span></div></div>
-</div>
-<div class="ov-cols" style="margin-bottom:24px">
- <div class="set-card ovtabs"><div class="pad">
-  <div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">Members</h3><a class="hs-btn hs-btn--ghost" href="c-settings-members.html">View all</a></div>
-  <nav class="hs-tabs" style="margin:8px 0 0" aria-label="Members"><a class="hs-tab is-active" onclick="ovTab(this,'mAct')">Active 411</a><a class="hs-tab" onclick="ovTab(this,'mPen')">Pending 29</a></nav>
-  <div class="ovpanel" id="mAct">
-   <div class="ovrow"><span class="mini-av">AP</span><div class="ovrow-main"><div class="ovrow-t">Aisha Patel</div><div class="ovrow-d">aisha.patel@somos.com</div></div><span class="hs-badge hs-badge--info">Super Admin</span></div>
-   <div class="ovrow"><span class="mini-av">BM</span><div class="ovrow-main"><div class="ovrow-t">Bryn Morales</div><div class="ovrow-d">bryn.morales@somos.com</div></div><span class="hs-badge hs-badge--neutral">Admin</span></div>
-   <div class="ovrow"><span class="mini-av">CL</span><div class="ovrow-main"><div class="ovrow-t">Chaya Levi</div><div class="ovrow-d">chaya.levi@somos.com</div></div><span class="hs-badge hs-badge--neutral">Team Member</span></div>
-  </div>
-  <div class="ovpanel" id="mPen" hidden>
-   <div class="ovrow"><span class="material-symbols-outlined">mail</span><div class="ovrow-main"><div class="ovrow-t">erin.diaz@somos.com</div><div class="ovrow-d">Invited 2 days ago</div></div><button class="hs-btn hs-btn--ghost hs-btn--sm">Resend</button></div>
-   <div class="ovrow"><span class="material-symbols-outlined">mail</span><div class="ovrow-main"><div class="ovrow-t">finn.oboyle@somos.com</div><div class="ovrow-d">Invited 4 days ago</div></div><button class="hs-btn hs-btn--ghost hs-btn--sm">Resend</button></div>
-   <div class="ovrow"><span class="material-symbols-outlined">mail</span><div class="ovrow-main"><div class="ovrow-t">gita.rao@somos.com</div><div class="ovrow-d">Invited 6 days ago</div></div><button class="hs-btn hs-btn--ghost hs-btn--sm">Resend</button></div>
-  </div>
- </div></div>
- <div class="set-card ovtabs"><div class="pad">
-  <div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">Social accounts</h3><a class="hs-btn hs-btn--ghost" href="c-org-social.html">View all</a></div>
-  <nav class="hs-tabs" style="margin:8px 0 0" aria-label="Social accounts"><a class="hs-tab is-active" onclick="ovTab(this,'sRec')">Reconnect 36</a><a class="hs-tab" onclick="ovTab(this,'sCon')">Connected 25</a></nav>
-  <div class="ovpanel" id="sRec">
-   <div class="ovrow"><span class="material-symbols-outlined">hub</span><div class="ovrow-main"><div class="ovrow-t">somos_li</div><div class="ovrow-d">LinkedIn</div></div><a class="hs-btn hs-btn--ghost hs-btn--sm" href="c-org-social.html"><span class="material-symbols-outlined">refresh</span>Reconnect</a></div>
-   <div class="ovrow"><span class="material-symbols-outlined">photo_camera</span><div class="ovrow-main"><div class="ovrow-t">@somos.ig</div><div class="ovrow-d">Instagram</div></div><a class="hs-btn hs-btn--ghost hs-btn--sm" href="c-org-social.html"><span class="material-symbols-outlined">refresh</span>Reconnect</a></div>
-  </div>
-  <div class="ovpanel" id="sCon" hidden>
-   <div class="ovrow"><span class="material-symbols-outlined">public</span><div class="ovrow-main"><div class="ovrow-t">@SomosCorp</div><div class="ovrow-d">X / Twitter</div></div><span class="hs-badge hs-badge--positive">Connected</span></div>
-   <div class="ovrow"><span class="material-symbols-outlined">groups</span><div class="ovrow-main"><div class="ovrow-t">Somos (FB Page)</div><div class="ovrow-d">Facebook</div></div><span class="hs-badge hs-badge--positive">Connected</span></div>
-  </div>
- </div></div>
-</div>
-<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><div><h3 class="sec" style="margin:0">Teams</h3><div class="secd" style="margin:2px 0 0">Recently created</div></div><a class="hs-btn hs-btn--ghost" href="c-org-teams.html">View all teams</a></div>
- <div class="tcards">
-  <div class="tcard"><span class="mini-av">GT</span><div class="tcard-n">Growth Team</div><div class="tcard-x">17 members &middot; 8 accounts</div><div class="avstack"><span class="mini-av">AP</span><span class="mini-av">BM</span><span class="mini-av">CL</span></div></div>
-  <div class="tcard"><span class="mini-av">CT</span><div class="tcard-n">Content Team</div><div class="tcard-x">25 members &middot; 5 accounts</div><div class="avstack"><span class="mini-av">DK</span><span class="mini-av">EM</span></div></div>
-  <div class="tcard"><span class="mini-av">RT</span><div class="tcard-n">Regional Team</div><div class="tcard-x">30 members &middot; 12 accounts</div><div class="avstack"><span class="mini-av">AP</span><span class="mini-av">FA</span><span class="mini-av">GH</span></div></div>
-  <div class="tcard"><span class="mini-av">FA</span><div class="tcard-n">Field Team A</div><div class="tcard-x">19 members &middot; 4 accounts</div><div class="avstack"><span class="mini-av">BM</span><span class="mini-av">IJ</span></div></div>
- </div>
-</div></div>
-<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">Recent activity</h3><a class="hs-btn hs-btn--ghost" href="c-sec-logs.html">View audit log</a></div>
- <div class="act-list">
-  <div class="act-row"><span class="mini-av">AP</span><div class="act-tx"><b>Aisha Patel</b> changed Bryn Morales&rsquo;s role to Admin</div><span class="act-time">2h ago</span></div>
-  <div class="act-row"><span class="mini-av">BM</span><div class="act-tx"><b>Bryn Morales</b> connected a LinkedIn account</div><span class="act-time">5h ago</span></div>
-  <div class="act-row"><span class="mini-av">AP</span><div class="act-tx"><b>Aisha Patel</b> enabled MFA enforcement</div><span class="act-time">Yesterday</span></div>
-  <div class="act-row"><span class="mini-av">CL</span><div class="act-tx"><b>Chaya Levi</b> created the team &ldquo;Field Team A&rdquo;</div><span class="act-time">2 days ago</span></div>
- </div>
-</div></div>
-<div class="set-card"><div class="pad"><h3 class="sec">Organization details</h3><p class="secd">Name, logo, and who can see whom.</p>
- <div class="rowflex" style="gap:16px;margin-bottom:18px"><span class="avatar-lg">S</span><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">photo_camera</span>Change logo</button></div>
- <div class="grid2"><div class="hs-field"><label class="hs-field-label">Organization name</label><input class="hs-input" value="Somos"></div><div class="hs-field"><div class="hs-field-label">Member visibility</div><div class="stack" style="margin-top:10px"><label class="rowflex" style="cursor:pointer"><span class="hs-radio is-on"></span><span style="font:var(--hs-type-body-md)">Members can see each other</span></label><label class="rowflex" style="cursor:pointer"><span class="hs-radio"></span><span style="font:var(--hs-type-body-md)">Hidden &mdash; admins only</span></label></div></div></div>
- <div class="ac-foot" style="margin-top:18px"><button class="hs-btn hs-btn--ghost">Cancel</button><button class="hs-btn hs-btn--primary" onclick="showToast('Organization details saved.')">Save changes</button></div>
-</div></div>
-<div class="between"><div class="secd" style="margin:0">Delete this organization and everything in it. This can&rsquo;t be undone.</div><a class="hs-btn hs-btn--ghost" href="c-org-delete.html">Delete organization&hellip;</a></div></div>
+</aside><aside class="suite-drawer" id="navDrawer"><div class="sd-head">Settings <button class="sd-collapse" aria-label="Collapse navigation" title="Collapse navigation" onclick="collapseDrawer()"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button></div><div class="sd-body" id="navBody"></div></aside><div class="nav-backdrop" onclick="toggleNav()"></div><main class="suite-main"><div class="suite-topbar"><button class="op-trig" aria-haspopup="true" aria-label="Switch organization: Somos" title="Switch organization"><span class="logo">S</span><span class="org">Somos</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div><div class="set-scroll"><div class="page-header"><div class="ph-row"><div class="ph-lead"><button class="navmenu-btn hs-btn hs-btn--ghost hs-btn--icon" aria-label="Show navigation" title="Show navigation" onclick="toggleNav()"><span class="material-symbols-outlined nb-menu">menu</span><span class="material-symbols-outlined nb-expand">keyboard_double_arrow_right</span></button><div class="ph-titles"><nav class="bc" aria-label="Breadcrumb"><span class="crumb">Settings</span><span class="sep">/</span><span class="crumb">Publishing</span></nav><span class="ph-title">Link settings</span><span class="ph-sub">Custom short-link (vanity) domains for your organization&rsquo;s published links.</span></div></div><div class="ph-actions ph-actions-b"><div class="gs-wrap"><div class="hs-input affix ph-search"><span class="material-symbols-outlined lead">search</span><input id="navSearchHeader" type="search" placeholder="Search settings" autocomplete="off" role="combobox" aria-controls="gsResults" aria-expanded="false" oninput="globalSearch(this.value)" onfocus="globalSearch(this.value)" aria-label="Search settings"></div><div class="gs-results" id="gsResults" role="listbox" aria-label="Search results"></div></div></div></div></div><div class="set-wrap" id="pageContent"><div class="hs-alert hs-alert--info"><span class="material-symbols-outlined">moving</span><div>Moved here from Account settings, where it was misfiled &mdash; vanity domains are an org asset, not a personal one. <b>Usage under review</b> (parity carry-over; confirm before launch).</div></div>
+<div class="rowflex" style="justify-content:flex-end;margin-bottom:16px"><button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">add</span>Add domain</button></div>
+<div class="set-card"><table class="hs-table"><thead><tr><th>Domain</th><th>Status</th><th>Links</th><th></th></tr></thead><tbody><tr><td style="font:var(--hs-type-body-sm-b)">go.somos.com</td><td><span class="hs-badge hs-badge--positive">Active</span></td><td>1,284</td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr><tr><td style="font:var(--hs-type-body-sm-b)">sms.somos.com</td><td><span class="hs-badge hs-badge--warning">Verifying DNS</span></td><td>0</td><td style="text-align:right"><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="More" title="More"><span class="material-symbols-outlined">more_horiz</span></button></td></tr></tbody></table></div>
+<div class="hs-alert hs-alert--warning" style="margin-top:8px"><span class="material-symbols-outlined">warning</span><div>Deleting a vanity domain breaks every link published under it &mdash; destructive, confirm carefully.</div></div></div>
 <div class="set-wrap page-state" id="stLoading" hidden>
  <div class="set-card"><div class="pad">
   <div class="rowflex" style="gap:12px;margin-bottom:18px"><span class="sk sk-circle" style="width:40px;height:40px"></span><span class="sk sk-text" style="width:200px;height:18px"></span></div>
@@ -465,12 +405,12 @@
  </div></div>
 </div>
 <div class="set-wrap page-state" id="stEmpty" hidden>
- <div class="empty"><span class="material-symbols-outlined" style="font-size:44px;color:var(--bento-theme-color-icon-subtle)">inbox</span>
-  <div class="eh">Nothing here yet</div><div class="ed">When there is something to show, it will appear here.</div><button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Get started</button>
+ <div class="empty"><span class="material-symbols-outlined" style="font-size:44px;color:var(--bento-theme-color-icon-subtle)">link</span>
+  <div class="eh">No domains yet</div><div class="ed">Add a domain to brand the short links you share.</div><button class="hs-btn hs-btn--primary" style="margin-top:16px"><span class="material-symbols-outlined">add</span>Add domain</button>
  </div>
 </div>
 <div class="set-wrap page-state" id="stError" hidden>
- <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>Couldn't load this page.</b> Check your connection and try again.</div></div>
+ <div class="hs-alert hs-alert--warning"><span class="material-symbols-outlined">warning</span><div><b>Couldn't load your domains.</b> Check your connection and try again.</div></div>
  <div style="margin-top:14px"><button class="hs-btn hs-btn--secondary" onclick="setState('default')"><span class="material-symbols-outlined">refresh</span>Retry</button></div>
 </div></div>
 </main>
@@ -564,7 +504,7 @@
  var SUBLABEL = {people:'People & roles', assets:'Accounts & assets', billing:'Billing & plan'};
  var ROLE_IDX = {view:0, admin:1, sa:2, pm:3};
  var ROLE_LABEL = {view:'View only', admin:'Admin', sa:'Super admin', pm:'Paying member'};
- var PAGE_ID = 'overview';
+ var PAGE_ID = 'vanity';
  var OPT='a', ROLE='admin', PLAN='ent', QUERY='', COLL={}, dockMin=true, POPMODE='explicit';   /* default role preview = Admin (applies to both nav options) */
  try{ OPT=sessionStorage.getItem('navOpt')||'a'; }catch(e){}
  try{ ROLE=sessionStorage.getItem('navRole')||'admin'; }catch(e){}
