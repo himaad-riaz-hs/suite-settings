@@ -353,27 +353,43 @@
  /* Overview is a card DASHBOARD: it uses more width than the reading-width settings forms and packs cards tighter,
     so it reads as a multi-column dashboard rather than a single long list. Scoped to body.ovpage only. */
  body.ovpage .set-wrap{max-width:1180px;padding-left:28px;padding-right:28px;}
- body.perchpage .set-wrap{max-width:1280px;padding-left:28px;padding-right:28px;}
+ body.perchpage .set-wrap{max-width:1440px;padding-left:24px;padding-right:24px;}
  body.ovpage .set-grid{grid-template-columns:repeat(auto-fill,minmax(216px,1fr));}
- /* Perch planner WEEK view (v2 start screen), matched to the reboot / Claude-Design planner: Today nav + summary
-    metric cards + a 7-day grid of post cards. Backdrop for the flyout->Settings task. */
- .plan-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
- .plan-nav .rng{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin-left:4px;}
- .plan-nav .vdrop{margin-left:auto;}
- .wk-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--hs-border);border-radius:12px;overflow:hidden;background:var(--hs-surface);}
- .wk-col{border-right:1px solid var(--hs-border);}
+ /* Perch planner WEEK view (v2 start screen), matched to the social-os-reboot Figma calendar:
+    GMT gutter + 7 day columns, all-day event chips, media post cards. Backdrop for the flyout->Settings task. */
+ .plan-nav{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+ .plan-nav .rng{display:inline-flex;align-items:center;gap:2px;font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin-left:6px;cursor:pointer;}
+ .plan-nav .rng .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);}
+ .plan-nav .pn-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+ .seg{display:inline-flex;border:1px solid var(--hs-border);border-radius:8px;overflow:hidden;}
+ .seg button{border:0;background:var(--hs-surface);padding:6px 9px;display:flex;align-items:center;cursor:pointer;color:var(--bento-theme-color-icon-subtle);}
+ .seg button.on{background:var(--bento-component-list-item-fill-hovered);color:var(--bento-theme-color-icon-base);}
+ .seg button+button{border-left:1px solid var(--hs-border);}
+ .seg .material-symbols-outlined{font-size:18px;}
+ .wk-grid{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));border:1px solid var(--hs-border);border-radius:12px;overflow:hidden;background:var(--hs-surface);}
+ .wk-gutter{border-right:1px solid var(--hs-border);padding-top:64px;}
+ .wk-gutter .gz{padding:6px 8px 0;font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);text-align:right;white-space:nowrap;}
+ .wk-col{border-right:1px solid var(--hs-border);min-width:0;}
  .wk-col:last-child{border-right:none;}
- .wk-dh{padding:8px 10px;border-bottom:1px solid var(--hs-border);display:flex;align-items:baseline;gap:5px;}
- .wk-dh .dow{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
- .wk-dh .dnum{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
- .wk-body{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:300px;}
- .pcard{border:1px solid var(--hs-border);border-radius:8px;overflow:hidden;background:var(--hs-surface);}
- .pcard .pc-thumb{height:46px;background:var(--hs-border);display:flex;align-items:center;justify-content:center;}
- .pcard .pc-thumb .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);font-size:20px;}
- .pcard .pc-b{padding:6px 8px;display:flex;flex-direction:column;gap:4px;}
- .pcard .pc-h{display:flex;align-items:center;gap:5px;font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
- .pcard .pc-h .material-symbols-outlined{font-size:14px;color:var(--bento-theme-color-icon-base);flex:none;}
+ .wk-dh{padding:9px 8px 8px;border-bottom:1px solid var(--hs-border);text-align:center;}
+ .wk-dh .dow{display:block;font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
+ .wk-dh .dnum{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);}
+ .wk-dh .dnum.today{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;border-radius:50%;background:var(--bento-theme-color-text-base);color:var(--hs-surface);}
+ .allday{margin:8px 8px 0;display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:var(--bento-component-list-item-fill-hovered);font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .allday .material-symbols-outlined{font-size:15px;color:var(--bento-theme-color-icon-subtle);flex:none;}
+ .wk-body{padding:8px;display:flex;flex-direction:column;gap:10px;min-height:440px;}
+ .pcard{border:1px solid var(--hs-border);border-radius:10px;overflow:hidden;background:var(--hs-surface);cursor:pointer;transition:box-shadow .12s;}
+ .pcard:hover{box-shadow:var(--bento-theme-elevation-shadow-raised);}
+ .pcard .pc-thumb{height:74px;background-size:cover;background-position:center;}
+ .pcard .pc-b{padding:8px 9px;display:flex;flex-direction:column;gap:5px;}
+ .pcard .pc-h{display:flex;align-items:center;gap:6px;}
+ .net{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+ .net .material-symbols-outlined{font-size:11px;color:#fff;}
+ .pcard .pc-acct{font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+ .pcard .pc-time{margin-left:auto;font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);flex:none;}
  .pcard .pc-cap{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .pcard .pc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:1px;}
+ .pcard .pc-foot .cmt{font-size:16px;color:var(--bento-theme-color-icon-subtle);}
  /* ===== Mobile overrides — kept LAST so they win source-order ties over the base rules above (media queries add no specificity) ===== */
  /* (mobile: in-content filters are always shown now; the old body.optb grid fallback is gone) */
  @media (max-width:600px){
