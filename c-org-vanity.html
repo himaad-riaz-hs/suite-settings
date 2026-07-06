@@ -205,6 +205,27 @@
  .v3-steps{margin:10px 0 16px;padding-left:20px;display:flex;flex-direction:column;gap:8px;}
  .v3-steps li{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
  .v3-steps li b{font:var(--hs-type-body-sm-b);}
+ /* C2 (Hill): non-table member view — one card per member, key actions VISIBLE (no "..." ellipsis). Bento
+    card tokens (mirrors .set-tile / .set-card surfaces) + a11y. Renders only in v3, only on the real Members page. */
+ .v3-mcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+ .v3-mcard{display:flex;flex-direction:column;gap:14px;padding:18px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;transition:border-color .12s,box-shadow .12s;}
+ .v3-mcard:hover{border-color:var(--bento-theme-color-border-base);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
+ .v3-mcard:focus-within{border-color:var(--bento-theme-color-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
+ .v3-mcard .mc-top{display:flex;align-items:flex-start;gap:12px;}
+ .v3-mcard .mc-av{width:44px;height:44px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-body-md-b);flex:none;}
+ .v3-mcard .mc-id{flex:1;min-width:0;}
+ .v3-mcard .mc-name{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .v3-mcard .mc-mail{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .v3-mcard .mc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+ .v3-mcard .mc-via{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ .v3-mcard .mc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:14px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v3-mcard .mc-sel{flex:none;}
+ /* C1 (invite): success state inside the shared Bento modal — a saffron/positive confirmation, colour + icon (never colour alone) */
+ .v3-invite-done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:12px 4px;}
+ .v3-invite-done .ok-ic{width:52px;height:52px;border-radius:999px;display:grid;place-items:center;background:var(--hs-bg-positive);color:var(--hs-fg-positive);}
+ .v3-invite-done .ok-ic .material-symbols-outlined{font-size:30px;}
+ .v3-invite-done .ok-t{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);}
+ .v3-invite-done .ok-d{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);max-width:360px;}
  /* nav search */
  .suite-drawer .sd-search{padding:8px 14px 12px;}
  .suite-drawer .sd-search .hs-input{width:100%;box-sizing:border-box;}
@@ -568,6 +589,12 @@
     today; everything v3 adds is gated behind body.v3 + the V3 flag below. Persists across settings pages; ?v3=0 clears. */
  var V3=false;
  try{ var _v3=new URLSearchParams(location.search).get('v3'); if(_v3==='1')sessionStorage.setItem('v3','1'); else if(_v3==='0')sessionStorage.removeItem('v3'); V3=(sessionStorage.getItem('v3')==='1'); }catch(e){}
+ /* Members layout A/B sub-flag (?mtable=1): only meaningful with v3 on. When set, the Members page keeps the ORIGINAL
+    table instead of the v3 card layout, while EVERY other v3 change (labels, password home, nav order, search, invite
+    modal, transfer reassign, offboarding steps) stays active, so a usability test can compare cards vs table as the only
+    difference. Parsed/persisted exactly like v3; ?mtable=0 clears it. Only gates v3MemberCards + its table-hide. */
+ var MTABLE=false;
+ try{ var _mt=new URLSearchParams(location.search).get('mtable'); if(_mt==='1')sessionStorage.setItem('mtable','1'); else if(_mt==='0')sessionStorage.removeItem('mtable'); MTABLE=(sessionStorage.getItem('mtable')==='1'); }catch(e){}
  if(V3&&document.body)document.body.classList.add('v3');
  if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
@@ -678,6 +705,8 @@
   });
   /* also filter the Overview dashboard lists (members / accounts / teams / activity) */
   Array.prototype.forEach.call(pc.querySelectorAll('.ovrow,.tcard,.act-row'),function(r){ r.style.display=(!q||r.textContent.toLowerCase().indexOf(q)!==-1)?'':'none'; });
+  /* v3 member cards (the table is hidden in v3): keep the search box working over the card layout too */
+  Array.prototype.forEach.call(pc.querySelectorAll('.v3-mcard'),function(c){ c.style.display=(!q||c.textContent.toLowerCase().indexOf(q)!==-1)?'':'none'; });
  }
  /* Overview dashboard tab groups (Members active/pending, Social reconnect/connected) */
  function ovTab(el,id){ var box=el.closest('.ovtabs'); if(!box)return; Array.prototype.forEach.call(box.querySelectorAll('.hs-tab'),function(t){t.classList.remove('is-active');}); el.classList.add('is-active'); Array.prototype.forEach.call(box.querySelectorAll('.ovpanel'),function(p){p.hidden=true;}); var t=box.querySelector('#'+id); if(t)t.hidden=false; }
@@ -882,8 +911,17 @@
           second step here, and on Teams add an "Add members" affordance that routes into the same invite flow.
           Guarded to the REAL Members page (the transfer page shares active='members'). ---- */
   if(PAGE_ID==='members' && v3IsPage('Members')){
+   /* C1: wire the previously-inert "Invite members" primary button to the working invite modal. */
+   var inviteBtn=Array.prototype.filter.call(pc.querySelectorAll('.csearch-row .hs-btn--primary'),function(b){return /Invite members/i.test(b.textContent);})[0];
+   if(inviteBtn){ inviteBtn.setAttribute('type','button'); inviteBtn.setAttribute('onclick','v3OpenInvite()'); }
+   v3EnsureInviteModal();
+   /* C2 (Hill): swap the members table for a scannable card layout with actions visible (built from the same rows).
+      A/B: with ?mtable=1 we skip the cards + table-hide so the ORIGINAL table renders, holding every other v3 change
+      constant. Only this call is gated; the invite modal + offboarding drawer steps below stay active either way. */
+   if(V3 && !MTABLE) v3MemberCards(pc);
    var hint=pc.querySelector('.hs-field-hint');
-   var step=v3El('<div class="hs-alert hs-alert--info" style="margin-top:14px"><span class="material-symbols-outlined">group_add</span><div>Inviting someone is step one. After they accept, <b>assign them to a team</b> from that team\'s page (or select them here and use <b>Add to team</b>) to grant the accounts the team manages.</div></div>');
+   var cardClause=MTABLE?'':' (or from a member card above using <b>Add to team</b>)';
+   var step=v3El('<div class="hs-alert hs-alert--info" style="margin-top:14px"><span class="material-symbols-outlined">group_add</span><div>Inviting someone is step one. After they accept, <b>assign them to a team</b> from that team\'s page'+cardClause+' to grant the accounts the team manages.</div></div>');
    if(hint)hint.parentNode.insertBefore(step, hint.nextSibling); else pc.appendChild(step);
   }
   if(PAGE_ID==='teams'){
@@ -929,16 +967,29 @@
   if(!step2||document.getElementById('v3ReassignTbl')) return;
   var newInner='<div class="pad"><h3 class="sec">2. Reassign the accounts Bryn owns directly</h3><p class="secd" style="margin:0">Each account below is owned directly by Bryn. Pick who takes over each one so nothing gets disconnected. Team-based access ends automatically and stays with the team, so it is not listed here.</p></div>'
    +'<table class="hs-table" id="v3ReassignTbl"><thead><tr><th>Account</th><th>Network</th><th>Role</th><th>Reassign to</th></tr></thead><tbody>'
-   +v3ReassignRow('groups','Somos (FB Page)','Facebook','Editor','Aisha Patel','AP')
-   +v3ReassignRow('public','@SomosCorp','X / Twitter','Advanced','Aisha Patel','AP')
-   +v3ReassignRow('hub','somos_li','LinkedIn','Editor','Omar Reyes','OR')
+   +v3ReassignRow('groups','Somos (FB Page)','Facebook','Editor','Aisha Patel')
+   +v3ReassignRow('public','@SomosCorp','X / Twitter','Advanced','Aisha Patel')
+   +v3ReassignRow('hub','somos_li','LinkedIn','Editor','Omar Reyes')
    +'</tbody></table>'
    +'<div class="pad"><div class="hs-alert hs-alert--info" style="margin:0"><span class="material-symbols-outlined">info</span><div>3 more accounts reach Bryn through Growth Team and Content Team. Those stay with the teams and need no reassignment.</div></div></div>';
   step2.innerHTML=newInner;
+  /* wire the completion button to a clear success toast so the flow finishes without a dead-end */
+  var doneBtn=Array.prototype.filter.call(pc.querySelectorAll('.footer .hs-btn--primary'),function(b){return /Transfer/i.test(b.textContent);})[0];
+  if(doneBtn){ doneBtn.setAttribute('type','button'); doneBtn.textContent='Transfer 3 accounts and remove Bryn'; doneBtn.setAttribute('onclick','v3CompleteTransfer()'); }
  }
- function v3ReassignRow(icon,acct,net,role,to,ini){
+ /* real, INTERACTIVE reassign control: a Bento .hs-select (native select keeps it keyboard-operable + all states with
+    no custom listbox to dead-end). Each directly-owned account gets its own picker so every one is reassignable. */
+ var V3_CUSTODIANS=['Aisha Patel','Omar Reyes','Priya Nair','Marcus Webb'];
+ function v3ReassignRow(icon,acct,net,role,to){
+  var opts=V3_CUSTODIANS.map(function(n){ return '<option value="'+n+'"'+(n===to?' selected':'')+'>'+n+'</option>'; }).join('');
   return '<tr><td><div class="rowflex"><span class="material-symbols-outlined">'+icon+'</span><span style="font:var(--hs-type-body-sm-b)">'+acct+'</span></div></td><td>'+net+'</td><td>'+role+'</td>'
-   +'<td><div class="hs-input affix" style="max-width:220px"><span class="mini-av">'+ini+'</span><input value="'+to+'" readonly aria-label="Reassign '+acct+' to"><button class="clr" aria-label="Choose member for '+acct+'" title="Choose member"><span class="material-symbols-outlined">expand_more</span></button></div></td></tr>';
+   +'<td><select class="v3-reassign hs-select" style="max-width:220px" aria-label="Reassign '+acct+' to">'+opts+'</select></td></tr>';
+ }
+ function v3CompleteTransfer(){
+  var sels=Array.prototype.slice.call(document.querySelectorAll('.v3-reassign'));
+  var to=(sels[0]&&sels[0].value)||'the selected member';
+  var many=sels.some(function(s){return s.value!==sels[0].value;});
+  showToast(many?('Accounts reassigned. Bryn Morales removed from the organization.'):(sels.length+' accounts transferred to '+to+'. Bryn Morales removed from the organization.'));
  }
  /* C8 (contractor / limited access): the raw custom-role toggle wall froze users. Turn c-org-role-new into a guided,
     predefined-role-first step with a readable capability grid so the grant is legible before confirm. Predefined roles
@@ -978,6 +1029,92 @@
   tb.innerHTML=g.rows.map(function(row){ return '<tr><td>'+row[0]+'</td><td style="text-align:right;width:64px"><span class="hs-toggle'+(row[1]?' is-on':'')+'" role="switch" tabindex="0" aria-label="'+row[0]+'" aria-checked="'+(row[1]?'true':'false')+'"></span></td></tr>'; }).join('');
   initControlA11y(tb);
  }
+ /* ===== C1 (invite): make the previously-inert "Invite members" button open a working invite flow. A shared Bento
+    modal (same .modal-wrap/.modal pattern as the change-password dialog) with a real .hs-input email field, a real
+    .hs-select role picker, an optional "Add to a team" .hs-select, and a primary "Send invite" that advances to a
+    clear success state. Static/client-side only (no backend). Injected + wired only in v3, only on the real Members page. */
+ var V3_INVITE_FORM='<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v3InvEmail">Email address</label><input class="hs-input" id="v3InvEmail" type="email" inputmode="email" autocomplete="off" placeholder="name@company.com" aria-describedby="v3InvErr"><div class="hs-field-hint" id="v3InvErr" role="alert" style="display:none;color:var(--hs-fg-negative)"></div></div>'
+  +'<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v3InvRole">Role</label><select class="hs-select" id="v3InvRole"><option value="Super Admin">Super Admin</option><option value="Admin">Admin</option><option value="Team Member" selected>Team Member</option><option value="View Only">View Only</option><option value="Compliance reviewer">Compliance reviewer</option></select><div class="hs-field-hint">Sets what they can do across the organization. You can change it later.</div></div>'
+  +'<div class="hs-field"><label class="hs-field-label" for="v3InvTeam">Add to a team <span style="font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle)">(optional)</span></label><select class="hs-select" id="v3InvTeam"><option value="">No team for now</option><option value="Growth Team">Growth Team</option><option value="Content Team">Content Team</option><option value="Regional Team">Regional Team</option><option value="Field Team A">Field Team A</option></select><div class="hs-field-hint">Team assignment grants the accounts that team manages. Optional, and doable later from the team\'s page.</div></div>';
+ function v3EnsureInviteModal(){
+  if(document.getElementById('v3InviteWrap')) return;
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  var m=v3El('<div class="modal-wrap" id="v3InviteWrap" onclick="v3CloseInvite()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="v3InvTitle"><div class="modal-head"><div class="mt" id="v3InvTitle">Invite members</div><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" title="Close" onclick="v3CloseInvite()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="v3InvBody"></div><div class="modal-foot" id="v3InvFoot"></div></div></div>');
+  pc.appendChild(m);
+ }
+ function v3OpenInvite(){
+  v3EnsureInviteModal();
+  var body=document.getElementById('v3InvBody'), foot=document.getElementById('v3InvFoot'), title=document.getElementById('v3InvTitle');
+  if(!body||!foot) return;
+  title.textContent='Invite members';
+  body.innerHTML=V3_INVITE_FORM;
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" onclick="v3CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" id="v3InvSend" onclick="v3SendInvite()"><span class="material-symbols-outlined">send</span>Send invite</button>';
+  initControlA11y(body);
+  var w=document.getElementById('v3InviteWrap'); w.classList.add('open');
+  setTimeout(function(){ var e=document.getElementById('v3InvEmail'); if(e)e.focus(); },30);
+ }
+ function v3CloseInvite(){ var w=document.getElementById('v3InviteWrap'); if(w)w.classList.remove('open'); }
+ function v3SendInvite(){
+  var email=(document.getElementById('v3InvEmail')||{}).value||'';
+  var role=(document.getElementById('v3InvRole')||{}).value||'Team Member';
+  var team=(document.getElementById('v3InvTeam')||{}).value||'';
+  var err=document.getElementById('v3InvErr'); email=email.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ if(err){ err.textContent='Enter a valid email address so we know where to send the invite.'; err.style.display=''; } var e=document.getElementById('v3InvEmail'); if(e)e.focus(); return; }
+  var body=document.getElementById('v3InvBody'), foot=document.getElementById('v3InvFoot'), title=document.getElementById('v3InvTitle');
+  title.textContent='Invite sent';
+  var teamLine=team?(' They were added to <b>'+gsEsc(team)+'</b>.'):'';
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Invite sent to '+gsEsc(email)+'</div><div class="ok-d">They will get an email to join Somos as <b>'+gsEsc(role)+'</b>.'+teamLine+' They appear under pending until they accept.</div></div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" onclick="v3OpenInvite()">Invite another</button><button class="hs-btn hs-btn--primary" onclick="v3CloseInvite()">Done</button>';
+ }
+ /* ===== C2 (Hill): non-table member view. Build one Bento card per member from the existing table rows (so the data
+    stays identical), with the key actions VISIBLE — change role, add to team, transfer & offboard, remove — instead of
+    hidden behind the "..." ellipsis. Replaces the table only in v3; the table markup stays intact for non-v3. ===== */
+ var V3_ROLE_BADGE={'super admin':'hs-badge--info'};
+ function v3MemberCards(pc){
+  var tbl=pc.querySelector('.set-card > table.hs-table'); if(!tbl) return;
+  var wrap=tbl.closest('.set-card'); if(!wrap||document.getElementById('v3MemberCards')) return;
+  var rows=Array.prototype.slice.call(tbl.querySelectorAll('tbody tr'));
+  var grid=v3El('<div class="v3-mcards" id="v3MemberCards"></div>');
+  rows.forEach(function(tr){
+   var av=tr.querySelector('.mini-av'), nm=tr.querySelector('.mlink'), em=tr.querySelector('.secd'), rb=tr.querySelector('.rolebadge'), sel=tr.querySelector('.rowsel');
+   var tds=tr.querySelectorAll('td'); var via=(tds[3]?tds[3].textContent:'Direct').trim();
+   var name=nm?nm.textContent:'', mail=em?em.textContent:'', role=rb?rb.textContent:'', ini=av?av.textContent:'';
+   var badgeCls=V3_ROLE_BADGE[role.toLowerCase()]||'hs-badge--neutral';
+   var viaTxt=/direct/i.test(via)?'Direct access':('Access '+via);
+   var card=v3El('<article class="v3-mcard"></article>');
+   card.innerHTML=
+    '<div class="mc-top">'
+     +'<span class="hs-check rowsel mc-sel" role="checkbox" tabindex="0" aria-label="Select '+gsEsc(name)+'"></span>'
+     +'<span class="mc-av" aria-hidden="true">'+gsEsc(ini)+'</span>'
+     +'<div class="mc-id"><a class="mc-name mlink" href="#" onclick="return v3OpenMemberCard(this)">'+gsEsc(name)+'</a><div class="mc-mail">'+gsEsc(mail)+'</div></div>'
+    +'</div>'
+    +'<div class="mc-meta"><span class="hs-badge '+badgeCls+' rolebadge">'+gsEsc(role)+'</span><span class="mc-via">'+gsEsc(viaTxt)+'</span></div>'
+    +'<div class="mc-actions">'
+     +'<button class="hs-btn hs-btn--secondary hs-btn--sm" onclick="v3CardChangeRole(this)"><span class="material-symbols-outlined" style="font-size:18px">badge</span>Change role</button>'
+     +'<button class="hs-btn hs-btn--secondary hs-btn--sm" onclick="showToast(\'Add-to-team is available from the member panel and the team page.\')"><span class="material-symbols-outlined" style="font-size:18px">group_add</span>Add to team</button>'
+     +'<a class="hs-btn hs-btn--secondary hs-btn--sm" href="c-org-transfer.html"><span class="material-symbols-outlined" style="font-size:18px">swap_horiz</span>Transfer &amp; offboard</a>'
+     +'<button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="showToast(\'Removing '+gsEsc(name).replace(/\x27/g,"")+' opens Transfer &amp; offboard so their accounts are reassigned first.\')"><span class="material-symbols-outlined" style="font-size:18px">person_remove</span>Remove</button>'
+    +'</div>';
+   /* carry the row data so the existing openMember drawer works from a card too (change role + full access view) */
+   card.setAttribute('data-name',name); card.setAttribute('data-mail',mail); card.setAttribute('data-role',role); card.setAttribute('data-ini',ini); card.setAttribute('data-via',via);
+   grid.appendChild(card);
+  });
+  wrap.parentNode.insertBefore(grid, wrap);
+  wrap.style.display='none';                 /* hide the table (kept in DOM for non-v3 parity + filterContent hooks) */
+  initControlA11y(grid);
+ }
+ /* open the existing member access drawer from a card (reuses openMember's fields) */
+ function v3OpenMemberCard(a){
+  var c=a.closest('.v3-mcard'); if(!c) return false;
+  var st=function(id,t){var x=document.getElementById(id);if(x)x.textContent=t;};
+  var name=c.getAttribute('data-name'), role=c.getAttribute('data-role'), via=c.getAttribute('data-via');
+  st('mdAv',c.getAttribute('data-ini')); st('mdName',name); st('mdMeta',c.getAttribute('data-mail')+' \u00b7 '+role);
+  var rbd=document.getElementById('mdRole'); if(rbd){ rbd.textContent=role; rbd.className='hs-badge '+(/super admin/i.test(role)?'hs-badge--info':'hs-badge--neutral'); }
+  st('mdAccessNote', /direct/i.test(via)?('This role is assigned directly to '+name+'.'):('Comes '+via+'. Ends if they leave that team, and stays with the team.'));
+  var w=document.getElementById('mdWrap'); if(w)w.classList.add('open');
+  return false;
+ }
+ function v3CardChangeRole(btn){ v3OpenMemberCard(btn.closest('.v3-mcard').querySelector('.mc-name')); }
  function applyV3(){
   if(!V3) return;
   try{ v3Flyout(); }catch(e){}
