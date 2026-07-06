@@ -199,6 +199,12 @@
  body.popsimple .pop-explicit{display:none;}
  body.popsimple .pop-simple{display:block;}
  .suite-navbtn.is-selected .circle{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
+ /* v3 (C2 follow-up) additions — Bento tokens only, scoped so they only render behind ?v3=1 */
+ .v3-navsearch{padding:6px 14px 10px;}
+ .v3-navsearch .hs-input{width:100%;box-sizing:border-box;}
+ .v3-steps{margin:10px 0 16px;padding-left:20px;display:flex;flex-direction:column;gap:8px;}
+ .v3-steps li{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ .v3-steps li b{font:var(--hs-type-body-sm-b);}
  /* nav search */
  .suite-drawer .sd-search{padding:8px 14px 12px;}
  .suite-drawer .sd-search .hs-input{width:100%;box-sizing:border-box;}
@@ -556,6 +562,13 @@
     "overview landing vs left nav". Kept SEPARATE from ut so the current pilot (ut=1, no ov) is unchanged. Persists. */
  var OV=false;
  try{ var _ov=new URLSearchParams(location.search).get('ov'); if(_ov==='1')sessionStorage.setItem('ov','1'); else if(_ov==='0')sessionStorage.removeItem('ov'); OV=(sessionStorage.getItem('ov')==='1'); }catch(e){}
+ /* Follow-up variant flag (?v3=1): the C2 prototype that fixes the problems both usability rounds surfaced (labels,
+    password home, section order, flyout copy, offboarding, member invite, contractor role, Overview, search). Kept
+    SEPARATE from ut and ov, mirrors ov's parse/persist so the current pilot link (ut=1, no v3) renders EXACTLY as
+    today; everything v3 adds is gated behind body.v3 + the V3 flag below. Persists across settings pages; ?v3=0 clears. */
+ var V3=false;
+ try{ var _v3=new URLSearchParams(location.search).get('v3'); if(_v3==='1')sessionStorage.setItem('v3','1'); else if(_v3==='0')sessionStorage.removeItem('v3'); V3=(sessionStorage.getItem('v3')==='1'); }catch(e){}
+ if(V3&&document.body)document.body.classList.add('v3');
  if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
@@ -564,6 +577,22 @@
  function planOK(req){ return !req || req!=='ent' || PLAN==='ent'; }
  function itemVisible(it,g){ if(it.acc.charAt(ROLE_IDX[ROLE])==='H') return false; if(!planOK(g.plan)) return false; if(!planOK(it.plan)) return false; if(QUERY && it.label.toLowerCase().indexOf(QUERY)===-1) return false; return true; }
  function groupVisible(g){ return g.items.filter(function(it){return itemVisible(it,g);}); }
+ /* ===== v3 (C2 follow-up) transforms — all gated behind V3 so the current pilot is byte-identical without ?v3=1 =====
+    NAV data is mutated ONCE at init (below) before any render, so every consumer (renderNav / renderStaticNav /
+    toggleCollapse) picks up the follow-up labels and order automatically. Evidence in BUILD-PLAN.md: C1, C2, C4, C12. */
+ var V3_LABELS = { 'mcp':'AI connectors', 'apps':'Connected apps' };          /* C1 + C2: purpose-based, "AI" leads */
+ var V3_GROUP_LABELS = { 'publishing':'Links & publishing' };                  /* C4: section header only; "Link settings" leaf unchanged */
+ var V3_GROUP_ORDER = ['account','org','int','publishing','sec'];             /* C12: Organization above Integrations */
+ function v3ApplyNav(){
+  if(!V3) return;
+  NAV.forEach(function(g){
+   if(V3_GROUP_LABELS[g.key]) g.label=V3_GROUP_LABELS[g.key];
+   g.items.forEach(function(it){ if(V3_LABELS[it.id]) it.label=V3_LABELS[it.id]; });
+  });
+  NAV.sort(function(a,b){ var ia=V3_GROUP_ORDER.indexOf(a.key), ib=V3_GROUP_ORDER.indexOf(b.key); return (ia<0?99:ia)-(ib<0?99:ib); });
+  /* keep the global header search index honest: same relabels + an "AI"/"Claude" synonym so search resolves the rename */
+  try{ SEARCH.forEach(function(e){ if(e.type==='Settings'){ if(e.label==='MCP connectors'){ e.label='AI connectors'; e.kw=(e.kw||'')+' ai connectors claude ai tools'; } else if(e.label==='Apps & API'){ e.label='Connected apps'; e.kw=(e.kw||'')+' connected apps installed apps directory'; } if(e.sub==='Publishing') e.sub='Links & publishing'; } }); }catch(e){}
+ }
  /* collapse module (Option A only) — isolated; remove this block + the isCollapsed/toggleCollapse uses to drop the feature.
     SNOWFLAKE: collapsible nav groups have no native Bento component (checked against NavDrawer, Accordion, Tree).
     Built on Bento tokens + APG disclosure a11y (button + aria-expanded) and FLAGGED — pending Giancarlo's pattern
@@ -574,7 +603,7 @@
  function navItem(it){ var a=el('a','sd-item'); a.href=it.href; a.setAttribute('data-id',it.id); a.appendChild(ic(it.icon)); a.appendChild(el('span','sd-label',it.label)); if(it.id===PAGE_ID)a.classList.add('on'); return a; }
  /* Settings Overview = a standalone first nav item above the groups (Joao's card-dashboard direction). Hidden in the
     user-test link (?ut=1) so the current pilot keeps testing the nav as-designed; shown in normal mode. */
- function navOverview(body){ if(UT&&!OV)return; var a=el('a','sd-item sd-overview'); a.href='c-settings-overview.html'; a.setAttribute('data-id','soverview'); a.appendChild(ic('space_dashboard')); a.appendChild(el('span','sd-label','Overview')); if(PAGE_ID==='soverview')a.classList.add('on'); body.appendChild(a); }
+ function navOverview(body){ if(V3)return; /* C11: v3 always drops the Overview nav item and leads with the left nav (takes priority over a leftover ov flag) */ if(UT&&!OV)return; var a=el('a','sd-item sd-overview'); a.href='c-settings-overview.html'; a.setAttribute('data-id','soverview'); a.appendChild(ic('space_dashboard')); a.appendChild(el('span','sd-label','Overview')); if(PAGE_ID==='soverview')a.classList.add('on'); body.appendChild(a); }
  function appendItems(body,g,vis){   /* flat two-level nav: group label -> flat item list, no sub-sub-groups */
   vis.forEach(function(it){ body.appendChild(navItem(it)); });
  }
@@ -764,6 +793,197 @@
  function initFilters(){ document.querySelectorAll('.csearch').forEach(function(w){ if(w.getAttribute('data-filter'))return; w.setAttribute('data-filter','1'); var lead=w.querySelector('.lead'); if(lead)lead.textContent='filter_list'; var inp=w.querySelector('input'); if(!inp)return; var ph=(inp.getAttribute('placeholder')||'').replace(/^Search\s+/i,'Filter these ').replace(/[.\u2026]+$/,''); if(!/^Filter/i.test(ph))ph='Filter these '+ph; inp.setAttribute('placeholder',ph); inp.setAttribute('aria-label',ph); if(!w.querySelector('.clr')){ var b=document.createElement('button'); b.type='button'; b.className='clr'; b.setAttribute('aria-label','Clear filter'); b.setAttribute('title','Clear filter'); b.innerHTML='<span class="material-symbols-outlined">close</span>'; b.style.display='none'; b.onclick=function(){inp.value=''; if(typeof filterContent==='function')filterContent(''); b.style.display='none'; inp.focus();}; w.appendChild(b); inp.addEventListener('input',function(){b.style.display=inp.value?'':'none';}); } }); }
  /* Cmd/Ctrl+K (and "/") focus the global header Search, so it reads as the single command entry */
  document.addEventListener('keydown',function(e){ if(((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K'))||(e.key==='/'&&!/^(INPUT|TEXTAREA)$/.test((e.target.tagName||'')))){ var s=document.getElementById('navSearchHeader'); if(s){ e.preventDefault(); s.focus(); } } });
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} syncControls(); renderNav(); initControlA11y(); initFilters(); })();
+ /* ================= v3 (C2 follow-up) DOM transforms =================
+    Every block is gated behind V3 and, where it touches a page, PAGE_ID, so with no ?v3=1 nothing below runs and
+    each page is byte-identical to today. Changes are applied to the live DOM after load (not baked into the content
+    strings) precisely so the non-v3 render is untouched. Maps 1:1 to BUILD-PLAN.md change IDs (noted per block). */
+ function v3El(html){ var t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+ function v3Flyout(){
+  /* C1 + C3: fix the avatar flyout copy. "MCP connectors" -> "AI connectors" (+ AI-tools subtitle); the
+     "Social accounts & teams" item over-promised Teams (it only lands on Social accounts), so split its label to
+     "Social & ad accounts". Applied to both popover variants. */
+  document.querySelectorAll('#popwrap .pi').forEach(function(pi){
+   var t=pi.querySelector('.pt'), d=pi.querySelector('.pd'); if(!t)return;
+   var tx=t.textContent.trim();
+   if(tx==='MCP connectors'){ t.textContent='AI connectors'; if(d)d.textContent='Connect AI tools like Claude to Hootsuite'; }
+   else if(tx==='Social accounts & teams'){ t.textContent='Social & ad accounts'; if(d)d.textContent='Manage the social and ad accounts you publish to'; }
+  });
+  /* C11 landing: the flyout's "Account settings" lands on the left-nav Settings home (a real settings page with the
+     drawer), never the Overview card page. Profile is the first left-nav item, so it IS the settings home; make sure
+     no ov-rewrite pointed it at the overview card. */
+  document.querySelectorAll('#popwrap a[href="c-settings-overview.html"]').forEach(function(a){ a.setAttribute('href','c-account-profile.html'); });
+ }
+ function v3NavSearch(){
+  /* C13: a client-side "Search settings" filter at the top of the left nav. Reuses the existing setQuery/QUERY/
+     renderNav machinery (QUERY already filters NAV items by label in itemVisible) plus a small synonym map so
+     "mcp" -> AI connectors, "password" -> Security, "app" -> Connected apps, "link" -> Links & publishing. Client-
+     side only, no backend — the cheap filter BUILD-PLAN C13/B4 calls for. Shown in v3 on the settings shell only. */
+  var body=document.getElementById('navBody'); if(!body||document.getElementById('v3NavSearchWrap'))return;
+  var wrap=v3El('<div class="v3-navsearch" id="v3NavSearchWrap"><div class="hs-input affix"><span class="material-symbols-outlined lead">search</span><input id="v3NavSearch" type="search" placeholder="Search settings" autocomplete="off" aria-label="Search settings" oninput="v3SetNavQuery(this.value)"></div></div>');
+  body.parentNode.insertBefore(wrap, body);
+ }
+ /* synonym-aware nav filter: map common terms to the label QUERY that itemVisible already understands */
+ var V3_SYN=[['mcp','ai connectors'],['ai','ai connectors'],['claude','ai connectors'],['password','security'],['2fa','security'],['mfa','security'],['sign in','security'],['app','connected apps'],['api','connected apps'],['integration','connected apps'],['link','links'],['short link','links'],['vanity','links'],['domain','links'],['invite','members'],['role','permissions'],['contractor','permissions'],['tag','tags'],['time zone','preferences'],['language','preferences']];
+ function v3SetNavQuery(v){ var q=(v||'').trim().toLowerCase(); for(var i=0;i<V3_SYN.length;i++){ if(q&&V3_SYN[i][0].indexOf(q)===0){ q=V3_SYN[i][1]; break; } } if(typeof setQuery==='function') setQuery(q); }
+ /* Retitle a page in place: rewrite the leading .set-head (and the header band title mirror) + the .set-sub lead. */
+ function v3Retitle(title, sub){
+  var pc=document.getElementById('pageContent'); if(!pc)return;
+  var h=pc.querySelector('.set-head'); if(h)h.textContent=title;
+  var tb=document.querySelector('.suite-topbar .tb-title'); if(tb)tb.textContent=title;
+  if(sub!=null){ var s=pc.querySelector('.set-sub'); if(s)s.innerHTML=sub; }
+ }
+ function v3Cap(ok){ return '<span class="material-symbols-outlined" title="'+(ok?'Allowed':'Not allowed')+'" style="color:var('+(ok?'--bento-theme-color-icon-positive':'--bento-theme-color-icon-subtle')+')">'+(ok?'check':'remove')+'</span>'; }
+ function v3Page(){
+  var pc=document.getElementById('pageContent'); if(!pc)return;
+  /* ---- C1: AI connectors (was "MCP connectors"). Purpose label + "Connect AI tools like Claude" subtitle; MCP kept
+          only as small helper text. Everyone reached for "AI"; a descriptive subtitle rescued the one v1 comprehension miss. */
+  if(PAGE_ID==='mcp'){
+   v3Retitle('AI connectors','Connect AI tools like Claude to Hootsuite, so they can read and act on your data through secure connectors.');
+   var mh=pc.querySelector('.sec'); if(mh)mh.textContent='AI connectors';
+   pc.querySelectorAll('.secd').forEach(function(p){ if(/AI assistants read and act/.test(p.textContent)) p.innerHTML='Let AI tools like Claude read and act on your Hootsuite data through secure connectors. <span style="color:var(--bento-theme-color-text-subtle)">Uses the Model Context Protocol (MCP).</span>'; });
+  }
+  /* ---- C2: Connected apps (was "Apps & API"). Group by purpose, not technical substrate. ---- */
+  if(PAGE_ID==='apps'){
+   v3Retitle('Connected apps','Installed apps and API access for the organization.');
+  }
+  /* ---- C4: Link settings page copy tidy. Section header rename ("Publishing" -> "Links & publishing") is nav-only
+          (v3ApplyNav); the leaf title "Link settings" tests well and stays. Disambiguate vanity domain vs short link. */
+  if(PAGE_ID==='vanity'){
+   var s=pc.querySelector('.set-sub'); if(s)s.innerHTML='Branded short-link domains for the links your organization publishes. A short link (for example go.somos.com/abc) is built on one of these domains.';
+  }
+  /* ---- C6: password primary home = Security & privacy, with a working change-password control here; Profile keeps
+          a cross-link (reverse of today's Profile-primary + dead redirect). Enterprise norm + fixes the Security-first bounce. */
+  if(PAGE_ID==='security'){
+   var authCard=pc.querySelector('.set-card .pad'); // first pad = "Authentication methods"
+   if(authCard){
+    var note=authCard.querySelector('.secd'); if(note)note.textContent='How you sign in to Hootsuite.';
+    var pwRow=v3El('<div class="between"><div><div style="font:var(--hs-type-body-md-b)">Password</div><div class="secd" style="margin:0">Last changed 3 months ago.</div></div><button class="hs-btn hs-btn--outlined" onclick="openEdit(\'password\')">Change password</button></div>');
+    var connRow=authCard.querySelector('.between');
+    if(connRow) authCard.insertBefore(pwRow, connRow); else authCard.appendChild(pwRow);
+    /* the change-password dialog (Bento) is authored only on Profile; inject the same modal container here so the
+       control actually works. openEdit/saveEdit/closeEdit + EDIT_FORMS.password already exist globally. */
+    if(!document.getElementById('editWrap')){
+     var modal=v3El('<div class="modal-wrap" id="editWrap" onclick="closeEdit()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="editTitle"><div class="modal-head"><div class="mt" id="editTitle">Edit</div><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" title="Close" onclick="closeEdit()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="editBody"></div><div class="modal-foot"><button class="hs-btn hs-btn--ghost" onclick="closeEdit()">Cancel</button><button class="hs-btn hs-btn--primary" id="editSave" data-kind="password" onclick="saveEdit()">Update password</button></div></div></div>');
+     pc.appendChild(modal);
+    }
+   }
+  }
+  if(PAGE_ID==='profile'){
+   /* turn the Profile password card into a cross-link that deep-links to Security (no dead tooltip) */
+   pc.querySelectorAll('.set-card').forEach(function(card){
+    var lbl=card.querySelector('div[style*="body-md-b"]');
+    if(lbl && lbl.textContent.trim()==='Password'){
+     var meta=card.querySelector('.secd'); if(meta)meta.textContent='Your password now lives in Security & privacy.';
+     var btn=card.querySelector('button'); if(btn){ var link=v3El('<a class="hs-btn hs-btn--outlined" href="c-account-security.html">Go to Security &amp; privacy</a>'); btn.parentNode.replaceChild(link,btn); }
+    }
+   });
+  }
+  /* ---- C7: member invite vs add-to-team. Members is already the primary invite; add an explicit "assign to a team"
+          second step here, and on Teams add an "Add members" affordance that routes into the same invite flow.
+          Guarded to the REAL Members page (the transfer page shares active='members'). ---- */
+  if(PAGE_ID==='members' && v3IsPage('Members')){
+   var hint=pc.querySelector('.hs-field-hint');
+   var step=v3El('<div class="hs-alert hs-alert--info" style="margin-top:14px"><span class="material-symbols-outlined">group_add</span><div>Inviting someone is step one. After they accept, <b>assign them to a team</b> from that team\'s page (or select them here and use <b>Add to team</b>) to grant the accounts the team manages.</div></div>');
+   if(hint)hint.parentNode.insertBefore(step, hint.nextSibling); else pc.appendChild(step);
+  }
+  if(PAGE_ID==='teams'){
+   /* the add-to-team dead-end: let admins invite/add from Teams too, routing into the same invite flow (Members). */
+   var createBtn=pc.querySelector('.csearch-row .hs-btn--primary');
+   if(createBtn && !document.getElementById('v3TeamAdd')){
+    var grp=v3El('<div class="rowflex" style="gap:10px"></div>');
+    var addBtn=v3El('<a class="hs-btn hs-btn--secondary" id="v3TeamAdd" href="c-settings-members.html"><span class="material-symbols-outlined">person_add</span>Add members</a>');
+    createBtn.parentNode.insertBefore(grp, createBtn); grp.appendChild(addBtn); grp.appendChild(createBtn);
+    var tip=v3El('<div class="hs-alert hs-alert--info" style="margin-bottom:16px"><span class="material-symbols-outlined">info</span><div>To add someone to a team, invite them in <b>Members</b> first (or use <b>Add members</b> above), then assign them here. New people always start from Members.</div></div>');
+    var firstCard=pc.querySelector('.set-card'); if(firstCard)firstCard.parentNode.insertBefore(tip, firstCard);
+   }
+  }
+  /* ---- C9: offboarding. (a) directly-owned accounts reassignable IN PLACE within the transfer step (the key
+          Mandi25 bug: today directly-owned accounts dead-end); (b) "review connected accounts" as an explicit step
+          in the member-remove path (the member access drawer). ---- */
+  if(PAGE_ID==='members' && v3IsPage('Members')){
+   /* member access drawer: name the review-before-remove step so users reach it without guessing */
+   var md=document.querySelector('#mdWrap .md-body');
+   if(md){
+    var leaveH=Array.prototype.filter.call(md.querySelectorAll('.sec'),function(x){return /When this person leaves/.test(x.textContent);})[0];
+    if(leaveH){
+     var p=leaveH.nextElementSibling; // the secd paragraph
+     var stepList=v3El('<ol class="v3-steps"><li><b>Review connected accounts.</b> See what this person owns directly vs through a team (above).</li><li><b>Reassign directly-owned accounts</b> to another member so nothing gets disconnected.</li><li><b>Remove</b> the person once their accounts have a new owner.</li></ol>');
+     if(p&&p.classList.contains('secd')) p.parentNode.insertBefore(stepList, p.nextSibling); else leaveH.parentNode.insertBefore(stepList, leaveH.nextSibling);
+    }
+   }
+  }
+  applyV3Transfer(pc);
+  applyV3RoleNew(pc);
+ }
+ /* C9 (transfer): make directly-owned social accounts reassignable in place. Today the transfer step only lists ONE
+    directly-owned account and treats team-based ones as untransferable, so a user with several direct accounts dead-
+    ends. Rebuild step 2 as a per-account reassign table where each directly-owned account gets its own "reassign to"
+    control, and keep the team-based note. External best practice: reassign each orphan-risk asset to a named custodian. */
+ function v3IsPage(tbTitle){ var t=document.querySelector('.suite-topbar .tb-title'); return !!(t && t.textContent.trim()===tbTitle); }
+ function applyV3Transfer(pc){
+  if(PAGE_ID!=='members') return; // transfer page is generated with active='members'
+  if(!v3IsPage('Transfer & offboard')) return; // discriminate from the real Members page (same active)
+  var cards=pc.querySelectorAll('.set-card');
+  var step2=null;
+  cards.forEach(function(c){ var h=c.querySelector('.sec'); if(h&&/2\. Accounts to transfer/.test(h.textContent)) step2=c; });
+  if(!step2||document.getElementById('v3ReassignTbl')) return;
+  var newInner='<div class="pad"><h3 class="sec">2. Reassign the accounts Bryn owns directly</h3><p class="secd" style="margin:0">Each account below is owned directly by Bryn. Pick who takes over each one so nothing gets disconnected. Team-based access ends automatically and stays with the team, so it is not listed here.</p></div>'
+   +'<table class="hs-table" id="v3ReassignTbl"><thead><tr><th>Account</th><th>Network</th><th>Role</th><th>Reassign to</th></tr></thead><tbody>'
+   +v3ReassignRow('groups','Somos (FB Page)','Facebook','Editor','Aisha Patel','AP')
+   +v3ReassignRow('public','@SomosCorp','X / Twitter','Advanced','Aisha Patel','AP')
+   +v3ReassignRow('hub','somos_li','LinkedIn','Editor','Omar Reyes','OR')
+   +'</tbody></table>'
+   +'<div class="pad"><div class="hs-alert hs-alert--info" style="margin:0"><span class="material-symbols-outlined">info</span><div>3 more accounts reach Bryn through Growth Team and Content Team. Those stay with the teams and need no reassignment.</div></div></div>';
+  step2.innerHTML=newInner;
+ }
+ function v3ReassignRow(icon,acct,net,role,to,ini){
+  return '<tr><td><div class="rowflex"><span class="material-symbols-outlined">'+icon+'</span><span style="font:var(--hs-type-body-sm-b)">'+acct+'</span></div></td><td>'+net+'</td><td>'+role+'</td>'
+   +'<td><div class="hs-input affix" style="max-width:220px"><span class="mini-av">'+ini+'</span><input value="'+to+'" readonly aria-label="Reassign '+acct+' to"><button class="clr" aria-label="Choose member for '+acct+'" title="Choose member"><span class="material-symbols-outlined">expand_more</span></button></div></td></tr>';
+ }
+ /* C8 (contractor / limited access): the raw custom-role toggle wall froze users. Turn c-org-role-new into a guided,
+    predefined-role-first step with a readable capability grid so the grant is legible before confirm. Predefined roles
+    first + a compact capability matrix is the evidenced pattern (avoid role explosion, avoid unbounded toggles). */
+ var V3_PRESET_GRID = {
+  'Contractor (limited)': {desc:'Draft and view analytics only. Cannot publish, manage billing, or manage people. A safe default for external contractors.',
+    rows:[['See analytics',1],['Create drafts',1],['Publish content',0],['Reply to comments and messages',0],['Manage billing',0],['Add or remove people',0]]},
+  'Editor': {desc:'Publish own content and reply, plus everything a contractor can do. No people or billing management.',
+    rows:[['See analytics',1],['Create drafts',1],['Publish content',1],['Reply to comments and messages',1],['Manage billing',0],['Add or remove people',0]]},
+  'Analyst (view only)': {desc:'Read-only across analytics and content. Cannot draft or publish.',
+    rows:[['See analytics',1],['Create drafts',0],['Publish content',0],['Reply to comments and messages',0],['Manage billing',0],['Add or remove people',0]]}
+ };
+ function applyV3RoleNew(pc){
+  if(PAGE_ID!=='roles') return; // role-new page is generated with active='roles' (shared with Roles + roles-detail)
+  if(!v3IsPage('Create custom role')) return; // discriminate the create-role sub-page by its header title
+  if(document.getElementById('v3RoleGuide')) return;
+  var tb=document.querySelector('.suite-topbar .tb-title'); if(tb)tb.textContent='Give limited access';
+  var sub=pc.querySelector('.set-sub'); if(sub)sub.textContent='Start from a predefined role, then check exactly what it can do. Best for contractors and temporary access.';
+  var info=pc.querySelector('.hs-alert'); if(info)info.parentNode.removeChild(info);
+  /* remove the raw toggle-wall cards (the guided grid replaces them) */
+  var cards=pc.querySelectorAll('.set-card');
+  cards.forEach(function(c){ if(c.querySelector('.footer')||c.querySelector('.hs-toggle')||c.querySelector('input[placeholder]')) c.parentNode.removeChild(c); });
+  var opts=Object.keys(V3_PRESET_GRID);
+  var radios=opts.map(function(name,i){ return '<label class="rowflex" style="cursor:pointer;align-items:flex-start;gap:10px;padding:10px 0"><span class="hs-radio'+(i===0?' is-on':'')+'" data-role="'+name+'"></span><span><span style="font:var(--hs-type-body-md-b)">'+name+'</span><span class="secd" style="display:block;margin:2px 0 0">'+V3_PRESET_GRID[name].desc+'</span></span></label>'; }).join('');
+  var guide=v3El('<div id="v3RoleGuide"></div>');
+  guide.innerHTML='<div class="set-card"><div class="pad"><div class="grid2"><div class="hs-field"><label class="hs-field-label">Role name</label><input class="hs-input" value="Contractor" aria-label="Role name"></div><div class="hs-field"><label class="hs-field-label">Applies to</label><div class="hs-input affix"><input value="Selected social accounts" readonly aria-label="Applies to"><button class="clr" aria-label="Change" title="Change"><span class="material-symbols-outlined">expand_more</span></button></div></div></div></div></div>'
+   +'<div class="set-card"><div class="pad"><h3 class="sec">1. Start from a predefined role</h3><p class="secd">Predefined roles cover almost every case and are easy to manage. Pick the closest one.</p><div class="stack" style="gap:0" id="v3RolePresets">'+radios+'</div></div>'
+   +'<div class="pad"><h3 class="sec">2. What this role can do</h3><p class="secd">Confirm the capabilities before you save. Toggle any you want to change.</p><table class="hs-table" id="v3CapGrid"><tbody></tbody></table></div>'
+   +'<div class="footer"><a class="hs-btn hs-btn--ghost" href="c-org-roles.html">Cancel</a><button class="hs-btn hs-btn--primary" onclick="showToast(\'Limited-access role created.\')">Create role</button></div></div>';
+  var after=sub||pc.firstElementChild; // .set-head was lifted into the header band; anchor on the in-body .set-sub
+  after.parentNode.insertBefore(guide, after.nextSibling);
+  v3RenderCapGrid(opts[0]);
+  document.getElementById('v3RolePresets').addEventListener('click',function(e){ var r=e.target.closest('.hs-radio'); if(!r)return; v3RenderCapGrid(r.getAttribute('data-role')); });
+ }
+ function v3RenderCapGrid(roleName){
+  var g=V3_PRESET_GRID[roleName]; var tb=document.querySelector('#v3CapGrid tbody'); if(!g||!tb)return;
+  tb.innerHTML=g.rows.map(function(row){ return '<tr><td>'+row[0]+'</td><td style="text-align:right;width:64px"><span class="hs-toggle'+(row[1]?' is-on':'')+'" role="switch" tabindex="0" aria-label="'+row[0]+'" aria-checked="'+(row[1]?'true':'false')+'"></span></td></tr>'; }).join('');
+  initControlA11y(tb);
+ }
+ function applyV3(){
+  if(!V3) return;
+  try{ v3Flyout(); }catch(e){}
+  try{ if(document.getElementById('navBody')) v3NavSearch(); }catch(e){}
+  try{ v3Page(); }catch(e){}
+ }
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); initControlA11y(); initFilters(); })();
 </script>
 </body></html>
