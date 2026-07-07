@@ -977,7 +977,7 @@
   var step2=null;
   cards.forEach(function(c){ var h=c.querySelector('.sec'); if(h&&/2\. Accounts to transfer/.test(h.textContent)) step2=c; });
   if(!step2||document.getElementById('v3ReassignTbl')) return;
-  var newInner='<div class="pad"><h3 class="sec">2. Reassign the accounts Bryn owns directly</h3><p class="secd" style="margin:0">Each account below is owned directly by Bryn. Pick who takes over each one so nothing gets disconnected. Team-based access ends automatically and stays with the team, so it is not listed here.</p></div>'
+  var newInner='<div class="pad"><h3 class="sec">1. Reassign the accounts Bryn owns directly</h3><p class="secd" style="margin:0">Each account below is owned directly by Bryn. Pick who takes over each one so nothing gets disconnected. Team-based access ends automatically and stays with the team, so it is not listed here.</p></div>'
    +'<table class="hs-table" id="v3ReassignTbl"><thead><tr><th>Account</th><th>Network</th><th>Role</th><th>Reassign to</th></tr></thead><tbody>'
    +v3ReassignRow('groups','Somos (FB Page)','Facebook','Editor','Aisha Patel')
    +v3ReassignRow('public','@SomosCorp','X / Twitter','Advanced','Aisha Patel')
@@ -985,6 +985,12 @@
    +'</tbody></table>'
    +'<div class="pad"><div class="hs-alert hs-alert--info" style="margin:0"><span class="material-symbols-outlined">info</span><div>3 more accounts reach Bryn through Growth Team and Content Team. Those stay with the teams and need no reassignment.</div></div></div>';
   step2.innerHTML=newInner;
+  /* C9 bug fix (v3): remove the vestigial step-1 single-recipient card. It asks 'who receives' with a readonly picker that contradicts the per-account pickers above; step 2 is now the one obvious place to assign each account. */
+  cards.forEach(function(c){ var h=c.querySelector('.sec'); if(h&&/1\. Who receives the accounts/.test(h.textContent)&&c.parentNode) c.parentNode.removeChild(c); });
+  /* C9 bug fix (v3): the base summary hard-codes 'receives 1 account', but v3 reassigns several accounts, possibly to different owners; make it accurate. */
+  Array.prototype.forEach.call(pc.querySelectorAll('.secd'),function(e){ if(/receives 1 account/.test(e.textContent)) e.textContent='The accounts above move to their new owners. Bryn Morales is then removed from the organization.'; });
+  /* copy (v3): focus the warning on the offboarding case; the base text mixes in an unrelated 'changing your email' scenario. */
+  var v3warn=pc.querySelector('.hs-alert--warning div'); if(v3warn&&/changing your email/.test(v3warn.textContent)) v3warn.textContent='When someone leaves, the accounts they own directly can lose their connection. Reassign them first so nothing gets disconnected.';
   /* wire the completion button to a clear success toast so the flow finishes without a dead-end */
   var doneBtn=Array.prototype.filter.call(pc.querySelectorAll('.footer .hs-btn--primary'),function(b){return /Transfer/i.test(b.textContent);})[0];
   if(doneBtn){ doneBtn.setAttribute('type','button'); doneBtn.textContent='Transfer 3 accounts and remove Bryn'; doneBtn.setAttribute('onclick','v3CompleteTransfer()'); }
