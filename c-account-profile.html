@@ -207,19 +207,36 @@
  .v3-steps li b{font:var(--hs-type-body-sm-b);}
  /* C2 (Hill): non-table member view — one card per member, key actions VISIBLE (no "..." ellipsis). Bento
     card tokens (mirrors .set-tile / .set-card surfaces) + a11y. Renders only in v3, only on the real Members page. */
- .v3-mcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
- .v3-mcard{display:flex;flex-direction:column;gap:14px;padding:18px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;transition:border-color .12s,box-shadow .12s;}
+ .v3-mcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;}
+ .v3-mcard{display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;transition:border-color .12s,box-shadow .12s;}
  .v3-mcard:hover{border-color:var(--bento-theme-color-border-base);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
  .v3-mcard:focus-within{border-color:var(--bento-theme-color-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
  .v3-mcard .mc-top{display:flex;align-items:flex-start;gap:12px;}
- .v3-mcard .mc-av{width:44px;height:44px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-body-md-b);flex:none;}
+ .v3-mcard .mc-av{width:40px;height:40px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-body-md-b);flex:none;}
  .v3-mcard .mc-id{flex:1;min-width:0;}
  .v3-mcard .mc-name{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
  .v3-mcard .mc-mail{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ /* C2 density trim (v3): fold access + role onto one quiet meta line so the badge and the small via note read as a unit; the 4 actions stay visible below. */
  .v3-mcard .mc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
- .v3-mcard .mc-via{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
- .v3-mcard .mc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:14px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v3-mcard .mc-via{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);}
+ .v3-mcard .mc-via::before{content:"\\00b7";margin-right:8px;color:var(--bento-theme-color-text-disabled);}
+ .v3-mcard .mc-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:10px;border-top:1px solid var(--bento-theme-color-border-subtle);}
  .v3-mcard .mc-sel{flex:none;}
+ /* C-kebab (v3): row-level actions menu for tables that today carry a dead "More" ellipsis. Reuses the .bb-menu
+    role=menu / role=menuitem pattern from the bulk bar; the cell hosting the ellipsis is the positioning context. */
+ .hs-table td.v3-kebab-cell{position:relative;overflow:visible;}
+ .v3-kebab-menu{position:absolute;top:calc(100% - 4px);right:12px;z-index:60;min-width:196px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:10px;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);padding:6px;display:none;}
+ .v3-kebab-menu.open{display:block;}
+ .v3-kebab-menu button{display:flex;width:100%;align-items:center;gap:10px;border:0;background:transparent;cursor:pointer;text-align:left;padding:8px 10px;border-radius:8px;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+ .v3-kebab-menu button:hover{background:var(--bento-component-list-item-fill-hovered);}
+ .v3-kebab-menu button .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-base);}
+ /* C8 (contractor grid): constrain the capability list to one readable column so each label and its toggle read as a unit. */
+ #v3CapGrid{max-width:496px;}
+ #v3CapGrid td:first-child{width:auto;}
+ #v3CapGrid td:last-child{text-align:right;width:56px;}
+ /* C8 (contractor grid): "Applies to" is a static read-only fact, not a control — plain label + value, no input chrome, no chevron. */
+ .v3-static-field .hs-field-label{margin-bottom:4px;}
+ .v3-static-value{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);padding:6px 0;}
  /* C1 (invite): success state inside the shared Bento modal — a saffron/positive confirmation, colour + icon (never colour alone) */
  .v3-invite-done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:12px 4px;}
  .v3-invite-done .ok-ic{width:52px;height:52px;border-radius:999px;display:grid;place-items:center;background:var(--hs-bg-positive);color:var(--hs-fg-positive);}
@@ -1033,7 +1050,7 @@
   var opts=Object.keys(V3_PRESET_GRID);
   var radios=opts.map(function(name,i){ return '<label class="rowflex" style="cursor:pointer;align-items:flex-start;gap:10px;padding:10px 0"><span class="hs-radio'+(i===0?' is-on':'')+'" data-role="'+name+'"></span><span><span style="font:var(--hs-type-body-md-b)">'+name+'</span><span class="secd" style="display:block;margin:2px 0 0">'+V3_PRESET_GRID[name].desc+'</span></span></label>'; }).join('');
   var guide=v3El('<div id="v3RoleGuide"></div>');
-  guide.innerHTML='<div class="set-card"><div class="pad"><div class="grid2"><div class="hs-field"><label class="hs-field-label">Role name</label><input class="hs-input" value="Contractor" aria-label="Role name"></div><div class="hs-field"><label class="hs-field-label">Applies to</label><div class="hs-input affix"><input value="Selected social accounts" readonly aria-label="Applies to"><button class="clr" aria-label="Change" title="Change"><span class="material-symbols-outlined">expand_more</span></button></div></div></div></div></div>'
+  guide.innerHTML='<div class="set-card"><div class="pad"><div class="grid2"><div class="hs-field"><label class="hs-field-label" for="v3RoleName">Role name</label><input class="hs-input" id="v3RoleName" value="Contractor" aria-label="Role name"></div><div class="hs-field v3-static-field"><span class="hs-field-label">Applies to</span><div class="v3-static-value">All selected social accounts</div></div></div></div></div>'
    +'<div class="set-card"><div class="pad"><h3 class="sec">1. Start from a predefined role</h3><p class="secd">Predefined roles cover almost every case and are easy to manage. Pick the closest one.</p><div class="stack" style="gap:0" id="v3RolePresets">'+radios+'</div></div>'
    +'<div class="pad"><h3 class="sec">2. What this role can do</h3><p class="secd">Confirm the capabilities before you save. Toggle any you want to change.</p><table class="hs-table" id="v3CapGrid"><tbody></tbody></table></div>'
    +'<div class="footer"><a class="hs-btn hs-btn--ghost" href="c-org-roles.html">Cancel</a><button class="hs-btn hs-btn--primary" onclick="showToast(\'Limited-access role created.\')">Create role</button></div></div>';
@@ -1051,8 +1068,18 @@
     modal (same .modal-wrap/.modal pattern as the change-password dialog) with a real .hs-input email field, a real
     .hs-select role picker, an optional "Add to a team" .hs-select, and a primary "Send invite" that advances to a
     clear success state. Static/client-side only (no backend). Injected + wired only in v3, only on the real Members page. */
+ /* C3 (invite): role scent. A one-line capability hint under the Role select that updates on change, so the picker
+    is legible before you commit. Copy tracks how these roles read elsewhere (member drawer, roles pages, cap grid). */
+ var V3_INV_ROLE_HINT={
+  'Super Admin':'Full control, including billing and managing people.',
+  'Admin':'Manages members, content, and social accounts. No billing.',
+  'Team Member':'Works within assigned teams. Cannot manage people or billing.',
+  'View Only':'Can view but not change anything.',
+  'Compliance reviewer':'Reviews and approves content. No publishing or admin.'
+ };
+ function v3InvRoleHint(){ var s=document.getElementById('v3InvRole'), h=document.getElementById('v3InvRoleHint'); if(!s||!h)return; h.textContent=V3_INV_ROLE_HINT[s.value]||'Sets what they can do across the organization. You can change it later.'; }
  var V3_INVITE_FORM='<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v3InvEmail">Email address</label><input class="hs-input" id="v3InvEmail" type="email" inputmode="email" autocomplete="off" placeholder="name@company.com" aria-describedby="v3InvErr"><div class="hs-field-hint" id="v3InvErr" role="alert" style="display:none;color:var(--hs-fg-negative)"></div></div>'
-  +'<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v3InvRole">Role</label><select class="hs-select" id="v3InvRole"><option value="Super Admin">Super Admin</option><option value="Admin">Admin</option><option value="Team Member" selected>Team Member</option><option value="View Only">View Only</option><option value="Compliance reviewer">Compliance reviewer</option></select><div class="hs-field-hint">Sets what they can do across the organization. You can change it later.</div></div>'
+  +'<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v3InvRole">Role</label><select class="hs-select" id="v3InvRole" onchange="v3InvRoleHint()"><option value="Super Admin">Super Admin</option><option value="Admin">Admin</option><option value="Team Member" selected>Team Member</option><option value="View Only">View Only</option><option value="Compliance reviewer">Compliance reviewer</option></select><div class="hs-field-hint" id="v3InvRoleHint"></div></div>'
   +'<div class="hs-field"><label class="hs-field-label" for="v3InvTeam">Add to a team <span style="font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle)">(optional)</span></label><select class="hs-select" id="v3InvTeam"><option value="">No team for now</option><option value="Growth Team">Growth Team</option><option value="Content Team">Content Team</option><option value="Regional Team">Regional Team</option><option value="Field Team A">Field Team A</option></select><div class="hs-field-hint">Team assignment grants the accounts that team manages. Optional, and doable later from the team\'s page.</div></div>';
  function v3EnsureInviteModal(){
   if(document.getElementById('v3InviteWrap')) return;
@@ -1060,18 +1087,32 @@
   var m=v3El('<div class="modal-wrap" id="v3InviteWrap" onclick="v3CloseInvite()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="v3InvTitle"><div class="modal-head"><div class="mt" id="v3InvTitle">Invite members</div><button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" title="Close" onclick="v3CloseInvite()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="v3InvBody"></div><div class="modal-foot" id="v3InvFoot"></div></div></div>');
   pc.appendChild(m);
  }
+ /* C2 (invite a11y, W3C APG dialog): remember the trigger to restore focus on close, and trap Tab within the modal. */
+ var _v3InvLastFocus=null;
+ function v3InvFocusables(){ var m=document.querySelector('#v3InviteWrap .modal'); if(!m)return []; return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),function(el){ return !el.disabled && el.offsetParent!==null; }); }
+ function v3InvKeydown(e){
+  if(e.key==='Escape'){ e.preventDefault(); v3CloseInvite(); return; }
+  if(e.key!=='Tab') return;
+  var f=v3InvFocusables(); if(!f.length) return;
+  var first=f[0], last=f[f.length-1];
+  if(e.shiftKey){ if(document.activeElement===first || !document.querySelector('#v3InviteWrap .modal').contains(document.activeElement)){ e.preventDefault(); last.focus(); } }
+  else { if(document.activeElement===last){ e.preventDefault(); first.focus(); } }
+ }
  function v3OpenInvite(){
   v3EnsureInviteModal();
   var body=document.getElementById('v3InvBody'), foot=document.getElementById('v3InvFoot'), title=document.getElementById('v3InvTitle');
   if(!body||!foot) return;
+  _v3InvLastFocus=document.activeElement;   /* the trigger; focus returns here on close */
   title.textContent='Invite members';
   body.innerHTML=V3_INVITE_FORM;
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" onclick="v3CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" id="v3InvSend" onclick="v3SendInvite()"><span class="material-symbols-outlined">send</span>Send invite</button>';
   initControlA11y(body);
+  v3InvRoleHint();
   var w=document.getElementById('v3InviteWrap'); w.classList.add('open');
+  w.addEventListener('keydown',v3InvKeydown);
   setTimeout(function(){ var e=document.getElementById('v3InvEmail'); if(e)e.focus(); },30);
  }
- function v3CloseInvite(){ var w=document.getElementById('v3InviteWrap'); if(w)w.classList.remove('open'); }
+ function v3CloseInvite(){ var w=document.getElementById('v3InviteWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v3InvKeydown); } if(_v3InvLastFocus&&_v3InvLastFocus.focus){ try{_v3InvLastFocus.focus();}catch(e){} _v3InvLastFocus=null; } }
  function v3SendInvite(){
   var email=(document.getElementById('v3InvEmail')||{}).value||'';
   var role=(document.getElementById('v3InvRole')||{}).value||'Team Member';
@@ -1133,11 +1174,78 @@
   return false;
  }
  function v3CardChangeRole(btn){ v3OpenMemberCard(btn.closest('.v3-mcard').querySelector('.mc-name')); }
+ /* ===== C-kebab (v3): wire the dead "More" ellipsis in tables to a REAL row-actions menu. Reuses the bulk bar's
+    .bb-menu role=menu / role=menuitem pattern (renamed .v3-kebab-menu to scope positioning) so nothing is invented.
+    Actions mirror the member cards + each page's own affordances. Full APG menu-button a11y: aria-haspopup + aria-
+    expanded on the trigger, Escape closes and restores focus, click-outside closes. Only runs in v3. ===== */
+ function v3OpenMemberRow(tr){ if(typeof openMember==='function') openMember({preventDefault:function(){},target:tr}); }
+ /* per-page row action sets: each item {label, icon, run(tr)}. Pages not listed keep their (harmless) ellipsis and are noted in the build comment below. */
+ var V3_ROW_ACTIONS={
+  'members':function(tr){ var nm=tr.querySelector('.mlink'); var name=nm?nm.textContent:'this member'; return [
+    {label:'Change role',icon:'badge',run:function(){ v3OpenMemberRow(tr); }},
+    {label:'Add to team',icon:'group_add',run:function(){ showToast('Add-to-team is available from the member panel and the team page.'); }},
+    {label:'Transfer & offboard',icon:'swap_horiz',run:function(){ location.href='c-org-transfer.html'; }},
+    {label:'Remove',icon:'person_remove',run:function(){ showToast('Removing '+name+' opens Transfer & offboard so their accounts are reassigned first.'); }}
+  ]; },
+  'social':function(tr){ var nm=tr.querySelector('span[style]'); var acct=nm?nm.textContent:'this account'; return [
+    {label:'Reconnect',icon:'refresh',run:function(){ showToast('Reconnect started for '+acct+'.'); }},
+    {label:'Disconnect',icon:'link_off',run:function(){ showToast('Disconnect is limited to Super Admins.'); }},
+    {label:'Transfer',icon:'swap_horiz',run:function(){ showToast('Transfer is limited to Super Admins.'); }}
+  ]; },
+  'teams':function(tr){ var nm=tr.querySelector('span[style]'); var team=nm?nm.textContent:'this team'; return [
+    {label:'Open team',icon:'open_in_new',run:function(){ showToast('Opening '+team+'.'); }},
+    {label:'Add members',icon:'group_add',run:function(){ location.href='c-settings-members.html'; }},
+    {label:'Rename team',icon:'edit',run:function(){ showToast('Rename '+team+'.'); }},
+    {label:'Delete team',icon:'delete',run:function(){ showToast('Deleting a team is limited to admins. Members keep their direct access.'); }}
+  ]; },
+  'tags':function(tr){ var nm=tr.querySelector('.hs-badge'); var tag=nm?nm.textContent:'this tag'; return [
+    {label:'Rename tag',icon:'edit',run:function(){ showToast('Rename '+tag+'.'); }},
+    {label:'Merge into another tag',icon:'merge',run:function(){ showToast('Merge '+tag+' into another tag.'); }},
+    {label:'Delete tag',icon:'delete',run:function(){ showToast('Deleting '+tag+' removes it from all posts. This cannot be undone.'); }}
+  ]; },
+  'vanity':function(tr){ var td=tr.querySelector('td'); var dom=td?td.textContent.trim():'this domain'; return [
+    {label:'Verify DNS',icon:'dns',run:function(){ showToast('Re-checking DNS for '+dom+'.'); }},
+    {label:'Copy domain',icon:'content_copy',run:function(){ showToast('Copied '+dom+'.'); }},
+    {label:'Remove domain',icon:'delete',run:function(){ showToast('Removing '+dom+' stops new short links on it. Existing links keep working.'); }}
+  ]; }
+ };
+ var _v3KebabOpenTrigger=null;
+ function v3CloseKebabs(restore){ var open=document.querySelector('.v3-kebab-menu.open'); if(open)open.classList.remove('open'); document.querySelectorAll('[data-v3-kebab][aria-expanded="true"]').forEach(function(b){ b.setAttribute('aria-expanded','false'); }); if(restore&&_v3KebabOpenTrigger&&_v3KebabOpenTrigger.focus){ try{_v3KebabOpenTrigger.focus();}catch(e){} } _v3KebabOpenTrigger=null; }
+ function v3ToggleKebab(btn){ var menu=btn.parentNode.querySelector('.v3-kebab-menu'); if(!menu)return; var isOpen=menu.classList.contains('open'); v3CloseKebabs(false); if(!isOpen){ menu.classList.add('open'); btn.setAttribute('aria-expanded','true'); _v3KebabOpenTrigger=btn; var f=menu.querySelector('[role="menuitem"]'); if(f)setTimeout(function(){f.focus();},0); } }
+ function v3WireKebabs(){
+  var factory=V3_ROW_ACTIONS[PAGE_ID]; if(!factory) return;                 /* pages with no meaningful row action are left as-is */
+  if(PAGE_ID==='members' && !v3IsPage('Members')) return;                    /* skip the transfer page (shares active='members') */
+  var scope=document.getElementById('pageContent'); if(!scope) return;
+  var btns=scope.querySelectorAll('table.hs-table button[aria-label="More"]');
+  Array.prototype.forEach.call(btns,function(btn){
+   if(btn.getAttribute('data-v3-kebab')) return;
+   var tr=btn.closest('tr'); if(!tr) return;
+   var items=factory(tr); if(!items||!items.length) return;
+   var cell=btn.closest('td'); if(cell)cell.classList.add('v3-kebab-cell');
+   btn.setAttribute('data-v3-kebab','1');
+   btn.setAttribute('type','button');
+   btn.setAttribute('aria-haspopup','menu');
+   btn.setAttribute('aria-expanded','false');
+   btn.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); v3ToggleKebab(btn); });
+   var menu=document.createElement('div'); menu.className='v3-kebab-menu'; menu.setAttribute('role','menu'); menu.setAttribute('aria-label','Row actions');
+   items.forEach(function(it){
+    var mi=document.createElement('button'); mi.type='button'; mi.setAttribute('role','menuitem'); mi.setAttribute('tabindex','-1');
+    mi.innerHTML='<span class="material-symbols-outlined">'+it.icon+'</span>'+gsEsc(it.label);
+    mi.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); v3CloseKebabs(true); it.run(tr); });
+    menu.appendChild(mi);
+   });
+   (cell||btn.parentNode).appendChild(menu);
+  });
+ }
+ /* click-outside + Escape close the row-actions menu (Escape restores focus to the ellipsis, per APG) */
+ document.addEventListener('click',function(e){ if(!e.target.closest('.v3-kebab-menu')&&!e.target.closest('[data-v3-kebab]')) v3CloseKebabs(false); });
+ document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.querySelector('.v3-kebab-menu.open')) v3CloseKebabs(true); });
  function applyV3(){
   if(!V3) return;
   try{ v3Flyout(); }catch(e){}
   try{ if(document.getElementById('navBody')) v3NavSearch(); }catch(e){}
   try{ v3Page(); }catch(e){}
+  try{ v3WireKebabs(); }catch(e){}
  }
  (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); initControlA11y(); initFilters(); })();
 </script>
