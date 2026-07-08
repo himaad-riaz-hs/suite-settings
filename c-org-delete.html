@@ -228,6 +228,19 @@
  .v3-mcard .mc-via::before{content:"\00b7";margin-right:6px;color:var(--bento-theme-color-text-disabled);}
  .v3-mcard .mc-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:10px;border-top:1px solid var(--bento-theme-color-border-subtle);}
  .v3-mcard .mc-sel{flex:none;}
+ /* TEST-MODE-ONLY "View as" switch (ut + v3): lets a participant flip the members list between the card grid and
+    the original table IN PLACE, no URL change. Deliberately minimal/quiet so it reads as a view switch, not a
+    product control: a small right-aligned label + a compact segmented control (two toggle buttons). Tokens only.
+    Injected only under ?ut=1 (see v3ViewSwitch); never present in normal v3, so non-ut/non-v3 stay byte-identical. */
+ .v3-viewswitch{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:0 0 12px;}
+ .v3-viewswitch .vs-label{font:var(--hs-type-meta-b);font-weight:700;color:var(--bento-theme-color-text-subtle);}
+ .v3-viewswitch .vs-seg{display:inline-flex;border:1px solid var(--bento-theme-color-border-base);border-radius:8px;overflow:hidden;}
+ .v3-viewswitch .vs-btn{appearance:none;border:0;background:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-subtle);padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+ .v3-viewswitch .vs-btn+.vs-btn{border-left:1px solid var(--bento-theme-color-border-base);}
+ .v3-viewswitch .vs-btn .material-symbols-outlined{font-size:18px;}
+ .v3-viewswitch .vs-btn:hover{background:var(--bento-component-list-item-fill-hovered);color:var(--bento-theme-color-text-base);}
+ .v3-viewswitch .vs-btn:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:-2px;}
+ .v3-viewswitch .vs-btn[aria-checked="true"]{background:var(--bento-theme-color-bg-surface-recessed);color:var(--bento-theme-color-text-base);}
  /* C-kebab (v3): row-level actions menu for tables that today carry a dead "More" ellipsis. Reuses the .bb-menu
     role=menu / role=menuitem pattern from the bulk bar; the cell hosting the ellipsis is the positioning context. */
  .hs-table td.v3-kebab-cell{position:relative;overflow:visible;}
@@ -941,6 +954,10 @@
       A/B: with ?mtable=1 we skip the cards + table-hide so the ORIGINAL table renders, holding every other v3 change
       constant. Only this call is gated; the invite modal + offboarding drawer steps below stay active either way. */
    if(V3 && !MTABLE) v3MemberCards(pc);
+   /* TEST-MODE-ONLY: in the user-test link (?ut=1) add a quiet "View as" switch so a participant can flip cards<->table
+      in place without editing the URL (the URL swap broke for a pilot participant on paste). ut-gated ONLY, so normal v3
+      never shows it. Needs both the card grid and the table present, i.e. not the mtable-only build. */
+   if(UT && !MTABLE) v3ViewSwitch(pc);
    var hint=pc.querySelector('.hs-field-hint');
    var cardClause=MTABLE?'':' (or from a member card above using <b>Add to team</b>)';
    var step=v3El('<div class="hs-alert hs-alert--info" style="margin-top:14px"><span class="material-symbols-outlined">group_add</span><div>Inviting someone is step one. After they accept, <b>assign them to a team</b> from that team\'s page'+cardClause+' to grant the accounts the team manages.</div></div>');
@@ -1154,6 +1171,43 @@
   wrap.parentNode.insertBefore(grid, wrap);
   wrap.style.display='none';                 /* hide the table (kept in DOM for non-v3 parity + filterContent hooks) */
   initControlA11y(grid);
+ }
+ /* ===== TEST-MODE-ONLY (?ut=1) "View as: Cards / Table" switch =====
+    A tiny scaffold, NOT a product feature: it lets a usability participant flip the members list between the v3 card
+    grid (#v3MemberCards) and the original .hs-table in place, with no navigation and no URL edit (the ?mtable= swap broke
+    on copy-paste for a pilot). ut-gated only, so normal v3 stays exactly as today. Both views already coexist in the DOM
+    (v3MemberCards keeps the table, just display:none) and their kebab / card actions are wired independently, so switching
+    is pure show/hide. SNOWFLAKE: a labelled two-option segmented control; no single named Bento component covers it, so
+    it is built from Bento tokens + two toggle buttons with APG radiogroup a11y (role=radiogroup / role=radio + aria-checked,
+    roving tabindex, arrow-key move) and FLAGGED. Label is exactly "View as"; options exactly "Cards" and "Table". */
+ function v3SetMemberView(mode){
+  var grid=document.getElementById('v3MemberCards'); if(!grid) return;
+  var wrap=grid.nextElementSibling; if(!wrap||!wrap.classList.contains('set-card')) return;   /* the table's .set-card sits right after the grid */
+  var cards=(mode!=='table');
+  grid.style.display=cards?'':'none';
+  wrap.style.display=cards?'none':'';
+  v3CloseKebabs(false);                                    /* don't leave a row menu open behind a hidden table */
+  var sw=document.getElementById('v3ViewSwitch');
+  if(sw){ Array.prototype.forEach.call(sw.querySelectorAll('.vs-btn'),function(b){ var on=(b.getAttribute('data-view')||'cards')===(cards?'cards':'table'); b.setAttribute('aria-checked',on?'true':'false'); b.setAttribute('tabindex',on?'0':'-1'); }); }
+ }
+ function v3ViewSwitch(pc){
+  if(document.getElementById('v3ViewSwitch')) return;
+  var grid=pc.querySelector('#v3MemberCards'); if(!grid) return;                                /* cards build must exist (skipped under mtable) */
+  var wrap=grid.nextElementSibling; if(!wrap||!wrap.classList.contains('set-card')) return;     /* and the table right after it */
+  var startCards=(grid.style.display!=='none');                                                /* default to whatever is currently shown (Cards after v3MemberCards) */
+  function btn(view,icon,label){ return '<button type="button" role="radio" class="vs-btn" data-view="'+view+'" aria-checked="'+((view==='cards')===startCards?'true':'false')+'" tabindex="'+(((view==='cards')===startCards)?'0':'-1')+'" onclick="v3SetMemberView(\''+view+'\')"><span class="material-symbols-outlined">'+icon+'</span>'+label+'</button>'; }
+  var sw=v3El('<div class="v3-viewswitch" id="v3ViewSwitch"><span class="vs-label" id="v3ViewLbl">View as</span><div class="vs-seg" role="radiogroup" aria-labelledby="v3ViewLbl">'+btn('cards','grid_view','Cards')+btn('table','table_rows','Table')+'</div></div>');
+  grid.parentNode.insertBefore(sw, grid);                                                       /* sits at the very top of the members list, above both views */
+  /* APG radiogroup keyboarding: arrows move + select between the two options, Space/Enter selects the focused one */
+  sw.addEventListener('keydown',function(e){
+   var btns=Array.prototype.slice.call(sw.querySelectorAll('.vs-btn')); var i=btns.indexOf(e.target); if(i<0) return;
+   if(e.key===' '||e.key==='Enter'){ e.preventDefault(); e.target.click(); return; }
+   if(e.key.indexOf('Arrow')!==0) return;
+   e.preventDefault();
+   var nx=(e.key==='ArrowRight'||e.key==='ArrowDown')?(btns[i+1]||btns[0]):(i>0?btns[i-1]:btns[btns.length-1]);
+   if(nx){ nx.click(); nx.focus(); }
+  });
+  v3SetMemberView(startCards?'cards':'table');                                                 /* normalize state + aria */
  }
  /* open the existing member access drawer from a card (reuses openMember's fields) */
  function v3OpenMemberCard(a){
