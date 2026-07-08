@@ -202,6 +202,12 @@
  /* v3 (C2 follow-up) additions — Bento tokens only, scoped so they only render behind ?v3=1 */
  .v3-navsearch{padding:6px 14px 10px;}
  .v3-navsearch .hs-input{width:100%;box-sizing:border-box;}
+ /* v3: the "Search settings" field moves OUT of the left drawer and lives in the header's right side, reusing the
+    existing .suite-topbar .gs-wrap / .ph-search / #navSearchHeader / globalSearch pattern (results dropdown + a11y +
+    Cmd/K all come for free). The pilot link runs ?ut=1, which forces Option B and adds body.nosearch (line 69 hides
+    the header search); this rule re-reveals it for v3 only. Desktop-only (min-width:861px) so the existing mobile
+    hide at max-width:860px still wins there. Non-v3 never gets body.v3, so it stays byte-identical (search hidden). */
+ @media (min-width:861px){ body.v3.nosearch .suite-topbar .gs-wrap{display:block;} }
  .v3-steps{margin:10px 0 16px;padding-left:20px;display:flex;flex-direction:column;gap:8px;}
  .v3-steps li{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
  .v3-steps li b{font:var(--hs-type-body-sm-b);}
@@ -1239,7 +1245,9 @@
  function applyV3(){
   if(!V3) return;
   try{ v3Flyout(); }catch(e){}
-  try{ if(document.getElementById('navBody')) v3NavSearch(); }catch(e){}
+  /* v3: the "Search settings" field now lives in the header's right side (.suite-topbar .tb-right, revealed by the
+     body.v3.nosearch CSS rule above), reusing the existing globalSearch/gsResults pattern. It is deliberately NOT
+     injected into the left drawer any more, so v3NavSearch() is not called here (kept defined but unused). */
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
