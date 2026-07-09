@@ -262,6 +262,89 @@
  .v3-invite-done .ok-ic .material-symbols-outlined{font-size:30px;}
  .v3-invite-done .ok-t{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);}
  .v3-invite-done .ok-d{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);max-width:360px;}
+ /* ===== v4 (member management, "One door, many rooms") additions — Bento tokens only, no new colours. Scoped so they
+    only render behind ?v4=1 (body.v4) and are injected by applyV4() after load, so non-v4 pages stay byte-identical.
+    Reuses existing components (.hs-table, .hs-tabs, .modal, .hs-radio, .hs-select, .hs-badge, .hs-alert--warning). ===== */
+ /* Members list (section 1): filter bar (text + two dropdown triggers) and clickable rows. */
+ .v4-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;}
+ .v4-filterbar .hs-input{max-width:300px;flex:1 1 220px;}
+ .v4-filterbar .cf{flex:none;}
+ body.v4 tr.v4-rowlink{cursor:pointer;}
+ /* Member detail full page (section 2): breadcrumb + header with visible actions + tabs. */
+ .v4-crumb{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 10px;display:flex;align-items:center;gap:6px;}
+ .v4-crumb a{color:var(--bento-theme-color-text-subtle);text-decoration:none;}
+ .v4-crumb a:hover{color:var(--bento-theme-color-text-base);text-decoration:underline;}
+ .v4-crumb .material-symbols-outlined{font-size:16px;color:var(--bento-theme-color-text-disabled);}
+ .v4-mdhead{display:flex;align-items:flex-start;gap:16px;margin:0 0 4px;}
+ .v4-mdhead .v4-mdid{flex:1;min-width:0;}
+ .v4-mdhead .v4-mdname{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+ .v4-mdhead .v4-mdmeta{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:4px 0 0;}
+ .v4-mdhead .v4-mdactions{display:flex;flex-wrap:wrap;gap:8px;flex:none;}
+ .v4-tabpanel[hidden]{display:none;}
+ /* Access-summary sentence card (section 2, Overview): plain-language, quiet chips below. */
+ .v4-summary{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);line-height:1.5;}
+ .v4-summary b{font:var(--hs-type-body-md-b);}
+ .v4-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+ .v4-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--bento-theme-color-border-subtle);border-radius:999px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);background:var(--bento-theme-color-bg-surface);}
+ .v4-chip .material-symbols-outlined{font-size:16px;color:var(--bento-theme-color-icon-subtle);}
+ /* Social-accounts rows (member detail + offboard): network icon, handle, network name, right-aligned badge. */
+ .v4-acct{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v4-acct:first-child{border-top:0;}
+ .v4-acct .v4-acct-ic{width:32px;height:32px;border-radius:8px;display:inline-grid;place-items:center;background:var(--bento-theme-color-bg-surface-recessed);color:var(--bento-theme-color-icon-base);flex:none;}
+ .v4-acct .v4-acct-ic .material-symbols-outlined{font-size:20px;}
+ .v4-acct .v4-acct-id{flex:1;min-width:0;}
+ .v4-acct .v4-acct-handle{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .v4-acct .v4-acct-net{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ .v4-acct .v4-acct-right{flex:none;margin-left:auto;}
+ /* Invite modal stepper (section 3): a wider modal, step indicator, role radios with what-it-does descriptors. */
+ body.v4 #v4InviteWrap .modal{max-width:560px;}
+ .v4-steps{display:flex;align-items:center;gap:8px;margin:0 0 4px;}
+ .v4-step{display:flex;align-items:center;gap:8px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ .v4-step .v4-step-n{width:22px;height:22px;border-radius:999px;display:inline-grid;place-items:center;font:var(--hs-type-meta-b);font-weight:700;background:var(--bento-theme-color-bg-surface-recessed);color:var(--bento-theme-color-text-subtle);flex:none;}
+ .v4-step.on{color:var(--bento-theme-color-text-base);}
+ .v4-step.on .v4-step-n{background:var(--bento-system-sys-primary-500);color:var(--bento-theme-color-text-on-primary);}
+ .v4-step.done .v4-step-n{background:var(--hs-bg-positive);color:var(--hs-fg-positive);}
+ .v4-step-sep{flex:1;height:1px;background:var(--bento-theme-color-border-subtle);min-width:12px;}
+ .v4-rolegrid{display:flex;flex-direction:column;gap:0;}
+ .v4-roleopt{display:flex;align-items:flex-start;gap:10px;padding:12px 0;cursor:pointer;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v4-roleopt:first-child{border-top:0;}
+ .v4-roleopt .v4-role-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .v4-roleopt .v4-role-d{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);display:block;margin:2px 0 0;}
+ .v4-teamlist{display:flex;flex-direction:column;gap:0;}
+ .v4-teamopt{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v4-teamopt:first-child{border-top:0;}
+ .v4-teamopt .v4-team-t{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+ .v4-teamopt .v4-team-m{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-left:auto;}
+ .v4-inv-emails{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px;padding:8px 10px;border:1px solid var(--hs-border);border-radius:8px;background:var(--bento-theme-color-bg-surface);}
+ .v4-inv-emails:focus-within{border-color:var(--bento-theme-color-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
+ .v4-inv-emails input{flex:1;min-width:140px;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);padding:4px 2px;}
+ /* Transfer & offboard modal (section 4): per-account picker rows + disabled counter footer. */
+ body.v4 #v4OffWrap .modal{max-width:620px;}
+ .v4-off-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v4-off-row:first-child{border-top:0;}
+ .v4-off-row .v4-off-pick{flex:none;margin-left:auto;min-width:210px;}
+ .v4-off-row .v4-off-pick .hs-select{width:100%;}
+ .v4-off-teamline{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:12px 0 0;padding:12px 0 0;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ .v4-off-foot{display:flex;align-items:center;gap:12px;}
+ .v4-off-foot .v4-off-count{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-right:auto;}
+ .v4-off-foot .v4-off-count.zero{color:var(--hs-fg-positive);}
+ /* Roles & permissions matrix (section 6): capability x role table; stubbed cells read "eng confirm". */
+ #v4Matrix th.v4-cap{text-align:left;}
+ #v4Matrix td.v4-cap{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
+ #v4Matrix th.v4-rolecol, #v4Matrix td.v4-rolecell{text-align:center;width:112px;}
+ #v4Matrix td.v4-rolecell .material-symbols-outlined{font-size:20px;}
+ .v4-stub{display:inline-flex;align-items:center;gap:4px;font:var(--hs-type-meta-b);font-weight:700;color:var(--hs-fg-warning);background:var(--hs-bg-warning);padding:2px 8px;border-radius:999px;}
+ .v4-stub .material-symbols-outlined{font-size:14px;}
+ /* Teams card grid (section 5): facepile + meta, click to detail. Reuses .set-tile surface tokens. */
+ .v4-teamgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+ .v4-teamcard{display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;text-align:left;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+ .v4-teamcard:hover{border-color:var(--bento-theme-color-border-base);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
+ .v4-teamcard:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:2px;}
+ .v4-facepile{display:flex;align-items:center;}
+ .v4-facepile .v4-face{width:34px;height:34px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-body-sm-b);border:2px solid var(--bento-theme-color-bg-surface);}
+ .v4-facepile .v4-face+.v4-face{margin-left:-10px;}
+ .v4-teamcard .v4-team-name{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ .v4-teamcard .v4-team-meta{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-top:2px;}
  /* nav search */
  .suite-drawer .sd-search{padding:8px 14px 12px;}
  .suite-drawer .sd-search .hs-input{width:100%;box-sizing:border-box;}
@@ -632,7 +715,15 @@
     difference. Parsed/persisted exactly like v3; ?mtable=0 clears it. Only gates v3MemberCards + its table-hide. */
  var MTABLE=false;
  try{ var _mt=new URLSearchParams(location.search).get('mtable'); if(_mt==='1')sessionStorage.setItem('mtable','1'); else if(_mt==='0')sessionStorage.removeItem('mtable'); MTABLE=(sessionStorage.getItem('mtable')==='1'); }catch(e){}
+ /* v4 member-management flag (?v4=1): the "One door, many rooms" redesign — every person-task (invite, team
+    assignment, permission scoping, offboard) starts at Members and lands on the person. Parsed/persisted EXACTLY like
+    v3/ov so the live v3 study link (v3=1, no v4) renders byte-identical; everything v4 adds is gated behind body.v4 +
+    the V4 flag and only runs from applyV4(). v4 builds ON the v3 nav direction, so v4 implies v3. Persists; ?v4=0 clears. */
+ var V4=false;
+ try{ var _v4=new URLSearchParams(location.search).get('v4'); if(_v4==='1')sessionStorage.setItem('v4','1'); else if(_v4==='0')sessionStorage.removeItem('v4'); V4=(sessionStorage.getItem('v4')==='1'); }catch(e){}
+ if(V4){ V3=true; try{ if(sessionStorage.getItem('v3')!=='1') sessionStorage.setItem('v3','1'); }catch(e){} }  /* v4 inherits the v3 nav direction (section 0 is already in v3) */
  if(V3&&document.body)document.body.classList.add('v3');
+ if(V4&&document.body)document.body.classList.add('v4');
  if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
@@ -946,8 +1037,10 @@
   }
   /* ---- C7: member invite vs add-to-team. Members is already the primary invite; add an explicit "assign to a team"
           second step here, and on Teams add an "Add members" affordance that routes into the same invite flow.
-          Guarded to the REAL Members page (the transfer page shares active='members'). ---- */
-  if(PAGE_ID==='members' && v3IsPage('Members')){
+          Guarded to the REAL Members page (the transfer page shares active='members'). v4 REPLACES this whole members
+          treatment (single invite button, table not cards, ellipsis = Change role only, full-page detail), so skip
+          under V4 and let v4Members() own the page. ---- */
+  if(PAGE_ID==='members' && v3IsPage('Members') && !V4){
    /* C1: wire the previously-inert "Invite members" primary button to the working invite modal. */
    var inviteBtn=Array.prototype.filter.call(pc.querySelectorAll('.csearch-row .hs-btn--primary'),function(b){return /Invite members/i.test(b.textContent);})[0];
    if(inviteBtn){ inviteBtn.setAttribute('type','button'); inviteBtn.setAttribute('onclick','v3OpenInvite()'); }
@@ -965,7 +1058,7 @@
    var step=v3El('<div class="hs-alert hs-alert--info" style="margin-top:14px"><span class="material-symbols-outlined">group_add</span><div>Inviting someone is step one. After they accept, <b>assign them to a team</b> from that team\'s page'+cardClause+' to grant the accounts the team manages.</div></div>');
    if(hint)hint.parentNode.insertBefore(step, hint.nextSibling); else pc.appendChild(step);
   }
-  if(PAGE_ID==='teams'){
+  if(PAGE_ID==='teams' && !V4){                 /* v4 rebuilds Teams as a card grid with a shared invite modal; skip the v3 add-members link there */
    /* the add-to-team dead-end: let admins invite/add from Teams too, routing into the same invite flow (Members). */
    var createBtn=pc.querySelector('.csearch-row .hs-btn--primary');
    if(createBtn && !document.getElementById('v3TeamAdd')){
@@ -978,8 +1071,9 @@
   }
   /* ---- C9: offboarding. (a) directly-owned accounts reassignable IN PLACE within the transfer step (the key
           Mandi25 bug: today directly-owned accounts dead-end); (b) "review connected accounts" as an explicit step
-          in the member-remove path (the member access drawer). ---- */
-  if(PAGE_ID==='members' && v3IsPage('Members')){
+          in the member-remove path (the member access drawer). v4 moves offboard to a full modal on the detail page,
+          so skip this v3 drawer treatment under V4. ---- */
+  if(PAGE_ID==='members' && v3IsPage('Members') && !V4){
    /* member access drawer: name the review-before-remove step so users reach it without guessing */
    var md=document.querySelector('#mdWrap .md-body');
    if(md){
@@ -1264,6 +1358,8 @@
  function v3WireKebabs(){
   var factory=V3_ROW_ACTIONS[PAGE_ID]; if(!factory) return;                 /* pages with no meaningful row action are left as-is */
   if(PAGE_ID==='members' && !v3IsPage('Members')) return;                    /* skip the transfer page (shares active='members') */
+  if(PAGE_ID==='members' && V4) return;                                      /* v4 owns the members-row ellipsis (Change role only) */
+  if((PAGE_ID==='teams'||PAGE_ID==='roles') && V4) return;                    /* v4 rebuilds Teams (cards) and Roles (matrix); no v3 row kebabs there */
   var scope=document.getElementById('pageContent'); if(!scope) return;
   var btns=scope.querySelectorAll('table.hs-table button[aria-label="More"]');
   Array.prototype.forEach.call(btns,function(btn){
@@ -1289,6 +1385,416 @@
  /* click-outside + Escape close the row-actions menu (Escape restores focus to the ellipsis, per APG) */
  document.addEventListener('click',function(e){ if(!e.target.closest('.v3-kebab-menu')&&!e.target.closest('[data-v3-kebab]')) v3CloseKebabs(false); });
  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.querySelector('.v3-kebab-menu.open')) v3CloseKebabs(true); });
+ /* ================= v4 (member management, "One door, many rooms") DOM transforms =================
+    Every block is gated behind V4 and PAGE_ID and injected after load, so with no ?v4=1 nothing below runs and each
+    page is byte-identical to the v3 build. Maps 1:1 to V4-BUILD-SPEC.md sections 1-6. Reuses existing Bento components
+    only (table, tabs, modal, radio group, matrix table, badges, amber alert). No new colours; no em/en dashes. */
+ function v4El(html){ var t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+ function v4IsPage(t){ return v3IsPage(t); }   /* discriminate shared-active sub-pages by topbar title (textContent is entity-decoded) */
+ /* ---- Section 7 sample data. Bryn is the offboard test case: 3 directly-owned + 1 via Growth Team. ---- */
+ var V4_ACCT_IC={ 'Instagram':'photo_camera','LinkedIn':'hub','X / Twitter':'public','Facebook':'groups','TikTok':'music_note','YouTube':'smart_display' };
+ var V4_MEMBERS=[
+  {ini:'AP',name:'Aisha Patel',email:'aisha.patel@somos.com',role:'Super Admin',via:'Direct',
+   direct:[{handle:'@somos.main',net:'Instagram'}], team:[] },
+  {ini:'BM',name:'Bryn Morales',email:'bryn.morales@somos.com',role:'Admin',via:'Direct',
+   direct:[{handle:'@somos.main',net:'Instagram'},{handle:'Somos Co',net:'LinkedIn'},{handle:'@somos',net:'X / Twitter'}],
+   team:[{handle:'@somos.growth',net:'TikTok',team:'Growth Team'}] },
+  {ini:'CL',name:'Chaya Levi',email:'chaya.levi@somos.com',role:'Team Member',via:'via Growth Team',
+   direct:[], team:[{handle:'@somos.growth',net:'TikTok',team:'Growth Team'}] },
+  {ini:'DK',name:'Dar Khan',email:'dar.khan@somos.com',role:'View Only',via:'Direct', direct:[], team:[] },
+  {ini:'ED',name:'Elif Demir',email:'elif.demir@somos.com',role:'Team Member',via:'via Content Team',
+   direct:[], team:[{handle:'@somos.content',net:'Instagram',team:'Content Team'}] }
+ ];
+ var V4_TEAMS=[
+  {ini:'GT',name:'Growth Team',members:17,accounts:8,faces:['AP','BM','CL']},
+  {ini:'CT',name:'Content Team',members:25,accounts:5,faces:['ED','DK','AP']},
+  {ini:'RT',name:'Regional Team',members:30,accounts:12,faces:['CL','BM','ED']},
+  {ini:'FA',name:'Field Team A',members:19,accounts:4,faces:['DK','AP','BM']}
+ ];
+ function v4MemberByName(name){ for(var i=0;i<V4_MEMBERS.length;i++){ if(V4_MEMBERS[i].name===name) return V4_MEMBERS[i]; } return null; }
+ function v4RoleBadge(role){ return 'hs-badge '+(/super admin/i.test(role)?'hs-badge--info':'hs-badge--neutral'); }
+ function v4AcctIcon(net){ return V4_ACCT_IC[net]||'public'; }
+ /* Access-summary plain-language sentence (section 2, Overview) built from role + provenance. */
+ var V4_ROLE_SENTENCE={
+  'Super Admin':'Super Admin, held directly. Can manage everything, including members, teams, publishing, and billing.',
+  'Admin':'Admin, held directly. Can manage members, teams, and publishing. Cannot touch billing.',
+  'Team Member':'Team member. Creates and publishes for their teams. Cannot manage people or billing.',
+  'View Only':'View only. Sees analytics and drafts, and changes nothing.'
+ };
+ function v4AccessSentence(m){
+  var base=V4_ROLE_SENTENCE[m.role]||(m.role+'.');
+  if(/^via /i.test(m.via)) base=base.replace(/held directly/i,'held '+m.via);
+  return base;
+ }
+ function v4OwnsLabel(m){ var n=m.direct.length; return n?(n+' account'+(n===1?'':'s')):'\u2014'; }  /* em-dash glyph only as the "none" placeholder, not in copy */
+
+ /* ================= Section 1: Members list ================= */
+ function v4Members(pc){
+  if(document.getElementById('v4MembersTbl')) return;
+  /* Page header: one primary "+ Invite people", subtitle with dynamic count. Retitle subtitle only (title band stays "Members"). */
+  var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='440 people \u00b7 everything about a person starts here';
+  /* Header actions: remove Bulk upload CSV; keep ONE primary button = "+ Invite people". */
+  var row=pc.querySelector('.csearch-row');
+  if(row){
+   var actionWrap=row.querySelector('.rowflex'); // the right-side button cluster (Bulk upload + Invite)
+   if(actionWrap){
+    actionWrap.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4OpenInvite()"><span class="material-symbols-outlined">person_add</span>Invite people</button>';
+   }
+   /* Filter bar: keep the text filter, add Role and Team dropdown triggers (section 1). */
+   var inputWrap=row.querySelector('.hs-input.affix.csearch');
+   if(inputWrap && !document.getElementById('v4FilterBar')){
+    var fb=v4El('<div class="v4-filterbar" id="v4FilterBar"></div>');
+    inputWrap.parentNode.insertBefore(fb, inputWrap);
+    fb.appendChild(inputWrap);                                  /* move the text filter into the bar */
+    fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Role filter is a prototype control.\')">Role<span class="material-symbols-outlined" style="font-size:18px">expand_more</span></button>'));
+    fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Team filter is a prototype control.\')">Team<span class="material-symbols-outlined" style="font-size:18px">expand_more</span></button>'));
+   }
+  }
+  /* Rebuild the table with the v4 columns: checkbox | Member | Role | Access via | Owns. Entire row clickable to detail;
+     ellipsis menu limited to Change role only. Rebuilt from the sample data so Owns + the 5th member (Elif) are correct. */
+  var tbl=pc.querySelector('.set-card > table.hs-table'); if(!tbl) return;
+  var thead=tbl.querySelector('thead'); if(thead){ thead.innerHTML='<tr><th style="width:40px"><span class="hs-check" id="selAll" role="checkbox" tabindex="0" aria-label="Select all members" onclick="bulkAll(this)"></span></th><th>Member</th><th>Role</th><th>Access via</th><th>Owns</th><th></th></tr>'; }
+  var tb=tbl.querySelector('tbody'); if(!tb) return;
+  tbl.id='v4MembersTbl';
+  tb.innerHTML=V4_MEMBERS.map(function(m,i){
+   return '<tr class="v4-rowlink" tabindex="0" role="link" aria-label="Open '+gsEsc(m.name)+'" data-name="'+gsEsc(m.name)+'" onclick="v4RowOpen(event,this)" onkeydown="v4RowKey(event,this)">'
+    +'<td onclick="event.stopPropagation()"><span class="hs-check rowsel" role="checkbox" tabindex="0" aria-label="Select '+gsEsc(m.name)+'" onclick="bulkRow(this)"></span></td>'
+    +'<td><div class="rowflex"><span class="mini-av">'+gsEsc(m.ini)+'</span><div><span class="mlink" style="font:var(--hs-type-body-md-b)">'+gsEsc(m.name)+'</span><div class="secd">'+gsEsc(m.email)+'</div></div></div></td>'
+    +'<td><span class="'+v4RoleBadge(m.role)+' rolebadge">'+gsEsc(m.role)+'</span></td>'
+    +'<td class="secd">'+gsEsc(m.via)+'</td>'
+    +'<td class="secd">'+v4OwnsLabel(m)+'</td>'
+    +'<td class="v4-kebab-cell" onclick="event.stopPropagation()" style="text-align:right;position:relative;overflow:visible"><button class="hs-btn hs-btn--ghost hs-btn--icon" type="button" aria-label="More actions for '+gsEsc(m.name)+'" title="More actions" aria-haspopup="menu" aria-expanded="false" onclick="v4RowMenu(event,this,\''+gsEsc(m.name)+'\')"><span class="material-symbols-outlined">more_horiz</span></button></td>'
+    +'</tr>';
+  }).join('');
+  /* Update the helper hint under the table to describe the v4 columns without over-promising. */
+  var hint=pc.querySelector('.hs-field-hint'); if(hint) hint.innerHTML='Select people to change role in bulk. <b>Access via</b> shows whether a role is held directly or through a team. <b>Owns</b> counts the social accounts a person owns directly, so offboarding risk is visible before you remove anyone.';
+  v4EnsureInviteModal(pc);
+  initControlA11y(tb);
+ }
+ /* whole-row navigation to the member detail full page (section 2). Keyboard: Enter/Space opens. */
+ function v4RowOpen(e,tr){ if(e){ if(e.target.closest('.v4-kebab-cell')||e.target.closest('.rowsel')||e.target.closest('td[onclick]')&&e.target!==tr&&e.target.closest('.hs-check')) return; } var name=tr.getAttribute('data-name'); location.href='c-org-member.html?m='+encodeURIComponent(name); }
+ function v4RowKey(e,tr){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); location.href='c-org-member.html?m='+encodeURIComponent(tr.getAttribute('data-name')); } }
+ /* row ellipsis: ONE quick action only (Change role). It is NOT the door to capabilities — the detail page is. */
+ var _v4RowMenuTrig=null;
+ function v4CloseRowMenus(restore){ var open=document.querySelector('.v4-rowmenu.open'); if(open){ open.classList.remove('open'); open.parentNode&&open.parentNode.querySelector('[aria-haspopup="menu"]')&&open.parentNode.querySelector('[aria-haspopup="menu"]').setAttribute('aria-expanded','false'); } if(restore&&_v4RowMenuTrig&&_v4RowMenuTrig.focus){ try{_v4RowMenuTrig.focus();}catch(e){} } _v4RowMenuTrig=null; }
+ function v4RowMenu(e,btn,name){
+  e.preventDefault(); e.stopPropagation();
+  var cell=btn.closest('td'); var existing=cell.querySelector('.v4-rowmenu');
+  var wasOpen=existing&&existing.classList.contains('open');
+  v4CloseRowMenus(false);
+  if(wasOpen) return;
+  if(!existing){
+   existing=document.createElement('div'); existing.className='v3-kebab-menu v4-rowmenu'; existing.setAttribute('role','menu'); existing.setAttribute('aria-label','Row actions');
+   var mi=document.createElement('button'); mi.type='button'; mi.setAttribute('role','menuitem'); mi.setAttribute('tabindex','-1');
+   mi.innerHTML='<span class="material-symbols-outlined">badge</span>Change role';
+   mi.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); v4CloseRowMenus(true); v4OpenChangeRole(name); });
+   existing.appendChild(mi);
+   cell.appendChild(existing);
+  }
+  existing.classList.add('open'); btn.setAttribute('aria-expanded','true'); _v4RowMenuTrig=btn;
+  var f=existing.querySelector('[role="menuitem"]'); if(f) setTimeout(function(){f.focus();},0);
+ }
+ function v4OpenChangeRole(name){
+  var m=v4MemberByName(name)||{name:name,role:'Team Member'};
+  v4EnsureInviteModal(document.getElementById('pageContent'));
+  var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
+  if(!body) return;
+  _v4InvLastFocus=document.activeElement;
+  title.textContent='Change role';
+  var roles=['View only','Team member','Admin','Super Admin'];
+  var cur=({'view only':'View only','team member':'Team member','admin':'Admin','super admin':'Super Admin'})[m.role.toLowerCase()]||'Team member';
+  body.innerHTML='<p class="secd" style="margin:0 0 10px">Set the organization role for <b>'+gsEsc(m.name)+'</b>. This changes what they can do across Somos.</p>'
+   +'<div class="v4-rolegrid" id="v4CRGrid" role="radiogroup" aria-label="Role">'+roles.map(function(r,i){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===cur?' is-on':'')+'" role="radio" tabindex="'+(r===cur?'0':'-1')+'" aria-checked="'+(r===cur?'true':'false')+'" data-role="'+r+'"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r]||'')+'</span></span></label>'; }).join('')+'</div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4SaveRole(\''+gsEsc(m.name)+'\')">Save role</button>';
+  initControlA11y(body);
+  var w=document.getElementById('v4InviteWrap'); w.classList.add('open'); w.addEventListener('keydown',v4InvKeydown);
+ }
+ function v4SaveRole(name){ var sel=document.querySelector('#v4CRGrid .hs-radio.is-on'); var r=sel?sel.getAttribute('data-role'):'the selected role'; v4CloseInvite(); showToast(gsEsc(name)+' is now '+r+'.'); }
+ document.addEventListener('click',function(e){ if(!e.target.closest('.v4-rowmenu')&&!e.target.closest('[aria-haspopup="menu"]')) v4CloseRowMenus(false); });
+ document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.querySelector('.v4-rowmenu.open')) v4CloseRowMenus(true); });
+
+ /* ================= Section 3: Invite flow (modal, 3 steps) =================
+    Who -> Role (what-it-does descriptors) -> Teams (optional). Count-aware "Send {n} invite(s)". CSV link in step 1.
+    The SAME modal opens from Teams with a team pre-checked (section 5). GATE: this is a wireframe behind the flag; the
+    add-member LOGIC is blocked on the Mixpanel anomaly, so we do not "lock" it (no real submit, just a success state). */
+ var V4_INVITE_ROLES_DESC={
+  'View only':'sees analytics and drafts, changes nothing',
+  'Team member':'creates and publishes for their teams',
+  'Admin':'manages people, teams, and settings',
+  'Super Admin':'full control, including billing'
+ };
+ var _v4InvStep=1, _v4InvEmails=[], _v4InvRole='Team member', _v4InvTeams={}, _v4InvLastFocus=null, _v4InvPreTeam=null;
+ function v4EnsureInviteModal(pc){
+  if(document.getElementById('v4InviteWrap')) return;
+  pc=pc||document.getElementById('pageContent'); if(!pc) return;
+  var m=v4El('<div class="modal-wrap" id="v4InviteWrap" onclick="v4CloseInvite()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="v4InvTitle"><div class="modal-head"><div class="mt" id="v4InvTitle">Invite people</div><button class="hs-btn hs-btn--ghost hs-btn--icon" type="button" aria-label="Close" title="Close" onclick="v4CloseInvite()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="v4InvBody"></div><div class="modal-foot" id="v4InvFoot"></div></div></div>');
+  pc.appendChild(m);
+ }
+ function v4InvFocusables(){ var m=document.querySelector('#v4InviteWrap .modal'); if(!m)return []; return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),function(el){ return !el.disabled && el.offsetParent!==null; }); }
+ function v4InvKeydown(e){
+  if(e.key==='Escape'){ e.preventDefault(); v4CloseInvite(); return; }
+  if(e.key!=='Tab') return;
+  var f=v4InvFocusables(); if(!f.length) return; var first=f[0], last=f[f.length-1];
+  if(e.shiftKey){ if(document.activeElement===first){ e.preventDefault(); last.focus(); } }
+  else { if(document.activeElement===last){ e.preventDefault(); first.focus(); } }
+ }
+ function v4OpenInvite(preTeam){
+  v4EnsureInviteModal(document.getElementById('pageContent'));
+  _v4InvLastFocus=document.activeElement; _v4InvStep=1; _v4InvEmails=[]; _v4InvRole='Team member'; _v4InvTeams={}; _v4InvPreTeam=preTeam||null;
+  if(preTeam) _v4InvTeams[preTeam]=true;                          /* Teams entrance: that team is PRE-CHECKED in step 3 */
+  var title=document.getElementById('v4InvTitle'); if(title) title.textContent='Invite people';
+  v4RenderInvite();
+  var w=document.getElementById('v4InviteWrap'); w.classList.add('open'); w.addEventListener('keydown',v4InvKeydown);
+  setTimeout(function(){ var e=document.getElementById('v4InvEmailInput'); if(e)e.focus(); },30);
+ }
+ function v4CloseInvite(){ var w=document.getElementById('v4InviteWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v4InvKeydown); } if(_v4InvLastFocus&&_v4InvLastFocus.focus){ try{_v4InvLastFocus.focus();}catch(e){} _v4InvLastFocus=null; } }
+ function v4InvSteps(){
+  var labels=['Who','Role','Teams']; var out='<div class="v4-steps" aria-hidden="true">';
+  for(var i=0;i<3;i++){ var n=i+1; var cls=(n===_v4InvStep)?'on':(n<_v4InvStep?'done':''); out+='<span class="v4-step '+cls+'"><span class="v4-step-n">'+(n<_v4InvStep?'\u2713':n)+'</span>'+labels[i]+'</span>'; if(i<2) out+='<span class="v4-step-sep"></span>'; }
+  return out+'</div>';
+ }
+ function v4RenderInvite(){
+  var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'); if(!body||!foot) return;
+  var n=_v4InvEmails.length;
+  if(_v4InvStep===1){
+   var chips=_v4InvEmails.map(function(em,i){ return '<span class="hs-input-tag"><span class="hs-input-tag-label">'+gsEsc(em)+'</span><button class="x" type="button" aria-label="Remove '+gsEsc(em)+'" onclick="v4InvRemoveEmail('+i+')"><span class="material-symbols-outlined">close</span></button></span>'; }).join('');
+   body.innerHTML=v4InvSteps()
+    +'<p class="secd" style="margin:0 0 12px">They will get an email and land inside Somos with the access you set here.</p>'
+    +'<div class="hs-field"><label class="hs-field-label" for="v4InvEmailInput">Email addresses</label>'
+    +'<div class="v4-inv-emails" onclick="var i=document.getElementById(\'v4InvEmailInput\');if(i)i.focus()">'+chips+'<input id="v4InvEmailInput" type="email" inputmode="email" autocomplete="off" placeholder="'+(n?'Add another':'name@company.com')+'" aria-label="Add an email address" onkeydown="v4InvEmailKey(event)"></div>'
+    +'<div class="hs-field-hint">Type an email and press Enter to add each person. Inviting many people? <a href="#" onclick="return v4InvCsv()">Upload a CSV</a>.</div></div>';
+   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4InvNext" onclick="v4InvGo(2)"'+(n?'':' disabled')+'>Next: role</button>';
+  } else if(_v4InvStep===2){
+   var roles=['View only','Team member','Admin','Super Admin'];
+   body.innerHTML=v4InvSteps()
+    +'<p class="secd" style="margin:0 0 8px">What can these '+(n===1?'person':n+' people')+' do across Somos? Pick the closest role.</p>'
+    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')+'</div>';
+   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4InvGo(1)">Back</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4InvGo(3)">Next: teams</button>';
+  } else {
+   body.innerHTML=v4InvSteps()
+    +'<p class="secd" style="margin:0 0 4px">Add these people to teams (optional). A team grants the accounts it manages.</p>'
+    +'<div class="v4-teamlist" id="v4InvTeamList">'+V4_TEAMS.map(function(t){ var on=!!_v4InvTeams[t.name]; return '<label class="v4-teamopt"><span class="hs-check'+(on?' is-on':'')+'" role="checkbox" tabindex="0" aria-checked="'+(on?'true':'false')+'" data-team="'+gsEsc(t.name)+'" onclick="v4InvToggleTeam(\''+gsEsc(t.name)+'\')"></span><span class="v4-team-t">'+gsEsc(t.name)+'</span><span class="v4-team-m">'+t.members+' people</span></label>'; }).join('')+'</div>'
+    +'<div class="hs-field-hint" style="margin-top:10px">Skip this and they join the org without a team. You can add one later.</div>';
+   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4InvGo(2)">Back</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4InvSend()"><span class="material-symbols-outlined">send</span>Send '+n+' invite'+(n===1?'':'s')+'</button>';
+  }
+  initControlA11y(body);
+ }
+ function v4InvGo(step){ if(step===2 && !_v4InvEmails.length) return; _v4InvStep=step; v4RenderInvite(); }
+ function v4InvEmailKey(e){
+  var inp=e.target;
+  if(e.key==='Enter'||e.key===','||e.key===' '){ e.preventDefault(); var v=inp.value.trim().replace(/,$/,''); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && _v4InvEmails.indexOf(v)===-1){ _v4InvEmails.push(v); inp.value=''; v4RenderInvite(); setTimeout(function(){ var i=document.getElementById('v4InvEmailInput'); if(i)i.focus(); },0); } }
+  else if(e.key==='Backspace' && !inp.value && _v4InvEmails.length){ _v4InvEmails.pop(); v4RenderInvite(); setTimeout(function(){ var i=document.getElementById('v4InvEmailInput'); if(i)i.focus(); },0); }
+ }
+ function v4InvRemoveEmail(i){ _v4InvEmails.splice(i,1); v4RenderInvite(); }
+ function v4InvSetRole(r){ _v4InvRole=r; v4RenderInvite(); }
+ function v4InvToggleTeam(t){ _v4InvTeams[t]=!_v4InvTeams[t]; v4RenderInvite(); }
+ function v4InvCsv(){ showToast('Bulk CSV upload is a prototype control. Up to 500 rows per file.'); return false; }
+ function v4InvSend(){
+  var n=_v4InvEmails.length; var teams=Object.keys(_v4InvTeams).filter(function(k){return _v4InvTeams[k];});
+  var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
+  title.textContent='Invites sent';
+  var teamLine=teams.length?(' They join <b>'+gsEsc(teams.join(', '))+'</b>.'):'';
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+n+' invite'+(n===1?'':'s')+' sent</div><div class="ok-d">They will get an email to join Somos as <b>'+gsEsc(_v4InvRole)+'</b>.'+teamLine+' They appear under pending until they accept.</div></div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4OpenInvite(_v4InvPreTeam)">Invite more</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
+ }
+
+ /* ================= Section 5: Teams page (card grid) ================= */
+ function v4Teams(pc){
+  if(!v4IsPage('Teams')) return;                                /* only the real Teams page (active='teams' is shared) */
+  if(document.getElementById('v4TeamGrid')) return;
+  var tbl=pc.querySelector('.set-card > table.hs-table'); if(!tbl) return;
+  var wrap=tbl.closest('.set-card'); if(!wrap) return;
+  var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='52 teams \u00b7 group people and the accounts they manage';
+  var grid=v4El('<div class="v4-teamgrid" id="v4TeamGrid"></div>');
+  V4_TEAMS.forEach(function(t){
+   var faces=t.faces.map(function(f){ return '<span class="v4-face" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
+   var card=v4El('<button class="v4-teamcard" type="button" onclick="showToast(\'Opening '+gsEsc(t.name)+'. Add people here opens the same invite flow with this team pre-checked.\')"></button>');
+   card.innerHTML='<div class="v4-facepile">'+faces+'</div><div><div class="v4-team-name">'+gsEsc(t.name)+'</div><div class="v4-team-meta">'+t.members+' members \u00b7 '+t.accounts+' accounts</div></div>'
+    +'<div class="rowflex" style="gap:8px;margin-top:auto"><span class="hs-btn hs-btn--secondary hs-btn--sm" role="button" tabindex="0" onclick="event.stopPropagation();v4OpenInvite(\''+gsEsc(t.name)+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();v4OpenInvite(\''+gsEsc(t.name)+'\');}"><span class="material-symbols-outlined" style="font-size:18px">person_add</span>Add people</span></div>';
+   grid.appendChild(card);
+  });
+  wrap.parentNode.insertBefore(grid, wrap);
+  wrap.style.display='none';                                     /* hide the table; kept in DOM for filterContent + non-v4 parity */
+  v4EnsureInviteModal(pc);
+ }
+
+ /* ================= Section 6: Roles & permissions matrix ================= */
+ /* Capability x role matrix (View / Member / Admin / Super Admin). STRUCTURE only; the 7 contested cells (spec 6) are
+    STUBBED with an "eng confirm" chip, never fabricated. GATE: matrix cannot be populated truthfully until Mandy Xiao
+    resolves those cells. 1 = allowed, 0 = not, '?' = contested/stub. */
+ var V4_MATRIX_ROLES=['View','Member','Admin','Super Admin'];
+ var V4_MATRIX=[
+  ['Publish posts',            [0,1,1,1]],
+  ['Reply to comments and messages',[0,1,1,1]],
+  ['Create drafts',            [1,1,1,1]],
+  ['See analytics',            [1,1,1,1]],
+  ['Manage members',           [0,0,1,1]],
+  ['Manage teams',             [0,0,1,1]],
+  ['Connect accounts',         [0,0,1,1]],
+  ['Manage billing',           [0,0,0,1]],
+  /* ---- the 7 contested cells (STUB, do not fabricate) ---- */
+  ['Disconnect profiles',      [0,0,'?',1]],   /* #1 Disconnect-profiles Admin conflict */
+  ['Sync profiles',            ['?','?','?','?']],/* #2 Sync-profiles row (whole row unresolved) */
+  ['Create organizations',     [0,0,0,'?']],   /* #3 Create-orgs Super Admin vs Paying Super Admin */
+  ['Re-assign across orgs',    [0,0,'?','?']], /* #4 cross-org re-assign */
+  ['Manage SSO / MFA',         [0,0,'?',1]],   /* #5 SSO/MFA gating */
+  ['Export data',              [0,'?','?',1]], /* #6 Data-export scope */
+  ['Publishing needs a social role',['?','?','?','?']]/* #7 publishing-needs-a-social-role */
+ ];
+ function v4MatrixCell(v){
+  if(v==='?') return '<span class="v4-stub" title="Contested: pending eng confirm (Mandy Xiao)"><span class="material-symbols-outlined">help</span>eng confirm</span>';
+  return v?'<span class="material-symbols-outlined" title="Allowed" style="color:var(--bento-theme-color-icon-positive)">check</span>':'<span class="material-symbols-outlined" title="Not allowed" style="color:var(--bento-theme-color-icon-subtle)">remove</span>';
+ }
+ function v4Roles(pc){
+  if(!v4IsPage('Roles & permissions')) return;   /* skip roles-detail + role-new sub-pages (active='roles' is shared) */
+  if(document.getElementById('v4Matrix')) return;
+  var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='The dictionary: what each role can do across the organization. To change what one person can access, open them in <a href="c-settings-members.html">Members</a>.';
+  /* Replace the layered role cards + the read-only drawer with a single capability matrix table. */
+  var first=pc.querySelector('.set-card'); if(!first) return;
+  var head='<thead><tr><th class="v4-cap">Capability</th>'+V4_MATRIX_ROLES.map(function(r){ return '<th class="v4-rolecol">'+gsEsc(r)+'</th>'; }).join('')+'</tr></thead>';
+  var bodyRows=V4_MATRIX.map(function(row){ return '<tr><td class="v4-cap">'+gsEsc(row[0])+'</td>'+row[1].map(function(v){ return '<td class="v4-rolecell">'+v4MatrixCell(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+  var card=v4El('<div class="set-card" id="v4MatrixCard"></div>');
+  card.innerHTML='<div class="pad"><h3 class="sec" style="margin:0">Capabilities by role</h3><p class="secd" style="margin:4px 0 0">Read-only reference. Rows marked <b>eng confirm</b> are still being resolved and are not final.</p></div>'
+   +'<table class="hs-table" id="v4Matrix">'+head+'<tbody>'+bodyRows+'</tbody></table>'
+   +'<div class="pad"><div class="hs-alert hs-alert--warning" style="margin:0"><span class="material-symbols-outlined">warning</span><div>Seven capability cells are still contested and shown as <b>eng confirm</b>. They will be filled once the role definitions are signed off, so treat them as unresolved for now.</div></div></div>';
+  first.parentNode.insertBefore(card, first);
+  /* hide the legacy layered-roles cards + the read-only role drawer (kept in DOM for non-v4 parity) */
+  Array.prototype.forEach.call(pc.querySelectorAll('.set-card'),function(c){ if(c!==card) c.style.display='none'; });
+  var rw=document.getElementById('roleWrap'); if(rw) rw.style.display='none';
+ }
+
+ /* ================= Section 2: Member detail full page ================= */
+ function v4MemberDetail(pc){
+  if(document.getElementById('v4MdPage')) return;
+  var qs=new URLSearchParams(location.search); var name=qs.get('m')||'Bryn Morales';
+  var m=v4MemberByName(name)||V4_MEMBERS[1];
+  var tb=document.querySelector('.suite-topbar .tb-title'); if(tb) tb.textContent=m.name;
+  var host=v4El('<div id="v4MdPage"></div>');
+  /* breadcrumb */
+  host.appendChild(v4El('<div class="v4-crumb"><a href="c-settings-members.html">Members</a><span class="material-symbols-outlined">chevron_right</span><span>'+gsEsc(m.name)+'</span></div>'));
+  /* header: avatar + name + role badge inline + secondary meta; visible Change role + Transfer & offboard actions */
+  host.appendChild(v4El('<div class="v4-mdhead"><span class="avatar-lg">'+gsEsc(m.ini)+'</span>'
+   +'<div class="v4-mdid"><div class="v4-mdname">'+gsEsc(m.name)+' <span class="'+v4RoleBadge(m.role)+'">'+gsEsc(m.role)+'</span></div>'
+   +'<div class="v4-mdmeta">'+gsEsc(m.email)+' \u00b7 joined Jun 2024</div></div>'
+   +'<div class="v4-mdactions"><button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenChangeRole(\''+gsEsc(m.name)+'\')"><span class="material-symbols-outlined">badge</span>Change role</button>'
+   +'<button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenOffboard(\''+gsEsc(m.name)+'\')"><span class="material-symbols-outlined">swap_horiz</span>Transfer &amp; offboard</button></div></div>'));
+  /* tabs */
+  var nDirect=m.direct.length, nTeam=m.team.length, nAccts=nDirect+nTeam;
+  var teams=[]; m.team.forEach(function(a){ if(teams.indexOf(a.team)===-1) teams.push(a.team); });
+  host.appendChild(v4El('<nav class="hs-tabs" style="margin:6px 0 4px" aria-label="Member detail" id="v4MdTabs">'
+   +'<a class="hs-tab is-active" role="tab" tabindex="0" onclick="v4MdTab(this,\'ov\')">Overview</a>'
+   +'<a class="hs-tab" role="tab" tabindex="0" onclick="v4MdTab(this,\'teams\')">Teams '+teams.length+'</a>'
+   +'<a class="hs-tab" role="tab" tabindex="0" onclick="v4MdTab(this,\'perms\')">Permissions</a>'
+   +'<a class="hs-tab" role="tab" tabindex="0" onclick="v4MdTab(this,\'accts\')">Social accounts '+nAccts+'</a></nav>'));
+  /* --- Overview panel: access-summary card + social-accounts card --- */
+  var chips=teams.map(function(t){ return '<span class="v4-chip"><span class="material-symbols-outlined">groups</span>'+gsEsc(t)+'</span>'; }).join('');
+  var ov=v4El('<div class="v4-tabpanel" id="v4Md-ov"></div>');
+  ov.innerHTML='<div class="set-card"><div class="pad"><h3 class="sec" style="margin:0 0 8px">Access summary</h3><p class="v4-summary">'+gsEsc(v4AccessSentence(m))+'</p>'+(chips?('<div class="v4-chips">'+chips+'</div>'):'<p class="secd" style="margin:10px 0 0">Not on any team.</p>')+'</div></div>'
+   +'<div class="set-card"><div class="pad" style="padding-bottom:0"><h3 class="sec" style="margin:0 0 4px">Social accounts</h3><p class="secd" style="margin:0 0 4px">What this person can act on, and where each grant comes from.</p></div><div class="pad" style="padding-top:6px">'+v4AcctRows(m)+'</div></div>';
+  host.appendChild(ov);
+  /* --- Teams panel --- */
+  var tp=v4El('<div class="v4-tabpanel" id="v4Md-teams" hidden></div>');
+  var teamRows=teams.length?teams.map(function(t){ return '<div class="between"><div class="rowflex" style="gap:12px"><span class="mini-av">'+gsEsc(t.split(' ').map(function(w){return w[0];}).join('').slice(0,2))+'</span><div><div style="font:var(--hs-type-body-md-b)">'+gsEsc(t)+'</div><div class="secd" style="margin:0">'+gsEsc(m.role)+' in team</div></div></div><button class="hs-btn hs-btn--ghost" type="button" onclick="showToast(\'Opening '+gsEsc(t)+'.\')">View team</button></div>'; }).join(''):'<p class="secd" style="margin:0">Not on any team yet.</p>';
+  tp.innerHTML='<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">Teams</h3><button class="hs-btn hs-btn--secondary hs-btn--sm" type="button" onclick="v4OpenInvite()"><span class="material-symbols-outlined" style="font-size:18px">group_add</span>Add to team</button></div>'+teamRows+'</div></div>';
+  host.appendChild(tp);
+  /* --- Permissions panel (canonical place to edit a person's access) --- */
+  var pp=v4El('<div class="v4-tabpanel" id="v4Md-perms" hidden></div>');
+  pp.innerHTML='<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><div><div style="font:var(--hs-type-body-md-b)">Organization role</div><div class="secd" style="margin:0">'+gsEsc(v4AccessSentence(m))+'</div></div><button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenChangeRole(\''+gsEsc(m.name)+'\')">Change role</button></div></div>'
+   +'<div class="pad"><div class="hs-alert hs-alert--info" style="margin:0"><span class="material-symbols-outlined">info</span><div>This is where you edit what <b>'+gsEsc(m.name)+'</b> can access. The Roles &amp; permissions page only defines what each role means org-wide.</div></div></div></div>';
+  host.appendChild(pp);
+  /* --- Social accounts panel: full list + per-account Transfer --- */
+  var ap=v4El('<div class="v4-tabpanel" id="v4Md-accts" hidden></div>');
+  ap.innerHTML='<div class="set-card"><div class="pad" style="padding-bottom:6px"><h3 class="sec" style="margin:0 0 4px">Social accounts</h3><p class="secd" style="margin:0">Ownership provenance for every account this person can reach.</p></div><div class="pad" style="padding-top:6px">'+v4AcctRows(m,true)+'</div></div>';
+  host.appendChild(ap);
+  /* mount: clear the fallback body content and insert the v4 page */
+  pc.innerHTML=''; pc.appendChild(host);
+  v4EnsureInviteModal(pc); v4EnsureOffboard(pc);
+  initControlA11y(pc);
+ }
+ /* social-account rows with Direct owner (amber) / via {Team} (neutral) badges; withTransfer adds a per-account action */
+ function v4AcctRows(m,withTransfer){
+  var rows='';
+  m.direct.forEach(function(a){
+   rows+='<div class="v4-acct"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span>'
+    +'<div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+'</div></div>'
+    +'<div class="v4-acct-right rowflex" style="gap:10px"><span class="hs-badge hs-badge--warning" title="Owned directly by this person">Direct owner</span>'
+    +(withTransfer?'<button class="hs-btn hs-btn--ghost hs-btn--sm" type="button" onclick="v4OpenOffboard(\''+gsEsc(m.name)+'\')">Transfer</button>':'')+'</div></div>';
+  });
+  m.team.forEach(function(a){
+   rows+='<div class="v4-acct"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span>'
+    +'<div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+'</div></div>'
+    +'<div class="v4-acct-right"><span class="hs-badge hs-badge--neutral" title="Reaches this person through a team">via '+gsEsc(a.team)+'</span></div></div>';
+  });
+  return rows||'<p class="secd" style="margin:0">No social accounts.</p>';
+ }
+ function v4MdTab(elm,id){ var tabs=document.getElementById('v4MdTabs'); if(tabs){ Array.prototype.forEach.call(tabs.querySelectorAll('.hs-tab'),function(t){ t.classList.remove('is-active'); }); } elm.classList.add('is-active'); ['ov','teams','perms','accts'].forEach(function(k){ var p=document.getElementById('v4Md-'+k); if(p)p.hidden=(k!==id); }); }
+
+ /* ================= Section 4: Transfer & offboard modal ================= */
+ var _v4OffName=null, _v4OffLastFocus=null;
+ var V4_OFF_CANDIDATES=['Aisha Patel','Chaya Levi','Dar Khan','Elif Demir'];   /* suggest members with equivalent access first */
+ function v4EnsureOffboard(pc){
+  if(document.getElementById('v4OffWrap')) return;
+  pc=pc||document.getElementById('pageContent'); if(!pc) return;
+  var m=v4El('<div class="modal-wrap" id="v4OffWrap" onclick="v4CloseOffboard()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="v4OffTitle"><div class="modal-head"><div class="mt" id="v4OffTitle">Remove</div><button class="hs-btn hs-btn--ghost hs-btn--icon" type="button" aria-label="Close" title="Close" onclick="v4CloseOffboard()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="v4OffBody"></div><div class="modal-foot"><div class="v4-off-foot" style="width:100%"><span class="v4-off-count" id="v4OffCount"></span><button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseOffboard()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4OffGo" onclick="v4OffConfirm()">Transfer and remove</button></div></div></div></div>');
+  pc.appendChild(m);
+ }
+ function v4OffKeydown(e){ if(e.key==='Escape'){ e.preventDefault(); v4CloseOffboard(); } }
+ function v4OpenOffboard(name){
+  v4EnsureOffboard(document.getElementById('pageContent'));
+  var m=v4MemberByName(name)||V4_MEMBERS[1]; _v4OffName=m.name; _v4OffLastFocus=document.activeElement;
+  var title=document.getElementById('v4OffTitle'), body=document.getElementById('v4OffBody'), foot=document.querySelector('#v4OffWrap .modal-foot');
+  title.textContent='Remove '+m.name;
+  var nDirect=m.direct.length;
+  if(nDirect===0){
+   /* zero direct ownership: skip banner + list, plain confirm */
+   var teamNote=m.team.length?('<p class="secd" style="margin:10px 0 0">Access held through '+gsEsc(m.team.map(function(a){return a.team;}).filter(function(v,i,s){return s.indexOf(v)===i;}).join(', '))+' ends automatically. Nothing to reassign there.</p>'):'';
+   body.innerHTML='<p style="font:var(--hs-type-body-md)">Remove <b>'+gsEsc(m.name)+'</b> from Somos? They own no social accounts directly, so nothing gets disconnected.'+teamNote+'</p>';
+   var cnt=document.getElementById('v4OffCount'); if(cnt){ cnt.textContent=''; }
+   var go=document.getElementById('v4OffGo'); if(go){ go.disabled=false; go.textContent='Remove '+m.name; }
+  } else {
+   var teamAccts=m.team.length;
+   var teamNames=m.team.map(function(a){return a.team;}).filter(function(v,i,s){return s.indexOf(v)===i;}).join(', ');
+   var rows=m.direct.map(function(a,i){
+    var opts='<option value="" selected>Choose owner\u2026</option>'+V4_OFF_CANDIDATES.map(function(c){ return '<option value="'+gsEsc(c)+'">'+gsEsc(c)+'</option>'; }).join('');
+    return '<div class="v4-off-row"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span>'
+     +'<div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+'</div></div>'
+     +'<div class="v4-off-pick"><select class="hs-select v4-off-sel" aria-label="New owner for '+gsEsc(a.handle)+'" onchange="v4OffTally()">'+opts+'</select></div></div>';
+   }).join('');
+   var teamLine=teamAccts?('<div class="v4-off-teamline">Access held through '+gsEsc(teamNames)+' ('+teamAccts+' account'+(teamAccts===1?'':'s')+') ends automatically. Nothing to do there.</div>'):'';
+   body.innerHTML='<div class="hs-alert hs-alert--warning" style="margin:0 0 14px"><span class="material-symbols-outlined">warning</span><div>'+gsEsc(m.name)+' directly owns '+nDirect+' social account'+(nDirect===1?'':'s')+'. Choose who takes over each one before they can be removed, otherwise the connections would be lost.</div></div>'
+    +'<div>'+rows+'</div>'+teamLine;
+   var go=document.getElementById('v4OffGo'); if(go){ go.textContent='Transfer and remove'; }
+   v4OffTally();
+  }
+  var w=document.getElementById('v4OffWrap'); w.classList.add('open'); w.addEventListener('keydown',v4OffKeydown);
+ }
+ function v4CloseOffboard(){ var w=document.getElementById('v4OffWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v4OffKeydown); } if(_v4OffLastFocus&&_v4OffLastFocus.focus){ try{_v4OffLastFocus.focus();}catch(e){} _v4OffLastFocus=null; } }
+ function v4OffTally(){
+  var sels=Array.prototype.slice.call(document.querySelectorAll('.v4-off-sel'));
+  var remaining=sels.filter(function(s){ return !s.value; }).length;
+  var cnt=document.getElementById('v4OffCount'), go=document.getElementById('v4OffGo');
+  if(cnt){ if(remaining===0){ cnt.textContent='All accounts have a new owner'; cnt.classList.add('zero'); } else { cnt.textContent=remaining+' account'+(remaining===1?'':'s')+' still need an owner'; cnt.classList.remove('zero'); } }
+  if(go){ go.disabled=(remaining>0); }
+ }
+ function v4OffConfirm(){
+  var name=_v4OffName||'this member';
+  var sels=Array.prototype.slice.call(document.querySelectorAll('.v4-off-sel'));
+  if(sels.length && sels.some(function(s){return !s.value;})) return;   /* guardrail: disabled until every account has an owner */
+  v4CloseOffboard();
+  showToast(sels.length?('Accounts reassigned. '+name+' removed from Somos.'):(name+' removed from Somos.'));
+  setTimeout(function(){ location.href='c-settings-members.html'; },900);
+ }
+
+ function applyV4(){
+  if(!V4) return;
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  try{
+   if(PAGE_ID==='memberdetail'){ v4MemberDetail(pc); }
+   else if(PAGE_ID==='members' && v3IsPage('Members')){ v4Members(pc); }
+   else if(PAGE_ID==='teams'){ v4Teams(pc); }
+   else if(PAGE_ID==='roles'){ v4Roles(pc); }
+  }catch(e){}
+ }
  function applyV3(){
   if(!V3) return;
   try{ v3Flyout(); }catch(e){}
@@ -1298,6 +1804,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
