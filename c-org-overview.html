@@ -1719,7 +1719,7 @@
   v4EnsureInviteModal(pc);
  }
  /* Team detail full page (section 5 tail): reached by clicking a team card. Reuses the member-detail chrome
-    (.v4-crumb, .v4-mdhead, .hs-tabs, .set-card, .v4-acct) so Teams -> card -> detail is a real, non-dead-end flow.
+    (.v4-mdhead, .hs-tabs, .set-card, .v4-acct) so Teams -> card -> detail is a real, non-dead-end flow.
     Built from V4_TEAMS + V4_MEMBERS (members whose team[] includes this team). Non-v4 has no inbound link. */
  function v4TeamByName(name){ for(var i=0;i<V4_TEAMS.length;i++){ if(V4_TEAMS[i].name===name) return V4_TEAMS[i]; } return null; }
  function v4TeamDetail(pc){
