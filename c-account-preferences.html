@@ -266,20 +266,19 @@
     only render behind ?v4=1 (body.v4) and are injected by applyV4() after load, so non-v4 pages stay byte-identical.
     Reuses existing components (.hs-table, .hs-tabs, .modal, .hs-radio, .hs-select, .hs-badge, .hs-alert--warning). ===== */
  /* Members list (section 1): filter bar (text + two dropdown triggers) and clickable rows. */
- .v4-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;}
+ /* Fix (v4, filter chips): the Role/Team triggers are the real Bento ChipFilter (.cf). The earlier build had
+    re-skinned .cf inside .v4-filterbar (added a 1px border, dropped the label to weight 400, recoloured the icon)
+    because a bare grey-300 chip is invisible on the RECESSED page surface (body.v4 bg = --hs-bg #EEF1F2, the same
+    colour as --bento-component-chip-fill grey-300). That was a fork of the component. The canonical ChipFilter is a
+    BORDERLESS grey-300 pill with a bold-700 label, and every canonical example (preview/chip-filter.html "in a
+    filter toolbar", patterns/Inline Filters.html) sits the chips on a WHITE filter toolbar surface — that is where
+    grey-300 reads as a pill. So the real fix is to drop the re-skin (done: the .v4-filterbar .cf overrides are gone,
+    .cf now renders as shipped) and put the filter row on the canonical white toolbar surface it is built for. */
+ .v4-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;
+   background:var(--hs-surface);border:1px solid var(--hs-border);border-radius:var(--hs-radii-lg);padding:12px 16px;}
+ .v4-filterbar>.v4-fb-lead{color:var(--bento-theme-color-icon-base);flex:none;}
  .v4-filterbar .hs-input{max-width:300px;flex:1 1 220px;}
  .v4-filterbar .cf{flex:none;}
- /* Fix (v4): the Role/Team triggers are Bento .cf chips, but the members filter bar sits on the RECESSED page
-    surface (--hs-bg #eef1f2), which is the SAME colour as the chip fill (--bento-component-chip-fill grey-300),
-    so the grey pill vanished and only .cf's bold 700 label showed (read as "bold dark text, not a chip"). The
-    real ChipFilter (preview/chip-filter.html "in a filter toolbar") sits on a WHITE surface where grey-300 reads
-    as a pill. Rather than fork the component, give the v4 filter chips a 1px neutral edge so the pill is legible
-    on the recessed surface, and drop to regular weight (spec: "normal weight, grey Bento .cf chips"). Scoped to
-    .v4-filterbar so the shared .cf and every non-v4 page stay byte-identical. */
- .v4-filterbar .cf{font-weight:var(--bento-theme-font-weights-regular,400);box-shadow:inset 0 0 0 1px var(--bento-theme-color-border-base);}
- .v4-filterbar .cf:hover{background:var(--bento-component-chip-fill-hovered);}
- .v4-filterbar .cf:active,.v4-filterbar .cf.open{box-shadow:inset 0 0 0 1.5px var(--bento-theme-color-border-base);}
- .v4-filterbar .cf .material-symbols-outlined{color:var(--bento-theme-color-icon-base);}
  body.v4 tr.v4-rowlink{cursor:pointer;}
  /* Member detail full page (section 2): breadcrumb + header with visible actions + tabs. */
  .v4-crumb{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 10px;display:flex;align-items:center;gap:6px;}
@@ -359,16 +358,14 @@
  #v4Matrix td.v4-cap{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
  #v4Matrix th.v4-rolecol, #v4Matrix td.v4-rolecell{text-align:center;width:112px;}
  #v4Matrix td.v4-rolecell .material-symbols-outlined{font-size:20px;}
- .v4-stub{display:inline-flex;align-items:center;gap:4px;font:var(--hs-type-meta-b);font-weight:700;color:var(--hs-fg-warning);background:var(--hs-bg-warning);padding:2px 8px;border-radius:999px;}
- .v4-stub .material-symbols-outlined{font-size:14px;}
+ /* the contested-cell marker now uses the real .hs-badge--warning (see v4MatrixCell); no bespoke stub class. */
+ #v4Matrix td.v4-rolecell .hs-badge .material-symbols-outlined{font-size:16px;}  /* keep the badge's own 16px icon, not the 20px cell-icon rule above */
  /* Teams card grid (section 5): facepile + meta, click to detail. Reuses .set-tile surface tokens. */
  .v4-teamgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
  .v4-teamcard{display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;text-align:left;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
  .v4-teamcard:hover{border-color:var(--bento-theme-color-border-base);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);}
  .v4-teamcard:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:2px;}
- .v4-facepile{display:flex;align-items:center;}
- .v4-facepile .v4-face{width:34px;height:34px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-300);color:var(--bento-theme-color-text-base);display:inline-grid;place-items:center;font:var(--hs-type-body-sm-b);border:2px solid var(--bento-theme-color-bg-surface);}
- .v4-facepile .v4-face+.v4-face{margin-left:-10px;}
+ /* facepiles reuse the shared .avstack + .mini-av avatar-stack primitive (see .avstack rules); no bespoke face class. */
  .v4-teamcard .v4-team-name{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
  .v4-teamcard .v4-team-meta{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-top:2px;}
  /* nav search */
@@ -1484,9 +1481,11 @@
    if(inputWrap && !document.getElementById('v4FilterBar')){
     var fb=v4El('<div class="v4-filterbar" id="v4FilterBar"></div>');
     inputWrap.parentNode.insertBefore(fb, inputWrap);
+    fb.appendChild(v4El('<span class="material-symbols-outlined v4-fb-lead" aria-hidden="true">filter_list</span>'));  /* canonical filter-toolbar lead icon (patterns/Inline Filters.html) */
     fb.appendChild(inputWrap);                                  /* move the text filter into the bar */
-    fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Role filter is a prototype control.\')">Role<span class="material-symbols-outlined" style="font-size:18px">expand_more</span></button>'));
-    fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Team filter is a prototype control.\')">Team<span class="material-symbols-outlined" style="font-size:18px">expand_more</span></button>'));
+    /* Real Bento ChipFilter markup, unchanged (active=false = trailing .chev chevron). preview/chip-filter.html */
+    fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Role filter is a prototype control.\')">Role<span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>'));
+    fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Team filter is a prototype control.\')">Team<span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>'));
    }
    /* Header layout (spec section 1: "ONE primary button, right-aligned"): the build's .csearch-row put the
       button cluster next to the filter bar under space-between, which floated the button mid-height and let the
@@ -1659,12 +1658,12 @@
   var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='52 teams \u00b7 group people and the accounts they manage';
   var grid=v4El('<div class="v4-teamgrid" id="v4TeamGrid"></div>');
   V4_TEAMS.forEach(function(t){
-   var faces=t.faces.map(function(f){ return '<span class="v4-face" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
+   var faces=t.faces.map(function(f){ return '<span class="mini-av" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
    /* Fix (v4): the card now NAVIGATES to the team detail page (c-org-team.html?t=...), the same way a member row
       opens c-org-member.html?m=... — no dead-end toast. "Add people" still opens the shared invite with this team
       pre-checked in step 3 (section 5). */
    var card=v4El('<button class="v4-teamcard" type="button" aria-label="Open '+gsEsc(t.name)+'" onclick="location.href=\'c-org-team.html?t=\'+encodeURIComponent(\''+gsEsc(t.name)+'\')"></button>');
-   card.innerHTML='<div class="v4-facepile">'+faces+'</div><div><div class="v4-team-name">'+gsEsc(t.name)+'</div><div class="v4-team-meta">'+t.members+' members \u00b7 '+t.accounts+' accounts</div></div>'
+   card.innerHTML='<div class="avstack">'+faces+'</div><div><div class="v4-team-name">'+gsEsc(t.name)+'</div><div class="v4-team-meta">'+t.members+' members \u00b7 '+t.accounts+' accounts</div></div>'
     +'<div class="rowflex" style="gap:8px;margin-top:auto"><span class="hs-btn hs-btn--secondary hs-btn--sm" role="button" tabindex="0" onclick="event.stopPropagation();v4OpenInvite(\''+gsEsc(t.name)+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();v4OpenInvite(\''+gsEsc(t.name)+'\');}"><span class="material-symbols-outlined" style="font-size:18px">person_add</span>Add people</span></div>';
    grid.appendChild(card);
   });
@@ -1686,8 +1685,8 @@
   var accts=[]; V4_MEMBERS.forEach(function(m){ m.team.forEach(function(a){ if(a.team===t.name && !accts.some(function(x){return x.handle===a.handle;})) accts.push(a); }); });
   var host=v4El('<div id="v4TdPage"></div>');
   host.appendChild(v4El('<div class="v4-crumb"><a href="c-org-teams.html">Teams</a><span class="material-symbols-outlined">chevron_right</span><span>'+gsEsc(t.name)+'</span></div>'));
-  var faces=t.faces.map(function(f){ return '<span class="v4-face" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
-  host.appendChild(v4El('<div class="v4-mdhead"><div class="v4-facepile" style="flex:none">'+faces+'</div>'
+  var faces=t.faces.map(function(f){ return '<span class="mini-av" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
+  host.appendChild(v4El('<div class="v4-mdhead"><div class="avstack" style="flex:none">'+faces+'</div>'
    +'<div class="v4-mdid"><div class="v4-mdname">'+gsEsc(t.name)+'</div>'
    +'<div class="v4-mdmeta">'+t.members+' members \u00b7 '+t.accounts+' social accounts</div></div>'
    +'<div class="v4-mdactions"><button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenInvite(\''+gsEsc(t.name)+'\')"><span class="material-symbols-outlined">person_add</span>Add people</button></div></div>'));
@@ -1734,7 +1733,9 @@
   ['Publishing needs a social role',['?','?','?','?']]/* #7 publishing-needs-a-social-role */
  ];
  function v4MatrixCell(v){
-  if(v==='?') return '<span class="v4-stub" title="Contested: pending eng confirm (Mandy Xiao)"><span class="material-symbols-outlined">help</span>eng confirm</span>';
+  /* Contested cell -> the real Bento warning badge (.hs-badge--warning), not a hand-rolled pill. Amber, paired
+     with a warning icon + text so it reads without colour. Never red (Bento: warnings are amber). */
+  if(v==='?') return '<span class="hs-badge hs-badge--warning" title="Contested: pending eng confirm (Mandy Xiao)"><span class="material-symbols-outlined">warning</span>eng confirm</span>';
   return v?'<span class="material-symbols-outlined" title="Allowed" style="color:var(--bento-theme-color-icon-positive)">check</span>':'<span class="material-symbols-outlined" title="Not allowed" style="color:var(--bento-theme-color-icon-subtle)">remove</span>';
  }
  function v4Roles(pc){
