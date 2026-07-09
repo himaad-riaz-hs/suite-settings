@@ -269,6 +269,17 @@
  .v4-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;}
  .v4-filterbar .hs-input{max-width:300px;flex:1 1 220px;}
  .v4-filterbar .cf{flex:none;}
+ /* Fix (v4): the Role/Team triggers are Bento .cf chips, but the members filter bar sits on the RECESSED page
+    surface (--hs-bg #eef1f2), which is the SAME colour as the chip fill (--bento-component-chip-fill grey-300),
+    so the grey pill vanished and only .cf's bold 700 label showed (read as "bold dark text, not a chip"). The
+    real ChipFilter (preview/chip-filter.html "in a filter toolbar") sits on a WHITE surface where grey-300 reads
+    as a pill. Rather than fork the component, give the v4 filter chips a 1px neutral edge so the pill is legible
+    on the recessed surface, and drop to regular weight (spec: "normal weight, grey Bento .cf chips"). Scoped to
+    .v4-filterbar so the shared .cf and every non-v4 page stay byte-identical. */
+ .v4-filterbar .cf{font-weight:var(--bento-theme-font-weights-regular,400);box-shadow:inset 0 0 0 1px var(--bento-theme-color-border-base);}
+ .v4-filterbar .cf:hover{background:var(--bento-component-chip-fill-hovered);}
+ .v4-filterbar .cf:active,.v4-filterbar .cf.open{box-shadow:inset 0 0 0 1.5px var(--bento-theme-color-border-base);}
+ .v4-filterbar .cf .material-symbols-outlined{color:var(--bento-theme-color-icon-base);}
  body.v4 tr.v4-rowlink{cursor:pointer;}
  /* Member detail full page (section 2): breadcrumb + header with visible actions + tabs. */
  .v4-crumb{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 10px;display:flex;align-items:center;gap:6px;}
@@ -315,9 +326,24 @@
  .v4-teamopt:first-child{border-top:0;}
  .v4-teamopt .v4-team-t{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
  .v4-teamopt .v4-team-m{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-left:auto;}
- .v4-inv-emails{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px;padding:8px 10px;border:1px solid var(--hs-border);border-radius:8px;background:var(--bento-theme-color-bg-surface);}
- .v4-inv-emails:focus-within{border-color:var(--bento-theme-color-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
- .v4-inv-emails input{flex:1;min-width:140px;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);padding:4px 2px;}
+ /* Invite email token field: a multi-value wrapper that mirrors the real Bento Input (.hs-input) states exactly,
+    holding .hs-input-tag pills + a bare typing input. Fix (v4): the resting border was --hs-border (#EBEBEB, nearly
+    invisible), there was NO hover state, and text-selection used the browser default (looked off). Now it matches
+    .hs-input token-for-token: resting --hs-border-input, hover --hs-fg, focus --hs-border-focus + halo, plus a
+    token-driven ::selection so highlighted text uses the Bento focus-blue tint. */
+ .v4-inv-emails{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px;padding:6px 10px;border:1px solid var(--hs-border-input);border-radius:var(--hs-radii-lg);background:var(--hs-surface);transition:border-color 150ms,box-shadow 150ms;cursor:text;}
+ .v4-inv-emails:hover{border-color:var(--hs-fg);}
+ .v4-inv-emails:focus-within{border-color:var(--hs-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
+ .v4-inv-emails:focus-within:hover{border-color:var(--hs-border-focus);}
+ .v4-inv-emails input{flex:1;min-width:140px;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--hs-fg);padding:4px 2px;}
+ .v4-inv-emails input::placeholder{color:var(--bento-theme-color-text-placeholder);}
+ .v4-inv-emails input::selection{background:var(--hs-focus-halo);color:var(--hs-fg);}
+ .v4-inv-emails .hs-input-tag::selection{background:transparent;}
+ /* Single-modal invite: three quiet sections stacked (email / role / teams), each with a small caption. */
+ .v4-inv-sec{margin:0 0 18px;}
+ .v4-inv-sec:last-child{margin-bottom:0;}
+ .v4-inv-sec>.v4-inv-lbl{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);display:block;margin:0 0 6px;}
+ .v4-inv-sec>.v4-inv-cap{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 8px;}
  /* Transfer & offboard modal (section 4): per-account picker rows + disabled counter footer. */
  body.v4 #v4OffWrap .modal{max-width:620px;}
  .v4-off-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--bento-theme-color-border-subtle);}
@@ -1547,12 +1573,15 @@
   /* Update the helper hint under the table to describe the v4 columns without over-promising. */
   var hint=pc.querySelector('.hs-field-hint'); if(hint) hint.innerHTML='Select people to change role in bulk. <b>Access via</b> shows whether a role is held directly or through a team. <b>Owns</b> counts the social accounts a person owns directly, so offboarding risk is visible before you remove anyone.';
   v4EnsureInviteModal(pc);
+  v4EnsureOffboard(pc);                                            /* Fix (v4): row kebab "Remove" routes here (guardrail) */
   initControlA11y(tb);
  }
  /* whole-row navigation to the member detail full page (section 2). Keyboard: Enter/Space opens. */
  function v4RowOpen(e,tr){ if(e){ if(e.target.closest('.v4-kebab-cell')||e.target.closest('.rowsel')||e.target.closest('td[onclick]')&&e.target!==tr&&e.target.closest('.hs-check')) return; } var name=tr.getAttribute('data-name'); location.href='c-org-member.html?m='+encodeURIComponent(name); }
  function v4RowKey(e,tr){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); location.href='c-org-member.html?m='+encodeURIComponent(tr.getAttribute('data-name')); } }
- /* row ellipsis: ONE quick action only (Change role). It is NOT the door to capabilities — the detail page is. */
+ /* row ellipsis (Fix v4): TWO quick actions — Change role, and Remove. Remove is NEVER a one-click delete: it opens
+    the shared transfer/offboard guardrail (v4OpenOffboard), which forces reassignment of every directly-owned account
+    before "Transfer and remove" enables (zero-ownership = plain confirm). Deep capabilities still live on the detail page. */
  var _v4RowMenuTrig=null;
  function v4CloseRowMenus(restore){ var open=document.querySelector('.v4-rowmenu.open'); if(open){ open.classList.remove('open'); open.parentNode&&open.parentNode.querySelector('[aria-haspopup="menu"]')&&open.parentNode.querySelector('[aria-haspopup="menu"]').setAttribute('aria-expanded','false'); } if(restore&&_v4RowMenuTrig&&_v4RowMenuTrig.focus){ try{_v4RowMenuTrig.focus();}catch(e){} } _v4RowMenuTrig=null; }
  function v4RowMenu(e,btn,name){
@@ -1567,6 +1596,11 @@
    mi.innerHTML='<span class="material-symbols-outlined">badge</span>Change role';
    mi.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); v4CloseRowMenus(true); v4OpenChangeRole(name); });
    existing.appendChild(mi);
+   /* Remove -> the transfer/offboard guardrail modal (no one-click removal when accounts are at stake). */
+   var mr=document.createElement('button'); mr.type='button'; mr.setAttribute('role','menuitem'); mr.setAttribute('tabindex','-1');
+   mr.innerHTML='<span class="material-symbols-outlined">person_remove</span>Remove';
+   mr.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); v4CloseRowMenus(true); v4OpenOffboard(name); });
+   existing.appendChild(mr);
    cell.appendChild(existing);
   }
   existing.classList.add('open'); btn.setAttribute('aria-expanded','true'); _v4RowMenuTrig=btn;
@@ -1618,46 +1652,36 @@
  }
  function v4OpenInvite(preTeam){
   v4EnsureInviteModal(document.getElementById('pageContent'));
-  _v4InvLastFocus=document.activeElement; _v4InvStep=1; _v4InvEmails=[]; _v4InvRole='Team member'; _v4InvTeams={}; _v4InvPreTeam=preTeam||null;
-  if(preTeam) _v4InvTeams[preTeam]=true;                          /* Teams entrance: that team is PRE-CHECKED in step 3 */
+  _v4InvLastFocus=document.activeElement; _v4InvEmails=[]; _v4InvRole='Team member'; _v4InvTeams={}; _v4InvPreTeam=preTeam||null;
+  if(preTeam) _v4InvTeams[preTeam]=true;                          /* Teams entrance: that team is PRE-CHECKED below */
   var title=document.getElementById('v4InvTitle'); if(title) title.textContent='Invite people';
   v4RenderInvite();
   var w=document.getElementById('v4InviteWrap'); w.classList.add('open'); w.addEventListener('keydown',v4InvKeydown);
   setTimeout(function(){ var e=document.getElementById('v4InvEmailInput'); if(e)e.focus(); },30);
  }
  function v4CloseInvite(){ var w=document.getElementById('v4InviteWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v4InvKeydown); } if(_v4InvLastFocus&&_v4InvLastFocus.focus){ try{_v4InvLastFocus.focus();}catch(e){} _v4InvLastFocus=null; } }
- function v4InvSteps(){
-  var labels=['Who','Role','Teams']; var out='<div class="v4-steps" aria-hidden="true">';
-  for(var i=0;i<3;i++){ var n=i+1; var cls=(n===_v4InvStep)?'on':(n<_v4InvStep?'done':''); out+='<span class="v4-step '+cls+'"><span class="v4-step-n">'+(n<_v4InvStep?'\u2713':n)+'</span>'+labels[i]+'</span>'; if(i<2) out+='<span class="v4-step-sep"></span>'; }
-  return out+'</div>';
- }
+ /* Fix (v4, spec section 3): ONE modal, not a 3-step wizard. Email + role + team are shown together and scan at a
+    glance. The email field uses the .hs-input-tag pills + the .v4-inv-emails token container (Bento Input states). */
  function v4RenderInvite(){
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'); if(!body||!foot) return;
   var n=_v4InvEmails.length;
-  if(_v4InvStep===1){
-   var chips=_v4InvEmails.map(function(em,i){ return '<span class="hs-input-tag"><span class="hs-input-tag-label">'+gsEsc(em)+'</span><button class="x" type="button" aria-label="Remove '+gsEsc(em)+'" onclick="v4InvRemoveEmail('+i+')"><span class="material-symbols-outlined">close</span></button></span>'; }).join('');
-   body.innerHTML=v4InvSteps()
-    +'<p class="secd" style="margin:0 0 12px">They will get an email and land inside Somos with the access you set here.</p>'
-    +'<div class="hs-field"><label class="hs-field-label" for="v4InvEmailInput">Email addresses</label>'
+  var roles=['View only','Team member','Admin','Super Admin'];
+  var chips=_v4InvEmails.map(function(em,i){ return '<span class="hs-input-tag"><span class="hs-input-tag-label">'+gsEsc(em)+'</span><button class="x" type="button" aria-label="Remove '+gsEsc(em)+'" onclick="v4InvRemoveEmail('+i+')"><span class="material-symbols-outlined">close</span></button></span>'; }).join('');
+  body.innerHTML=''
+   +'<p class="secd" style="margin:0 0 16px">They will get an email and land inside Somos with the access you set here.</p>'
+   /* Email */
+   +'<div class="v4-inv-sec"><label class="v4-inv-lbl" for="v4InvEmailInput">Who are you inviting?</label>'
     +'<div class="v4-inv-emails" onclick="var i=document.getElementById(\'v4InvEmailInput\');if(i)i.focus()">'+chips+'<input id="v4InvEmailInput" type="email" inputmode="email" autocomplete="off" placeholder="'+(n?'Add another':'name@company.com')+'" aria-label="Add an email address" onkeydown="v4InvEmailKey(event)"></div>'
-    +'<div class="hs-field-hint">Type an email and press Enter to add each person. Inviting many people? <a href="#" onclick="return v4InvCsv()">Upload a CSV</a>.</div></div>';
-   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4InvNext" onclick="v4InvGo(2)"'+(n?'':' disabled')+'>Next: role</button>';
-  } else if(_v4InvStep===2){
-   var roles=['View only','Team member','Admin','Super Admin'];
-   body.innerHTML=v4InvSteps()
-    +'<p class="secd" style="margin:0 0 8px">What can '+(n===1?'this person':'these '+n+' people')+' do across Somos? Pick the closest role.</p>'
-    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')+'</div>';
-   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4InvGo(1)">Back</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4InvGo(3)">Next: teams</button>';
-  } else {
-   body.innerHTML=v4InvSteps()
-    +'<p class="secd" style="margin:0 0 4px">Add these people to teams (optional). A team grants the accounts it manages.</p>'
-    +'<div class="v4-teamlist" id="v4InvTeamList">'+V4_TEAMS.map(function(t){ var on=!!_v4InvTeams[t.name]; return '<label class="v4-teamopt"><span class="hs-check'+(on?' is-on':'')+'" role="checkbox" tabindex="0" aria-checked="'+(on?'true':'false')+'" data-team="'+gsEsc(t.name)+'" onclick="v4InvToggleTeam(\''+gsEsc(t.name)+'\')"></span><span class="v4-team-t">'+gsEsc(t.name)+'</span><span class="v4-team-m">'+t.members+' people</span></label>'; }).join('')+'</div>'
-    +'<div class="hs-field-hint" style="margin-top:10px">Skip this and they join the org without a team. You can add one later.</div>';
-   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4InvGo(2)">Back</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4InvSend()"><span class="material-symbols-outlined">send</span>Send '+n+' invite'+(n===1?'':'s')+'</button>';
-  }
+    +'<div class="hs-field-hint">Type an email and press Enter to add each person. Inviting many people? <a href="#" onclick="return v4InvCsv()">Upload a CSV</a>.</div></div>'
+   /* Role */
+   +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What can they do?</span><p class="v4-inv-cap">Pick the closest role. You can change it later.</p>'
+    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')+'</div></div>'
+   /* Teams */
+   +'<div class="v4-inv-sec"><span class="v4-inv-lbl">Add to a team? <span class="secd" style="font:var(--hs-type-body-sm)">(optional)</span></span><p class="v4-inv-cap">A team grants the accounts it manages. Skip this and they join the org without a team.</p>'
+    +'<div class="v4-teamlist" id="v4InvTeamList">'+V4_TEAMS.map(function(t){ var on=!!_v4InvTeams[t.name]; return '<label class="v4-teamopt"><span class="hs-check'+(on?' is-on':'')+'" role="checkbox" tabindex="0" aria-checked="'+(on?'true':'false')+'" data-team="'+gsEsc(t.name)+'" onclick="v4InvToggleTeam(\''+gsEsc(t.name)+'\')"></span><span class="v4-team-t">'+gsEsc(t.name)+'</span><span class="v4-team-m">'+t.members+' people</span></label>'; }).join('')+'</div></div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4InvSendBtn" onclick="v4InvSend()"'+(n?'':' disabled')+'><span class="material-symbols-outlined">send</span>Send '+n+' invite'+(n===1?'':'s')+'</button>';
   initControlA11y(body);
  }
- function v4InvGo(step){ if(step===2 && !_v4InvEmails.length) return; _v4InvStep=step; v4RenderInvite(); }
  function v4InvEmailKey(e){
   var inp=e.target;
   if(e.key==='Enter'||e.key===','||e.key===' '){ e.preventDefault(); var v=inp.value.trim().replace(/,$/,''); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && _v4InvEmails.indexOf(v)===-1){ _v4InvEmails.push(v); inp.value=''; v4RenderInvite(); setTimeout(function(){ var i=document.getElementById('v4InvEmailInput'); if(i)i.focus(); },0); } }
@@ -1668,7 +1692,8 @@
  function v4InvToggleTeam(t){ _v4InvTeams[t]=!_v4InvTeams[t]; v4RenderInvite(); }
  function v4InvCsv(){ showToast('Bulk CSV upload is a prototype control. Up to 500 rows per file.'); return false; }
  function v4InvSend(){
-  var n=_v4InvEmails.length; var teams=Object.keys(_v4InvTeams).filter(function(k){return _v4InvTeams[k];});
+  var n=_v4InvEmails.length; if(!n) return;                         /* guard: Send stays disabled until at least one email */
+  var teams=Object.keys(_v4InvTeams).filter(function(k){return _v4InvTeams[k];});
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   title.textContent='Invites sent';
   var teamLine=teams.length?(' They join <b>'+gsEsc(teams.join(', '))+'</b>.'):'';
@@ -1686,7 +1711,10 @@
   var grid=v4El('<div class="v4-teamgrid" id="v4TeamGrid"></div>');
   V4_TEAMS.forEach(function(t){
    var faces=t.faces.map(function(f){ return '<span class="v4-face" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
-   var card=v4El('<button class="v4-teamcard" type="button" onclick="showToast(\'Opening '+gsEsc(t.name)+'. Add people here opens the same invite flow with this team pre-checked.\')"></button>');
+   /* Fix (v4): the card now NAVIGATES to the team detail page (c-org-team.html?t=...), the same way a member row
+      opens c-org-member.html?m=... — no dead-end toast. "Add people" still opens the shared invite with this team
+      pre-checked in step 3 (section 5). */
+   var card=v4El('<button class="v4-teamcard" type="button" aria-label="Open '+gsEsc(t.name)+'" onclick="location.href=\'c-org-team.html?t=\'+encodeURIComponent(\''+gsEsc(t.name)+'\')"></button>');
    card.innerHTML='<div class="v4-facepile">'+faces+'</div><div><div class="v4-team-name">'+gsEsc(t.name)+'</div><div class="v4-team-meta">'+t.members+' members \u00b7 '+t.accounts+' accounts</div></div>'
     +'<div class="rowflex" style="gap:8px;margin-top:auto"><span class="hs-btn hs-btn--secondary hs-btn--sm" role="button" tabindex="0" onclick="event.stopPropagation();v4OpenInvite(\''+gsEsc(t.name)+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();v4OpenInvite(\''+gsEsc(t.name)+'\');}"><span class="material-symbols-outlined" style="font-size:18px">person_add</span>Add people</span></div>';
    grid.appendChild(card);
@@ -1695,6 +1723,43 @@
   wrap.style.display='none';                                     /* hide the table; kept in DOM for filterContent + non-v4 parity */
   v4EnsureInviteModal(pc);
  }
+ /* Team detail full page (section 5 tail): reached by clicking a team card. Reuses the member-detail chrome
+    (.v4-crumb, .v4-mdhead, .hs-tabs, .set-card, .v4-acct) so Teams -> card -> detail is a real, non-dead-end flow.
+    Built from V4_TEAMS + V4_MEMBERS (members whose team[] includes this team). Non-v4 has no inbound link. */
+ function v4TeamByName(name){ for(var i=0;i<V4_TEAMS.length;i++){ if(V4_TEAMS[i].name===name) return V4_TEAMS[i]; } return null; }
+ function v4TeamDetail(pc){
+  if(document.getElementById('v4TdPage')) return;
+  var qs=new URLSearchParams(location.search); var name=qs.get('t')||'Growth Team';
+  var t=v4TeamByName(name)||V4_TEAMS[0];
+  var tb=document.querySelector('.suite-topbar .tb-title'); if(tb) tb.textContent=t.name;
+  /* members of this team (from the seed) + the accounts the team holds */
+  var mem=V4_MEMBERS.filter(function(m){ return m.team.some(function(a){ return a.team===t.name; }); });
+  var accts=[]; V4_MEMBERS.forEach(function(m){ m.team.forEach(function(a){ if(a.team===t.name && !accts.some(function(x){return x.handle===a.handle;})) accts.push(a); }); });
+  var host=v4El('<div id="v4TdPage"></div>');
+  host.appendChild(v4El('<div class="v4-crumb"><a href="c-org-teams.html">Teams</a><span class="material-symbols-outlined">chevron_right</span><span>'+gsEsc(t.name)+'</span></div>'));
+  var faces=t.faces.map(function(f){ return '<span class="v4-face" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
+  host.appendChild(v4El('<div class="v4-mdhead"><div class="v4-facepile" style="flex:none">'+faces+'</div>'
+   +'<div class="v4-mdid"><div class="v4-mdname">'+gsEsc(t.name)+'</div>'
+   +'<div class="v4-mdmeta">'+t.members+' members \u00b7 '+t.accounts+' social accounts</div></div>'
+   +'<div class="v4-mdactions"><button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenInvite(\''+gsEsc(t.name)+'\')"><span class="material-symbols-outlined">person_add</span>Add people</button></div></div>'));
+  host.appendChild(v4El('<nav class="hs-tabs" style="margin:6px 0 4px" aria-label="Team detail" id="v4TdTabs">'
+   +'<a class="hs-tab is-active" role="tab" tabindex="0" onclick="v4TdTab(this,\'mem\')">Members '+t.members+'</a>'
+   +'<a class="hs-tab" role="tab" tabindex="0" onclick="v4TdTab(this,\'accts\')">Social accounts '+t.accounts+'</a></nav>'));
+  /* Members panel: the seeded members on this team; row links to that member's detail (keeps the "lands on the person" spine) */
+  var mp=v4El('<div class="v4-tabpanel" id="v4Td-mem"></div>');
+  var memRows=mem.length?mem.map(function(m){ return '<div class="between"><div class="rowflex" style="gap:12px"><span class="mini-av">'+gsEsc(m.ini)+'</span><div><div style="font:var(--hs-type-body-md-b)">'+gsEsc(m.name)+'</div><div class="secd" style="margin:0">'+gsEsc(m.email)+'</div></div></div><div class="rowflex" style="gap:10px"><span class="'+v4RoleBadge(m.role)+'">'+gsEsc(m.role)+'</span><a class="hs-btn hs-btn--ghost hs-btn--sm" href="c-org-member.html?m='+encodeURIComponent(m.name)+'">Open</a></div></div>'; }).join(''):'<p class="secd" style="margin:0">The other '+t.members+' members are not in this prototype seed.</p>';
+  mp.innerHTML='<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">People on this team</h3></div>'+memRows+'<p class="secd" style="margin:12px 0 0">Showing the seeded members. This team has '+t.members+' people in total.</p></div></div>';
+  host.appendChild(mp);
+  /* Social accounts panel: accounts the team holds; everyone on the team can act on these */
+  var ap=v4El('<div class="v4-tabpanel" id="v4Td-accts" hidden></div>');
+  var acctRows=accts.length?accts.map(function(a){ return '<div class="v4-acct"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span><div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+'</div></div><div class="v4-acct-right"><span class="hs-badge hs-badge--neutral" title="Held by the team">Team account</span></div></div>'; }).join(''):'<p class="secd" style="margin:0">No seeded accounts for this team.</p>';
+  ap.innerHTML='<div class="set-card"><div class="pad" style="padding-bottom:6px"><h3 class="sec" style="margin:0 0 4px">Social accounts</h3><p class="secd" style="margin:0">Everyone on this team can act on these accounts. Access ends when someone leaves the team.</p></div><div class="pad" style="padding-top:6px">'+acctRows+'</div></div>';
+  host.appendChild(ap);
+  pc.innerHTML=''; pc.appendChild(host);
+  v4EnsureInviteModal(pc);
+  initControlA11y(pc);
+ }
+ function v4TdTab(elm,id){ var tabs=document.getElementById('v4TdTabs'); if(tabs){ Array.prototype.forEach.call(tabs.querySelectorAll('.hs-tab'),function(t){ t.classList.remove('is-active'); }); } elm.classList.add('is-active'); ['mem','accts'].forEach(function(k){ var p=document.getElementById('v4Td-'+k); if(p)p.hidden=(k!==id); }); }
 
  /* ================= Section 6: Roles & permissions matrix ================= */
  /* Capability x role matrix (View / Member / Admin / Super Admin). STRUCTURE only; the 7 contested cells (spec 6) are
@@ -1868,6 +1933,7 @@
   var pc=document.getElementById('pageContent'); if(!pc) return;
   try{
    if(PAGE_ID==='memberdetail'){ v4MemberDetail(pc); }
+   else if(PAGE_ID==='teamdetail'){ v4TeamDetail(pc); }
    else if(PAGE_ID==='members' && v3IsPage('Members')){ v4Members(pc); }
    else if(PAGE_ID==='teams'){ v4Teams(pc); }
    else if(PAGE_ID==='roles'){ v4Roles(pc); }
