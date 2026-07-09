@@ -1421,11 +1421,16 @@
     only (table, tabs, modal, radio group, matrix table, badges, amber alert). No new colours; no em/en dashes. */
  function v4El(html){ var t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
  function v4IsPage(t){ return v3IsPage(t); }   /* discriminate shared-active sub-pages by topbar title (textContent is entity-decoded) */
- /* ---- Section 7 sample data. Bryn is the offboard test case: 3 directly-owned + 1 via Growth Team. ---- */
+ /* ---- Section 7 sample data = the CANONICAL members dataset (member-management-spec.md section 7); single source
+    for every v4 render (list Owns, member detail, offboard). Bryn is the offboard test case: 3 directly-owned + 1 via
+    Growth Team. Aisha owns Facebook "Somos (FB Page)" (NOT @somos.main, which is Bryn's; no account may have two
+    direct owners). NOTE: the base and v3 pages still use separate legacy hardcoded copies (members side panel, member
+    detail, transfer). Migrate those onto this object once the live v3 study closes; changing them now would alter what
+    a v3 participant sees mid-study. ---- */
  var V4_ACCT_IC={ 'Instagram':'photo_camera','LinkedIn':'hub','X / Twitter':'public','Facebook':'groups','TikTok':'music_note','YouTube':'smart_display' };
  var V4_MEMBERS=[
   {ini:'AP',name:'Aisha Patel',email:'aisha.patel@somos.com',role:'Super Admin',via:'Direct',
-   direct:[{handle:'@somos.main',net:'Instagram'}], team:[] },
+   direct:[{handle:'Somos (FB Page)',net:'Facebook'}], team:[] },
   {ini:'BM',name:'Bryn Morales',email:'bryn.morales@somos.com',role:'Admin',via:'Direct',
    direct:[{handle:'@somos.main',net:'Instagram'},{handle:'Somos Co',net:'LinkedIn'},{handle:'@somos',net:'X / Twitter'}],
    team:[{handle:'@somos.growth',net:'TikTok',team:'Growth Team'}] },
