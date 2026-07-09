@@ -321,24 +321,28 @@
  .v4-teamopt:first-child{border-top:0;}
  .v4-teamopt .v4-team-t{font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);}
  .v4-teamopt .v4-team-m{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin-left:auto;}
- /* Invite email token field: a multi-value wrapper that mirrors the real Bento Input (.hs-input) states exactly,
-    holding .hs-input-tag pills + a bare typing input. Fix (v4): the resting border was --hs-border (#EBEBEB, nearly
-    invisible), there was NO hover state, and text-selection used the browser default (looked off). Now it matches
-    .hs-input token-for-token: resting --hs-border-input, hover --hs-fg, focus --hs-border-focus + halo, plus a
-    token-driven ::selection so highlighted text uses the Bento focus-blue tint. */
- .v4-inv-emails{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px;padding:6px 10px;border:1px solid var(--hs-border-input);border-radius:var(--hs-radii-lg);background:var(--hs-surface);transition:border-color 150ms,box-shadow 150ms;cursor:text;}
+ /* Invite email token field = the REAL Bento Input as a multi-value container (preview/inputs.html .hs-input.affix
+    pattern): the field carries the base .hs-input class in the markup, so border/radius/background/hover ride the
+    shared component token-for-token. This block only adds the multi-value LAYOUT (wrap + gap + grow) and the
+    :focus-within ring the container form needs (a <div> can't fire .hs-input:focus, so the ring is on the wrapper,
+    same token values --hs-border-focus + --hs-focus-halo the affix pattern uses). The ring lives ONLY on the
+    container: the inner <input> is transparent and has NO border/outline/box-shadow on any focus state, so a
+    participant sees one crisp Bento ring, not a nested blue box (Robin's flag). Bento 16px input padding-x. */
+ .v4-inv-emails{box-sizing:border-box;height:auto;min-height:40px;padding-top:3px;padding-bottom:3px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;cursor:text;}
  .v4-inv-emails:hover{border-color:var(--hs-fg);}
  .v4-inv-emails:focus-within{border-color:var(--hs-border-focus);box-shadow:0 0 0 2px var(--hs-focus-halo);}
  .v4-inv-emails:focus-within:hover{border-color:var(--hs-border-focus);}
- .v4-inv-emails input{flex:1;min-width:140px;border:0;outline:0;background:transparent;font:var(--hs-type-body-md);color:var(--hs-fg);padding:4px 2px;}
- .v4-inv-emails input::placeholder{color:var(--bento-theme-color-text-placeholder);}
- .v4-inv-emails input::selection{background:var(--hs-focus-halo);color:var(--hs-fg);}
+ .v4-inv-emails>input{flex:1 1 160px;min-width:160px;height:32px;padding:0;margin:0;border:0;background:transparent;font:var(--hs-type-body-md);color:var(--hs-fg);}
+ .v4-inv-emails>input:focus,.v4-inv-emails>input:focus-visible,.v4-inv-emails>input:active{outline:0!important;box-shadow:none!important;border:0!important;}
+ .v4-inv-emails>input::placeholder{color:var(--bento-theme-color-text-placeholder);}
+ .v4-inv-emails>input::selection{background:var(--hs-focus-halo);color:var(--hs-fg);}
  .v4-inv-emails .hs-input-tag::selection{background:transparent;}
  /* Single-modal invite: three quiet sections stacked (email / role / teams), each with a small caption. */
- .v4-inv-sec{margin:0 0 18px;}
+ .v4-inv-sec{margin:0 0 20px;}
  .v4-inv-sec:last-child{margin-bottom:0;}
  .v4-inv-sec>.v4-inv-lbl{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);display:block;margin:0 0 6px;}
- .v4-inv-sec>.v4-inv-cap{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 8px;}
+ .v4-inv-sec>.v4-inv-cap{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 10px;}
+ .v4-inv-sec>.hs-field-hint{margin-top:8px;}
  /* Transfer & offboard modal (section 4): per-account picker rows + disabled counter footer. */
  body.v4 #v4OffWrap .modal{max-width:620px;}
  .v4-off-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--bento-theme-color-border-subtle);}
@@ -1618,7 +1622,7 @@
    +'<p class="secd" style="margin:0 0 16px">They will get an email and land inside Somos with the access you set here.</p>'
    /* Email */
    +'<div class="v4-inv-sec"><label class="v4-inv-lbl" for="v4InvEmailInput">Who are you inviting?</label>'
-    +'<div class="v4-inv-emails" onclick="var i=document.getElementById(\'v4InvEmailInput\');if(i)i.focus()">'+chips+'<input id="v4InvEmailInput" type="email" inputmode="email" autocomplete="off" placeholder="'+(n?'Add another':'name@company.com')+'" aria-label="Add an email address" onkeydown="v4InvEmailKey(event)"></div>'
+    +'<div class="hs-input v4-inv-emails" onclick="var i=document.getElementById(\'v4InvEmailInput\');if(i)i.focus()">'+chips+'<input id="v4InvEmailInput" type="text" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" name="v4-invite-recipients-'+Date.now()+'" data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="'+(n?'Add another':'name@company.com')+'" aria-label="Add an email address" onkeydown="v4InvEmailKey(event)"></div>'
     +'<div class="hs-field-hint">Type an email and press Enter to add each person. Inviting many people? <a href="#" onclick="return v4InvCsv()">Upload a CSV</a>.</div></div>'
    /* Role */
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What can they do?</span><p class="v4-inv-cap">Pick the closest role. You can change it later.</p>'
@@ -1782,7 +1786,7 @@
   var chips=teams.map(function(t){ return '<span class="v4-chip"><span class="material-symbols-outlined">groups</span>'+gsEsc(t)+'</span>'; }).join('');
   var ov=v4El('<div class="v4-tabpanel" id="v4Md-ov"></div>');
   ov.innerHTML='<div class="set-card"><div class="pad"><h3 class="sec" style="margin:0 0 8px">Access summary</h3><p class="v4-summary">'+gsEsc(v4AccessSentence(m))+'</p>'+(chips?('<div class="v4-chips">'+chips+'</div>'):'<p class="secd" style="margin:10px 0 0">Not on any team.</p>')+'</div></div>'
-   +'<div class="set-card"><div class="pad" style="padding-bottom:0"><h3 class="sec" style="margin:0 0 4px">Social accounts</h3><p class="secd" style="margin:0 0 4px">What this person can act on, and where each grant comes from.</p></div><div class="pad" style="padding-top:6px">'+v4AcctRows(m)+'</div></div>';
+   +'<div class="set-card"><div class="pad" style="padding-bottom:0"><h3 class="sec" style="margin:0 0 4px">Social accounts <span class="secd" style="font:var(--hs-type-body-md);margin:0">\u00b7 '+nAccts+'</span></h3><p class="secd" style="margin:0 0 4px">What this person can act on, and where each grant comes from.</p></div><div class="pad" style="padding-top:6px">'+v4AcctRows(m)+'</div></div>';
   host.appendChild(ov);
   /* --- Teams panel --- */
   var tp=v4El('<div class="v4-tabpanel" id="v4Md-teams" hidden></div>');
@@ -1796,7 +1800,7 @@
   host.appendChild(pp);
   /* --- Social accounts panel: full list + per-account Transfer --- */
   var ap=v4El('<div class="v4-tabpanel" id="v4Md-accts" hidden></div>');
-  ap.innerHTML='<div class="set-card"><div class="pad" style="padding-bottom:6px"><h3 class="sec" style="margin:0 0 4px">Social accounts</h3><p class="secd" style="margin:0">Ownership provenance for every account this person can reach.</p></div><div class="pad" style="padding-top:6px">'+v4AcctRows(m,true)+'</div></div>';
+  ap.innerHTML='<div class="set-card"><div class="pad" style="padding-bottom:6px"><h3 class="sec" style="margin:0 0 4px">Social accounts <span class="secd" style="font:var(--hs-type-body-md);margin:0">\u00b7 '+nAccts+'</span></h3><p class="secd" style="margin:0">Ownership provenance for every account this person can reach.</p></div><div class="pad" style="padding-top:6px">'+v4AcctRows(m,true)+'</div></div>';
   host.appendChild(ap);
   /* mount: clear the fallback body content and insert the v4 page */
   pc.innerHTML=''; pc.appendChild(host);
