@@ -280,11 +280,7 @@
  .v4-filterbar .hs-input{max-width:300px;flex:1 1 220px;}
  .v4-filterbar .cf{flex:none;}
  body.v4 tr.v4-rowlink{cursor:pointer;}
- /* Member detail full page (section 2): breadcrumb + header with visible actions + tabs. */
- .v4-crumb{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);margin:0 0 10px;display:flex;align-items:center;gap:6px;}
- .v4-crumb a{color:var(--bento-theme-color-text-subtle);text-decoration:none;}
- .v4-crumb a:hover{color:var(--bento-theme-color-text-base);text-decoration:underline;}
- .v4-crumb .material-symbols-outlined{font-size:16px;color:var(--bento-theme-color-text-disabled);}
+ /* Member/team detail full page (section 2): header with visible actions + tabs. No breadcrumb (not a Bento component); back nav is the shared Bento ghost back-arrow, like the other detail pages. */
  .v4-mdhead{display:flex;align-items:flex-start;gap:16px;margin:0 0 4px;}
  .v4-mdhead .v4-mdid{flex:1;min-width:0;}
  .v4-mdhead .v4-mdname{font:var(--hs-type-title-base);color:var(--bento-theme-color-text-base);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
@@ -1706,7 +1702,7 @@
   var mem=V4_MEMBERS.filter(function(m){ return m.team.some(function(a){ return a.team===t.name; }); });
   var accts=[]; V4_MEMBERS.forEach(function(m){ m.team.forEach(function(a){ if(a.team===t.name && !accts.some(function(x){return x.handle===a.handle;})) accts.push(a); }); });
   var host=v4El('<div id="v4TdPage"></div>');
-  host.appendChild(v4El('<div class="v4-crumb"><a href="c-org-teams.html">Teams</a><span class="material-symbols-outlined">chevron_right</span><span>'+gsEsc(t.name)+'</span></div>'));
+  host.appendChild(v4El('<a class="hs-btn hs-btn--ghost hs-btn--icon" href="c-org-teams.html" aria-label="Back to teams" title="Back to teams" style="margin:0 0 8px"><span class="material-symbols-outlined">arrow_back</span></a>'));
   var faces=t.faces.map(function(f){ return '<span class="mini-av" aria-hidden="true">'+gsEsc(f)+'</span>'; }).join('');
   host.appendChild(v4El('<div class="v4-mdhead"><div class="avstack" style="flex:none">'+faces+'</div>'
    +'<div class="v4-mdid"><div class="v4-mdname">'+gsEsc(t.name)+'</div>'
@@ -1785,8 +1781,8 @@
   var m=v4MemberByName(name)||V4_MEMBERS[1];
   var tb=document.querySelector('.suite-topbar .tb-title'); if(tb) tb.textContent=m.name;
   var host=v4El('<div id="v4MdPage"></div>');
-  /* breadcrumb */
-  host.appendChild(v4El('<div class="v4-crumb"><a href="c-settings-members.html">Members</a><span class="material-symbols-outlined">chevron_right</span><span>'+gsEsc(m.name)+'</span></div>'));
+  /* back to members: Bento ghost back-arrow (breadcrumbs are not a Bento component) */
+  host.appendChild(v4El('<a class="hs-btn hs-btn--ghost hs-btn--icon" href="c-settings-members.html" aria-label="Back to members" title="Back to members" style="margin:0 0 8px"><span class="material-symbols-outlined">arrow_back</span></a>'));
   /* header: avatar + name + role badge inline + secondary meta; visible Change role + Transfer & offboard actions */
   host.appendChild(v4El('<div class="v4-mdhead"><span class="avatar-lg">'+gsEsc(m.ini)+'</span>'
    +'<div class="v4-mdid"><div class="v4-mdname">'+gsEsc(m.name)+' <span class="'+v4RoleBadge(m.role)+'">'+gsEsc(m.role)+'</span></div>'
