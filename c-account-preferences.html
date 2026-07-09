@@ -1457,6 +1457,20 @@
     fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Role filter is a prototype control.\')">Role<span class="material-symbols-outlined" style="font-size:18px">expand_more</span></button>'));
     fb.appendChild(v4El('<button class="cf" type="button" aria-haspopup="listbox" onclick="showToast(\'Team filter is a prototype control.\')">Team<span class="material-symbols-outlined" style="font-size:18px">expand_more</span></button>'));
    }
+   /* Header layout (spec section 1: "ONE primary button, right-aligned"): the build's .csearch-row put the
+      button cluster next to the filter bar under space-between, which floated the button mid-height and let the
+      Role/Team triggers wrap. Lift the subtitle + the Invite button into their own header row (subtitle left,
+      button top-right), and let the filter bar own a full-width row of its own so Role/Team never wrap. Inline
+      styles only (v4-only DOM), so the shared CSS + non-v4 output stay byte-identical. */
+   if(actionWrap && !document.getElementById('v4MbrHead')){
+    var head=v4El('<div class="rowflex" id="v4MbrHead" style="align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 16px"></div>');
+    row.parentNode.insertBefore(head, row);
+    if(sub){ sub.style.margin='0'; head.appendChild(sub); }     /* subtitle to the left of the header row */
+    actionWrap.style.flex='none'; head.appendChild(actionWrap); /* Invite button to the top-right */
+    row.style.justifyContent='flex-start';                      /* filter bar now leads its own row */
+    var fbNow=document.getElementById('v4FilterBar');
+    if(fbNow){ fbNow.style.flex='1 1 auto'; fbNow.style.width='100%'; }  /* fill the row so Role/Team stay inline */
+   }
   }
   /* Rebuild the table with the v4 columns: checkbox | Member | Role | Access via | Owns. Entire row clickable to detail;
      ellipsis menu limited to Change role only. Rebuilt from the sample data so Owns + the 5th member (Elif) are correct. */
@@ -1575,7 +1589,7 @@
   } else if(_v4InvStep===2){
    var roles=['View only','Team member','Admin','Super Admin'];
    body.innerHTML=v4InvSteps()
-    +'<p class="secd" style="margin:0 0 8px">What can these '+(n===1?'person':n+' people')+' do across Somos? Pick the closest role.</p>'
+    +'<p class="secd" style="margin:0 0 8px">What can '+(n===1?'this person':'these '+n+' people')+' do across Somos? Pick the closest role.</p>'
     +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')+'</div>';
    foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4InvGo(1)">Back</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4InvGo(3)">Next: teams</button>';
   } else {
@@ -1781,7 +1795,7 @@
   var sels=Array.prototype.slice.call(document.querySelectorAll('.v4-off-sel'));
   var remaining=sels.filter(function(s){ return !s.value; }).length;
   var cnt=document.getElementById('v4OffCount'), go=document.getElementById('v4OffGo');
-  if(cnt){ if(remaining===0){ cnt.textContent='All accounts have a new owner'; cnt.classList.add('zero'); } else { cnt.textContent=remaining+' account'+(remaining===1?'':'s')+' still need an owner'; cnt.classList.remove('zero'); } }
+  if(cnt){ if(remaining===0){ cnt.textContent='All accounts have a new owner'; cnt.classList.add('zero'); } else { cnt.textContent=remaining+' account'+(remaining===1?' still needs':'s still need')+' an owner'; cnt.classList.remove('zero'); } }
   if(go){ go.disabled=(remaining>0); }
  }
  function v4OffConfirm(){
