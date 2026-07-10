@@ -804,6 +804,37 @@
  body.v5 .v5-role-ghead{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
  body.v5 .v5-role-ghead .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);}
  body.v5 .v5-role-ghead .v5-role-count{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ /* ===== v5 People page: ONE white content surface (visual fix) =====
+    The People page tab bar (Members / Teams) was floating on the grey canvas with its baseline hairline reading as
+    stray text on grey, and the filter toolbar + table sat as two separately-bordered cards (card-on-card). Fix: the
+    page header row (subtitle + Invite, #v4MbrHead) stays on the grey canvas above, and the REST (the .hs-tabs bar +
+    both panels' content) is wrapped in a single white surface (.v5-people-panel), so the tabs anchor to a real
+    surface. Surface = the same card recipe as .set-card (bg-surface + border-subtle + 12px radius) plus the shipped
+    raised elevation token. Inside it the toolbar and table become FLUSH sections with hairline dividers, not nested
+    cards. Tokens only; body.v5-gated so v4 (separate cards on grey) and v3 stay byte-identical.
+    --v5pp-pad is the panel's horizontal padding; the tab bar is pulled out to it (negative margin) so the shipped
+    .hs-tabs bottom-border baseline spans the FULL panel width, with the tab labels padded back in so the active
+    underline still aligns to the label. */
+ body.v5 .v5-people-panel{--v5pp-pad:24px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;box-shadow:var(--bento-theme-elevation-shadow-raised);padding:var(--bento-space-005,4px) var(--v5pp-pad) var(--v5pp-pad);}
+ /* Tab bar anchored to the TOP of the panel with a full-width baseline: bleed the .hs-tabs out to the panel edges so
+    its 1px bottom border (the shipped tab baseline) runs the full panel width, then pad the labels back to the panel
+    gutter so the active 2px underline still sits under the label. Space below the baseline before the content. */
+ body.v5 .v5-people-panel > .v5-people-switch{margin:0 calc(-1 * var(--v5pp-pad)) var(--bento-space-400,24px);padding:0 calc(var(--v5pp-pad) - 16px);}
+ /* Inside the panel the members view is a stack of flush SECTIONS (no card-on-card): the filter toolbar loses its
+    card skin (surface/border/radius) and becomes a padded row closed by a hairline divider; the table's .set-card
+    loses its skin too and sits flush below with no extra elevation or margin. */
+ body.v5 .v5-people-panel .v4-filterbar{background:transparent;border:0;border-radius:0;padding:0 0 var(--bento-space-400,24px);margin:0 0 var(--bento-space-400,24px);border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ body.v5 .v5-people-panel .set-card{background:transparent;border:0;border-radius:0;box-shadow:none;margin:0;}
+ body.v5 .v5-people-panel .csearch-row{margin-bottom:0;}
+ /* The members-table field hint sits directly under the flush table (its own small top gap, no card gap). */
+ body.v5 .v5-people-panel .hs-field-hint{margin-top:12px;}
+ /* Teams view lives on the SAME white surface, so the team cards would be white-on-white: keep the shipped
+    .v4-teamcard border (border-subtle) as the resting affordance that makes each card read on white, rather than
+    relying on the hover elevation/shadow alone. The card already carries that border; we only make sure the resting
+    border stays (never suppressed on the white surface) and keep the shipped grid. */
+ body.v5 .v5-people-panel .v4-teamcard{border-color:var(--bento-theme-color-border-subtle);}
+ /* The Teams panel's own top search row + Create team button are a flush section on the surface (no extra card). */
+ body.v5 .v5-people-panel #v5Panel-teams > .csearch-row{margin-bottom:var(--bento-space-400,24px);}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -4083,6 +4114,12 @@
   var anchor=head||mbrBlock;                                           /* insert the toggle + panels where the block starts */
   var mbrPanel=v4El('<div id="v5Panel-members" role="tabpanel" aria-labelledby="v5PeopleTab-members"></div>');
   var teamsPanel=v4El('<div id="v5Panel-teams" role="tabpanel" aria-labelledby="v5PeopleTab-teams" hidden></div>');
+  /* Visual fix: one white content surface. The page header (#v4MbrHead: subtitle + Invite) stays on the grey canvas
+     ABOVE; this panel wraps only the tab bar + both panels' content so the tabs anchor to a real surface (no more
+     floating baseline on grey, no card-on-card inside). Inserted right AFTER the header (or where the block starts
+     if there is no header). */
+  var panel=v4El('<div class="v5-people-panel" id="v5PeoplePanel"></div>');
+  anchor.parentNode.insertBefore(panel, head?head.nextSibling:anchor);
   /* The single primary object switch: the shipped Bento Tabs (.hs-tabs/.hs-tab, components.css), the same tab
      component every other page header uses, switching the Members panel and the Teams panel in place. This replaces
      the earlier v5a ToggleGroup snowflake (its .tg/.ti class CSS was not in the shipped stylesheet). APG tab pattern:
@@ -4092,11 +4129,13 @@
    +'<a class="hs-tab is-active" role="tab" tabindex="0" aria-selected="true" aria-controls="v5Panel-members" id="v5PeopleTab-members" onclick="v5PeopleTab(\'members\')" onkeydown="v5PeopleTabKey(event,\'members\')">Members</a>'
    +'<a class="hs-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="v5Panel-teams" id="v5PeopleTab-teams" onclick="v5PeopleTab(\'teams\')" onkeydown="v5PeopleTabKey(event,\'teams\')">Teams</a>'
    +'</nav>');
-  anchor.parentNode.insertBefore(toggle, anchor);
-  toggle.parentNode.insertBefore(mbrPanel, toggle.nextSibling);
-  mbrPanel.parentNode.insertBefore(teamsPanel, mbrPanel.nextSibling);
-  /* Move the v4 members block into the Members panel (order preserved). */
-  if(head) mbrPanel.appendChild(head);
+  /* Tab bar anchors to the TOP of the white surface; both panels follow, inside the same surface. The header
+     (#v4MbrHead) is deliberately NOT moved in here: it stays on the grey canvas above the panel. */
+  panel.appendChild(toggle);
+  panel.appendChild(mbrPanel);
+  panel.appendChild(teamsPanel);
+  /* Move the v4 members block into the Members panel (order preserved). The subtitle + Invite header (#v4MbrHead)
+     stays outside the panel on the grey canvas. */
   mbrPanel.appendChild(mbrBlock);
   if(mp) mbrPanel.appendChild(mp);
   if(pp) mbrPanel.appendChild(pp);
