@@ -774,19 +774,23 @@
  }
  /* ===== v5 (post-stakeholder-sync) additions (all body.v5-scoped, injected/toggled by applyV5() after load, so
     non-v5 output (v3 baseline AND the v4 reference build) stays byte-identical). Tokens only. =====
-    Bento ToggleGroup (segmented control), preview/toggle-group.html + comp-toggle-group tokens (Figma 59111:76930).
-    The comp-toggle-group-* TOKENS ship in tokens/layout.css, but the .tg/.ti CLASS rules live only in the preview
-    harness (_card.css), not the linked components.css, so they are ported here verbatim, on the canonical tokens,
-    and the gap (ToggleGroup class CSS unbundled) is logged in GAP-BACKLOG.md. Used for the People Members/Teams toggle. */
+    People page primary switch: the shipped Bento Tabs (.hs-tabs/.hs-tab, components.css) are reused as-is for the
+    Members/Teams object switch, so nothing bespoke is needed there; only bottom spacing is nudged so the tab strip
+    sits above the panel like the other page headers. (The earlier v5a ToggleGroup .tg/.ti snowflake was dropped.) */
  body.v5 .v5-people-switch{margin:0 0 16px;}
- body.v5 .v5-people-switch .tg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:var(--bento-space-02);}
- body.v5 .v5-people-switch .ti{appearance:none;border:0;background:transparent;color:var(--bento-theme-color-text-base);border-radius:var(--bento-component-toggle-group-radius);min-height:var(--bento-component-toggle-group-min-touch);padding:var(--bento-component-toggle-group-padding-y) var(--bento-component-toggle-group-padding-x-text);display:inline-flex;align-items:center;gap:var(--bento-component-toggle-group-gap-inline);font:var(--hs-type-body-md-b);cursor:pointer;}
- body.v5 .v5-people-switch .ti:hover{background:var(--bento-component-toggle-group-fill-hovered);}
- body.v5 .v5-people-switch .ti:active{background:var(--bento-component-toggle-group-fill-pressed);}
- body.v5 .v5-people-switch .ti:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:1px;}
- body.v5 .v5-people-switch .ti.selected{background:var(--bento-component-toggle-group-selected-fill);box-shadow:inset 0 0 0 var(--bento-component-toggle-group-border-width-selected) var(--bento-theme-color-border-selected);}
- body.v5 .v5-people-switch .ti .lead,body.v5 .v5-people-switch .ti .check{font-size:var(--bento-theme-icon-md,20px);}
- body.v5 .v5-people-switch .ti:not(.selected) .check{display:none;}   /* check glyph shows only on the selected option (ToggleGroup spec) */
+ /* Members STATUS FILTER: an [Active | Pending] segmented control that lives INSIDE the members filter toolbar (with
+    the text filter, Role and Team). It is deliberately lighter than the top .hs-tabs so it reads as a filter, not a
+    second tab strip: a small grey-fill segmented pill on the canonical ToggleGroup tokens (--bento-component-toggle-
+    group-*), the selected segment carrying the surface fill + selected border. Sits at the trailing end of the
+    toolbar. Tokens only. */
+ body.v5 .v5-status-seg{display:inline-flex;align-items:center;flex:none;margin-left:auto;padding:var(--bento-space-005,2px);gap:var(--bento-space-005,2px);background:var(--bento-component-toggle-group-fill,var(--bento-theme-color-bg-subtle));border-radius:var(--bento-component-toggle-group-radius);}
+ body.v5 .v5-seg-btn{appearance:none;border:0;background:transparent;color:var(--bento-theme-color-text-subtle);border-radius:var(--bento-component-toggle-group-radius);min-height:var(--bento-component-toggle-group-min-touch,32px);padding:var(--bento-component-toggle-group-padding-y,6px) var(--bento-component-toggle-group-padding-x-text,12px);display:inline-flex;align-items:center;gap:6px;font:var(--hs-type-body-sm-b);cursor:pointer;white-space:nowrap;}
+ body.v5 .v5-seg-btn:hover{background:var(--bento-component-toggle-group-fill-hovered);color:var(--bento-theme-color-text-base);}
+ body.v5 .v5-seg-btn:active{background:var(--bento-component-toggle-group-fill-pressed);}
+ body.v5 .v5-seg-btn:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:1px;}
+ body.v5 .v5-seg-btn.is-on{background:var(--bento-component-toggle-group-selected-fill,var(--hs-surface));color:var(--bento-theme-color-text-base);box-shadow:inset 0 0 0 var(--bento-component-toggle-group-border-width-selected,1px) var(--bento-theme-color-border-selected);}
+ body.v5 .v5-seg-ct{color:var(--bento-theme-color-text-subtle);font:var(--hs-type-body-sm);}
+ body.v5 .v5-seg-btn.is-on .v5-seg-ct{color:var(--bento-theme-color-text-base);}
  /* v5b CHANGE 1: Contact us links page. Whole-row links reuse the .between list-row look; add a hover fill + a
     real focus ring (tokens only) so each row reads as an interactive, keyboard-reachable link. */
  body.v5 .v5-link-row{text-decoration:none;border-radius:var(--bento-radius-sm,6px);}
@@ -3948,10 +3952,13 @@
  /* ===== v5 page-level pass (post-stakeholder-sync). Runs AFTER applyV4() (v5 implies v4), so v4 has already rendered
     every page. All v5 page changes live here, gated on V5, and are pure transforms on the v4-rendered DOM. Two things:
       (T3) The combined People page: on the Members page, host BOTH the v4 Members view and the v4 Teams card-grid under
-           one page, with a Bento ToggleGroup (Members / Teams) at the top switching between them in place (default
-           Members). Reuses the shipped renderers: the v4 Members block (already rendered by applyV4) is wrapped into a
-           Members panel; the Teams grid is produced by calling the SAME v4Teams() renderer against a scoped Teams-panel
-           host (hosted=true). The single-layer member + team detail pages are untouched (v4MemberDetail / v4TeamDetail
+           one page, with a single Bento Tabs strip (.hs-tabs: Members / Teams) at the top switching between them in
+           place (default Members). Inside the Members view, pending invites are a status FILTER ([Active | Pending] in
+           the members toolbar), not a second tab strip, so "Members" is not a tab at two levels. Reuses the shipped
+           renderers: the v4 Members block (already rendered by applyV4) is wrapped into a Members panel and its inner
+           v4 [Members | Pending] tab strip is suppressed; the Teams grid is produced by calling the SAME v4Teams()
+           renderer against a scoped Teams-panel host (hosted=true). The single-layer member + team detail pages are
+           untouched (v4MemberDetail / v4TeamDetail
            still own c-org-member.html / c-org-team.html); a member row still opens member detail, a team card still
            opens team detail, and their back-arrow returns to this People view (c-settings-members.html / c-org-teams).
       (T4) Remove Sync profiles: strip the "Sync profiles" capability row from the roles matrix (Hill scrapped it). Done
@@ -4077,13 +4084,15 @@
   var anchor=head||mbrBlock;                                           /* insert the toggle + panels where the block starts */
   var mbrPanel=v4El('<div id="v5Panel-members" role="tabpanel" aria-labelledby="v5PeopleTab-members"></div>');
   var teamsPanel=v4El('<div id="v5Panel-teams" role="tabpanel" aria-labelledby="v5PeopleTab-teams" hidden></div>');
-  /* Bento ToggleGroup (segmented control), preview/toggle-group.html: .tg role=radiogroup / .ti role=radio, selected
-     shows a leading check + a 2px selected border. Its CSS is not in the shipped components.css (preview-harness only),
-     so it is ported into a body.v5-scoped block below and LOGGED in GAP-BACKLOG.md. Two options: Members / Teams. */
-  var toggle=v4El('<div class="v5-people-switch" id="v5PeopleToggle"><div class="tg" role="radiogroup" aria-label="Switch between people and teams">'
-   +'<button class="ti selected" type="button" role="radio" aria-checked="true" id="v5PeopleTab-members" onclick="v5PeopleTab(\'members\')"><span class="material-symbols-outlined check" aria-hidden="true">check</span><span class="material-symbols-outlined lead" aria-hidden="true">group</span>Members</button>'
-   +'<button class="ti" type="button" role="radio" aria-checked="false" id="v5PeopleTab-teams" onclick="v5PeopleTab(\'teams\')"><span class="material-symbols-outlined check" aria-hidden="true">check</span><span class="material-symbols-outlined lead" aria-hidden="true">groups</span>Teams</button>'
-   +'</div></div>');
+  /* The single primary object switch: the shipped Bento Tabs (.hs-tabs/.hs-tab, components.css), the same tab
+     component every other page header uses, switching the Members panel and the Teams panel in place. This replaces
+     the earlier v5a ToggleGroup snowflake (its .tg/.ti class CSS was not in the shipped stylesheet). APG tab pattern:
+     role=tablist / role=tab, is-active + aria-selected on the current tab, roving tabindex, arrow-key navigation.
+     Two tabs: Members / Teams. Default Members. */
+  var toggle=v4El('<nav class="v5-people-switch hs-tabs" id="v5PeopleToggle" role="tablist" aria-label="Switch between people and teams">'
+   +'<a class="hs-tab is-active" role="tab" tabindex="0" aria-selected="true" aria-controls="v5Panel-members" id="v5PeopleTab-members" onclick="v5PeopleTab(\'members\')" onkeydown="v5PeopleTabKey(event,\'members\')">Members</a>'
+   +'<a class="hs-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="v5Panel-teams" id="v5PeopleTab-teams" onclick="v5PeopleTab(\'teams\')" onkeydown="v5PeopleTabKey(event,\'teams\')">Teams</a>'
+   +'</nav>');
   anchor.parentNode.insertBefore(toggle, anchor);
   toggle.parentNode.insertBefore(mbrPanel, toggle.nextSibling);
   mbrPanel.parentNode.insertBefore(teamsPanel, mbrPanel.nextSibling);
@@ -4092,6 +4101,9 @@
   mbrPanel.appendChild(mbrBlock);
   if(mp) mbrPanel.appendChild(mp);
   if(pp) mbrPanel.appendChild(pp);
+  /* v5 IA fix: retire the inner [Members | Pending invites] tab strip and move pending into an [Active | Pending]
+     status filter in the members toolbar, so "Members" is not a tab at two levels. (mbrBlock is #v4MbrTabs.) */
+  v5BuildStatusFilter();
   /* Build the Teams host with the EXACT base markup v4Teams consumes (a .set-sub, a .csearch-row with a primary
      button, and a .set-card > table.hs-table), then run the shipped v4Teams renderer against this scoped panel
      (hosted=true bypasses only its topbar-title page-guard; all its content queries are already pc-scoped). */
@@ -4104,16 +4116,72 @@
   /* Default view = Members, unless arriving from a team-detail back-arrow (?peopletab=teams), which opens on Teams. */
   try{ var _pt=new URLSearchParams(location.search).get('peopletab'); if(_pt==='teams') v5PeopleTab('teams'); }catch(e){}
  }
- /* Toggle the People view between the Members panel and the Teams panel (APG radiogroup: aria-checked + selected). */
+ /* Switch the People view between the Members panel and the Teams panel (APG tab pattern: is-active + aria-selected
+    move to the current tab, roving tabindex 0/-1, the other panel is hidden). */
  function v5PeopleTab(view){
   var mp=document.getElementById('v5Panel-members'), tp=document.getElementById('v5Panel-teams');
   if(!mp||!tp) return;
   var isTeams=(view==='teams');
   mp.hidden=isTeams; tp.hidden=!isTeams;
   var bm=document.getElementById('v5PeopleTab-members'), bt=document.getElementById('v5PeopleTab-teams');
-  /* the .selected class drives both the pill fill/border and the check-glyph visibility (CSS: .ti:not(.selected) .check{display:none}) */
-  if(bm){ bm.classList.toggle('selected',!isTeams); bm.setAttribute('aria-checked', String(!isTeams)); }
-  if(bt){ bt.classList.toggle('selected',isTeams); bt.setAttribute('aria-checked', String(isTeams)); }
+  if(bm){ bm.classList.toggle('is-active',!isTeams); bm.setAttribute('aria-selected', String(!isTeams)); bm.setAttribute('tabindex', isTeams?'-1':'0'); }
+  if(bt){ bt.classList.toggle('is-active',isTeams); bt.setAttribute('aria-selected', String(isTeams)); bt.setAttribute('tabindex', isTeams?'0':'-1'); }
+ }
+ /* Keyboard for the People tabs: Enter/Space activates, Left/Right moves to and focuses the other tab (APG). */
+ function v5PeopleTabKey(e,view){
+  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); v5PeopleTab(view); return; }
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ e.preventDefault(); var other=(view==='members')?'teams':'members'; v5PeopleTab(other); var ob=document.getElementById('v5PeopleTab-'+other); if(ob) ob.focus(); }
+ }
+ /* Members status filter (v5): the inner v4 [Members | Pending invites] tab strip is a second, competing navigation
+    next to the top Members/Teams tabs (Members would appear at two levels), so under v5 it is suppressed and pending
+    invites become a STATUS FILTER inside the Members view. This adds an [Active | Pending] segmented status control to
+    the members filter toolbar (alongside the text filter, Role and Team), reading as a filter (lighter than the top
+    tabs), never a second tab strip, and never repeating the word "Members". Active (default) shows the members table +
+    its toolbar filters + bulk bar; Pending shows the SAME pending-invites content v4 already renders (#v4MbrPanel-pending:
+    email, role, sent date, Resend + Revoke, plus the zero-state), reused as-is. v5-gated; v4 keeps its tab strip. */
+ var _v5MbrStatus='active';
+ function v5BuildStatusFilter(){
+  /* Suppress the inner v4 [Members | Pending invites] tab strip under v5. It carries both .hs-tabs and .v4-mbr-tabs,
+     and .hs-tabs{display:flex} outranks the UA [hidden] rule, so the hidden attribute alone would not hide it; force
+     display:none inline (also set hidden for semantics). */
+  var tabs=document.getElementById('v4MbrTabs'); if(tabs){ tabs.hidden=true; tabs.style.display='none'; }
+  var fb=document.getElementById('v4FilterBar'); if(!fb) return;
+  if(document.getElementById('v5StatusSeg')) return;                                     /* idempotent */
+  var c=(typeof v4Counts==='function')?v4Counts():{membersTotal:'',pending:''};
+  /* Segmented status control (APG tablist look, filter weight): two options, single-select, keyboard-operable. It is
+     appended to the toolbar so it clearly belongs to the filters, not the page-level tabs above. */
+  var seg=v4El('<div class="v5-status-seg" id="v5StatusSeg" role="tablist" aria-label="Filter by status">'
+   +'<button class="v5-seg-btn is-on" type="button" role="tab" tabindex="0" aria-selected="true" id="v5Status-active" aria-controls="v4MbrPanel-members" onclick="v5MbrStatus(\'active\')" onkeydown="v5StatusKey(event,\'active\')">Active <span class="v5-seg-ct">'+c.membersTotal+'</span></button>'
+   +'<button class="v5-seg-btn" type="button" role="tab" tabindex="-1" aria-selected="false" id="v5Status-pending" aria-controls="v4MbrPanel-pending" onclick="v5MbrStatus(\'pending\')" onkeydown="v5StatusKey(event,\'pending\')">Pending <span class="v5-seg-ct">'+c.pending+'</span></button>'
+   +'</div>');
+  fb.appendChild(seg);
+  v5MbrStatus('active');
+ }
+ /* Apply the status filter: Active shows the members table (toolbar filters + bulk bar live); Pending hides the
+    members-only content and reveals the reused v4 pending panel. The status segment itself stays visible in both. */
+ function v5MbrStatus(status){
+  _v5MbrStatus=status; var pending=(status==='pending');
+  var mp=document.getElementById('v4MbrPanel-members'); var pp=document.getElementById('v4MbrPanel-pending');
+  if(pp) pp.hidden=!pending;                                                             /* pending panel: shown only for Pending */
+  /* Hide the members-only pieces inside the members panel when Pending is active (they filter/act on members): the
+     table card, the field hint, the bulk bar, and the members-only toolbar controls (text, Role, Team). The status
+     segment and the toolbar frame stay. */
+  if(mp){
+   var card=document.getElementById('v4MembersTbl'); card=card?card.closest('.set-card'):null; if(card) card.style.display=pending?'none':'';
+   Array.prototype.forEach.call(mp.querySelectorAll('.hs-field-hint'),function(h){ h.style.display=pending?'none':''; });
+   var bulk=document.getElementById('v4BulkBar'); if(bulk && pending) bulk.style.display='none';
+  }
+  var fb=document.getElementById('v4FilterBar');
+  if(fb){ Array.prototype.forEach.call(fb.querySelectorAll('.hs-input.affix.csearch, .v4-fb-chip'),function(el){ el.style.display=pending?'none':''; }); }
+  var ba=document.getElementById('v5Status-active'), bp=document.getElementById('v5Status-pending');
+  if(ba){ ba.classList.toggle('is-on',!pending); ba.setAttribute('aria-selected', String(!pending)); ba.setAttribute('tabindex', pending?'-1':'0'); }
+  if(bp){ bp.classList.toggle('is-on',pending); bp.setAttribute('aria-selected', String(pending)); bp.setAttribute('tabindex', pending?'0':'-1'); }
+  if(pending && typeof v4FbCloseAll==='function'){ try{ v4FbCloseAll(); }catch(e){} }     /* close any open Role/Team popover when leaving Active */
+ }
+ /* Keyboard for the status segment (APG tablist): Enter/Space activates, Left/Right moves + focuses the other option. */
+ function v5StatusKey(e,status){
+  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); v5MbrStatus(status); return; }
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ e.preventDefault(); var other=(status==='active')?'pending':'active'; v5MbrStatus(other); var ob=document.getElementById('v5Status-'+other); if(ob) ob.focus(); }
  }
  /* T4: remove the "Sync profiles" row from the rendered roles matrix (Hill scrapped the capability). v5-gated, done
     on the DOM the v4 matrix produced, so V4_MATRIX (and the v4 build) keep the row. Idempotent. The other stubbed
