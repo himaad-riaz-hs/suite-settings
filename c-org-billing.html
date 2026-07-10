@@ -772,6 +772,34 @@
   .between{flex-wrap:wrap;}                          /* label + right-side control wrap to two lines instead of cramping */
   .mcards{grid-template-columns:1fr;}                /* metric cards go single-column on phones */
  }
+ /* ===== v5 (post-stakeholder-sync) additions (all body.v5-scoped, injected/toggled by applyV5() after load, so
+    non-v5 output (v3 baseline AND the v4 reference build) stays byte-identical). Tokens only. =====
+    Bento ToggleGroup (segmented control), preview/toggle-group.html + comp-toggle-group tokens (Figma 59111:76930).
+    The comp-toggle-group-* TOKENS ship in tokens/layout.css, but the .tg/.ti CLASS rules live only in the preview
+    harness (_card.css), not the linked components.css, so they are ported here verbatim, on the canonical tokens,
+    and the gap (ToggleGroup class CSS unbundled) is logged in GAP-BACKLOG.md. Used for the People Members/Teams toggle. */
+ body.v5 .v5-people-switch{margin:0 0 16px;}
+ body.v5 .v5-people-switch .tg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:var(--bento-space-02);}
+ body.v5 .v5-people-switch .ti{appearance:none;border:0;background:transparent;color:var(--bento-theme-color-text-base);border-radius:var(--bento-component-toggle-group-radius);min-height:var(--bento-component-toggle-group-min-touch);padding:var(--bento-component-toggle-group-padding-y) var(--bento-component-toggle-group-padding-x-text);display:inline-flex;align-items:center;gap:var(--bento-component-toggle-group-gap-inline);font:var(--hs-type-body-md-b);cursor:pointer;}
+ body.v5 .v5-people-switch .ti:hover{background:var(--bento-component-toggle-group-fill-hovered);}
+ body.v5 .v5-people-switch .ti:active{background:var(--bento-component-toggle-group-fill-pressed);}
+ body.v5 .v5-people-switch .ti:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:1px;}
+ body.v5 .v5-people-switch .ti.selected{background:var(--bento-component-toggle-group-selected-fill);box-shadow:inset 0 0 0 var(--bento-component-toggle-group-border-width-selected) var(--bento-theme-color-border-selected);}
+ body.v5 .v5-people-switch .ti .lead,body.v5 .v5-people-switch .ti .check{font-size:var(--bento-theme-icon-md,20px);}
+ body.v5 .v5-people-switch .ti:not(.selected) .check{display:none;}   /* check glyph shows only on the selected option (ToggleGroup spec) */
+ /* v5b CHANGE 1: Contact us links page. Whole-row links reuse the .between list-row look; add a hover fill + a
+    real focus ring (tokens only) so each row reads as an interactive, keyboard-reachable link. */
+ body.v5 .v5-link-row{text-decoration:none;border-radius:var(--bento-radius-sm,6px);}
+ body.v5 .v5-link-row + .v5-link-row{border-top:1px solid var(--bento-theme-color-border-subtle);}
+ body.v5 .v5-link-row:hover{background:var(--bento-component-list-item-fill-hovered);}
+ body.v5 .v5-link-row:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:-2px;}
+ body.v5 .v5-link-row:hover .v4-acct-ic .material-symbols-outlined,body.v5 .v5-link-row:hover span[style*="text-base"]{color:var(--bento-theme-color-text-base);}
+ /* v5b CHANGE 2: team detail role hierarchy. Two grouped sections (Admins, then Members) with a small section
+    heading + count; admins carry the info badge, members the neutral badge, so the split reads without colour. */
+ body.v5 .v5-role-grp + .v5-role-grp{margin-top:14px;}
+ body.v5 .v5-role-ghead{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ body.v5 .v5-role-ghead .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);}
+ body.v5 .v5-role-ghead .v5-role-count{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -932,9 +960,19 @@
     the V4 flag and only runs from applyV4(). v4 builds ON the v3 nav direction, so v4 implies v3. Persists; ?v4=0 clears. */
  var V4=false;
  try{ var _v4=new URLSearchParams(location.search).get('v4'); if(_v4==='1')sessionStorage.setItem('v4','1'); else if(_v4==='0')sessionStorage.removeItem('v4'); V4=(sessionStorage.getItem('v4')==='1'); }catch(e){}
+ /* v5 structural-nav flag (?v5=1): the post-stakeholder-sync nav pass on TOP of v4. Parsed/persisted EXACTLY like
+    v4 so the current v4 build renders byte-identical without ?v5=1. V5 IMPLIES V4 (and therefore V3): when V5 is on
+    we also turn V4/V3 on and add body.v4, so every v4 flow (Members table, Teams grid, member/team detail, roles
+    matrix, modals) is present and the v5 deltas are pure transforms on top. Everything v5 adds is gated behind
+    body.v5 + the V5 flag and only runs from applyV5() / v5ApplyNav(), which run AFTER their v4 counterparts.
+    Persists across settings pages; ?v5=0 clears just v5 (leaving v4 intact as the reference build). */
+ var V5=false;
+ try{ var _v5=new URLSearchParams(location.search).get('v5'); if(_v5==='1')sessionStorage.setItem('v5','1'); else if(_v5==='0')sessionStorage.removeItem('v5'); V5=(sessionStorage.getItem('v5')==='1'); }catch(e){}
+ if(V5){ V4=true; try{ if(sessionStorage.getItem('v4')!=='1') sessionStorage.setItem('v4','1'); }catch(e){} }  /* v5 builds ON the v4 flows, so v5 implies v4 */
  if(V4){ V3=true; try{ if(sessionStorage.getItem('v3')!=='1') sessionStorage.setItem('v3','1'); }catch(e){} }  /* v4 inherits the v3 nav direction (section 0 is already in v3) */
  if(V3&&document.body)document.body.classList.add('v3');
  if(V4&&document.body)document.body.classList.add('v4');
+ if(V5&&document.body)document.body.classList.add('v5');
  if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
@@ -1013,6 +1051,46 @@
     denied items, and because v4ApplyNav rebuilds NAV from the seed on load, a role change reruns through v4RegateNav
     which rebuilds then re-gates. */
  function v4GateNav(){ if(!V4) return; NAV.forEach(function(g){ g.items=g.items.filter(function(it){ return !v4PageDenied(it.id); }); }); }
+ /* ===== v5 structural nav pass (post-stakeholder-sync). Runs AFTER v4ApplyNav() (v5 implies v4), mutating the SAME
+    runtime NAV array that v4ApplyNav already shaped, so it drives renderNav / renderStaticNav / the header search with
+    no change to the base nav data (var NAV), js_nav(), the static drawer HTML, or any non-v5 render. Gated on V5: with
+    no ?v5=1 this is a no-op and the nav is byte-identical to the v4 build. Two structural changes:
+      (T2) Bring back a Publishing section: pull Tags + Vanity URLs (the `vanity` leaf, "Link settings" in the base,
+           relabelled "Vanity URLs" by v4) OUT of Organization into a NEW "Publishing" group, so v5 nav order is
+           Account, Organization, Publishing, then the pinned Contact us. NOTE: the base + v4 nav only carry ONE link
+           leaf (id `vanity`); "Vanity URLs" and "Link settings" in the sync notes are the same leaf under its v4 vs
+           base label, so Publishing = [Vanity URLs, Tags]. No separate third leaf exists to move.
+      (T3) Combine Members + Teams into ONE "People" area: relabel the Members item to "People" and DROP the separate
+           Teams nav item. The People item keeps id `members` so it still highlights + routes to c-settings-members.html
+           (which applyV5 rebuilds into the combined Members/Teams page). Teams stays reachable via the in-page toggle
+           and via a team card -> team detail; it just loses its own nav entry.
+    LABEL NOTE (directional): "People" is provisional, and combining Members + Teams under one nav item is a direction
+    pending the design owner + research sign-off. Kept here as a v5-only transform so v4 (the reference) is untouched. ===== */
+ function v5FindItem(id){ for(var i=0;i<NAV.length;i++){ var g=NAV[i]; for(var j=0;j<g.items.length;j++){ if(g.items[j].id===id) return {g:g,it:g.items[j],j:j}; } } return null; }
+ function v5TakeItem(id){ var f=v5FindItem(id); if(!f) return null; f.g.items.splice(f.j,1); return f.it; }
+ function v5ApplyNav(){
+  if(!V5) return;
+  var byKey={}; NAV.forEach(function(g){ byKey[g.key]=g; });
+  var org=byKey['org']; if(!org) return;   /* defensive: only rewrites the settings nav, never a product sub-nav */
+  /* --- T3: People. Relabel Members -> People; drop the standalone Teams nav item (the combined page hosts both). --- */
+  var members=v5FindItem('members'); if(members) members.it.label='People';   /* provisional label, pending the design owner + research */
+  v5TakeItem('teams');   /* Teams loses its own nav entry under v5; still reached via the People toggle + team cards */
+  /* --- T2: Publishing. Pull Tags + Vanity URLs out of Organization into a new Publishing group. Preserve the v4
+     relative order (Vanity URLs before Tags, as v4ApplyNav slotted them). If role/plan gating already removed one of
+     them (e.g. Standard hides Vanity URLs), Publishing simply carries whatever remains; an empty group is hidden by
+     renderNav, same as every other group. --- */
+  var vanity=v5TakeItem('vanity');
+  var tags=v5TakeItem('tags');
+  var pubItems=[]; if(vanity) pubItems.push(vanity); if(tags) pubItems.push(tags);
+  /* --- Rebuild NAV order: Account, Organization, Publishing, then the pinned Contact us group last. v4ApplyNav left
+     NAV as [account, org, contactgrp]; splice Publishing in BEFORE contactgrp so Contact us stays pinned at the bottom
+     (its body.v4 separator CSS keys on data-grp="contactgrp", untouched). Only add Publishing if it has any items. --- */
+  var contactIdx=-1; for(var i=0;i<NAV.length;i++){ if(NAV[i].key==='contactgrp'){ contactIdx=i; break; } }
+  if(pubItems.length){
+   var pub={key:'publishing',label:'Publishing',collapsed:false,plan:null,items:pubItems};
+   if(contactIdx>=0) NAV.splice(contactIdx,0,pub); else NAV.push(pub);
+  }
+ }
  /* collapse module (Option A only) — isolated; remove this block + the isCollapsed/toggleCollapse uses to drop the feature.
     SNOWFLAKE: collapsible nav groups have no native Bento component (checked against NavDrawer, Accordion, Tree).
     Built on Bento tokens + APG disclosure a11y (button + aria-expanded) and FLAGGED — pending Giancarlo's pattern
@@ -1096,7 +1174,7 @@
  }
  /* On a v4 role change, rebuild NAV from the pristine seed then re-run the v4 shell so org-admin pages correctly
     reappear (leaving Member) or disappear (entering Member). No-op when not v4. */
- function v4RegateNav(){ if(!V4) return; try{ NAV.splice(0,NAV.length); JSON.parse(JSON.stringify(NAV_SEED)).forEach(function(g){ NAV.push(g); }); v3ApplyNav(); v4ApplyNav(); }catch(e){} }
+ function v4RegateNav(){ if(!V4) return; try{ NAV.splice(0,NAV.length); JSON.parse(JSON.stringify(NAV_SEED)).forEach(function(g){ NAV.push(g); }); v3ApplyNav(); v4ApplyNav(); v5ApplyNav(); }catch(e){} }
  function setPlan(p){ PLAN=p; try{sessionStorage.setItem('navPlan',p);}catch(e){} syncControls(); renderNav(); }
  function setPop(m){ POPMODE=m; try{sessionStorage.setItem('popMode',m);}catch(e){} syncControls(); }   /* A/B test: switch avatar-menu variant (explicit vs simplified) */
  function setQuery(v){ QUERY=(v||'').trim().toLowerCase(); renderNav(); }   /* drawer search: filters the left nav (Option A, and Option B mobile fallback) */
@@ -2264,8 +2342,11 @@
  }
 
  /* ================= Section 5: Teams page (card grid) ================= */
- function v4Teams(pc){
-  if(!v4IsPage('Teams')) return;                                /* only the real Teams page (active='teams' is shared) */
+ function v4Teams(pc,hosted){
+  /* `hosted` (v5 only): when the combined People page hosts the Teams grid inside its own panel, the caller passes a
+     scoped `pc` (the teams panel) + hosted=true, so we skip the topbar-title page-guard (title reads "People", not
+     "Teams") and trust the caller's scope. Absent/false = the untouched v4 path (real Teams page, guarded by title). */
+  if(!hosted && !v4IsPage('Teams')) return;                     /* only the real Teams page (active='teams' is shared) */
   if(document.getElementById('v4TeamGrid')) return;
   var tbl=pc.querySelector('.set-card > table.hs-table'); if(!tbl) return;
   var wrap=tbl.closest('.set-card'); if(!wrap) return;
@@ -3863,6 +3944,234 @@
    else if(PAGE_ID==='notifs'){ v4Notifications(pc); }
   }catch(e){}
  }
+ /* ===== v5 page-level pass (post-stakeholder-sync). Runs AFTER applyV4() (v5 implies v4), so v4 has already rendered
+    every page. All v5 page changes live here, gated on V5, and are pure transforms on the v4-rendered DOM. Two things:
+      (T3) The combined People page: on the Members page, host BOTH the v4 Members view and the v4 Teams card-grid under
+           one page, with a Bento ToggleGroup (Members / Teams) at the top switching between them in place (default
+           Members). Reuses the shipped renderers: the v4 Members block (already rendered by applyV4) is wrapped into a
+           Members panel; the Teams grid is produced by calling the SAME v4Teams() renderer against a scoped Teams-panel
+           host (hosted=true). The single-layer member + team detail pages are untouched (v4MemberDetail / v4TeamDetail
+           still own c-org-member.html / c-org-team.html); a member row still opens member detail, a team card still
+           opens team detail, and their back-arrow returns to this People view (c-settings-members.html / c-org-teams).
+      (T4) Remove Sync profiles: strip the "Sync profiles" capability row from the roles matrix (Hill scrapped it). Done
+           on the v4-rendered matrix, v5-gated, so v4 keeps the row. Other stubbed cells are left as-is.
+    LABEL / DIRECTION NOTE: "People" is provisional and the Members+Teams combine is directional, pending the design
+    owner + research. Kept as a v5-only transform so the v4 reference build is untouched. ===== */
+ function applyV5(){
+  if(!V5) return;
+  try{ if(PAGE_ID==='members' && v4IsPage('Members')) v5People(); }catch(e){}            /* combined People page: real Members host only (title still reads Members here; v5People relabels it to People) */
+  try{ if(PAGE_ID==='roles' && v4IsPage('Roles & permissions')){ v5StripSyncProfiles(); v5RolesReframe(); } }catch(e){}   /* T4: drop the Sync profiles matrix row; v5b: reframe the page toward management with the matrix as reference (real Roles page only) */
+  try{ if(PAGE_ID==='teamdetail'){ v5FixTeamDetailBack(); v5TeamDetailHierarchy(); } }catch(e){}   /* back-arrow -> People view (Teams); v5b: show admins-above-members role hierarchy */
+  try{ if(PAGE_ID==='contact' && v4IsPage('Contact us')) v5Contact(); }catch(e){}         /* v5b: Contact us becomes a light in-product links page (drops the v4 form) */
+ }
+ /* ================= v5b CHANGE 1: Contact us as a light in-product LINKS page =================
+    Under v5, Contact us stops being the v4 thin support form and becomes a short, self-serve links page: an intro
+    line plus a Bento list-card of outbound resources, each opening in a new tab (target=_blank rel=noopener). This
+    runs from applyV5() AFTER applyV4() has already rendered the v4 form, so it replaces that form entirely; the v4
+    form stays intact under ?v4=1 (v4Contact is untouched). v5-gated, so base (v3) + v4 output stay byte-identical.
+    PROVISIONAL: pending Hill + Anne Kavanagh confirming (1) whether Contact us is a light in-product page (this)
+    versus routing straight to the Help Center with NO in-product page at all, and (2) whether "Contact support"
+    should offer more than a chatbot (for example a sales path). Neither is resolved here; we render the light links
+    version only. Shipped Bento: .set-card / .pad list rows (.between look), .material-symbols-outlined, links.
+    NOTE: five resources are shown. "Message us on X" and "Share feedback" are outbound social/feedback pointers, not
+    invented in-product surfaces, so no new Bento surface is fabricated. */
+ function v5Contact(){
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  if(document.getElementById('v5Contact')) return;                        /* idempotent */
+  /* Resource list: [icon, label, one-line description, href]. All external; all open in a new tab. */
+  var links=[
+   ['help','Help Center','Search guides and answers for every part of Hootsuite.','https://help.hootsuite.com/'],
+   ['school','Hootsuite Academy','Free courses and certifications for social marketing.','https://education.hootsuite.com/'],
+   ['support_agent','Contact support','Chat with our support team about your account.','https://help.hootsuite.com/hc/en-us/requests/new'],
+   ['forum','Message us on X','Reach @Hootsuite_Help on X for a quick question.','https://x.com/Hootsuite_Help'],
+   ['rate_review','Share feedback','Tell us what to build or fix next.','https://feedback.hootsuite.com/']
+  ];
+  var host=v4El('<div id="v5Contact"></div>');
+  host.appendChild(v4El('<p class="set-sub" style="margin:0 0 16px">Find an answer, learn something new, or reach our team. These links open in a new tab.</p>'));
+  var card=v4El('<div class="set-card"><div class="pad" id="v5ContactList" style="padding-top:6px;padding-bottom:6px"></div></div>');
+  var list=card.querySelector('#v5ContactList');
+  links.forEach(function(l,i){
+   /* Each row is a whole-row link (Bento .between layout): leading icon, label + description, trailing open_in_new.
+      target=_blank + rel=noopener per spec. The trailing glyph reinforces "opens in a new tab" beyond colour. */
+   list.appendChild(v4El('<a class="between v5-link-row" href="'+l[3]+'" target="_blank" rel="noopener"'+(i===0?' style="padding-top:0"':'')+'>'
+    +'<span class="rowflex" style="gap:12px;align-items:flex-start">'
+    +'<span class="v4-acct-ic" aria-hidden="true"><span class="material-symbols-outlined">'+l[0]+'</span></span>'
+    +'<span><span style="display:block;font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base)">'+gsEsc(l[1])+'</span>'
+    +'<span class="secd" style="display:block;margin:0">'+gsEsc(l[2])+'</span></span></span>'
+    +'<span class="material-symbols-outlined" aria-label="opens in a new tab" title="Opens in a new tab" style="color:var(--bento-theme-color-icon-subtle)">open_in_new</span></a>'));
+  });
+  host.appendChild(card);
+  pc.innerHTML=''; pc.appendChild(host);
+  initControlA11y(pc);
+ }
+ /* Under v5 the standalone Teams page is folded into People, so a team-detail back-arrow must return to the People
+    view (c-settings-members.html) with the Teams toggle pre-selected, not to the now-hidden c-org-teams.html. Member
+    detail already points at c-settings-members.html (the People host, default Members view), so it needs no change. */
+ function v5FixTeamDetailBack(){
+  var back=document.querySelector('.suite-topbar a[aria-label="Back"]'); if(!back) return;
+  var href=back.getAttribute('href')||'';
+  if(href.indexOf('c-org-teams.html')!==-1){ back.setAttribute('href','c-settings-members.html?peopletab=teams'); }
+ }
+ /* ================= v5b CHANGE 2: team detail role hierarchy (admins above members) =================
+    Under v5, make the team's role hierarchy visually obvious: split the flat v4 members list into two grouped
+    sections, "Admins" first then "Members", each with a small heading + count, so team admins are clearly
+    distinguished from and ordered above team members. Layered on top of v4TeamDetail (which already rendered the
+    flat list into #v4Td-mem): we recompute the same rows from the canonical arrays, bucket by team role, and
+    re-render just the members panel body. v5-gated, so the v4 team detail stays a single flat list under ?v4=1.
+    Kept scannable as sections of cards (not a dense table). Admin vs member reads without colour: an "Admin" info
+    badge + a person_add-off icon heading vs a neutral "Member" badge. Reuses the shipped v4TeamMembers() derivation
+    and the SAME role-in-team rule v4 uses (V4_MEMBERS[].team[].role, else org-role -> Team Admin / Team Member).
+    NOTE: the FINAL layout (grouped sections vs a denser treatment, and whether to page/virtualize) waits on Maria's
+    research into real team sizes; this grouped-sections version is the provisional v5 take. Idempotent. */
+ function v5TeamDetailHierarchy(){
+  var panel=document.getElementById('v4Td-mem'); if(!panel) return;               /* v4 members panel not rendered yet */
+  if(panel.getAttribute('data-v5hier')==='1') return;                             /* already regrouped */
+  var qs=new URLSearchParams(location.search); var name=qs.get('t')||'Growth Team';
+  var t=(typeof v4TeamByName==='function'&&v4TeamByName(name))||V4_TEAMS[0]; if(!t) return;
+  var mem=v4TeamMembers(t.name);
+  if(!mem.length) return;                                                         /* empty-state copy from v4 stands; nothing to group */
+  /* Compute each member's role-in-team exactly as v4TeamDetail does, then split admins vs members. */
+  function roleInTeam(m){ var tm=null; m.team.forEach(function(a){ if(a.team===t.name) tm=a; }); return (tm&&tm.role)?tm.role:(/admin/i.test(m.role)?'Team Admin':'Team Member'); }
+  var admins=[], members=[];
+  mem.forEach(function(m){ var r=roleInTeam(m); (/admin/i.test(r)?admins:members).push({m:m,role:r}); });
+  /* One member row, matching the v4 row markup so nothing else about the row changes (avatar, name, email, role
+     badge, Open link); admins get the info badge, members the neutral badge so the split reads without colour. */
+  function rowHtml(e){
+   var isAdmin=/admin/i.test(e.role);
+   var badge='<span class="hs-badge '+(isAdmin?'hs-badge--info':'hs-badge--neutral')+'" title="Role on this team">'+gsEsc(e.role)+'</span>';
+   return '<div class="between"><div class="rowflex" style="gap:12px"><span class="mini-av">'+gsEsc(e.m.ini)+'</span><div><div style="font:var(--hs-type-body-md-b)">'+gsEsc(e.m.name)+'</div><div class="secd" style="margin:0">'+gsEsc(e.m.email)+'</div></div></div><div class="rowflex" style="gap:10px">'+badge+'<a class="hs-btn hs-btn--ghost hs-btn--sm" href="c-org-member.html?m='+encodeURIComponent(e.m.name)+'">Open</a></div></div>';
+  }
+  /* One grouped section: heading (icon + label + count) then its rows. Admins render first (and only if any). */
+  function group(icon,label,list){
+   if(!list.length) return '';
+   var rows=list.map(rowHtml).join('');
+   return '<div class="v5-role-grp"><div class="v5-role-ghead"><span class="material-symbols-outlined" aria-hidden="true">'+icon+'</span>'+gsEsc(label)+' <span class="v5-role-count">'+list.length+'</span></div>'+rows+'</div>';
+  }
+  var foot='<p class="secd" style="margin:12px 0 0">Admins can manage this team\u2019s people and accounts. Everyone keeps their own organization role; the badge is their role on this team.</p>';
+  panel.innerHTML='<div class="set-card"><div class="pad"><div class="between" style="padding-top:0"><h3 class="sec" style="margin:0">People on this team</h3>'
+   +'<button class="hs-btn hs-btn--secondary hs-btn--sm" type="button" onclick="v4OpenInvite(\''+gsEsc(t.name)+'\')"><span class="material-symbols-outlined" style="font-size:18px">person_add</span>Add people</button></div>'
+   +group('shield_person','Admins',admins)+group('group','Members',members)+foot+'</div></div>';
+  panel.setAttribute('data-v5hier','1');
+  initControlA11y(panel);
+ }
+ /* T3 combined People page. v4Members renders on a 650ms skeleton on first view, so poll for its content (#v4MbrTabs)
+    before wrapping; on a repeat view it is instant. Idempotent via #v5PeopleToggle. */
+ var _v5PeopleTries=0;
+ function v5People(){
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  if(document.getElementById('v5PeopleToggle')) return;                 /* already built */
+  var mbrBlock=document.getElementById('v4MbrTabs');                    /* the v4 members experience (tabs + panels) */
+  if(!mbrBlock){                                                        /* members render not finished (skeleton), retry */
+   if(_v5PeopleTries++>40) return;                                      /* ceiling ~3.3s; then give up quietly */
+   setTimeout(v5People, 80); return;
+  }
+  /* Relabel the page title band Members -> People (topbar .tb-title). Safe: every v4IsPage('Members') check either
+     requires !V4 (never under v5) or already ran during applyV4 before this relabel. "People" is provisional. */
+  var tb=document.querySelector('.suite-topbar .tb-title'); if(tb && tb.textContent.trim()==='Members') tb.textContent='People';
+  /* The v4 members block spans #v4MbrHead (subtitle + Invite) + #v4MbrTabs + the two #v4MbrPanel-* panels. Wrap them
+     into a Members panel; leave any modals v4 appended to pc (invite / offboard overlays) at page level. */
+  var head=document.getElementById('v4MbrHead');
+  var mp=document.getElementById('v4MbrPanel-members');
+  var pp=document.getElementById('v4MbrPanel-pending');
+  var anchor=head||mbrBlock;                                           /* insert the toggle + panels where the block starts */
+  var mbrPanel=v4El('<div id="v5Panel-members" role="tabpanel" aria-labelledby="v5PeopleTab-members"></div>');
+  var teamsPanel=v4El('<div id="v5Panel-teams" role="tabpanel" aria-labelledby="v5PeopleTab-teams" hidden></div>');
+  /* Bento ToggleGroup (segmented control), preview/toggle-group.html: .tg role=radiogroup / .ti role=radio, selected
+     shows a leading check + a 2px selected border. Its CSS is not in the shipped components.css (preview-harness only),
+     so it is ported into a body.v5-scoped block below and LOGGED in GAP-BACKLOG.md. Two options: Members / Teams. */
+  var toggle=v4El('<div class="v5-people-switch" id="v5PeopleToggle"><div class="tg" role="radiogroup" aria-label="Switch between people and teams">'
+   +'<button class="ti selected" type="button" role="radio" aria-checked="true" id="v5PeopleTab-members" onclick="v5PeopleTab(\'members\')"><span class="material-symbols-outlined check" aria-hidden="true">check</span><span class="material-symbols-outlined lead" aria-hidden="true">group</span>Members</button>'
+   +'<button class="ti" type="button" role="radio" aria-checked="false" id="v5PeopleTab-teams" onclick="v5PeopleTab(\'teams\')"><span class="material-symbols-outlined check" aria-hidden="true">check</span><span class="material-symbols-outlined lead" aria-hidden="true">groups</span>Teams</button>'
+   +'</div></div>');
+  anchor.parentNode.insertBefore(toggle, anchor);
+  toggle.parentNode.insertBefore(mbrPanel, toggle.nextSibling);
+  mbrPanel.parentNode.insertBefore(teamsPanel, mbrPanel.nextSibling);
+  /* Move the v4 members block into the Members panel (order preserved). */
+  if(head) mbrPanel.appendChild(head);
+  mbrPanel.appendChild(mbrBlock);
+  if(mp) mbrPanel.appendChild(mp);
+  if(pp) mbrPanel.appendChild(pp);
+  /* Build the Teams host with the EXACT base markup v4Teams consumes (a .set-sub, a .csearch-row with a primary
+     button, and a .set-card > table.hs-table), then run the shipped v4Teams renderer against this scoped panel
+     (hosted=true bypasses only its topbar-title page-guard; all its content queries are already pc-scoped). */
+  teamsPanel.innerHTML='<p class="set-sub" style="margin-top:0"></p>'
+   +'<div class="rowflex csearch-row" style="justify-content:space-between;margin-bottom:16px">'
+   +'<div class="hs-input affix csearch" style="max-width:320px"><span class="material-symbols-outlined lead">search</span><input placeholder="Search teams\u2026" oninput="filterContent(this.value)" aria-label="Search teams"></div>'
+   +'<button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">add</span>Create team</button></div>'
+   +'<div class="set-card"><table class="hs-table"><thead><tr><th>Team</th><th>Created</th><th>Members</th><th>Accounts</th><th></th></tr></thead><tbody></tbody></table></div>';
+  try{ v4Teams(teamsPanel, true); }catch(e){}
+  /* Default view = Members, unless arriving from a team-detail back-arrow (?peopletab=teams), which opens on Teams. */
+  try{ var _pt=new URLSearchParams(location.search).get('peopletab'); if(_pt==='teams') v5PeopleTab('teams'); }catch(e){}
+ }
+ /* Toggle the People view between the Members panel and the Teams panel (APG radiogroup: aria-checked + selected). */
+ function v5PeopleTab(view){
+  var mp=document.getElementById('v5Panel-members'), tp=document.getElementById('v5Panel-teams');
+  if(!mp||!tp) return;
+  var isTeams=(view==='teams');
+  mp.hidden=isTeams; tp.hidden=!isTeams;
+  var bm=document.getElementById('v5PeopleTab-members'), bt=document.getElementById('v5PeopleTab-teams');
+  /* the .selected class drives both the pill fill/border and the check-glyph visibility (CSS: .ti:not(.selected) .check{display:none}) */
+  if(bm){ bm.classList.toggle('selected',!isTeams); bm.setAttribute('aria-checked', String(!isTeams)); }
+  if(bt){ bt.classList.toggle('selected',isTeams); bt.setAttribute('aria-checked', String(isTeams)); }
+ }
+ /* T4: remove the "Sync profiles" row from the rendered roles matrix (Hill scrapped the capability). v5-gated, done
+    on the DOM the v4 matrix produced, so V4_MATRIX (and the v4 build) keep the row. Idempotent. The other stubbed
+    ("eng confirm") rows are left exactly as they are. */
+ function v5StripSyncProfiles(){
+  var tbl=document.getElementById('v4Matrix'); if(!tbl){ if((window._v5MtxTries=(window._v5MtxTries||0)+1)>40) return; setTimeout(v5StripSyncProfiles,80); return; }
+  var tb=tbl.querySelector('tbody'); if(!tb) return;
+  Array.prototype.forEach.call(tb.querySelectorAll('tr'),function(tr){
+   var cap=tr.querySelector('td.v4-cap'); if(cap && cap.textContent.trim()==='Sync profiles'){ tr.parentNode.removeChild(tr); }
+  });
+ }
+ /* ================= v5b CHANGE 3: Roles & permissions reframe (management-led, matrix as reference) =================
+    Per the Hill sync: the standalone Roles & permissions page should NOT read as a pure read-only dictionary. Role
+    understanding belongs at the point of action (the invite, where role descriptors already live from v4), and the
+    full reference lives in the Help Center. So under v5 we reframe this page to LEAD with the management framing
+    (managing roles, especially custom roles), keeping the capability matrix as SUPPORTING reference below. Layered on
+    top of v4Roles (which already built #v4MatrixCard + gated the "Create custom role" header button via
+    v4WireCreateCustomRole): we (1) rewrite the page subtitle toward management, (2) insert a management intro card
+    ABOVE the matrix, and (3) retune the matrix card's own lead so it reads as the reference table, with a helper line
+    noting each role is also explained where you assign it (the invite) and that the full role reference lives in the
+    Help Center. The matrix is NOT removed; the 7 contested cells stay "eng confirm" (held gate b, untouched here);
+    custom-role create/edit stays gated to Business/Enterprise (v4WireCreateCustomRole owns that gate, untouched).
+    v5-gated, so the v4 Roles page (dictionary-led) is unchanged under ?v4=1.
+    NOTE: this reframe is DIRECTIONAL pending the product/design lead sign-off. Idempotent via #v5RolesLead. */
+ function v5RolesReframe(){
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  if(document.getElementById('v5RolesLead')) return;                       /* already reframed */
+  var card=document.getElementById('v4MatrixCard');
+  if(!card){ if((window._v5RolesTries=(window._v5RolesTries||0)+1)>40) return; setTimeout(v5RolesReframe,80); return; }  /* wait for the v4 matrix */
+  /* (1) Subtitle: from "the dictionary" toward managing roles. */
+  var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='Manage the roles people can hold, and create custom roles for your organization. Each role is also explained where you assign it, and the full reference is in the <a href="https://help.hootsuite.com/" target="_blank" rel="noopener">Help Center</a> (opens in a new tab).';
+  var unlocked=(typeof v4CustomRolesUnlocked==='function')?v4CustomRolesUnlocked():false;
+  /* (2) Management intro card, inserted ABOVE the matrix. Leads with managing roles (custom roles especially). The
+     primary action here mirrors the header "Create custom role" gate: when unlocked it opens the same prototype
+     create modal (v4OpenCreateCustomRole); when gated it points at the upgrade path (v4CustomUpsell), never hidden. */
+  var actionBtn=unlocked
+   ? '<button class="hs-btn hs-btn--primary" type="button" onclick="v4OpenCreateCustomRole()"><span class="material-symbols-outlined">add</span>Create custom role</button>'
+   : '<button class="hs-btn hs-btn--primary is-locked" type="button" aria-disabled="true" title="Custom roles are on Business and Enterprise plans" aria-label="Create custom role (Business and Enterprise plans)" onclick="v4CustomUpsell();return false"><span class="material-symbols-outlined">add</span>Create custom role</button>';
+  var planLine=unlocked
+   ? '<p class="secd" style="margin:10px 0 0">Predefined roles cover most needs. Create a custom role when you need a specific bundle of capabilities, then assign it from the invite like any other role.</p>'
+   : '<p class="secd" style="margin:10px 0 0"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px">workspace_premium</span> Custom roles are a Business and Enterprise feature. <a href="#" onclick="return v4CustomUpsell()">See plans</a> to add your own roles.</p>';
+  var lead=v4El('<div class="set-card" id="v5RolesLead"><div class="pad">'
+   +'<h3 class="sec" style="margin:0 0 4px">Manage roles</h3>'
+   +'<p class="secd" style="margin:0">Roles decide what people can do across your organization. Assign a role to a person from the <a href="c-settings-members.html">People</a> area, where the invite explains each one as you pick it. To change what a single person can access, open them in People and use their Permissions tab.</p>'
+   +'<div class="rowflex" style="gap:12px;align-items:center;margin-top:14px">'+actionBtn
+   +'<span class="secd" style="margin:0">Custom roles let you bundle capabilities for your team.</span></div>'
+   +planLine+'</div></div>');
+  card.parentNode.insertBefore(lead, card);
+  /* (3) Retune the matrix card lead so it reads as the SUPPORTING reference (not the primary "dictionary" framing),
+     and add the helper line: role explained at the invite + full reference in the Help Center. Kept minimal; the
+     matrix table, its contested "eng confirm" cells, and the contested-cells warning alert below are untouched. */
+  var mtxLead=card.querySelector('.pad .sec');
+  if(mtxLead){
+   mtxLead.textContent='Capability reference';
+   var p=mtxLead.parentNode.querySelector('p.secd');
+   if(p) p.innerHTML='For reference: what each role can do across Somos. Each role is also explained where you assign it (the invite), and the full role reference lives in the <a href="https://help.hootsuite.com/" target="_blank" rel="noopener">Help Center</a> (opens in a new tab). To change what <b>one person</b> can access, open them in <a href="c-settings-members.html">People</a> and use their Permissions tab. Rows marked <b>eng confirm</b> are still being resolved and are not final.';
+  }
+  initControlA11y(lead);
+ }
  function applyV3(){
   if(!V3) return;
   try{ v3Flyout(); }catch(e){}
@@ -3872,6 +4181,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
