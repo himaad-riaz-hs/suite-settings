@@ -3299,11 +3299,53 @@
  }
  function v4CloseApprovers(){ var w=document.getElementById('v4ApprWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v4ApprKeydown); } if(_v4ApprLastFocus&&_v4ApprLastFocus.focus){ try{_v4ApprLastFocus.focus();}catch(e){} _v4ApprLastFocus=null; } }
  function v4GoApproverManagement(){ v4CloseApprovers(); showToast('Opening the existing approvals management. Prototype route into the approvals area.'); }
+ /* ================= Profile (v4 board-comment pass) =================
+    v4-gated (only runs from applyV4 under body.v4); non-v4 renders C['profile'] byte-identical (the v3 baseline).
+    Two SURGICAL transforms on the existing profile DOM (no full rebuild, so the edit modals + other cards stay as
+    built). Both are board feedback:
+      1. Preferences card (Layla Zonoozi): Time zone and Language render as a 2-column .grid2 in the v3 baseline,
+         which reads as if Language drives Time zone. Under v4 they become two SEPARATE STACKED ROWS by swapping the
+         shipped .grid2 for the shipped .stack layout (closest existing Bento pattern; no new component). Both fields
+         stay on Profile. Copy reworded so it no longer implies one setting sits under the other.
+      2. Delete-account discoverability (Hill + Layla): the v3 baseline puts a working destructive "Delete account"
+         button on Profile (opens the delete modal). The real destructive control lives in the Security & privacy
+         danger zone (v4Security), so under v4 we do NOT keep a second reachable delete here. We REPLACE that card's
+         body with a NON-destructive pointer (secondary text + an inline link to Security & privacy), mirroring the
+         shipped "your password lives on your <a>Profile</a>" inline-link pattern already in C['security']. This adds
+         the reviewer-requested pointer on Profile without moving or duplicating a destructive action. */
+ function v4Profile(pc){
+  if(!v4IsPage('Profile')) return;
+  if(pc.getAttribute('data-v4profile')) return; pc.setAttribute('data-v4profile','1');
+  /* 1. Stack the Time zone + Language fields (grid2 -> stack). Locate the exact grid by its known field labels. */
+  var tz=pc.querySelector('#tzLbl'); var grid=tz?tz.closest('.grid2'):null;
+  if(grid){
+   grid.classList.remove('grid2'); grid.classList.add('stack');
+   /* Reword the card copy so it no longer implies language sits under (is driven by) time zone. */
+   var prefCard=grid.closest('.set-card'); var lede=prefCard?prefCard.querySelector('.secd'):null;
+   if(lede) lede.textContent='Your time zone and language live here with the rest of your profile. Set each one on its own.';
+  }
+  /* 2. Replace the destructive Delete-account card with a non-destructive pointer to the Security danger zone. */
+  var cards=pc.querySelectorAll('.set-card'); var delCard=null;
+  Array.prototype.forEach.call(cards,function(card){
+   var lbl=card.querySelector('div[style*="body-md-b"]');
+   if(lbl && lbl.textContent.trim()==='Delete account') delCard=card;
+  });
+  if(delCard){
+   var pad=delCard.querySelector('.pad');
+   if(pad){
+    pad.innerHTML='';
+    pad.appendChild(v4El('<div><div style="font:var(--hs-type-body-md-b)">Delete account</div>'
+     +'<div class="secd" style="margin:2px 0 0">Looking to delete your account? Manage it in <a href="c-account-security.html">Security and privacy</a>.</div></div>'));
+   }
+  }
+ }
  /* ================= Billing & plan (ENTRY ONLY under v4) =================
     Spec: Billing is an entry point only. Reduce the page to ONE card that states the plan + a disabled/coming
     affordance. Do NOT build billing flows here. v4-gated (only runs from applyV4 under body.v4); non-v4 keeps the
     existing full billing page byte-identical. Seat count is DERIVED from the canonical dataset (v4Counts + V4_ORG),
-    never hardcoded. */
+    never hardcoded. A non-destructive delete-account POINTER (board feedback: Layla wanted delete discoverable near
+    Billing) is appended to the entry card, mirroring the same inline-link pattern used on Profile; the real
+    destructive control still lives only in the Security & privacy danger zone. */
  function v4Billing(pc){
   if(!v4IsPage('Billing & plan')) return;              /* the v4 nav relabels billing to "Billing & plan"; match that title */
   if(document.getElementById('v4Billing')) return;
@@ -3316,6 +3358,8 @@
    +'<div class="between"><div><div style="font:var(--hs-type-body-md-b)">Manage plan and payment</div>'
    +'<div class="secd" style="margin:0">Plan changes, seats, and invoices are handled by your organization owner and billing contact.</div></div>'
    +'<button class="hs-btn hs-btn--secondary" type="button" disabled aria-disabled="true" title="Coming soon">Coming soon</button></div>'
+   +'<div class="between"><div><div style="font:var(--hs-type-body-md-b)">Delete account</div>'
+   +'<div class="secd" style="margin:0">Looking to delete your account? Manage it in <a href="c-account-security.html">Security and privacy</a>.</div></div></div>'
    +'</div></div>'));
   host.appendChild(v4El('<div class="hs-alert hs-alert--info" style="margin:0"><span class="material-symbols-outlined">info</span>'
    +'<div>This is the entry point for billing. The full plan and payment tools open here in a later pass.</div></div>'));
@@ -3805,7 +3849,8 @@
   var pc=document.getElementById('pageContent'); if(!pc) return;
   if(v4PageDenied(PAGE_ID)){ try{ v4RenderUnauthorized(pc); }catch(e){} return; }   /* role-gated: stop before the real render */
   try{
-   if(PAGE_ID==='memberdetail'){ v4MemberDetail(pc); }
+   if(PAGE_ID==='profile'){ v4Profile(pc); }
+   else if(PAGE_ID==='memberdetail'){ v4MemberDetail(pc); }
    else if(PAGE_ID==='teamdetail'){ v4TeamDetail(pc); }
    else if(PAGE_ID==='members' && v3IsPage('Members')){ v4WithSkeleton(pc,'members',function(){ v4Members(pc); }); }
    else if(PAGE_ID==='teams'){ v4WithSkeleton(pc,'teams',function(){ v4Teams(pc); }); }
