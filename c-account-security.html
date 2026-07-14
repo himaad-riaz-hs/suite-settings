@@ -778,19 +778,24 @@
     Members/Teams object switch, so nothing bespoke is needed there; only bottom spacing is nudged so the tab strip
     sits above the panel like the other page headers. (The earlier v5a ToggleGroup .tg/.ti snowflake was dropped.) */
  body.v5 .v5-people-switch{margin:0 0 16px;}
- /* Members STATUS FILTER: an [Active | Pending] segmented control that lives INSIDE the members filter toolbar (with
-    the text filter, Role and Team). It is deliberately lighter than the top .hs-tabs so it reads as a filter, not a
-    second tab strip: a small grey-fill segmented pill on the canonical ToggleGroup tokens (--bento-component-toggle-
-    group-*), the selected segment carrying the surface fill + selected border. Sits at the trailing end of the
-    toolbar. Tokens only. */
- body.v5 .v5-status-seg{display:inline-flex;align-items:center;flex:none;margin-left:auto;padding:var(--bento-space-005,2px);gap:var(--bento-space-005,2px);background:var(--bento-component-toggle-group-fill,var(--bento-theme-color-bg-subtle));border-radius:var(--bento-component-toggle-group-radius);}
- body.v5 .v5-seg-btn{appearance:none;border:0;background:transparent;color:var(--bento-theme-color-text-subtle);border-radius:var(--bento-component-toggle-group-radius);min-height:var(--bento-component-toggle-group-min-touch,32px);padding:var(--bento-component-toggle-group-padding-y,6px) var(--bento-component-toggle-group-padding-x-text,12px);display:inline-flex;align-items:center;gap:6px;font:var(--hs-type-body-sm-b);cursor:pointer;white-space:nowrap;}
- body.v5 .v5-seg-btn:hover{background:var(--bento-component-toggle-group-fill-hovered);color:var(--bento-theme-color-text-base);}
- body.v5 .v5-seg-btn:active{background:var(--bento-component-toggle-group-fill-pressed);}
- body.v5 .v5-seg-btn:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:1px;}
- body.v5 .v5-seg-btn.is-on{background:var(--bento-component-toggle-group-selected-fill,var(--hs-surface));color:var(--bento-theme-color-text-base);box-shadow:inset 0 0 0 var(--bento-component-toggle-group-border-width-selected,1px) var(--bento-theme-color-border-selected);}
- body.v5 .v5-seg-ct{color:var(--bento-theme-color-text-subtle);font:var(--hs-type-body-sm);}
- body.v5 .v5-seg-btn.is-on .v5-seg-ct{color:var(--bento-theme-color-text-base);}
+ /* FIX 1b (v5, task 21): pin "Contact us" to the very bottom of the left nav, below everything else, the way Slack /
+    Notion / Linear pin a help/contact action. #navBody is a flex column (suite-drawer.css: .sd-body is flex + column +
+    overflow:auto), so margin-top:auto pushes the contactgrp to the bottom edge of the scrolling area: it reads as a
+    persistent bottom item when the group list is short, and still sits last (after the final group) when the list is
+    tall. The visual separation (top divider + breathing room) is the shipped body.v4 contactgrp rule already; this
+    v5 rule (emitted later, same specificity, so it wins under v5) only overrides its margin-top to auto. No new
+    component: the drawer footer-slot is still the logged gap, this is the flex composition on existing tokens. */
+ body.v5 .suite-drawer .sd-group[data-grp="contactgrp"]{margin-top:auto;padding-top:14px;}
+ /* FIX 2 (v5, task 23): the Org General visibility provisional note sits on its OWN row beneath the setting, set off
+    by a hairline so it reads as a note about the setting (held gate d), not part of the toggle row. Tokens only. */
+ body.v5 .v5-setting-note{margin-top:14px;padding-top:12px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ /* Members STATUS FILTER (A2 FIX GROUP 1 item 3): now the shipped Bento ChipFilter (.cf), identical to the Role/Team
+    filters, not a bespoke segmented control. It is #v5StatusChip, a .cf inside a .v4-fb-chip, so it inherits every
+    shipped chip style (grey resting, blue .cf.selected + .ct count when Pending is chosen, the .v4-fpop listbox
+    popover). It sits as the LEAD control in the toolbar (fb.insertBefore first child), so no margin-left:auto and no
+    empty gap in the Pending state. No bespoke chip CSS is needed; the only scoped rule keeps the Status chip from
+    growing (it shares .v4-filterbar .cf{flex:none}). The former .v5-status-seg / .v5-seg-* ToggleGroup rules were
+    removed with the bespoke control. */
  /* v5b CHANGE 1: Contact us links page. Whole-row links reuse the .between list-row look; add a hover fill + a
     real focus ring (tokens only) so each row reads as an interactive, keyboard-reachable link. */
  body.v5 .v5-link-row{text-decoration:none;border-radius:var(--bento-radius-sm,6px);}
@@ -828,13 +833,38 @@
  body.v5 .v5-people-panel .csearch-row{margin-bottom:0;}
  /* The members-table field hint sits directly under the flush table (its own small top gap, no card gap). */
  body.v5 .v5-people-panel .hs-field-hint{margin-top:12px;}
- /* Teams view lives on the SAME white surface, so the team cards would be white-on-white: keep the shipped
-    .v4-teamcard border (border-subtle) as the resting affordance that makes each card read on white, rather than
-    relying on the hover elevation/shadow alone. The card already carries that border; we only make sure the resting
-    border stays (never suppressed on the white surface) and keep the shipped grid. */
+ /* A2 FIX GROUP 2 item 2: team cards must read as proper Bento surfaces. On the standalone Teams page they sit on the
+    grey canvas; in the hosted People/Teams panel they sit on the white .v5-people-panel and were white-on-white with
+    only a faint border-subtle, so the card meta ("Growth Team" + counts) barely read. Give every v5 team card a
+    resting raised shadow (the SAME --bento-theme-elevation-shadow-raised the People panel uses) so each card lifts off
+    the surface behind it, and keep the shipped border-subtle. This is the "white card with border-subtle, like the
+    People panel treatment" the fix calls for. The shipped .v4-teamcard:hover elevation (overlay-bottom) still layers on
+    top as the hover affordance. v5-gated so the v4 team grid (flat cards) stays byte-identical. */
+ body.v5 .v4-teamcard{box-shadow:var(--bento-theme-elevation-shadow-raised);}
  body.v5 .v5-people-panel .v4-teamcard{border-color:var(--bento-theme-color-border-subtle);}
  /* The Teams panel's own top search row + Create team button are a flush section on the surface (no extra card). */
  body.v5 .v5-people-panel #v5Panel-teams > .csearch-row{margin-bottom:var(--bento-space-400,24px);}
+ /* A2 FIX GROUP 3: member-detail identity header. The header now sits in a white .set-card (#v5MdHeadCard) so it reads
+    on the grey canvas; the .v4-mdhead grid + its .pad wrapper handle padding. The Overview access sentence is merged
+    into the identity block under the name/meta as .v5-md-access: give it a little top gap and cap its measure so the
+    "what they can do" line reads as part of the identity, not a wall of text. Tokens only; v5-gated. */
+ body.v5 #v5MdHeadCard .v4-mdhead{margin:0;}
+ body.v5 .v4-mdid .v5-md-access{margin:8px 0 0;max-width:60ch;}
+ /* ===== B2 (v5, Hill Friday call): member/team/account relationship legibility on the Members row. DIRECTIONAL, pending
+    Maria's research (team/org sizes, what to surface). Reuses .v4-chip (team provenance pill) + .v4-acct-ic (account
+    network tile); the only new rules are v5-scoped layout + a table-appropriate tile size. Tokens only; v5-gated so the
+    v4 (and v3) members table stays byte-identical. ===== */
+ /* Both rewritten cells share a compact wrapping flex row so chips / tiles + count stay on one scannable line and wrap
+    gracefully if a person is on several teams. */
+ body.v5 #v5MembersTbl .v5-rel-cell,body.v5 #v4MembersTbl .v5-rel-cell{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+ /* Access via: the provenance lead word reads as a quiet label; the team chip carries the emphasis. Direct = no chip. */
+ body.v5 .v5-rel-via,body.v5 .v5-rel-direct{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ /* Owns: shrink the shipped account tile to a table-appropriate size (minor size tweak, not a structural fork), and
+    keep the count + overflow as quiet supporting text so the network glyphs lead. */
+ body.v5 .v5-owns .v4-acct-ic{width:24px;height:24px;border-radius:var(--bento-radius-sm,6px);}
+ body.v5 .v5-owns .v4-acct-ic .material-symbols-outlined{font-size:16px;}
+ body.v5 .v5-owns-count,body.v5 .v5-owns-more,body.v5 .v5-owns-none{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ body.v5 .v5-owns-count{margin-left:2px;}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -1110,6 +1140,10 @@
   /* --- T3: People. Relabel Members -> People; drop the standalone Teams nav item (the combined page hosts both). --- */
   var members=v5FindItem('members'); if(members) members.it.label='People';   /* provisional label, pending the design owner + research */
   v5TakeItem('teams');   /* Teams loses its own nav entry under v5; still reached via the People toggle + team cards */
+  /* --- TASK 22: Plan & billing. Relabel the Billing nav item to "Plan & billing" (the agreed v5 label); it stays
+     under the Account group (the v4 nav already moved it Org -> Account). Role/plan gating is UNCHANGED: the item keeps
+     its acc "HHRE", so it stays hidden from View only + Admin and visible to Super admin + Paying member. Label only. --- */
+  var v5bill=v5FindItem('billing'); if(v5bill) v5bill.it.label='Plan & billing';
   /* --- T2: Publishing. Pull Tags + Vanity URLs out of Organization into a new Publishing group. Preserve the v4
      relative order (Vanity URLs before Tags, as v4ApplyNav slotted them). If role/plan gating already removed one of
      them (e.g. Standard hides Vanity URLs), Publishing simply carries whatever remains; an empty group is hidden by
@@ -1162,6 +1196,12 @@
   var body=document.getElementById('navBody'); if(!body)return; body.innerHTML=''; navOverview(body);
   if(OPT==='b'){ renderStaticNav(body); return; }   /* Option B = flat, NON-collapsible list (and no search) */
   /* Option A = collapsible categorized groups + global search. A/B is a preference test: which nav do users like better? */
+  /* FIX 1a (v5, task 21): collapsible nav groups are not a real Bento pattern (already a logged gap). Under v5 the
+     Option A groups render FLAT/STATIC (same labelled-section markup as renderStaticNav: a plain .sd-group div, no
+     collapse/expand chevron, no toggle, items always shown). Global search is unaffected (it is driven by the OPT==='b'
+     nosearch body class, not by this render path). v5-gated only, so the v4 reference build (and the v3 baseline) keep
+     the collapsible behaviour unchanged. */
+  if(V5){ renderStaticNav(body); return; }
   NAV.forEach(function(g){
    var vis=groupVisible(g);
    if(!vis.length) return;                       /* role-adaptive: hide group header when empty */
@@ -4000,8 +4040,157 @@
   try{ if(PAGE_ID==='members' && v4IsPage('Members')) v5People(); }catch(e){}            /* combined People page: real Members host only (title still reads Members here; v5People relabels it to People) */
   try{ if(PAGE_ID==='roles' && v4IsPage('Roles & permissions')){ v5StripSyncProfiles(); v5RolesReframe(); } }catch(e){}   /* T4: drop the Sync profiles matrix row; v5b: reframe the page toward management with the matrix as reference (real Roles page only) */
   try{ if(PAGE_ID==='teamdetail'){ v5FixTeamDetailBack(); v5TeamDetailHierarchy(); } }catch(e){}   /* back-arrow -> People view (Teams); v5b: show admins-above-members role hierarchy */
+  try{ if(PAGE_ID==='memberdetail'){ v5MemberDetail(); } }catch(e){}                     /* A2 FIX GROUP 3: drop in-body back arrow, put the identity header on a surface, merge the access sentence into the header */
   try{ if(PAGE_ID==='contact' && v4IsPage('Contact us')) v5Contact(); }catch(e){}         /* v5b: Contact us becomes a light in-product links page (drops the v4 form) */
+  try{ if(v4IsPage('General')) v5OrgGeneral(); }catch(e){}                                  /* FIX 2 (task 23): reframe the Org General visibility control as a clearly-scoped RESTRICT setting + render the provisional marker cleanly */
+  try{ if(PAGE_ID==='billing' && v4IsPage('Billing & plan')) v5Billing(); }catch(e){}       /* TASK 22: replace the v4 entry-only stub with the real Plan & billing card page (role-gated at the nav via acc HHRE) */
  }
+ /* ================= FIX 2 (v5, task 23): Org General visibility = a clearly-scoped RESTRICT control =================
+    The v4 visibility card reads like a global on/off for the whole org and crams the provisional marker into the
+    control's label column, so it looks broken. Under v5 only, reframe the SAME shipped .hs-toggle (a single
+    independent on/off is a toggle per Bento convention) so it is unambiguous that turning it ON *restricts* who can
+    see the organization (label + helper text say what it restricts), and render the held-gate-d provisional marker
+    cleanly: the amber .hs-badge--warning + a short helper line on its OWN row beneath the setting (separated by a
+    hairline), not inline in the control row. This runs from applyV5() AFTER applyV4() rendered the v4 General page, so
+    it rewrites just the visibility card in place; the v4 reference build (and v3) keep the v4 card unchanged.
+    HELD GATE d STANDS: the exact visibility options + default are still unconfirmed pending the field walk. We only
+    present the provisional state cleanly; we do NOT resolve it and do NOT invent the real product options. Reuses the
+    already-logged v4Provisional helper (amber warning badge, colour never alone) and shipped .set-card/.between/.hs-toggle. */
+ function v5OrgGeneral(){
+  var host=document.getElementById('v4OrgGen'); if(!host) return;             /* v4 General page not rendered */
+  if(host.getAttribute('data-v5vis')==='1') return;                           /* idempotent */
+  /* Find the visibility card by its provisional marker (unique to this card on this page), then walk to its .set-card. */
+  var marker=host.querySelector('.v4-provisional'); if(!marker) return;
+  var card=marker.closest('.set-card'); if(!card) return;
+  var pad=card.querySelector('.pad'); if(!pad) return;
+  var visOn=/only|member|admin/i.test(V4_ORG.visibility);                     /* same placeholder seed as v4 */
+  /* Rebuild the card body: scoped intro, a single RESTRICT toggle row (label + helper that state what ON restricts),
+     then the provisional note on its own separated row. Label + helper make the restrict scope unambiguous. */
+  pad.innerHTML=''
+   +'<h3 class="sec" style="margin:0 0 4px">Visibility</h3>'
+   +'<p class="secd" style="margin:0 0 12px">Who can find '+gsEsc(V4_ORG.name)+' when switching organizations. This does not change what members can do inside it.</p>'
+   +'<div class="between" style="padding-top:0;align-items:flex-start">'
+   +'<div style="max-width:520px"><div style="font:var(--hs-type-body-md-b)">Restrict who can see this organization</div>'
+   +'<div class="secd" style="margin:2px 0 0">When on, only people who are already in '+gsEsc(V4_ORG.name)+' can find it in an organization switcher. When off, it can also appear to others who are not members yet.</div></div>'
+   +'<label class="rowflex" style="cursor:pointer;flex:none"><span class="hs-toggle'+(visOn?' is-on':'')+'" role="switch" tabindex="0" aria-checked="'+(visOn?'true':'false')+'" aria-label="Restrict who can see this organization"></span></label></div>'
+   +'<div class="v5-setting-note">'+v4Provisional('the exact visibility options and their default are unconfirmed')+'</div>';
+  host.setAttribute('data-v5vis','1');
+  initControlA11y(card);
+ }
+ /* ================= TASK 22 (v5): Plan & billing page =================
+    Replaces the v4 entry-only Billing stub with a real, slim Plan & billing page built from OUR v5 CARD pattern
+    (Bento .set-card sections), NOT an accordion, for consistency with the other Account pages. Runs from applyV5()
+    AFTER applyV4() rendered the v4 stub, so it replaces that stub entirely; ?v4=1 keeps v4Billing untouched and the
+    v3 baseline (full C['billing'] org page) stays byte-identical. v5-gated only.
+    ROLE GATING: reuses the EXISTING gate (the nav item's acc "HHRE" already hides Billing from View only + Admin and
+    shows it to Super admin + Paying member, and v5ApplyNav only relabels it to "Plan & billing"). "Admin sees no
+    Billing" is therefore enforced at the nav exactly as before; this page adds no new gate. 'billing' is not in
+    V4_ORG_ADMIN_PAGES, so the Paying Member (the billing role) is NOT blocked from the body.
+    CONTENT maps to Layla's mockup (Figma "Editing pattern", node 29-24479): four sections -> Billing details
+    (billing cycle + payment method + Update information, with a compact prototype add/update-card form), Billing
+    history (Bento empty state), Manage subscription (plan + price + status + renews + Update / Cancel), and Delete
+    account (a POINTER to Security & privacy, not a second destructive control).
+    DELETE-ACCOUNT DECISION: the real destructive Delete account stays ONLY in Security & privacy (the established v5
+    pattern). Here we render the same non-destructive inline pointer used on Profile + the old v4 billing stub, so
+    delete stays discoverable without duplicating a destructive action.
+    Shipped Bento only: .set-card / .pad / .between / .sec / .secd / .stack, .hs-btn*, .hs-badge*, .hs-field / .hs-input
+    / .hs-select / .hs-radio, .hs-alert, .material-symbols-outlined. The Annual/Monthly + card/PayPal CHOICE TILES in
+    Layla's mockup use Bento ButtonChoice (.bc), whose class CSS is preview-only (not in the shipped components.css),
+    the same unbundled-class situation as the ToggleGroup gap, so the edit form uses the shipped .hs-radio option rows +
+    .hs-field inputs instead (our established edit-form idiom); the ButtonChoice divergence is logged in GAP-BACKLOG.
+    PROTOTYPE only, no persistence: every action shows a "prototype, nothing is saved" toast. */
+ function v5Billing(){
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  if(document.getElementById('v5Billing')) return;                          /* idempotent */
+  /* Retitle the page band + head to "Plan & billing" (v5 label). The baked topbar title is the v4 "Billing & plan";
+     v5ApplyNav relabels the NAV item, so match the page title to it. v4IsPage('Billing & plan') already gated us in. */
+  var tb=document.querySelector('.suite-topbar .tb-title'); if(tb) tb.textContent='Plan & billing';
+  /* Prototype seed values (no real PII / no email): plan + payment method are display-only placeholders. */
+  var planName='Advanced plan', planPrice='$2,988 / year', renews='March 1, 2027', card='Visa ending in 4488';
+  var host=v4El('<div id="v5Billing"></div>');
+  host.appendChild(v4El('<p class="set-sub" style="margin:0 0 20px">Your billing details, invoices, and subscription.</p>'));
+
+  /* ---- Section 1: Billing details (payment) ---- */
+  var s1=v4El('<div class="set-card"><div class="pad">'
+   +'<div class="rowflex" style="gap:10px;margin:0 0 16px"><span class="material-symbols-outlined" aria-hidden="true" style="color:var(--bento-theme-color-icon-subtle)">credit_card</span><h3 class="sec" style="margin:0">Billing details</h3></div>'
+   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b)">Billing cycle</div><div class="secd" style="margin:2px 0 0">Annually</div></div>'
+   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b)">Payment method</div><div class="secd" style="margin:2px 0 0">'+gsEsc(card)+'</div></div>'
+   +'<button class="hs-btn hs-btn--outlined" type="button" id="v5BillEditBtn" aria-expanded="false" aria-controls="v5BillEdit" onclick="v5BillToggleEdit()">Update information</button>'
+   +'</div></div>');
+  s1.querySelector('.pad').appendChild(v5BillEditForm());   /* compact add/update-card form, hidden until "Update information" */
+  host.appendChild(s1);
+
+  /* ---- Section 2: Billing history (manage_search) -> Bento empty state ---- */
+  host.appendChild(v4El('<div class="set-card"><div class="pad">'
+   +'<div class="rowflex" style="gap:10px;margin:0 0 16px"><span class="material-symbols-outlined" aria-hidden="true" style="color:var(--bento-theme-color-icon-subtle)">manage_search</span><h3 class="sec" style="margin:0">Billing history</h3></div>'
+   +'<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:24px 16px">'
+   +'<span class="material-symbols-outlined" aria-hidden="true" style="font-size:40px;color:var(--bento-theme-color-icon-subtle)">receipt_long</span>'
+   +'<div style="font:var(--hs-type-body-md);color:var(--bento-theme-color-text-subtle);max-width:44ch">You will see your invoices here after your first payment.</div>'
+   +'</div></div></div>'));
+
+  /* ---- Section 3: Manage subscription (diamond) ---- */
+  host.appendChild(v4El('<div class="set-card"><div class="pad">'
+   +'<div class="rowflex" style="gap:10px;margin:0 0 16px"><span class="material-symbols-outlined" aria-hidden="true" style="color:var(--bento-theme-color-icon-subtle)">diamond</span><h3 class="sec" style="margin:0">Manage subscription</h3></div>'
+   +'<div class="between" style="padding-top:0;align-items:flex-start"><div><div style="font:var(--hs-type-body-md-b)">Your plan</div>'
+   +'<div class="secd" style="margin:2px 0 0">'+gsEsc(planName)+'</div></div>'
+   +'<div style="font:var(--hs-type-body-md-b);white-space:nowrap">'+gsEsc(planPrice)+'</div></div>'
+   +'<div class="secd" style="margin:4px 0 16px">All prices are in USD and subject to taxes unless stated otherwise.</div>'
+   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b);margin:0 0 4px">Status</div><span class="hs-badge hs-badge--positive">Active</span></div>'
+   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b)">Renews</div><div class="secd" style="margin:2px 0 0">'+gsEsc(renews)+'</div></div>'
+   +'<div class="rowflex" style="gap:10px"><button class="hs-btn hs-btn--secondary" type="button" onclick="v5BillProto(\'Update subscription\')">Update subscription</button>'
+   +'<button class="hs-btn hs-btn--ghost" type="button" onclick="v5BillProto(\'Cancel subscription\')">Cancel subscription</button></div>'
+   +'</div></div>'));
+
+  /* ---- Section 4: Delete account -> POINTER only (destructive control lives in Security & privacy) ---- */
+  host.appendChild(v4El('<div class="set-card"><div class="pad">'
+   +'<div class="rowflex" style="gap:10px;margin:0 0 12px"><span class="material-symbols-outlined" aria-hidden="true" style="color:var(--bento-theme-color-icon-subtle)">delete</span><h3 class="sec" style="margin:0">Delete account</h3></div>'
+   +'<div class="secd" style="margin:0">To delete your account, go to <a href="c-account-security.html">Security and privacy</a>.</div>'
+   +'</div></div>'));
+
+  pc.innerHTML=''; pc.appendChild(host);
+  initControlA11y(pc);
+ }
+ /* Compact prototype add/update-card form for Billing details (revealed by "Update information"). Uses shipped
+    .hs-field / .hs-input / .hs-select + a .hs-radio payment-method pair (Bento radio rows, our edit-form idiom).
+    Prototype only: Save shows a toast and collapses; nothing is submitted or persisted. */
+ function v5BillEditForm(){
+  var f=v4El('<div id="v5BillEdit" style="display:none;margin-top:16px;padding-top:20px;border-top:1px solid var(--bento-theme-color-border-subtle)"></div>');
+  /* Billing cycle choice (Annual / Monthly) as a two-option radio group. */
+  f.appendChild(v4El('<div class="hs-field" style="margin-bottom:16px"><span class="hs-field-label">Billing cycle</span>'
+   +'<div class="stack" style="gap:8px;margin-top:6px">'
+   +'<label class="rowflex" style="cursor:pointer;gap:10px"><span class="hs-radio is-on" data-grp="v5cycle"></span><span style="font:var(--hs-type-body-md)">Annual <span class="secd" style="margin:0">(save 37%)</span></span></label>'
+   +'<label class="rowflex" style="cursor:pointer;gap:10px"><span class="hs-radio" data-grp="v5cycle"></span><span style="font:var(--hs-type-body-md)">Monthly</span></label>'
+   +'</div></div>'));
+  /* Payment-method choice (Credit card / PayPal). */
+  f.appendChild(v4El('<div class="hs-field" style="margin-bottom:16px"><span class="hs-field-label">Choose payment method</span>'
+   +'<div class="stack" style="gap:8px;margin-top:6px">'
+   +'<label class="rowflex" style="cursor:pointer;gap:10px"><span class="hs-radio is-on" data-grp="v5pay"></span><span style="font:var(--hs-type-body-md)">Credit card</span></label>'
+   +'<label class="rowflex" style="cursor:pointer;gap:10px"><span class="hs-radio" data-grp="v5pay"></span><span style="font:var(--hs-type-body-md)">PayPal</span></label>'
+   +'</div></div>'));
+  /* Card fields (prototype, no real inputs wired). */
+  f.appendChild(v4El('<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v5BillCard">Card number</label>'
+   +'<input class="hs-input" id="v5BillCard" type="text" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456"></div>'));
+  f.appendChild(v4El('<div class="grid2" style="margin-bottom:16px">'
+   +'<div class="hs-field"><label class="hs-field-label" for="v5BillExp">Expiry date</label><input class="hs-input" id="v5BillExp" type="text" autocomplete="off" placeholder="MM / YY"></div>'
+   +'<div class="hs-field"><label class="hs-field-label" for="v5BillCvc">Security code</label><input class="hs-input" id="v5BillCvc" type="text" inputmode="numeric" autocomplete="off" placeholder="CVC"></div>'
+   +'</div>'));
+  f.appendChild(v4El('<div class="hs-field" style="margin-bottom:16px"><label class="hs-field-label" for="v5BillCountry">Country</label>'
+   +'<select class="hs-select" id="v5BillCountry"><option>Canada</option><option>United States</option><option>United Kingdom</option><option>Australia</option></select></div>'));
+  f.appendChild(v4El('<div class="grid2" style="margin-bottom:20px">'
+   +'<div class="hs-field"><label class="hs-field-label" for="v5BillProv">Province</label><select class="hs-select" id="v5BillProv"><option>British Columbia</option><option>Ontario</option><option>Quebec</option><option>Alberta</option></select></div>'
+   +'<div class="hs-field"><label class="hs-field-label" for="v5BillPost">Postal / ZIP code</label><input class="hs-input" id="v5BillPost" type="text" autocomplete="off" placeholder="A1A 1A1"></div>'
+   +'</div>'));
+  f.appendChild(v4El('<div class="rowflex" style="gap:10px"><button class="hs-btn hs-btn--ghost" type="button" onclick="v5BillToggleEdit()">Cancel</button>'
+   +'<button class="hs-btn hs-btn--primary" type="button" onclick="v5BillSaveCard()">Save</button></div>'));
+  return f;
+ }
+ function v5BillToggleEdit(){
+  var f=document.getElementById('v5BillEdit'), btn=document.getElementById('v5BillEditBtn'); if(!f) return;
+  var open=f.style.display!=='none'; f.style.display=open?'none':''; if(btn) btn.setAttribute('aria-expanded', open?'false':'true');
+  if(!open && btn){ var first=f.querySelector('input,select,.hs-radio'); if(first&&first.focus) setTimeout(function(){first.focus();},0); }
+ }
+ function v5BillSaveCard(){ v5BillToggleEdit(); showToast('This is a prototype; your billing details are not saved.'); }
+ function v5BillProto(what){ showToast(what+' is a prototype; nothing is saved.'); }
  /* ================= v5b CHANGE 1: Contact us as a light in-product LINKS page =================
     Under v5, Contact us stops being the v4 thin support form and becomes a short, self-serve links page: an intro
     line plus a Bento list-card of outbound resources, each opening in a new tab (target=_blank rel=noopener). This
@@ -4044,11 +4233,16 @@
  }
  /* Under v5 the standalone Teams page is folded into People, so a team-detail back-arrow must return to the People
     view (c-settings-members.html) with the Teams toggle pre-selected, not to the now-hidden c-org-teams.html. Member
-    detail already points at c-settings-members.html (the People host, default Members view), so it needs no change. */
+    detail already points at c-settings-members.html (the People host, default Members view), so it needs no change.
+    A2 FIX GROUP 2: also drop the REDUNDANT in-body back arrow v4TeamDetail appended to the top of #v4TdPage (the
+    header topbar already carries a Back affordance), which additionally pointed at the now-hidden c-org-teams.html.
+    Removing it lifts the team-detail content up. v5-only: v4TeamDetail still renders the in-body arrow for the v4
+    reference build (v4 DOM stays byte-identical); we remove it from the DOM only under v5. */
  function v5FixTeamDetailBack(){
-  var back=document.querySelector('.suite-topbar a[aria-label="Back"]'); if(!back) return;
-  var href=back.getAttribute('href')||'';
-  if(href.indexOf('c-org-teams.html')!==-1){ back.setAttribute('href','c-settings-members.html?peopletab=teams'); }
+  var back=document.querySelector('.suite-topbar a[aria-label="Back"]');
+  if(back){ var href=back.getAttribute('href')||''; if(href.indexOf('c-org-teams.html')!==-1){ back.setAttribute('href','c-settings-members.html?peopletab=teams'); } }
+  var page=document.getElementById('v4TdPage');
+  if(page){ var inBody=page.querySelector('a[aria-label="Back to teams"]'); if(inBody && inBody.parentNode) inBody.parentNode.removeChild(inBody); }
  }
  /* ================= v5b CHANGE 2: team detail role hierarchy (admins above members) =================
     Under v5, make the team's role hierarchy visually obvious: split the flat v4 members list into two grouped
@@ -4091,6 +4285,51 @@
    +group('shield_person','Admins',admins)+group('group','Members',members)+foot+'</div></div>';
   panel.setAttribute('data-v5hier','1');
   initControlA11y(panel);
+ }
+ /* ================= A2 FIX GROUP 3 (v5): member detail identity header =================
+    Three fixes on the person/detail page, layered on top of v4MemberDetail (which built #v4MdPage: an in-body back
+    arrow, the .v4-mdhead identity block, the tabs, and the Overview panel with an "Access summary" card):
+      1. Remove the REDUNDANT in-body back arrow (the header topbar already carries a Back affordance) so the content
+         lifts up.
+      2. Put the identity header (.v4-mdhead: name, role badge, Change role + Transfer & offboard actions) on a proper
+         Bento surface (a white .set-card, like the People panel), so it reads instead of floating on the grey canvas.
+      3. Merge the Overview tab's plain-language access sentence UP into that header (under the name), so "what they can
+         do" reads as part of the identity, not only inside the Overview tab. The Overview card then leads with the
+         person's Teams (its chips) rather than repeating the sentence.
+    v5-only: v4MemberDetail is untouched, so the v4 (and v3) member detail stay byte-identical. Idempotent via
+    #v5MdHeadCard. Runs synchronously after applyV4 built the page; a light retry covers any ordering. */
+ var _v5MdTries=0;
+ function v5MemberDetail(){
+  var page=document.getElementById('v4MdPage');
+  if(!page){ if(_v5MdTries++>40) return; setTimeout(v5MemberDetail,80); return; }        /* v4 detail not built yet, retry */
+  if(document.getElementById('v5MdHeadCard')) return;                                     /* already transformed */
+  /* (1) Remove the in-body back arrow v4MemberDetail appended at the top of #v4MdPage (aria-label "Back to members"). */
+  var inBody=page.querySelector('a[aria-label="Back to members"]'); if(inBody && inBody.parentNode) inBody.parentNode.removeChild(inBody);
+  var head=page.querySelector('.v4-mdhead'); if(!head) return;
+  /* (3) Lift the Overview access sentence into the identity block, under the meta line. The sentence lives in the
+     Overview panel's first card as <p class="v4-summary">; move that node up (keeps its text + tokens), then relabel
+     the Overview card so it no longer reads as a duplicate "Access summary" (it now leads with the person's Teams). */
+  var ov=document.getElementById('v4Md-ov');
+  var summary=ov?ov.querySelector('.v4-summary'):null;
+  var id=head.querySelector('.v4-mdid');
+  if(summary && id){
+   summary.classList.add('v5-md-access');                                                /* header-scoped spacing (CSS below) */
+   id.appendChild(summary);                                                               /* under name + role badge + meta */
+   if(ov){
+    var ovCard=ov.querySelector('.set-card'); var ovHead=ovCard?ovCard.querySelector('.pad .sec'):null;
+    if(ovHead){
+     var hasChips=!!ovCard.querySelector('.v4-chips');
+     ovHead.textContent=hasChips?'Teams':'Access';                                        /* card now leads with team membership (chips), not the moved sentence */
+    }
+   }
+  }
+  /* (2) Wrap the identity header in a white surface. Insert a .set-card where the header sits, then move the header
+     (and its .pad wrapper) inside, so name/role/actions read on a card rather than on grey. */
+  var card=v4El('<div class="set-card" id="v5MdHeadCard"><div class="pad" id="v5MdHeadPad"></div></div>');
+  head.parentNode.insertBefore(card, head);
+  document.getElementById('v5MdHeadPad').appendChild(head);
+  head.style.margin='0';                                                                  /* the .pad owns the padding now */
+  initControlA11y(page);
  }
  /* T3 combined People page. v4Members renders on a 650ms skeleton on first view, so poll for its content (#v4MbrTabs)
     before wrapping; on a repeat view it is instant. Idempotent via #v5PeopleToggle. */
@@ -4153,6 +4392,81 @@
   try{ v4Teams(teamsPanel, true); }catch(e){}
   /* Default view = Members, unless arriving from a team-detail back-arrow (?peopletab=teams), which opens on Teams. */
   try{ var _pt=new URLSearchParams(location.search).get('peopletab'); if(_pt==='teams') v5PeopleTab('teams'); }catch(e){}
+  /* B2 (Hill, Friday): once the members table is hosted in the People panel, make the org -> team -> member -> account
+     relationship legible on each row (strengthen "Access via" into named-team provenance chips, and turn "Owns" into
+     account-network icon tiles + a clear count). v5-gated; layered on the v4-rendered rows in place. */
+  try{ v5PeopleRelationship(); }catch(e){}
+ }
+ /* ================= B2 (v5, Hill Friday call): make the member/team/account RELATIONSHIP legible on the Members row =================
+    THE PROBLEM: in T&O today a Members row mostly shows email + role; the org -> team -> member -> account relationship is
+    opaque. Landing on Members you cannot see, at a glance, how a person relates to teams and to the social accounts they
+    hold. This pass rewrites TWO cells on each v5 members row so the chain reads without opening the person:
+      - ACCESS VIA -> role provenance as a PATH. Inherited access reads "via" + a named-team chip (reuse .v4-chip, the
+        accepted team-membership pill). Direct access reads a plain quiet "Direct". CRUCIALLY, a person whose ROLE is
+        direct can still be ON teams (e.g. Bryn is a direct Admin but also on Growth Team, through which he holds an
+        account): we surface those team chips too, so the member -> team relationship is visible regardless of where the
+        role came from. Multiple teams -> multiple chips. This is the key legibility win Hill asked for.
+      - OWNS -> member -> account relationship. The count reads clearly ("3 accounts" / "None") and is fronted by small
+        account-network icon tiles (reuse .v4-acct-ic), so you see WHAT each person directly holds, and on which networks,
+        without drilling in. Capped at 3 tiles + "+N" so the cell stays scannable.
+    The row still lets someone reason about role (what they can do) + how they got access (direct vs which named team) +
+    what they own. Kept SCANNABLE: chips + icon tiles over long text; the role badge is untouched; the single-layer member
+    detail page is unchanged (it already shows the full relationship on click).
+    DIRECTIONAL: pending Maria's research on what matters most to surface here and typical team/org sizes (a person on
+    many teams, or owning many accounts, would need a different truncation / density decision), this chip+icon treatment
+    is our best current read, NOT a locked design. Same "provisional pending research" footing as the v5 team-detail
+    hierarchy and People relabel.
+    IMPLEMENTATION: runs from v5People() AFTER the v4 members table (#v4MembersTbl, built once by v4Members under both v4
+    and v5) has been wrapped into the People panel. It rewrites ONLY the "Access via" (td index 3) and "Owns" (td index 4)
+    cells' innerHTML per row, keyed off the row's data-name -> the canonical V4_MEMBERS / V4_ACCOUNTS (never the cell text),
+    so the numbers still agree with the member detail + offboard. The row link (v4RowOpen reads data-name), the checkbox,
+    the kebab, and v4MbrFilter (filters on tr.textContent, and the team name + count text stay present inside the chips /
+    label) all keep working. v5-ONLY: v4Members still renders the plain-text cells, and the v4 reference build never runs
+    applyV5, so the v4 (and v3) rendered members table stays byte-identical. Idempotent via a per-row data-v5rel marker.
+    Bento: .v4-chip + .v4-acct-ic are the accepted snowflakes the brief names; the only new CSS is v5-scoped layout/size
+    (a .v5-rel-cell flex wrap and a smaller tile inside .v5-owns), tokens only, no new component. */
+ function v5PeopleRelationship(){
+  var tbl=document.getElementById('v4MembersTbl'); if(!tbl) return;
+  var tb=tbl.querySelector('tbody'); if(!tb) return;
+  Array.prototype.forEach.call(tb.querySelectorAll('tr.v4-rowlink'), function(tr){
+   if(tr.getAttribute('data-v5rel')==='1') return;                                  /* idempotent per row */
+   var name=tr.getAttribute('data-name'); var m=v4MemberByName(name); if(!m) return;
+   var tds=tr.querySelectorAll('td');
+   var accessTd=tds[3], ownsTd=tds[4]; if(!accessTd||!ownsTd) return;
+   /* --- ACCESS VIA: role provenance as a path + team chips --- */
+   var teams=v4MbrTeamsFor(m);                                                       /* every team this person is on (distinct) */
+   var inherited=/^via /i.test(m.via);                                               /* their ROLE comes through a team */
+   var lead;
+   if(inherited){
+    /* Role is inherited: "via" + the team(s). The via string names one team; render every team the person is on as a
+       chip (the naming team first if present), so multi-team people show all their chips. */
+    lead='<span class="v5-rel-via">via</span>';
+   } else {
+    /* Role is direct. Say so plainly; still show any team chips so the member -> team link is visible for direct roles. */
+    lead='<span class="v5-rel-direct">Direct</span>';
+   }
+   var chips=teams.map(function(t){
+    return '<span class="v4-chip"><span class="material-symbols-outlined" aria-hidden="true">groups</span>'+gsEsc(t)+'</span>';
+   }).join('');
+   accessTd.className='';                                                            /* drop the .secd plain-text styling; the cell now holds chips */
+   accessTd.innerHTML='<div class="v5-rel-cell">'+lead+chips+'</div>';
+   /* --- OWNS: account-network icon tiles + a clear count --- */
+   var owned=V4_ACCOUNTS.filter(function(a){ return a.owner===m.name; });            /* directly-owned, canonical source */
+   ownsTd.className='';
+   if(!owned.length){
+    ownsTd.innerHTML='<span class="v5-owns-none">None</span>';                        /* clear word, not an em-dash glyph */
+   } else {
+    var CAP=3;                                                                        /* keep the cell scannable */
+    var shown=owned.slice(0,CAP);
+    var tiles=shown.map(function(a){
+     return '<span class="v4-acct-ic" title="'+gsEsc(a.net)+'"><span class="material-symbols-outlined" aria-hidden="true">'+v4AcctIcon(a.net)+'</span></span>';
+    }).join('');
+    var overflow=(owned.length>CAP)?('<span class="v5-owns-more">+'+(owned.length-CAP)+'</span>'):'';
+    var count='<span class="v5-owns-count">'+owned.length+' account'+(owned.length===1?'':'s')+'</span>';
+    ownsTd.innerHTML='<div class="v5-owns v5-rel-cell">'+tiles+overflow+count+'</div>';
+   }
+   tr.setAttribute('data-v5rel','1');
+  });
  }
  /* Switch the People view between the Members panel and the Teams panel (APG tab pattern: is-active + aria-selected
     move to the current tab, roving tabindex 0/-1, the other panel is hidden). */
@@ -4172,11 +4486,15 @@
  }
  /* Members status filter (v5): the inner v4 [Members | Pending invites] tab strip is a second, competing navigation
     next to the top Members/Teams tabs (Members would appear at two levels), so under v5 it is suppressed and pending
-    invites become a STATUS FILTER inside the Members view. This adds an [Active | Pending] segmented status control to
-    the members filter toolbar (alongside the text filter, Role and Team), reading as a filter (lighter than the top
-    tabs), never a second tab strip, and never repeating the word "Members". Active (default) shows the members table +
-    its toolbar filters + bulk bar; Pending shows the SAME pending-invites content v4 already renders (#v4MbrPanel-pending:
-    email, role, sent date, Resend + Revoke, plus the zero-state), reused as-is. v5-gated; v4 keeps its tab strip. */
+    invites become a STATUS FILTER inside the Members view. A2 FIX GROUP 1 item 3: the status control is now the SAME
+    shipped Bento ChipFilter (.cf) the Role/Team filters use, not a bespoke segmented toggle, so all three toolbar
+    filters read as one consistent pattern. It is a single "Status" chip that mirrors Role/Team exactly: at rest it
+    shows the current value + count in a grey .cf .ct (default = Active); choosing Pending flips it to the shipped
+    .cf.selected state (the "blue chip with a count badge") with an .x that clears back to Active. Active (default)
+    shows the members table + its toolbar filters + bulk bar; Pending shows the SAME pending-invites content v4 already
+    renders (#v4MbrPanel-pending: email, role, sent date, Resend + Revoke, plus the zero-state), reused as-is. v5-gated;
+    v4 keeps its tab strip. NOTE: the model stays binary (Active | Pending) because pending invites are not members, so
+    there is no combined "All" view to merge them into; the chip's resting/default value is Active. */
  var _v5MbrStatus='active';
  function v5BuildStatusFilter(){
   /* Suppress the inner v4 [Members | Pending invites] tab strip under v5. It carries both .hs-tabs and .v4-mbr-tabs,
@@ -4184,42 +4502,83 @@
      display:none inline (also set hidden for semantics). */
   var tabs=document.getElementById('v4MbrTabs'); if(tabs){ tabs.hidden=true; tabs.style.display='none'; }
   var fb=document.getElementById('v4FilterBar'); if(!fb) return;
-  if(document.getElementById('v5StatusSeg')) return;                                     /* idempotent */
-  var c=(typeof v4Counts==='function')?v4Counts():{membersTotal:'',pending:''};
-  /* Segmented status control (APG tablist look, filter weight): two options, single-select, keyboard-operable. It is
-     appended to the toolbar so it clearly belongs to the filters, not the page-level tabs above. */
-  var seg=v4El('<div class="v5-status-seg" id="v5StatusSeg" role="tablist" aria-label="Filter by status">'
-   +'<button class="v5-seg-btn is-on" type="button" role="tab" tabindex="0" aria-selected="true" id="v5Status-active" aria-controls="v4MbrPanel-members" onclick="v5MbrStatus(\'active\')" onkeydown="v5StatusKey(event,\'active\')">Active <span class="v5-seg-ct">'+c.membersTotal+'</span></button>'
-   +'<button class="v5-seg-btn" type="button" role="tab" tabindex="-1" aria-selected="false" id="v5Status-pending" aria-controls="v4MbrPanel-pending" onclick="v5MbrStatus(\'pending\')" onkeydown="v5StatusKey(event,\'pending\')">Pending <span class="v5-seg-ct">'+c.pending+'</span></button>'
-   +'</div>');
-  fb.appendChild(seg);
+  if(document.getElementById('v5StatusChipWrap')) return;                                 /* idempotent */
+  /* A2 FIX GROUP 1 item 1: remove the redundant external filter icon that v4Members put to the LEFT of the search box
+     (.v4-fb-lead, the filter_list glyph). The search input keeps its own internal search glyph, so the external lead
+     is duplicative here. v5-only: v4Members still renders it for the v4 reference build (v4 DOM stays byte-identical);
+     we drop it from the DOM only under v5. */
+  var lead=fb.querySelector('.v4-fb-lead'); if(lead) lead.parentNode.removeChild(lead);
+  /* Status ChipFilter, built with the SAME .cf / .v4-fb-chip / .v4-fpop / .hs-option primitives as v4RoleChip /
+     v4TeamChip, so it is the identical component. Placed as the LEAD control (before the search) so the toolbar reads
+     status -> filters left-to-right and never relies on margin-left:auto (which left the empty gap in Pending). Built
+     in its resting/default state (Active); v5MbrStatus paints the selected/blue state when Pending is chosen. */
+  var wrap=v4El('<div class="v4-fb-chip" id="v5StatusChipWrap"><button class="cf" type="button" id="v5StatusChip" aria-haspopup="listbox" aria-expanded="false" onclick="v5StatusToggle(event)"></button></div>');
+  fb.insertBefore(wrap, fb.firstChild);
   v5MbrStatus('active');
  }
+ /* Repaint the Status chip for the current value. Active = resting grey .cf with the value + count in a grey .ct and a
+    trailing chevron (mirrors Role/Team at rest, but always shows the value since Status is never unset). Pending = the
+    shipped .cf.selected blue chip with the value + count in .ct and a trailing .x that clears back to Active. */
+ function v5StatusPaintChip(){
+  var chip=document.getElementById('v5StatusChip'); if(!chip) return;
+  var c=(typeof v4Counts==='function')?v4Counts():{membersTotal:'',pending:''};
+  var pending=(_v5MbrStatus==='pending');
+  chip.setAttribute('aria-controls', pending?'v4MbrPanel-pending':'v4MbrPanel-members');
+  if(pending){
+   chip.classList.add('selected');
+   chip.innerHTML='<span>Status</span><span class="ct">Pending \u00b7 '+c.pending+'</span>'
+    +'<span class="x" role="button" tabindex="0" aria-label="Show active people instead" onclick="v5StatusClear(event)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v5StatusClear(event);}"><span class="material-symbols-outlined">close</span></span>';
+  } else {
+   chip.classList.remove('selected');
+   chip.innerHTML='<span>Status</span><span class="ct">Active \u00b7 '+c.membersTotal+'</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span>';
+  }
+ }
+ /* Open/close the Status listbox popover (same .v4-fpop overlay + .hs-option rows as the Role/Team dropdowns; APG
+    listbox: roving focus, Enter/Space picks, Escape closes + restores focus to the chip). Reuses v4FbCloseAll so
+    opening Status closes any open Role/Team popover and vice versa. */
+ function v5StatusToggle(e){
+  e.preventDefault(); e.stopPropagation();
+  var wrap=document.getElementById('v5StatusChipWrap'); var chip=document.getElementById('v5StatusChip'); if(!wrap||!chip) return;
+  var pop=wrap.querySelector('.v4-fpop'); var isOpen=pop&&pop.classList.contains('open');
+  if(typeof v4FbCloseAll==='function'){ try{ v4FbCloseAll(); }catch(e2){} }
+  v5StatusCloseAll();
+  if(isOpen) return;
+  if(!pop){ pop=document.createElement('div'); pop.className='v4-fpop'; pop.setAttribute('role','listbox'); pop.setAttribute('aria-label','Filter by status'); wrap.appendChild(pop); }
+  var c=(typeof v4Counts==='function')?v4Counts():{membersTotal:'',pending:''};
+  var opts=[{v:'active',label:'Active',count:c.membersTotal},{v:'pending',label:'Pending',count:c.pending}];
+  pop.innerHTML=opts.map(function(o){ var sel=(o.v===_v5MbrStatus); return '<div class="hs-option'+(sel?' is-selected':'')+'" role="option" tabindex="0" aria-selected="'+(sel?'true':'false')+'" data-val="'+o.v+'" onclick="v5StatusPick(\''+o.v+'\')" onkeydown="v5StatusOptKey(event,\''+o.v+'\',this)"><span class="hs-option-label">'+o.label+'</span><span class="hs-option-count">'+o.count+'</span>'+(sel?'<span class="material-symbols-outlined">check</span>':'')+'</div>'; }).join('');
+  pop.classList.add('open'); chip.classList.add('open'); chip.setAttribute('aria-expanded','true');
+  var ch=chip.querySelector('.chev'); if(ch)ch.style.transform='rotate(180deg)';
+  var first=pop.querySelector('.hs-option.is-selected')||pop.querySelector('.hs-option'); if(first) setTimeout(function(){first.focus();},0);
+ }
+ function v5StatusCloseAll(){ var w=document.getElementById('v5StatusChipWrap'); if(!w) return; Array.prototype.forEach.call(w.querySelectorAll('.v4-fpop.open'),function(p){ p.classList.remove('open'); }); var chip=document.getElementById('v5StatusChip'); if(chip){ chip.classList.remove('open'); chip.setAttribute('aria-expanded','false'); var ch=chip.querySelector('.chev'); if(ch)ch.style.transform=''; } }
+ function v5StatusPick(v){ v5StatusCloseAll(); v5MbrStatus(v); var chip=document.getElementById('v5StatusChip'); if(chip) chip.focus(); }
+ function v5StatusClear(e){ if(e){ e.preventDefault(); e.stopPropagation(); } v5StatusCloseAll(); v5MbrStatus('active'); var chip=document.getElementById('v5StatusChip'); if(chip) chip.focus(); }
+ function v5StatusOptKey(e,v,opt){
+  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); v5StatusPick(v); return; }
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); var sib=e.key==='ArrowDown'?opt.nextElementSibling:opt.previousElementSibling; if(sib)sib.focus(); }
+  if(e.key==='Escape'){ e.preventDefault(); v5StatusCloseAll(); var chip=document.getElementById('v5StatusChip'); if(chip)chip.focus(); }
+ }
  /* Apply the status filter: Active shows the members table (toolbar filters + bulk bar live); Pending hides the
-    members-only content and reveals the reused v4 pending panel. The status segment itself stays visible in both. */
+    members-only content and reveals the reused v4 pending panel. A2 FIX GROUP 1 item 2: under Pending the members-only
+    toolbar filters (search, Role, Team) are hidden so the toolbar reflows cleanly with no empty gap; only the Status
+    chip remains. The Status chip stays visible in both states and repaints to reflect the current value. */
  function v5MbrStatus(status){
   _v5MbrStatus=status; var pending=(status==='pending');
   var mp=document.getElementById('v4MbrPanel-members'); var pp=document.getElementById('v4MbrPanel-pending');
   if(pp) pp.hidden=!pending;                                                             /* pending panel: shown only for Pending */
   /* Hide the members-only pieces inside the members panel when Pending is active (they filter/act on members): the
-     table card, the field hint, the bulk bar, and the members-only toolbar controls (text, Role, Team). The status
-     segment and the toolbar frame stay. */
+     table card, the field hint, the bulk bar, and the members-only toolbar controls (text, Role, Team). The Status
+     chip and the toolbar frame stay. */
   if(mp){
    var card=document.getElementById('v4MembersTbl'); card=card?card.closest('.set-card'):null; if(card) card.style.display=pending?'none':'';
    Array.prototype.forEach.call(mp.querySelectorAll('.hs-field-hint'),function(h){ h.style.display=pending?'none':''; });
    var bulk=document.getElementById('v4BulkBar'); if(bulk && pending) bulk.style.display='none';
   }
   var fb=document.getElementById('v4FilterBar');
-  if(fb){ Array.prototype.forEach.call(fb.querySelectorAll('.hs-input.affix.csearch, .v4-fb-chip'),function(el){ el.style.display=pending?'none':''; }); }
-  var ba=document.getElementById('v5Status-active'), bp=document.getElementById('v5Status-pending');
-  if(ba){ ba.classList.toggle('is-on',!pending); ba.setAttribute('aria-selected', String(!pending)); ba.setAttribute('tabindex', pending?'-1':'0'); }
-  if(bp){ bp.classList.toggle('is-on',pending); bp.setAttribute('aria-selected', String(pending)); bp.setAttribute('tabindex', pending?'0':'-1'); }
+  if(fb){ Array.prototype.forEach.call(fb.querySelectorAll('.hs-input.affix.csearch, .v4-fb-chip'),function(el){ if(el.id==='v5StatusChipWrap') return; el.style.display=pending?'none':''; }); }
   if(pending && typeof v4FbCloseAll==='function'){ try{ v4FbCloseAll(); }catch(e){} }     /* close any open Role/Team popover when leaving Active */
- }
- /* Keyboard for the status segment (APG tablist): Enter/Space activates, Left/Right moves + focuses the other option. */
- function v5StatusKey(e,status){
-  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); v5MbrStatus(status); return; }
-  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ e.preventDefault(); var other=(status==='active')?'pending':'active'; v5MbrStatus(other); var ob=document.getElementById('v5Status-'+other); if(ob) ob.focus(); }
+  v5StatusPaintChip();
  }
  /* T4: remove the "Sync profiles" row from the rendered roles matrix (Hill scrapped the capability). v5-gated, done
     on the DOM the v4 matrix produced, so V4_MATRIX (and the v4 build) keep the row. Idempotent. The other stubbed
