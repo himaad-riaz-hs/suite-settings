@@ -775,8 +775,9 @@
  /* ===== v5 (post-stakeholder-sync) additions (all body.v5-scoped, injected/toggled by applyV5() after load, so
     non-v5 output (v3 baseline AND the v4 reference build) stays byte-identical). Tokens only. =====
     People page primary switch: the shipped Bento Tabs (.hs-tabs/.hs-tab, components.css) are reused as-is for the
-    Members/Teams object switch, so nothing bespoke is needed there; only bottom spacing is nudged so the tab strip
-    sits above the panel like the other page headers. (The earlier v5a ToggleGroup .tg/.ti snowflake was dropped.) */
+    three-tab Members / Teams / Pending invites object switch (C2), so nothing bespoke is needed there; only bottom
+    spacing is nudged so the tab strip sits above the panel like the other page headers. (The earlier v5a ToggleGroup
+    .tg/.ti snowflake was dropped.) */
  body.v5 .v5-people-switch{margin:0 0 16px;}
  /* FIX 1b (v5, task 21): pin "Contact us" to the very bottom of the left nav, below everything else, the way Slack /
     Notion / Linear pin a help/contact action. #navBody is a flex column (suite-drawer.css: .sd-body is flex + column +
@@ -789,13 +790,11 @@
  /* FIX 2 (v5, task 23): the Org General visibility provisional note sits on its OWN row beneath the setting, set off
     by a hairline so it reads as a note about the setting (held gate d), not part of the toggle row. Tokens only. */
  body.v5 .v5-setting-note{margin-top:14px;padding-top:12px;border-top:1px solid var(--bento-theme-color-border-subtle);}
- /* Members STATUS FILTER (A2 FIX GROUP 1 item 3): now the shipped Bento ChipFilter (.cf), identical to the Role/Team
-    filters, not a bespoke segmented control. It is #v5StatusChip, a .cf inside a .v4-fb-chip, so it inherits every
-    shipped chip style (grey resting, blue .cf.selected + .ct count when Pending is chosen, the .v4-fpop listbox
-    popover). It sits as the LEAD control in the toolbar (fb.insertBefore first child), so no margin-left:auto and no
-    empty gap in the Pending state. No bespoke chip CSS is needed; the only scoped rule keeps the Status chip from
-    growing (it shares .v4-filterbar .cf{flex:none}). The former .v5-status-seg / .v5-seg-* ToggleGroup rules were
-    removed with the bespoke control. */
+ /* C2: pending invites are now their OWN third tab in the People .hs-tabs strip [Members | Teams | Pending
+    invites], not an Active/Pending status filter inside the Members toolbar. The status ChipFilter (#v5StatusChip and
+    its A2 predecessor .v5-status-seg / .v5-seg-* ToggleGroup) has been removed entirely: pending invites are a
+    different object from active members, so a status filter (which implies filtering one collection) was the wrong
+    pattern. No status-chip CSS remains; the third tab reuses the shipped .hs-tabs, so no new rules are needed here. */
  /* v5b CHANGE 1: Contact us links page. Whole-row links reuse the .between list-row look; add a hover fill + a
     real focus ring (tokens only) so each row reads as an interactive, keyboard-reachable link. */
  body.v5 .v5-link-row{text-decoration:none;border-radius:var(--bento-radius-sm,6px);}
@@ -865,6 +864,64 @@
  body.v5 .v5-owns .v4-acct-ic .material-symbols-outlined{font-size:16px;}
  body.v5 .v5-owns-count,body.v5 .v5-owns-more,body.v5 .v5-owns-none{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
  body.v5 .v5-owns-count{margin-left:2px;}
+ /* ===== v5 C1 FIX 1 (task 30): Roles page clean create action. #v5RolesLead is a layout-only row (NOT a card) that
+    sits above the capability matrix and holds the single labelled primary "Create custom role" button + one quiet
+    helper line, mirroring how Create team / Invite people present their primary action. Spacing only; tokens only. ===== */
+ body.v5 .v5-roles-lead{margin:0 0 var(--bento-space-400,24px);}
+ /* ===== v5 C1 FIX 2 (task 32): Invite "See what each role can do" all-roles side panel. DIRECTIONAL: the slide-in
+    side panel was chosen from three options (side panel / inline expander / separate page); it is easy to swap to an
+    inline expander later (the render is one function, v5InvRolesPanelHTML). The panel slides in from the right EDGE of
+    the invite modal and overlays the modal body, so the invite is never navigated away from; closing returns to the
+    invite. It reuses the SHIPPED roles capability data (V4_MATRIX / V4_MATRIX_ROLES) and the same .hs-badge--warning
+    "eng confirm" treatment (held gate b), rendered as a compact all-roles matrix. Tokens only; v5-gated so the v4 (and
+    v3) invite modal is byte-identical. ===== */
+ /* The trigger is a quiet ghost text-button under the role radios (see v4RenderInvite, v5-gated). */
+ body.v5 .v5-inv-seeall{margin-top:10px;}
+ body.v5 .v5-inv-seeall .hs-btn{padding-left:0;padding-right:0;}
+ /* Panel: absolutely positioned inside the .modal (which is position:relative under v5 below), sliding in from the
+    right. It covers the modal body area but leaves the modal head visible; it has its OWN header (title + close) and a
+    scrolling body. Hidden (translated off + aria-hidden) by default; .open slides it in. */
+ body.v5 #v4InviteWrap .modal{position:relative;overflow:hidden;}
+ body.v5 .v5-rolepanel{position:absolute;top:0;right:0;bottom:0;width:min(100%,520px);display:flex;flex-direction:column;background:var(--bento-theme-color-bg-surface);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);border-left:1px solid var(--bento-theme-color-border-subtle);transform:translateX(102%);transition:transform .18s ease;z-index:2;visibility:hidden;}
+ body.v5 .v5-rolepanel.open{transform:translateX(0);visibility:visible;}
+ @media (prefers-reduced-motion: reduce){ body.v5 .v5-rolepanel{transition:none;} }
+ body.v5 .v5-rolepanel .v5-rolepanel-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--bento-theme-color-border-subtle);}
+ body.v5 .v5-rolepanel .v5-rolepanel-head .mt{font:var(--hs-type-title-sm);color:var(--bento-theme-color-text-base);flex:1 1 auto;}
+ body.v5 .v5-rolepanel .v5-rolepanel-body{padding:20px;overflow-y:auto;}
+ body.v5 .v5-rolepanel .v5-rolepanel-foot{padding:14px 20px;border-top:1px solid var(--bento-theme-color-border-subtle);}
+ /* Compact all-roles matrix inside the panel: reuse the shipped .hs-table + the same cell glyphs the main matrix uses. */
+ body.v5 .v5-rolepanel .hs-table th.v5-rp-cap,body.v5 .v5-rolepanel .hs-table td.v5-rp-cap{text-align:left;font:var(--hs-type-body-sm);}
+ body.v5 .v5-rolepanel .hs-table th.v5-rp-role{font:var(--hs-type-body-sm-b);color:var(--bento-theme-color-text-base);text-align:center;white-space:nowrap;}
+ body.v5 .v5-rolepanel .hs-table td.v5-rp-cell{text-align:center;}
+ body.v5 .v5-rolepanel .hs-table td.v5-rp-cell .material-symbols-outlined{font-size:20px;}
+ body.v5 .v5-rolepanel .hs-table td.v5-rp-cell .hs-badge .material-symbols-outlined{font-size:16px;}
+ /* ===== v5 pass C3: UX-annotations layer (prototype-only, body.v5-scoped, built + toggled by v5AnnotInit() after load).
+    A floating PROTOTYPE control (bottom-left pill, clear of the demo dock at bottom-right and the toast at
+    bottom-centre) flips body.v5-annot, which SMOOTHLY reveals note callouts placed beside the real areas. OFF by
+    default (no clutter, no reserved gaps); ON reveals the notes. State persists in sessionStorage across navigation.
+    The callouts read as clearly-annotation (soft mint tint + a small "Why" pill + a lightbulb glyph), distinct from
+    the product surfaces, and never sit on top of the real controls. Tokens only; no em/en dashes. ===== */
+ body.v5 .v5-annot-fab{position:fixed;left:18px;bottom:18px;z-index:9992;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--bento-theme-color-border-base);background:var(--bento-theme-color-bg-surface);color:var(--bento-theme-color-text-base);font:var(--hs-type-body-sm-b);cursor:pointer;box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);transition:background .14s ease,box-shadow .14s ease;}
+ body.v5 .v5-annot-fab:hover{background:var(--bento-component-list-item-fill-hovered);}
+ body.v5 .v5-annot-fab:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:2px;}
+ body.v5 .v5-annot-fab .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);}
+ body.v5.v5-annot .v5-annot-fab{background:var(--bento-system-sys-brand-100,#dfffde);border-color:var(--bento-system-sys-positive-600,#0a7d2c);}
+ body.v5.v5-annot .v5-annot-fab .material-symbols-outlined{color:var(--bento-system-sys-positive-600,#0a7d2c);}
+ body.v5 .v5-annot-fab .v5-annot-fab-dot{width:8px;height:8px;border-radius:999px;background:var(--bento-theme-color-icon-subtle);flex:none;}
+ body.v5.v5-annot .v5-annot-fab .v5-annot-fab-dot{background:var(--bento-system-sys-positive-600,#0a7d2c);}
+ /* Note callouts: present in the DOM always, but display:none by default so they reserve NO space and never break
+    layout when off. When body.v5-annot is on they become blocks and play an entrance transition; turning off adds a
+    transient .v5-annot-leaving that plays the exit before display:none reapplies (JS-driven, both directions smooth). */
+ body.v5 .v5-annot-note{display:none;position:relative;margin:14px 0;padding:14px 16px 14px 44px;max-width:640px;background:var(--bento-system-sys-brand-100,#dfffde);border:1px solid var(--bento-system-sys-positive-600,#0a7d2c);border-radius:10px;color:var(--bento-theme-color-text-base);}
+ body.v5 .v5-annot-note.v5-annot-lead{margin:0 10px 12px;max-width:none;}
+ body.v5 .v5-annot-note > .v5-annot-ic{position:absolute;left:14px;top:14px;font-size:20px;color:var(--bento-system-sys-positive-600,#0a7d2c);}
+ body.v5 .v5-annot-note .v5-annot-why{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:2px 10px;border-radius:999px;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-system-sys-positive-600,#0a7d2c);font:var(--hs-type-meta-b);text-transform:uppercase;letter-spacing:.05em;color:var(--bento-system-sys-positive-600,#0a7d2c);}
+ body.v5 .v5-annot-note .v5-annot-body{margin:0;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ body.v5.v5-annot .v5-annot-note{display:block;animation:v5AnnotIn .2s ease both;}
+ body.v5.v5-annot .v5-annot-note.v5-annot-leaving{animation:v5AnnotOut .16s ease both;}
+ @keyframes v5AnnotIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+ @keyframes v5AnnotOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(6px);}}
+ @media (prefers-reduced-motion: reduce){ body.v5 .v5-annot-fab{transition:none;} body.v5.v5-annot .v5-annot-note,body.v5.v5-annot .v5-annot-note.v5-annot-leaving{animation:none;} }
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -2353,10 +2410,26 @@
   pc=pc||document.getElementById('pageContent'); if(!pc) return;
   var m=v4El('<div class="modal-wrap" id="v4InviteWrap" onclick="v4CloseInvite()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="v4InvTitle"><div class="modal-head"><div class="mt" id="v4InvTitle">Invite people</div><button class="hs-btn hs-btn--ghost hs-btn--icon" type="button" aria-label="Close" title="Close" onclick="v4CloseInvite()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="v4InvBody"></div><div class="modal-foot" id="v4InvFoot"></div></div></div>');
   pc.appendChild(m);
+  /* v5 C1 FIX 2 (task 32): add the all-roles capability side panel INSIDE the .modal (sibling to head/body/foot), so
+     it overlays the invite flow instead of navigating away. v5-only; not emitted under v4/v3 (the modal shell above is
+     byte-identical there). Labelled dialog; hidden by default (see CSS + aria-hidden). Body filled on open by
+     v5InvOpenRolesPanel so it always reflects the current capability data. */
+  if(V5){
+   var modal=m.querySelector('.modal'); if(modal){
+    var panel=v4El('<div class="v5-rolepanel" id="v5InvRolesPanel" role="dialog" aria-modal="false" aria-labelledby="v5InvRolesPanelTitle" aria-hidden="true">'
+     +'<div class="v5-rolepanel-head"><div class="mt" id="v5InvRolesPanelTitle">What each role can do</div>'
+     +'<button class="hs-btn hs-btn--ghost hs-btn--icon" type="button" aria-label="Close role reference" title="Close" onclick="v5InvCloseRolesPanel()"><span class="material-symbols-outlined">close</span></button></div>'
+     +'<div class="v5-rolepanel-body" id="v5InvRolesPanelBody"></div>'
+     +'<div class="v5-rolepanel-foot"><p class="secd" style="margin:0">This is a summary. The full role reference is in the <a href="https://help.hootsuite.com/" target="_blank" rel="noopener">Help Center</a> (opens in a new tab).</p></div></div>');
+    modal.appendChild(panel);
+   }
+  }
  }
- function v4InvFocusables(){ var m=document.querySelector('#v4InviteWrap .modal'); if(!m)return []; return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),function(el){ return !el.disabled && el.offsetParent!==null; }); }
+ /* When the v5 all-roles panel is open, the invite's Tab trap cycles WITHIN the panel (its own focusables), so the two
+    do not fight; otherwise it uses the whole modal. Excludes the panel's own controls when it is closed. */
+ function v4InvFocusables(){ if(_v5InvPanelOpen) return v5InvPanelFocusables(); var m=document.querySelector('#v4InviteWrap .modal'); if(!m)return []; return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),function(el){ if(el.closest&&el.closest('.v5-rolepanel')) return false; return !el.disabled && el.offsetParent!==null; }); }
  function v4InvKeydown(e){
-  if(e.key==='Escape'){ e.preventDefault(); v4CloseInvite(); return; }
+  if(e.key==='Escape'){ e.preventDefault(); if(_v5InvPanelOpen){ v5InvCloseRolesPanel(); return; } v4CloseInvite(); return; }   /* v5: Escape closes the panel first, returning to the invite */
   if(e.key!=='Tab') return;
   var f=v4InvFocusables(); if(!f.length) return; var first=f[0], last=f[f.length-1];
   if(e.shiftKey){ if(document.activeElement===first){ e.preventDefault(); last.focus(); } }
@@ -2371,7 +2444,46 @@
   var w=document.getElementById('v4InviteWrap'); w.classList.add('open'); w.addEventListener('keydown',v4InvKeydown);
   setTimeout(function(){ var e=document.getElementById('v4InvEmailInput'); if(e)e.focus(); },30);
  }
- function v4CloseInvite(){ var w=document.getElementById('v4InviteWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v4InvKeydown); } if(_v4InvLastFocus&&_v4InvLastFocus.focus){ try{_v4InvLastFocus.focus();}catch(e){} _v4InvLastFocus=null; } }
+ function v4CloseInvite(){ if(_v5InvPanelOpen) v5InvCloseRolesPanel(true); var w=document.getElementById('v4InviteWrap'); if(w){ w.classList.remove('open'); w.removeEventListener('keydown',v4InvKeydown); } if(_v4InvLastFocus&&_v4InvLastFocus.focus){ try{_v4InvLastFocus.focus();}catch(e){} _v4InvLastFocus=null; } }
+ /* ============ v5 C1 FIX 2 (task 32): all-roles capability side panel (in the invite) ============
+    DIRECTIONAL: the slide-in SIDE PANEL was chosen from three options (side panel / inline expander / separate
+    page). It is easy to swap to an inline expander later: only v5InvRolesPanelHTML + the open/close toggles + the CSS
+    would change; the trigger (#v5InvSeeAll) and data source (V4_MATRIX) stay. The panel opens IN-CONTEXT over the
+    invite (never navigates away), shows ALL roles and what each can/cannot do at a glance by reusing the SHIPPED roles
+    capability data (V4_MATRIX / V4_MATRIX_ROLES) + the same cell glyphs / "eng confirm" badge the Roles matrix uses
+    (held gate b: the 7 contested rows stay stubbed). Closing returns to the invite. Full reference stays in the Help
+    Center (link in the panel foot).
+    A11y: the panel is a labelled dialog; on open focus moves into it (the close button), Escape / close returns focus
+    to the trigger, and while it is open the invite modal's own Tab focus trap is scoped to the panel (v4InvKeydown +
+    v4InvFocusables both defer to the panel), so it does not fight the invite's trap. */
+ var _v5InvPanelOpen=false, _v5InvPanelLastFocus=null;
+ /* Compact all-roles matrix: predefined roles as columns, capabilities as rows, reusing v4MatrixCell for the glyphs
+    and the contested "eng confirm" badge. Predefined columns only (the panel is a picker aid; custom roles are managed
+    on the Roles page). */
+ function v5InvRolesPanelHTML(){
+  var head='<thead><tr><th class="v5-rp-cap">Capability</th>'+V4_MATRIX_ROLES.map(function(r){ return '<th class="v5-rp-role">'+gsEsc(r)+'</th>'; }).join('')+'</tr></thead>';
+  var rows=V4_MATRIX.map(function(row){ return '<tr><td class="v5-rp-cap">'+gsEsc(row[0])+'</td>'+row[1].map(function(v){ return '<td class="v5-rp-cell">'+v4MatrixCell(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+  return '<p class="secd" style="margin:0 0 14px">Compare what each role can do, then pick one. You can change a person\u2019s role later.</p>'
+   +'<div class="v4-matrix-scroll"><table class="hs-table">'+head+'<tbody>'+rows+'</tbody></table></div>'
+   +'<div class="hs-alert hs-alert--warning" style="margin:14px 0 0"><span class="material-symbols-outlined">warning</span><div>Rows marked <b>eng confirm</b> are still being resolved and are not final.</div></div>';
+ }
+ function v5InvOpenRolesPanel(){
+  var p=document.getElementById('v5InvRolesPanel'); var b=document.getElementById('v5InvRolesPanelBody'); if(!p||!b) return;
+  _v5InvPanelLastFocus=document.activeElement;                              /* the trigger, to restore on close */
+  b.innerHTML=v5InvRolesPanelHTML();
+  p.setAttribute('aria-hidden','false'); p.classList.add('open'); _v5InvPanelOpen=true;
+  initControlA11y(b);
+  var close=p.querySelector('.v5-rolepanel-head .hs-btn--icon'); setTimeout(function(){ if(close){ try{ close.focus(); }catch(e){} } },30);   /* focus moves INTO the panel */
+ }
+ /* silent=true when the whole invite is closing (do not steal focus back to the trigger). */
+ function v5InvCloseRolesPanel(silent){
+  var p=document.getElementById('v5InvRolesPanel'); if(!p) return;
+  p.classList.remove('open'); p.setAttribute('aria-hidden','true'); _v5InvPanelOpen=false;
+  var t=_v5InvPanelLastFocus; _v5InvPanelLastFocus=null;
+  if(!silent){ var trg=document.getElementById('v5InvSeeAll')||t; if(trg&&trg.focus){ try{ trg.focus(); }catch(e){} } }   /* return focus to the trigger */
+ }
+ /* Focusables scoped to the open panel (so the invite's Tab trap cycles WITHIN the panel while it is open). */
+ function v5InvPanelFocusables(){ var p=document.getElementById('v5InvRolesPanel'); if(!p)return []; return Array.prototype.filter.call(p.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),function(el){ return !el.disabled && el.offsetParent!==null; }); }
  /* Fix (v4, spec section 3): ONE modal, not a 3-step wizard. Email + role + team are shown together and scan at a
     glance. The email field uses the .hs-input-tag pills + the .v4-inv-emails token container (Bento Input states). */
  function v4RenderInvite(){
@@ -2390,7 +2502,11 @@
     +'</div>'
    /* Role */
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What can they do?</span><p class="v4-inv-cap">Pick the closest role. You can change it later.</p>'
-    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')+'</div></div>'
+    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')
+    /* v5 C1 FIX 2 (task 32): "See what each role can do" -> opens the compact all-roles capability panel IN-CONTEXT
+       (a slide-in side panel within the invite; does NOT navigate away). v5-gated: appended only under body.v5, so the
+       v4/v3 invite radio grid is byte-identical. The per-role one-line descriptors above stay. */
+    +(V5?'</div><div class="v5-inv-seeall"><button class="hs-btn hs-btn--ghost hs-btn--sm" type="button" id="v5InvSeeAll" aria-haspopup="dialog" onclick="v5InvOpenRolesPanel()"><span class="material-symbols-outlined">table_rows</span>See what each role can do</button></div></div>':'</div></div>')
    /* Teams */
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">Add to a team? <span class="secd" style="font:var(--hs-type-body-sm)">(optional)</span></span><p class="v4-inv-cap">A team grants the accounts it manages. Skip this and they join the org without a team.</p>'
     +'<div class="v4-teamlist" id="v4InvTeamList">'+V4_TEAMS.map(function(t){ var on=!!_v4InvTeams[t.name]; return '<label class="v4-teamopt"><span class="hs-check'+(on?' is-on':'')+'" role="checkbox" tabindex="0" aria-checked="'+(on?'true':'false')+'" data-team="'+gsEsc(t.name)+'" onclick="v4InvToggleTeam(\''+gsEsc(t.name)+'\')"></span><span class="v4-team-t">'+gsEsc(t.name)+'</span><span class="v4-team-m">'+t.members+' people</span></label>'; }).join('')+'</div></div>';
@@ -4079,6 +4195,164 @@
   try{ if(PAGE_ID==='contact' && v4IsPage('Contact us')) v5Contact(); }catch(e){}         /* v5b: Contact us becomes a light in-product links page (drops the v4 form) */
   try{ if(v4IsPage('General')) v5OrgGeneral(); }catch(e){}                                  /* FIX 2 (task 23): reframe the Org General visibility control as a clearly-scoped RESTRICT setting + render the provisional marker cleanly */
   try{ if(PAGE_ID==='billing' && v4IsPage('Billing & plan')) v5Billing(); }catch(e){}       /* TASK 22: replace the v4 entry-only stub with the real Plan & billing card page (role-gated at the nav via acc HHRE) */
+  try{ v5AnnotInit(); }catch(e){}                                                          /* pass C3: build the annotations toggle + place the note callouts (hidden until the toggle is on) */
+ }
+ /* ================= v5 pass C3: UX-annotations layer =================
+    A prototype-only, toggleable layer that explains the thinking behind the design. Built here from applyV5() AFTER the
+    page transforms have run, so the note hosts (the People tabs, the reframed Roles lead, the Org General visibility
+    card, and so on) already exist. Two parts:
+      (1) A floating PROTOTYPE control: a bottom-left pill button (clear of the demo dock bottom-right and the toast
+          bottom-centre), a real <button> with aria-pressed, OFF by default, labelled "Show annotations" / "Hide
+          annotations". It flips body.v5-annot, which the CSS uses to smoothly show/hide the notes (entrance animation
+          in; a transient .v5-annot-leaving plays the exit before display:none reapplies, so both directions are smooth
+          and honour prefers-reduced-motion). The on/off state persists in sessionStorage (key v5annot) so it survives
+          navigation between pages during a demo.
+      (2) The NOTES: soft mint-tinted callout cards (a small "Why" pill + a lightbulb glyph, distinct from the product
+          surfaces) placed BESIDE or ABOVE the relevant area on each page, never on top of the real controls. Copy is
+          the plain-English design notes, mapped to each page/area. Hidden (display:none, no reserved gap) until the
+          toggle is on. All body.v5-scoped; v4 and v3 never run applyV5, so their DOM is untouched.
+    NOTE COPY: kept in double-quoted JS strings so apostrophes need no escaping. Plain simple English, Canadian, no
+    AI jargon, no em/en dashes. */
+ var V5_ANNOT_LEAVE_MS=180;                                                    /* matches the .v5-annot-leaving exit animation */
+ function v5AnnotOn(){ try{ return sessionStorage.getItem('v5annot')==='1'; }catch(e){ return false; } }
+ /* Build one callout card. label defaults to "Why". Returns the element (display:none until body.v5-annot). */
+ function v5AnnotNote(text, lead){
+  var n=v4El('<div class="v5-annot-note'+(lead?' v5-annot-lead':'')+'" role="note">'
+   +'<span class="material-symbols-outlined v5-annot-ic" aria-hidden="true">lightbulb</span>'
+   +'<span class="v5-annot-why"><span class="material-symbols-outlined" aria-hidden="true" style="font-size:14px">design_services</span>Why</span>'
+   +'<p class="v5-annot-body"></p></div>');
+  n.querySelector('.v5-annot-body').textContent=text;                          /* textContent so the copy is never parsed as HTML */
+  return n;
+ }
+ /* Place a note relative to a host that may not be rendered yet (some v5 transforms retry on a timer). where:
+    'before' inserts the note before the host, 'after' inserts it after, 'prepend' puts it first inside the host.
+    id makes it idempotent (never double-placed across re-runs). Retries briefly, then gives up quietly. */
+ function v5AnnotPlace(id, text, hostFn, where, lead, tries){
+  if(document.getElementById(id)) return;                                      /* already placed */
+  var host; try{ host=hostFn(); }catch(e){ host=null; }
+  if(!host){ if((tries||0)>40) return; setTimeout(function(){ v5AnnotPlace(id,text,hostFn,where,lead,(tries||0)+1); },80); return; }
+  if(document.getElementById(id)) return;
+  var n=v5AnnotNote(text, lead); n.id=id;
+  if(where==='prepend'){ host.insertBefore(n, host.firstChild); }
+  else if(where==='after'){ host.parentNode.insertBefore(n, host.nextSibling); }
+  else { host.parentNode.insertBefore(n, host); }                              /* 'before' (default) */
+ }
+ /* Reflect the TARGET state on the button (pass the intended on/off, not the transient class, since the exit
+    animation removes the body class a beat later). */
+ function v5AnnotSetLabel(btn, on){
+  btn.setAttribute('aria-pressed', on?'true':'false');
+  var lbl=btn.querySelector('.v5-annot-fab-label'); if(lbl) lbl.textContent=on?'Hide annotations':'Show annotations';
+  btn.setAttribute('title', on?'Hide the design annotations':'Show the design annotations');
+ }
+ function v5AnnotToggle(){
+  var btn=document.getElementById('v5AnnotFab'); if(!btn) return;
+  var goingOn=!document.body.classList.contains('v5-annot');
+  if(goingOn){
+   document.body.classList.add('v5-annot');                                    /* CSS plays the entrance animation */
+   try{ sessionStorage.setItem('v5annot','1'); }catch(e){}
+   v5AnnotSetLabel(btn, true);
+  } else {
+   /* smooth exit: mark the notes leaving, let the exit animation play, then drop v5-annot so they display:none */
+   var notes=document.querySelectorAll('.v5-annot-note');
+   var reduce=false; try{ reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+   if(reduce){ document.body.classList.remove('v5-annot'); }
+   else {
+    Array.prototype.forEach.call(notes,function(n){ n.classList.add('v5-annot-leaving'); });
+    setTimeout(function(){ document.body.classList.remove('v5-annot'); Array.prototype.forEach.call(notes,function(n){ n.classList.remove('v5-annot-leaving'); }); }, V5_ANNOT_LEAVE_MS);
+   }
+   try{ sessionStorage.setItem('v5annot','0'); }catch(e){}
+   v5AnnotSetLabel(btn, false);
+  }
+ }
+ function v5AnnotBuildFab(){
+  if(document.getElementById('v5AnnotFab')) return;
+  var btn=v4El('<button type="button" class="v5-annot-fab" id="v5AnnotFab" aria-pressed="false" onclick="v5AnnotToggle()">'
+   +'<span class="v5-annot-fab-dot" aria-hidden="true"></span>'
+   +'<span class="material-symbols-outlined" aria-hidden="true">visibility</span>'
+   +'<span class="v5-annot-fab-label">Show annotations</span></button>');
+  document.body.appendChild(btn);
+  var on=v5AnnotOn();
+  if(on) document.body.classList.add('v5-annot');                              /* restore persisted state (survives navigation) */
+  v5AnnotSetLabel(btn, on);
+ }
+ /* Place the page notes. The left-nav lead + the one-time intro attach to the drawer, which exists on every standard
+    settings page (not the Perch stage). Page-specific notes attach to their area's host. All are idempotent. */
+ function v5AnnotInit(){
+  if(!V5) return;
+  v5AnnotBuildFab();
+  /* LEFT NAV (every standard v5 page): a lead note at the top of the drawer body. */
+  v5AnnotPlace('v5AnnotNav',
+   "You land on the left menu, not an overview page. In testing, most people went straight to the left menu to get around, and no one leaned on the overview, so we dropped it. Settings are grouped into your account, your organization, and publishing. Publishing is a temporary home for tags and links until the Perch team takes them over. Contact us sits at the bottom and links out, like other tools.",
+   function(){ return document.getElementById('navBody'); }, 'prepend', true);
+  /* ONE-TIME INTRO: shown once, on the first page you see (Profile). Kept to Profile so it does not repeat everywhere. */
+  if(PAGE_ID==='profile'){
+   v5AnnotPlace('v5AnnotIntro',
+    "The goal was to pull settings that were scattered across more than eight places into one home, and make things easier to find, without changing what anyone is allowed to do.",
+    function(){ var pc=document.getElementById('pageContent'); return pc?pc.firstChild:null; }, 'before');
+   /* PROFILE, near time zone / language (the preferences card). */
+   v5AnnotPlace('v5AnnotProfileTz',
+    "Time zone and language sit here as two separate settings. Layla pointed out that language does not decide your time zone, that is more about your region, so we split them.",
+    function(){ var l=document.getElementById('tzLbl'); return l?l.closest('.set-card'):null; }, 'after');
+  }
+  if(PAGE_ID==='security'){
+   /* SECURITY, near password. */
+   v5AnnotPlace('v5AnnotSecPw',
+    "Password lives here under Security and privacy. That is the first place people looked in testing, and it matches other tools.",
+    function(){ return document.getElementById('v4SecPwCard'); }, 'after');
+   /* SECURITY, near delete account (the danger zone). */
+   v5AnnotPlace('v5AnnotSecDel',
+    "Deleting your account lives here with a safety check, and we point to it from Profile and billing so it is easy to find. Closing your own account is a different thing from cancelling the organization's plan.",
+    function(){ return document.getElementById('v4SecDanger'); }, 'after');
+  }
+  if(PAGE_ID==='notifs'){
+   /* NOTIFICATIONS: a lead note at the top of the page content. */
+   v5AnnotPlace('v5AnnotNotifs',
+    "These use checkboxes because you are picking several kinds of notifications. A single on and off setting, like What's New, uses a switch.",
+    function(){ var pc=document.getElementById('pageContent'); return pc?pc.firstChild:null; }, 'before');
+  }
+  if(PAGE_ID==='members'){
+   /* PEOPLE, near the tabs (Members / Teams / Pending invites): placed just ABOVE the white People panel so it sits
+      beside the tab strip without landing inside the product surface. */
+   v5AnnotPlace('v5AnnotPeopleTabs',
+    "Members and Teams live in one place. In testing, people could not tell which page to use to manage someone, so you switch the view instead of guessing. Pending invites are their own tab because an invited person is a different thing from an active member.",
+    function(){ return document.getElementById('v5PeoplePanel'); }, 'before');
+   /* PEOPLE, near the members rows / Access via (above the members table). */
+   v5AnnotPlace('v5AnnotPeopleRows',
+    "Each row shows how a person got their access, directly or through a team, and what they own. Hill pointed out it is hard today to see how members, teams, and accounts connect, so we made that clear up front.",
+    function(){ var t=document.getElementById('v4MembersTbl'); return t?t.closest('.set-card'):null; }, 'before');
+   /* PEOPLE, near the Invite people button (about the invite). */
+   v5AnnotPlace('v5AnnotPeopleInvite',
+    "Inviting is one window: who, what they can do, and which team, all at once. Keeping invite and add to team separate confused people, and setting up a contractor with the right access failed about a third of the time, so each role is explained right where you choose it. You can also see what every role does without leaving the invite.",
+    function(){ return document.getElementById('v4MbrHead'); }, 'after');
+   /* PEOPLE, about removing someone (below the members table). */
+   v5AnnotPlace('v5AnnotPeopleRemove',
+    "You cannot remove someone who owns accounts until you hand each one to someone else. Removing people used to risk leaving accounts with no owner.",
+    function(){ var t=document.getElementById('v4MembersTbl'); return t?t.closest('.set-card'):null; }, 'after');
+  }
+  if(PAGE_ID==='billing'){
+   /* PLAN & BILLING page: a lead note at the top of the page content. */
+   v5AnnotPlace('v5AnnotBilling',
+    "Plan and billing sits under your account and only shows for people who handle billing. It is built from Layla's design.",
+    function(){ var pc=document.getElementById('pageContent'); return pc?pc.firstChild:null; }, 'before');
+  }
+  if(PAGE_ID==='general'){
+   /* ORG GENERAL, near the visibility setting (the reframed visibility card). */
+   v5AnnotPlace('v5AnnotOrgVis',
+    "This setting controls who can find the organization. It is marked as not final because we are still confirming the exact options.",
+    function(){ var m=document.querySelector('#v4OrgGen .v4-provisional'); return m?m.closest('.set-card'):null; }, 'after');
+  }
+  if(PAGE_ID==='social'){
+   /* SOCIAL & AD ACCOUNTS: a lead note at the top of the page content. */
+   v5AnnotPlace('v5AnnotSocial',
+    "Each account shows its real connection status and who approves its posts. Private accounts have their own filter.",
+    function(){ var pc=document.getElementById('pageContent'); return pc?pc.firstChild:null; }, 'before');
+  }
+  if(PAGE_ID==='roles'){
+   /* ROLES: near the reframed lead (above the create action + reference matrix). */
+   v5AnnotPlace('v5AnnotRoles',
+    "This page explains what each role can do and lets you create custom ones. The full details also live in the Help Center, so this page stays simple. A few things across settings are marked as not final on purpose: sending an invite does not go through yet, some permission rules still need engineering to confirm, and the remove guard is waiting on sign-off.",
+    function(){ return document.getElementById('v5RolesLead'); }, 'before');
+  }
  }
  /* ================= FIX 2 (v5, task 23): Org General visibility = a clearly-scoped RESTRICT control =================
     The v4 visibility card reads like a global on/off for the whole org and crams the provisional marker into the
@@ -4381,41 +4655,58 @@
      requires !V4 (never under v5) or already ran during applyV4 before this relabel. "People" is provisional. */
   var tb=document.querySelector('.suite-topbar .tb-title'); if(tb && tb.textContent.trim()==='Members') tb.textContent='People';
   /* The v4 members block spans #v4MbrHead (subtitle + Invite) + #v4MbrTabs + the two #v4MbrPanel-* panels. Wrap them
-     into a Members panel; leave any modals v4 appended to pc (invite / offboard overlays) at page level. */
+     into three top-level panels; leave any modals v4 appended to pc (invite / offboard overlays) at page level. */
   var head=document.getElementById('v4MbrHead');
   var mp=document.getElementById('v4MbrPanel-members');
   var pp=document.getElementById('v4MbrPanel-pending');
+  var c=v4Counts();                                                    /* Members 440 / Teams 52 / Pending invites 3, never hardcoded */
   var anchor=head||mbrBlock;                                           /* insert the toggle + panels where the block starts */
   var mbrPanel=v4El('<div id="v5Panel-members" role="tabpanel" aria-labelledby="v5PeopleTab-members"></div>');
   var teamsPanel=v4El('<div id="v5Panel-teams" role="tabpanel" aria-labelledby="v5PeopleTab-teams" hidden></div>');
+  var pendPanel=v4El('<div id="v5Panel-pending" role="tabpanel" aria-labelledby="v5PeopleTab-pending" hidden></div>');
   /* Visual fix: one white content surface. The page header (#v4MbrHead: subtitle + Invite) stays on the grey canvas
-     ABOVE; this panel wraps only the tab bar + both panels' content so the tabs anchor to a real surface (no more
+     ABOVE; this panel wraps only the tab bar + all three panels' content so the tabs anchor to a real surface (no more
      floating baseline on grey, no card-on-card inside). Inserted right AFTER the header (or where the block starts
      if there is no header). */
   var panel=v4El('<div class="v5-people-panel" id="v5PeoplePanel"></div>');
   anchor.parentNode.insertBefore(panel, head?head.nextSibling:anchor);
-  /* The single primary object switch: the shipped Bento Tabs (.hs-tabs/.hs-tab, components.css), the same tab
-     component every other page header uses, switching the Members panel and the Teams panel in place. This replaces
-     the earlier v5a ToggleGroup snowflake (its .tg/.ti class CSS was not in the shipped stylesheet). APG tab pattern:
-     role=tablist / role=tab, is-active + aria-selected on the current tab, roving tabindex, arrow-key navigation.
-     Two tabs: Members / Teams. Default Members. */
-  var toggle=v4El('<nav class="v5-people-switch hs-tabs" id="v5PeopleToggle" role="tablist" aria-label="Switch between people and teams">'
-   +'<a class="hs-tab is-active" role="tab" tabindex="0" aria-selected="true" aria-controls="v5Panel-members" id="v5PeopleTab-members" onclick="v5PeopleTab(\'members\')" onkeydown="v5PeopleTabKey(event,\'members\')">Members</a>'
-   +'<a class="hs-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="v5Panel-teams" id="v5PeopleTab-teams" onclick="v5PeopleTab(\'teams\')" onkeydown="v5PeopleTabKey(event,\'teams\')">Teams</a>'
+  /* C2: the People page primary switch is a single shipped Bento Tabs strip (.hs-tabs/.hs-tab,
+     components.css) with THREE tabs: Members / Teams / Pending invites. Members and Teams are the two objects; pending
+     invites are a third, distinct object (invites, not members), so they get their own tab rather than a status
+     filter inside Members (an Active/Pending status chip conflated an invite with a member). Counts come from
+     v4Counts() (440 / 52 / 3), never hardcoded. APG tab pattern: role=tablist / role=tab, is-active + aria-selected on
+     the current tab, roving tabindex, arrow-key navigation. Default Members. */
+  var toggle=v4El('<nav class="v5-people-switch hs-tabs" id="v5PeopleToggle" role="tablist" aria-label="Switch between members, teams and pending invites">'
+   +'<a class="hs-tab is-active" role="tab" tabindex="0" aria-selected="true" aria-controls="v5Panel-members" id="v5PeopleTab-members" onclick="v5PeopleTab(\'members\')" onkeydown="v5PeopleTabKey(event,\'members\')">Members <span id="v5PeopleTabMbrN">'+c.membersTotal+'</span></a>'
+   +'<a class="hs-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="v5Panel-teams" id="v5PeopleTab-teams" onclick="v5PeopleTab(\'teams\')" onkeydown="v5PeopleTabKey(event,\'teams\')">Teams <span id="v5PeopleTabTeamN">'+c.teamsTotal+'</span></a>'
+   +'<a class="hs-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="v5Panel-pending" id="v5PeopleTab-pending" onclick="v5PeopleTab(\'pending\')" onkeydown="v5PeopleTabKey(event,\'pending\')">Pending invites <span id="v5PeopleTabPendN">'+c.pending+'</span></a>'
    +'</nav>');
-  /* Tab bar anchors to the TOP of the white surface; both panels follow, inside the same surface. The header
+  /* Tab bar anchors to the TOP of the white surface; all three panels follow, inside the same surface. The header
      (#v4MbrHead) is deliberately NOT moved in here: it stays on the grey canvas above the panel. */
   panel.appendChild(toggle);
   panel.appendChild(mbrPanel);
   panel.appendChild(teamsPanel);
-  /* Move the v4 members block into the Members panel (order preserved). The subtitle + Invite header (#v4MbrHead)
-     stays outside the panel on the grey canvas. */
+  panel.appendChild(pendPanel);
+  /* Members panel = the active members table + its toolbar + bulk bar + the B2 relationship display. Move the v4
+     members block (mbrBlock = #v4MbrTabs, suppressed below) + the members content panel in, order preserved. The
+     subtitle + Invite header (#v4MbrHead) stays outside the panel on the grey canvas. */
   mbrPanel.appendChild(mbrBlock);
   if(mp) mbrPanel.appendChild(mp);
-  if(pp) mbrPanel.appendChild(pp);
-  /* v5 IA fix: retire the inner [Members | Pending invites] tab strip and move pending into an [Active | Pending]
-     status filter in the members toolbar, so "Members" is not a tab at two levels. (mbrBlock is #v4MbrTabs.) */
-  v5BuildStatusFilter();
+  /* Pending invites panel = the existing pending-invites list (#v4MbrPanel-pending: email, role, sent date, Resend,
+     Revoke) + its empty state, exactly as v4RenderPending built it. It now lives under its OWN top tab instead of
+     inside the Members panel; move it into the top-level pending tabpanel, unhide it (v4 built it hidden as an
+     inner-tab panel), and strip its old inner-tab role/labelledby so the top #v5Panel-pending is the sole tabpanel
+     (no nested tabpanel). The top tab now controls its visibility. */
+  if(pp){ pp.hidden=false; pp.removeAttribute('role'); pp.removeAttribute('aria-labelledby'); pendPanel.appendChild(pp); }
+  /* C2: retire the inner v4 [Members | Pending invites] tab strip (mbrBlock = #v4MbrTabs) under v5, since Members and
+     Pending invites are now top-level tabs. It carries both .hs-tabs and .v4-mbr-tabs, and .hs-tabs{display:flex}
+     outranks the UA [hidden] rule, so the hidden attribute alone would not hide it; force display:none inline (also
+     set hidden for semantics). */
+  if(mbrBlock){ mbrBlock.hidden=true; mbrBlock.style.display='none'; }
+  /* A2 FIX GROUP 1 item 1: remove the redundant external filter icon v4Members put to the LEFT of the search box
+     (.v4-fb-lead, the filter_list glyph); the search input keeps its own internal search glyph. v5-only (v4Members
+     still renders it for the v4 reference build, so v4 DOM stays byte-identical). */
+  var _fb=document.getElementById('v4FilterBar'); if(_fb){ var _lead=_fb.querySelector('.v4-fb-lead'); if(_lead) _lead.parentNode.removeChild(_lead); }
   /* Build the Teams host with the EXACT base markup v4Teams consumes (a .set-sub, a .csearch-row with a primary
      button, and a .set-card > table.hs-table), then run the shipped v4Teams renderer against this scoped panel
      (hosted=true bypasses only its topbar-title page-guard; all its content queries are already pc-scoped). */
@@ -4425,8 +4716,9 @@
    +'<button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">add</span>Create team</button></div>'
    +'<div class="set-card"><table class="hs-table"><thead><tr><th>Team</th><th>Created</th><th>Members</th><th>Accounts</th><th></th></tr></thead><tbody></tbody></table></div>';
   try{ v4Teams(teamsPanel, true); }catch(e){}
-  /* Default view = Members, unless arriving from a team-detail back-arrow (?peopletab=teams), which opens on Teams. */
-  try{ var _pt=new URLSearchParams(location.search).get('peopletab'); if(_pt==='teams') v5PeopleTab('teams'); }catch(e){}
+  /* Default view = Members, unless arriving from a team-detail back-arrow (?peopletab=teams) which opens on Teams, or
+     ?peopletab=pending which opens on Pending invites. */
+  try{ var _pt=new URLSearchParams(location.search).get('peopletab'); if(_pt==='teams'||_pt==='pending') v5PeopleTab(_pt); }catch(e){}
   /* B2 (Hill, Friday): once the members table is hosted in the People panel, make the org -> team -> member -> account
      relationship legible on each row (strengthen "Access via" into named-team provenance chips, and turn "Owns" into
      account-network icon tiles + a clear count). v5-gated; layered on the v4-rendered rows in place. */
@@ -4503,117 +4795,32 @@
    tr.setAttribute('data-v5rel','1');
   });
  }
- /* Switch the People view between the Members panel and the Teams panel (APG tab pattern: is-active + aria-selected
-    move to the current tab, roving tabindex 0/-1, the other panel is hidden). */
+ /* The three People tabs, in strip order. */
+ var _V5_PEOPLE_TABS=['members','teams','pending'];
+ /* Switch the People view between the Members, Teams and Pending invites panels (APG tab pattern: is-active +
+    aria-selected move to the current tab, roving tabindex 0/-1, the other panels are hidden). */
  function v5PeopleTab(view){
-  var mp=document.getElementById('v5Panel-members'), tp=document.getElementById('v5Panel-teams');
-  if(!mp||!tp) return;
-  var isTeams=(view==='teams');
-  mp.hidden=isTeams; tp.hidden=!isTeams;
-  var bm=document.getElementById('v5PeopleTab-members'), bt=document.getElementById('v5PeopleTab-teams');
-  if(bm){ bm.classList.toggle('is-active',!isTeams); bm.setAttribute('aria-selected', String(!isTeams)); bm.setAttribute('tabindex', isTeams?'-1':'0'); }
-  if(bt){ bt.classList.toggle('is-active',isTeams); bt.setAttribute('aria-selected', String(isTeams)); bt.setAttribute('tabindex', isTeams?'0':'-1'); }
+  if(_V5_PEOPLE_TABS.indexOf(view)===-1) return;
+  _V5_PEOPLE_TABS.forEach(function(k){
+   var p=document.getElementById('v5Panel-'+k); if(p) p.hidden=(k!==view);
+   var b=document.getElementById('v5PeopleTab-'+k);
+   if(b){ var on=(k===view); b.classList.toggle('is-active',on); b.setAttribute('aria-selected',String(on)); b.setAttribute('tabindex',on?'0':'-1'); }
+  });
+  /* Leaving the Members tab: close any open Role/Team filter popover so it does not float over another panel. */
+  if(view!=='members' && typeof v4FbCloseAll==='function'){ try{ v4FbCloseAll(); }catch(e){} }
  }
- /* Keyboard for the People tabs: Enter/Space activates, Left/Right moves to and focuses the other tab (APG). */
+ /* Keyboard for the People tabs: Enter/Space activates, Left/Right moves to and focuses the adjacent tab, wrapping
+    across the three (APG). */
  function v5PeopleTabKey(e,view){
   if(e.key==='Enter'||e.key===' '){ e.preventDefault(); v5PeopleTab(view); return; }
-  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ e.preventDefault(); var other=(view==='members')?'teams':'members'; v5PeopleTab(other); var ob=document.getElementById('v5PeopleTab-'+other); if(ob) ob.focus(); }
- }
- /* Members status filter (v5): the inner v4 [Members | Pending invites] tab strip is a second, competing navigation
-    next to the top Members/Teams tabs (Members would appear at two levels), so under v5 it is suppressed and pending
-    invites become a STATUS FILTER inside the Members view. A2 FIX GROUP 1 item 3: the status control is now the SAME
-    shipped Bento ChipFilter (.cf) the Role/Team filters use, not a bespoke segmented toggle, so all three toolbar
-    filters read as one consistent pattern. It is a single "Status" chip that mirrors Role/Team exactly: at rest it
-    shows the current value + count in a grey .cf .ct (default = Active); choosing Pending flips it to the shipped
-    .cf.selected state (the "blue chip with a count badge") with an .x that clears back to Active. Active (default)
-    shows the members table + its toolbar filters + bulk bar; Pending shows the SAME pending-invites content v4 already
-    renders (#v4MbrPanel-pending: email, role, sent date, Resend + Revoke, plus the zero-state), reused as-is. v5-gated;
-    v4 keeps its tab strip. NOTE: the model stays binary (Active | Pending) because pending invites are not members, so
-    there is no combined "All" view to merge them into; the chip's resting/default value is Active. */
- var _v5MbrStatus='active';
- function v5BuildStatusFilter(){
-  /* Suppress the inner v4 [Members | Pending invites] tab strip under v5. It carries both .hs-tabs and .v4-mbr-tabs,
-     and .hs-tabs{display:flex} outranks the UA [hidden] rule, so the hidden attribute alone would not hide it; force
-     display:none inline (also set hidden for semantics). */
-  var tabs=document.getElementById('v4MbrTabs'); if(tabs){ tabs.hidden=true; tabs.style.display='none'; }
-  var fb=document.getElementById('v4FilterBar'); if(!fb) return;
-  if(document.getElementById('v5StatusChipWrap')) return;                                 /* idempotent */
-  /* A2 FIX GROUP 1 item 1: remove the redundant external filter icon that v4Members put to the LEFT of the search box
-     (.v4-fb-lead, the filter_list glyph). The search input keeps its own internal search glyph, so the external lead
-     is duplicative here. v5-only: v4Members still renders it for the v4 reference build (v4 DOM stays byte-identical);
-     we drop it from the DOM only under v5. */
-  var lead=fb.querySelector('.v4-fb-lead'); if(lead) lead.parentNode.removeChild(lead);
-  /* Status ChipFilter, built with the SAME .cf / .v4-fb-chip / .v4-fpop / .hs-option primitives as v4RoleChip /
-     v4TeamChip, so it is the identical component. Placed as the LEAD control (before the search) so the toolbar reads
-     status -> filters left-to-right and never relies on margin-left:auto (which left the empty gap in Pending). Built
-     in its resting/default state (Active); v5MbrStatus paints the selected/blue state when Pending is chosen. */
-  var wrap=v4El('<div class="v4-fb-chip" id="v5StatusChipWrap"><button class="cf" type="button" id="v5StatusChip" aria-haspopup="listbox" aria-expanded="false" onclick="v5StatusToggle(event)"></button></div>');
-  fb.insertBefore(wrap, fb.firstChild);
-  v5MbrStatus('active');
- }
- /* Repaint the Status chip for the current value. Active = resting grey .cf with the value + count in a grey .ct and a
-    trailing chevron (mirrors Role/Team at rest, but always shows the value since Status is never unset). Pending = the
-    shipped .cf.selected blue chip with the value + count in .ct and a trailing .x that clears back to Active. */
- function v5StatusPaintChip(){
-  var chip=document.getElementById('v5StatusChip'); if(!chip) return;
-  var c=(typeof v4Counts==='function')?v4Counts():{membersTotal:'',pending:''};
-  var pending=(_v5MbrStatus==='pending');
-  chip.setAttribute('aria-controls', pending?'v4MbrPanel-pending':'v4MbrPanel-members');
-  if(pending){
-   chip.classList.add('selected');
-   chip.innerHTML='<span>Status</span><span class="ct">Pending \u00b7 '+c.pending+'</span>'
-    +'<span class="x" role="button" tabindex="0" aria-label="Show active people instead" onclick="v5StatusClear(event)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v5StatusClear(event);}"><span class="material-symbols-outlined">close</span></span>';
-  } else {
-   chip.classList.remove('selected');
-   chip.innerHTML='<span>Status</span><span class="ct">Active \u00b7 '+c.membersTotal+'</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span>';
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+   e.preventDefault();
+   var i=_V5_PEOPLE_TABS.indexOf(view); if(i===-1) return;
+   var n=_V5_PEOPLE_TABS.length;
+   var j=(e.key==='ArrowRight')?((i+1)%n):((i-1+n)%n);
+   var other=_V5_PEOPLE_TABS[j];
+   v5PeopleTab(other); var ob=document.getElementById('v5PeopleTab-'+other); if(ob) ob.focus();
   }
- }
- /* Open/close the Status listbox popover (same .v4-fpop overlay + .hs-option rows as the Role/Team dropdowns; APG
-    listbox: roving focus, Enter/Space picks, Escape closes + restores focus to the chip). Reuses v4FbCloseAll so
-    opening Status closes any open Role/Team popover and vice versa. */
- function v5StatusToggle(e){
-  e.preventDefault(); e.stopPropagation();
-  var wrap=document.getElementById('v5StatusChipWrap'); var chip=document.getElementById('v5StatusChip'); if(!wrap||!chip) return;
-  var pop=wrap.querySelector('.v4-fpop'); var isOpen=pop&&pop.classList.contains('open');
-  if(typeof v4FbCloseAll==='function'){ try{ v4FbCloseAll(); }catch(e2){} }
-  v5StatusCloseAll();
-  if(isOpen) return;
-  if(!pop){ pop=document.createElement('div'); pop.className='v4-fpop'; pop.setAttribute('role','listbox'); pop.setAttribute('aria-label','Filter by status'); wrap.appendChild(pop); }
-  var c=(typeof v4Counts==='function')?v4Counts():{membersTotal:'',pending:''};
-  var opts=[{v:'active',label:'Active',count:c.membersTotal},{v:'pending',label:'Pending',count:c.pending}];
-  pop.innerHTML=opts.map(function(o){ var sel=(o.v===_v5MbrStatus); return '<div class="hs-option'+(sel?' is-selected':'')+'" role="option" tabindex="0" aria-selected="'+(sel?'true':'false')+'" data-val="'+o.v+'" onclick="v5StatusPick(\''+o.v+'\')" onkeydown="v5StatusOptKey(event,\''+o.v+'\',this)"><span class="hs-option-label">'+o.label+'</span><span class="hs-option-count">'+o.count+'</span>'+(sel?'<span class="material-symbols-outlined">check</span>':'')+'</div>'; }).join('');
-  pop.classList.add('open'); chip.classList.add('open'); chip.setAttribute('aria-expanded','true');
-  var ch=chip.querySelector('.chev'); if(ch)ch.style.transform='rotate(180deg)';
-  var first=pop.querySelector('.hs-option.is-selected')||pop.querySelector('.hs-option'); if(first) setTimeout(function(){first.focus();},0);
- }
- function v5StatusCloseAll(){ var w=document.getElementById('v5StatusChipWrap'); if(!w) return; Array.prototype.forEach.call(w.querySelectorAll('.v4-fpop.open'),function(p){ p.classList.remove('open'); }); var chip=document.getElementById('v5StatusChip'); if(chip){ chip.classList.remove('open'); chip.setAttribute('aria-expanded','false'); var ch=chip.querySelector('.chev'); if(ch)ch.style.transform=''; } }
- function v5StatusPick(v){ v5StatusCloseAll(); v5MbrStatus(v); var chip=document.getElementById('v5StatusChip'); if(chip) chip.focus(); }
- function v5StatusClear(e){ if(e){ e.preventDefault(); e.stopPropagation(); } v5StatusCloseAll(); v5MbrStatus('active'); var chip=document.getElementById('v5StatusChip'); if(chip) chip.focus(); }
- function v5StatusOptKey(e,v,opt){
-  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); v5StatusPick(v); return; }
-  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); var sib=e.key==='ArrowDown'?opt.nextElementSibling:opt.previousElementSibling; if(sib)sib.focus(); }
-  if(e.key==='Escape'){ e.preventDefault(); v5StatusCloseAll(); var chip=document.getElementById('v5StatusChip'); if(chip)chip.focus(); }
- }
- /* Apply the status filter: Active shows the members table (toolbar filters + bulk bar live); Pending hides the
-    members-only content and reveals the reused v4 pending panel. A2 FIX GROUP 1 item 2: under Pending the members-only
-    toolbar filters (search, Role, Team) are hidden so the toolbar reflows cleanly with no empty gap; only the Status
-    chip remains. The Status chip stays visible in both states and repaints to reflect the current value. */
- function v5MbrStatus(status){
-  _v5MbrStatus=status; var pending=(status==='pending');
-  var mp=document.getElementById('v4MbrPanel-members'); var pp=document.getElementById('v4MbrPanel-pending');
-  if(pp) pp.hidden=!pending;                                                             /* pending panel: shown only for Pending */
-  /* Hide the members-only pieces inside the members panel when Pending is active (they filter/act on members): the
-     table card, the field hint, the bulk bar, and the members-only toolbar controls (text, Role, Team). The Status
-     chip and the toolbar frame stay. */
-  if(mp){
-   var card=document.getElementById('v4MembersTbl'); card=card?card.closest('.set-card'):null; if(card) card.style.display=pending?'none':'';
-   Array.prototype.forEach.call(mp.querySelectorAll('.hs-field-hint'),function(h){ h.style.display=pending?'none':''; });
-   var bulk=document.getElementById('v4BulkBar'); if(bulk && pending) bulk.style.display='none';
-  }
-  var fb=document.getElementById('v4FilterBar');
-  if(fb){ Array.prototype.forEach.call(fb.querySelectorAll('.hs-input.affix.csearch, .v4-fb-chip'),function(el){ if(el.id==='v5StatusChipWrap') return; el.style.display=pending?'none':''; }); }
-  if(pending && typeof v4FbCloseAll==='function'){ try{ v4FbCloseAll(); }catch(e){} }     /* close any open Role/Team popover when leaving Active */
-  v5StatusPaintChip();
  }
  /* T4: remove the "Sync profiles" row from the rendered roles matrix (Hill scrapped the capability). v5-gated, done
     on the DOM the v4 matrix produced, so V4_MATRIX (and the v4 build) keep the row. Idempotent. The other stubbed
@@ -4625,51 +4832,60 @@
    var cap=tr.querySelector('td.v4-cap'); if(cap && cap.textContent.trim()==='Sync profiles'){ tr.parentNode.removeChild(tr); }
   });
  }
- /* ================= v5b CHANGE 3: Roles & permissions reframe (management-led, matrix as reference) =================
-    Per the Hill sync: the standalone Roles & permissions page should NOT read as a pure read-only dictionary. Role
-    understanding belongs at the point of action (the invite, where role descriptors already live from v4), and the
-    full reference lives in the Help Center. So under v5 we reframe this page to LEAD with the management framing
-    (managing roles, especially custom roles), keeping the capability matrix as SUPPORTING reference below. Layered on
-    top of v4Roles (which already built #v4MatrixCard + gated the "Create custom role" header button via
-    v4WireCreateCustomRole): we (1) rewrite the page subtitle toward management, (2) insert a management intro card
-    ABOVE the matrix, and (3) retune the matrix card's own lead so it reads as the reference table, with a helper line
-    noting each role is also explained where you assign it (the invite) and that the full role reference lives in the
-    Help Center. The matrix is NOT removed; the 7 contested cells stay "eng confirm" (held gate b, untouched here);
-    custom-role create/edit stays gated to Business/Enterprise (v4WireCreateCustomRole owns that gate, untouched).
-    v5-gated, so the v4 Roles page (dictionary-led) is unchanged under ?v4=1.
-    NOTE: this reframe is DIRECTIONAL pending the product/design lead sign-off. Idempotent via #v5RolesLead. */
+ /* ================= v5 C1 FIX 1 (task 30): Roles & permissions simplify + real create pattern =================
+    Per the Hill sync + C1 pass: the standalone Roles & permissions page read as a busy, text-heavy dictionary with a
+    "Create custom role" buried in a dense explanatory card. That is NOT how we create things elsewhere: Create team
+    (v4OpenCreateTeam) and Invite people (v4OpenInvite) are a clean primary action that opens a modal. So under v5 we
+    STRIP the page to a minimal reference: (1) a short one-line intro (roles define what people can do; each role is
+    also explained where you assign it, in the invite; full reference in the Help Center), (2) a CLEAN primary
+    "Create custom role" action that opens the SAME create modal (v4OpenCreateCustomRole) exactly like Create team /
+    Invite people, gated Business/Enterprise via the existing v4CustomRolesUnlocked/v4CustomUpsell logic (never hidden,
+    just gated), and (3) the capability matrix below, retuned to read as the reference (no prose walls). Predefined
+    roles stay read-only, custom rows stay editable (v4RenderMatrix owns that, untouched). The matrix is NOT removed;
+    the 7 contested cells stay "eng confirm" (held gate b, untouched). v5-gated, so the v4 Roles page (dictionary-led)
+    is byte-identical under ?v4=1.
+    Idempotent via #v5RolesLead. Layered on top of v4Roles (which built #v4MatrixCard + wired the header .ph-add
+    create button via v4WireCreateCustomRole). We hide that legacy header icon button under v5 in favour of the clean
+    labelled primary below, so there is ONE obvious create action, matching Create team / Invite people.
+    NOTE: this reframe is DIRECTIONAL pending the product/design lead sign-off. */
  function v5RolesReframe(){
   var pc=document.getElementById('pageContent'); if(!pc) return;
   if(document.getElementById('v5RolesLead')) return;                       /* already reframed */
   var card=document.getElementById('v4MatrixCard');
   if(!card){ if((window._v5RolesTries=(window._v5RolesTries||0)+1)>40) return; setTimeout(v5RolesReframe,80); return; }  /* wait for the v4 matrix */
-  /* (1) Subtitle: from "the dictionary" toward managing roles. */
-  var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='Manage the roles people can hold, and create custom roles for your organization. Each role is also explained where you assign it, and the full reference is in the <a href="https://help.hootsuite.com/" target="_blank" rel="noopener">Help Center</a> (opens in a new tab).';
+  /* (1) Subtitle: one short line. Roles define what people can do; each role is also explained where you assign it
+     (the invite); full reference in the Help Center. No prose wall. */
+  var sub=pc.querySelector('.set-sub'); if(sub) sub.innerHTML='What each role can do across your organization. Each role is also explained where you assign it (the invite); the full reference is in the <a href="https://help.hootsuite.com/" target="_blank" rel="noopener">Help Center</a> (opens in a new tab).';
   var unlocked=(typeof v4CustomRolesUnlocked==='function')?v4CustomRolesUnlocked():false;
-  /* (2) Management intro card, inserted ABOVE the matrix. Leads with managing roles (custom roles especially). The
-     primary action here mirrors the header "Create custom role" gate: when unlocked it opens the same prototype
-     create modal (v4OpenCreateCustomRole); when gated it points at the upgrade path (v4CustomUpsell), never hidden. */
+  /* (2) CLEAN primary create action, mirroring Create team / Invite people: a single labelled Bento primary button
+     that opens the SAME create-custom-role modal (v4OpenCreateCustomRole). Gated to Business/Enterprise with the
+     existing logic: unlocked -> opens the modal; gated -> aria-disabled + lock + upgrade path (v4CustomUpsell), never
+     hidden. No explanatory card, no prose: just the action, with one quiet gated helper line only when locked. */
   var actionBtn=unlocked
    ? '<button class="hs-btn hs-btn--primary" type="button" onclick="v4OpenCreateCustomRole()"><span class="material-symbols-outlined">add</span>Create custom role</button>'
    : '<button class="hs-btn hs-btn--primary is-locked" type="button" aria-disabled="true" title="Custom roles are on Business and Enterprise plans" aria-label="Create custom role (Business and Enterprise plans)" onclick="v4CustomUpsell();return false"><span class="material-symbols-outlined">add</span>Create custom role</button>';
-  var planLine=unlocked
-   ? '<p class="secd" style="margin:10px 0 0">Predefined roles cover most needs. Create a custom role when you need a specific bundle of capabilities, then assign it from the invite like any other role.</p>'
+  var gatedLine=unlocked
+   ? ''
    : '<p class="secd" style="margin:10px 0 0"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px">workspace_premium</span> Custom roles are a Business and Enterprise feature. <a href="#" onclick="return v4CustomUpsell()">See plans</a> to add your own roles.</p>';
-  var lead=v4El('<div class="set-card" id="v5RolesLead"><div class="pad">'
-   +'<h3 class="sec" style="margin:0 0 4px">Manage roles</h3>'
-   +'<p class="secd" style="margin:0">Roles decide what people can do across your organization. Assign a role to a person from the <a href="c-settings-members.html">People</a> area, where the invite explains each one as you pick it. To change what a single person can access, open them in People and use their Permissions tab.</p>'
-   +'<div class="rowflex" style="gap:12px;align-items:center;margin-top:14px">'+actionBtn
-   +'<span class="secd" style="margin:0">Custom roles let you bundle capabilities for your team.</span></div>'
-   +planLine+'</div></div>');
+  /* The primary action sits directly above the matrix as its own minimal row (no .set-card skin, no heading, no
+     paragraph) so the page leads with the action + the reference, not a wall of text. #v5RolesLead is layout-only. */
+  var lead=v4El('<div id="v5RolesLead" class="v5-roles-lead">'
+   +'<div class="rowflex" style="gap:12px;align-items:center;flex-wrap:wrap">'+actionBtn
+   +'<span class="secd" style="margin:0">Bundle capabilities into a role you can assign from the invite.</span></div>'
+   +gatedLine+'</div>');
   card.parentNode.insertBefore(lead, card);
-  /* (3) Retune the matrix card lead so it reads as the SUPPORTING reference (not the primary "dictionary" framing),
-     and add the helper line: role explained at the invite + full reference in the Help Center. Kept minimal; the
-     matrix table, its contested "eng confirm" cells, and the contested-cells warning alert below are untouched. */
+  /* Hide the legacy header .ph-add create icon button under v5 so there is ONE clean create action (the labelled
+     primary above), matching Create team / Invite people. v4WireCreateCustomRole still ran (v4/v3 unaffected); we only
+     hide the header button in the v5 DOM. */
+  var phAdd=document.querySelector('.suite-topbar .ph-add'); if(phAdd) phAdd.style.display='none';
+  /* (3) Retune the matrix card lead so it reads as a lean reference table (no dictionary prose). Keep the helper line
+     minimal: role explained at the invite + full reference in the Help Center + the "eng confirm" note. The matrix
+     table, its contested "eng confirm" cells, and the contested-cells warning alert below are untouched. */
   var mtxLead=card.querySelector('.pad .sec');
   if(mtxLead){
    mtxLead.textContent='Capability reference';
    var p=mtxLead.parentNode.querySelector('p.secd');
-   if(p) p.innerHTML='For reference: what each role can do across Somos. Each role is also explained where you assign it (the invite), and the full role reference lives in the <a href="https://help.hootsuite.com/" target="_blank" rel="noopener">Help Center</a> (opens in a new tab). To change what <b>one person</b> can access, open them in <a href="c-settings-members.html">People</a> and use their Permissions tab. Rows marked <b>eng confirm</b> are still being resolved and are not final.';
+   if(p) p.innerHTML='What each role can do. Predefined roles are read-only; custom roles are editable. Rows marked <b>eng confirm</b> are still being resolved and are not final.';
   }
   initControlA11y(lead);
  }
