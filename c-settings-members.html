@@ -2385,12 +2385,19 @@
  /* whole-row navigation to the member detail full page (section 2). Keyboard: Enter/Space opens. */
  function v4RowOpen(e,tr){ if(e){ if(e.target.closest('.v4-kebab-cell')||e.target.closest('.rowsel')||e.target.closest('td[onclick]')&&e.target!==tr&&e.target.closest('.hs-check')) return; } var name=tr.getAttribute('data-name'); location.href='c-org-member.html?m='+encodeURIComponent(name); }
  function v4RowKey(e,tr){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); location.href='c-org-member.html?m='+encodeURIComponent(tr.getAttribute('data-name')); } }
- /* row ellipsis (spec section 1): ONE quick action — Change role. Removal is deliberately NOT a per-row kebab item:
-    a single removal happens from the member detail page (Transfer & offboard), and bulk removal runs from the
-    bulk-action toolbar, both routing through the transfer/offboard guardrail (v4OpenOffboard) so directly-owned
-    accounts must be reassigned first. Keeping the kebab to Change role only avoids a one-click removal affordance. */
+ /* row ellipsis. v4/v3: ONE quick action, Change role (single removal happens from the member detail page, bulk
+    removal from the toolbar). v5 FIX C1 (UT feedback: people expect to act on one person from the row menu): mirror
+    the bulk-action bar's set into the per-row kebab so a single member can be acted on directly (Change role, Add to
+    team, then Remove). The actions REUSE the exact handlers the bulk bar uses: Change role -> v4OpenChangeRole(name),
+    Add to team -> v4RowAddTeam(name) (the single-member sibling of v4BulkAddTeam), and Remove -> v4OpenOffboard(name),
+    the SAME transfer/offboard guardrail the detail page and the bulk Remove route through (individual Remove opens the
+    guardrail, it never deletes silently, and directly-owned accounts must be reassigned first). v5-gated: under v4/v3
+    the menu is built with the single Change role item exactly as before, so the v4/v3 rendered kebab stays byte-identical
+    (it is also built lazily on first open, so the initial members-table DOM is identical regardless). */
  var _v4RowMenuTrig=null;
  function v4CloseRowMenus(restore){ var open=document.querySelector('.v4-rowmenu.open'); if(open){ open.classList.remove('open'); open.parentNode&&open.parentNode.querySelector('[aria-haspopup="menu"]')&&open.parentNode.querySelector('[aria-haspopup="menu"]').setAttribute('aria-expanded','false'); } if(restore&&_v4RowMenuTrig&&_v4RowMenuTrig.focus){ try{_v4RowMenuTrig.focus();}catch(e){} } _v4RowMenuTrig=null; }
+ /* build one role=menuitem button (icon + label) wired to run(); tabindex -1 for the roving pattern already in use. */
+ function v4RowMenuItem(icon,label,run){ var mi=document.createElement('button'); mi.type='button'; mi.setAttribute('role','menuitem'); mi.setAttribute('tabindex','-1'); mi.innerHTML='<span class="material-symbols-outlined">'+icon+'</span>'+label; mi.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); v4CloseRowMenus(true); run(); }); return mi; }
  function v4RowMenu(e,btn,name){
   e.preventDefault(); e.stopPropagation();
   var cell=btn.closest('td'); var existing=cell.querySelector('.v4-rowmenu');
@@ -2399,15 +2406,20 @@
   if(wasOpen) return;
   if(!existing){
    existing=document.createElement('div'); existing.className='v3-kebab-menu v4-rowmenu'; existing.setAttribute('role','menu'); existing.setAttribute('aria-label','Row actions');
-   var mi=document.createElement('button'); mi.type='button'; mi.setAttribute('role','menuitem'); mi.setAttribute('tabindex','-1');
-   mi.innerHTML='<span class="material-symbols-outlined">badge</span>Change role';
-   mi.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); v4CloseRowMenus(true); v4OpenChangeRole(name); });
-   existing.appendChild(mi);
+   existing.appendChild(v4RowMenuItem('badge','Change role',function(){ v4OpenChangeRole(name); }));
+   if(V5){
+    /* mirror the bulk bar's remaining actions for a single member (same handlers) */
+    existing.appendChild(v4RowMenuItem('group_add','Add to team',function(){ v4RowAddTeam(name); }));
+    existing.appendChild(v4RowMenuItem('person_remove','Remove',function(){ v4OpenOffboard(name); }));
+   }
    cell.appendChild(existing);
   }
   existing.classList.add('open'); btn.setAttribute('aria-expanded','true'); _v4RowMenuTrig=btn;
   var f=existing.querySelector('[role="menuitem"]'); if(f) setTimeout(function(){f.focus();},0);
  }
+ /* single-member Add to team (v5 row kebab). Mirrors v4BulkAddTeam (a prototype control, held gate: no real team write),
+    but worded for one named person so the row action reads correctly. */
+ function v4RowAddTeam(name){ showToast('Add '+gsEsc(name)+' to a team is a prototype control.'); }
  function v4OpenChangeRole(name){
   var m=v4MemberByName(name)||{name:name,role:'Team Member'};
   v4EnsureInviteModal(document.getElementById('pageContent'));
@@ -2526,12 +2538,15 @@
   var chips=_v4InvEmails.map(function(em,i){ return '<span class="hs-input-tag"><span class="hs-input-tag-label">'+gsEsc(em)+'</span><button class="x" type="button" aria-label="Remove '+gsEsc(em)+'" onclick="v4InvRemoveEmail('+i+')"><span class="material-symbols-outlined">close</span></button></span>'; }).join('');
   body.innerHTML=''
    +'<p class="secd" style="margin:0 0 16px">They will get an email and land inside Somos with the access you set here.</p>'
-   /* Email */
+   /* Email. v5 FIX C2 (UT feedback: people type the email and get stuck not knowing to press Enter): under v5 the input
+      also live-validates (oninput -> v4InvEmailInput) and commits a valid address on BLUR (onblur -> v4InvEmailBlur), so
+      Enter is no longer required; Enter/comma/space still work. The onblur binding + the re-worded hint are v5-only, so the
+      v4/v3 email field markup stays byte-identical. */
    +'<div class="v4-inv-sec"><label class="v4-inv-lbl" for="v4InvEmailInput">Who are you inviting?</label>'
-    +'<div class="hs-input v4-inv-emails'+(_v4InvEmailErr?' hs-input--error':'')+'"'+(_v4InvEmailErr?' aria-invalid="true"':'')+' onclick="var i=document.getElementById(\'v4InvEmailInput\');if(i)i.focus()">'+chips+'<input id="v4InvEmailInput" type="text" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" name="v4-invite-recipients-'+Date.now()+'" data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="'+(n?'Add another':'name@company.com')+'"'+(_v4InvEmailErr?' aria-describedby="v4InvEmailErr"':'')+' aria-label="Add an email address" onkeydown="v4InvEmailKey(event)" oninput="v4InvEmailInput()"></div>'
+    +'<div class="hs-input v4-inv-emails'+(_v4InvEmailErr?' hs-input--error':'')+'"'+(_v4InvEmailErr?' aria-invalid="true"':'')+' onclick="var i=document.getElementById(\'v4InvEmailInput\');if(i)i.focus()">'+chips+'<input id="v4InvEmailInput" type="text" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" name="v4-invite-recipients-'+Date.now()+'" data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="'+(n?'Add another':'name@company.com')+'"'+(_v4InvEmailErr?' aria-describedby="v4InvEmailErr"':'')+' aria-label="'+(V5?'Add an email address (typing a valid address is enough, no need to press Enter)':'Add an email address')+'" onkeydown="v4InvEmailKey(event)" oninput="v4InvEmailInput()"'+(V5?' onblur="v4InvEmailBlur()"':'')+'></div>'
     +(_v4InvEmailErr
       ?'<div class="hs-field-hint" id="v4InvEmailErr" style="color:var(--bento-theme-color-text-negative)"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">error</span> '+gsEsc(_v4InvEmailErr)+'</div>'
-      :'<div class="hs-field-hint">Type an email and press Enter to add each person. Inviting many people? <a href="#" onclick="return v4InvCsv()">Upload a CSV</a> (up to 500 rows).</div>')
+      :'<div class="hs-field-hint">'+(V5?'Type an email address and it is added automatically. Inviting many people? ':'Type an email and press Enter to add each person. Inviting many people? ')+'<a href="#" onclick="return v4InvCsv()">Upload a CSV</a> (up to 500 rows).</div>')
     +'</div>'
    /* Role */
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What can they do?</span><p class="v4-inv-cap">Pick the closest role. You can change it later.</p>'
@@ -2543,8 +2558,21 @@
    /* Teams */
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">Add to a team? <span class="secd" style="font:var(--hs-type-body-sm)">(optional)</span></span><p class="v4-inv-cap">A team grants the accounts it manages. Skip this and they join the org without a team.</p>'
     +'<div class="v4-teamlist" id="v4InvTeamList">'+V4_TEAMS.map(function(t){ var on=!!_v4InvTeams[t.name]; return '<label class="v4-teamopt"><span class="hs-check'+(on?' is-on':'')+'" role="checkbox" tabindex="0" aria-checked="'+(on?'true':'false')+'" data-team="'+gsEsc(t.name)+'" onclick="v4InvToggleTeam(\''+gsEsc(t.name)+'\')"></span><span class="v4-team-t">'+gsEsc(t.name)+'</span><span class="v4-team-m">'+t.members+' people</span></label>'; }).join('')+'</div></div>';
-  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4InvSendBtn" onclick="v4InvSend()"'+(n?'':' disabled')+'><span class="material-symbols-outlined">send</span>Send '+n+' invite'+(n===1?'':'s')+'</button>';
+  /* Send button. v4/v3: disabled until >=1 chip, label "Send n invite(s)" (byte-identical). v5 C2: never disabled (so a
+     typed-but-not-yet-chipped valid email can be sent with no Enter and there is no blur/click race); v4InvSend is the
+     single gate: it flushes the typed email, then no-ops if nothing valid was entered. Label reads "Send invites" when
+     no chip is committed yet, and is updated live by v4InvEmailInput as a valid address is typed. */
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4InvSendBtn" onclick="v4InvSend()"'+((V5||n)?'':' disabled')+'><span class="material-symbols-outlined">send</span>'+(V5&&!n?'Send invites':('Send '+n+' invite'+(n===1?'':'s')))+'</button>';
   initControlA11y(body);
+ }
+ /* v5 C2: reflect a pending valid typed email (not yet chipped) in the Send button label, so "Send 1 invite" shows the
+    moment a valid address is typed even before it becomes a pill. Chips already committed count too. */
+ function v4InvSyncSendBtn(){
+  if(!V5) return; var btn=document.getElementById('v4InvSendBtn'); if(!btn||_v4InvSending) return;
+  var inp=document.getElementById('v4InvEmailInput'); var pending=0;
+  if(inp){ var v=inp.value.trim().replace(/,$/,'').trim(); if(v && V4_EMAIL_RE.test(v) && _v4InvEmails.indexOf(v)===-1) pending=1; }
+  var total=_v4InvEmails.length+pending;
+  btn.innerHTML='<span class="material-symbols-outlined">send</span>'+(total?('Send '+total+' invite'+(total===1?'':'s')):'Send invites');
  }
  var V4_EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  /* Commit a token on Enter / comma / space. Valid + new -> pill. Invalid -> inline error (NOT committed); the typed
@@ -2566,12 +2594,55 @@
   _v4InvEmailErr=msg; v4RenderInvite();
   setTimeout(function(){ var i=document.getElementById('v4InvEmailInput'); if(i){ i.value=keep||''; i.focus(); try{ i.setSelectionRange(i.value.length,i.value.length); }catch(e){} } },0);
  }
- /* Typing again clears the inline error without a full re-render (keeps focus/caret undisturbed). */
+ /* the neutral instructional hint under the email field, worded per flag (v5 = no Enter needed). Kept in one place so
+    the render, the live-validation reset, and the error-clear all agree. */
+ function v4InvEmailHintHTML(){ return (V5?'Type an email address and it is added automatically. Inviting many people? ':'Type an email and press Enter to add each person. Inviting many people? ')+'<a href="#" onclick="return v4InvCsv()">Upload a CSV</a> (up to 500 rows).'; }
+ /* Typing clears any committed inline error without a full re-render (keeps focus/caret undisturbed). Under v5 it ALSO
+    live-validates as C2 asks: a valid, new address shows a quiet positive hint (it will be accepted with no Enter); an
+    incomplete/invalid entry keeps the neutral instruction (we do NOT flash an error on every keystroke; the invalid
+    error is surfaced on blur / Send instead, so typing the first letters is never scolded). */
  function v4InvEmailInput(){
-  if(!_v4InvEmailErr) return; _v4InvEmailErr='';
-  var box=document.querySelector('.v4-inv-emails'); if(box){ box.classList.remove('hs-input--error'); box.removeAttribute('aria-invalid'); }
-  var hint=document.getElementById('v4InvEmailErr');
-  if(hint){ hint.removeAttribute('id'); hint.removeAttribute('style'); hint.innerHTML='Type an email and press Enter to add each person. Inviting many people? <a href="#" onclick="return v4InvCsv()">Upload a CSV</a> (up to 500 rows).'; var inp=document.getElementById('v4InvEmailInput'); if(inp) inp.removeAttribute('aria-describedby'); }
+  if(_v4InvEmailErr){
+   _v4InvEmailErr='';
+   var box=document.querySelector('.v4-inv-emails'); if(box){ box.classList.remove('hs-input--error'); box.removeAttribute('aria-invalid'); }
+   var hint=document.getElementById('v4InvEmailErr');
+   if(hint){ hint.removeAttribute('id'); hint.removeAttribute('style'); hint.innerHTML=v4InvEmailHintHTML(); var inp0=document.getElementById('v4InvEmailInput'); if(inp0) inp0.removeAttribute('aria-describedby'); }
+  }
+  if(!V5) return;                                            /* v4/v3: no live validation (byte-identical behaviour) */
+  var invBody=document.getElementById('v4InvBody');          /* scope to the invite modal so the seat-request form (also .v4-inv-sec) is never touched */
+  var inp=document.getElementById('v4InvEmailInput'); var hintEl=invBody?invBody.querySelector('.v4-inv-sec .hs-field-hint'):null; if(!inp||!hintEl) return;
+  var v=inp.value.trim().replace(/,$/,'').trim();
+  var box2=invBody.querySelector('.v4-inv-emails'); if(box2){ box2.classList.remove('hs-input--error'); box2.removeAttribute('aria-invalid'); }
+  if(v && V4_EMAIL_RE.test(v) && _v4InvEmails.indexOf(v)===-1){
+   /* quiet positive affordance: valid + new. Colour PLUS an icon (a11y). No Enter needed. */
+   hintEl.style.color='var(--bento-theme-color-text-positive)'; hintEl.innerHTML='<span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">check_circle</span> Looks good. This address is added when you continue.';
+  } else {
+   hintEl.style.color=''; hintEl.innerHTML=v4InvEmailHintHTML();
+  }
+  v4InvSyncSendBtn();
+ }
+ /* v5 C2: commit a typed address when the field loses focus, so a valid email becomes a pill with NO Enter. Valid+new ->
+    pill; non-empty but invalid -> inline error (kept editable); empty or duplicate -> no-op. Skipped while sending so a
+    click on Send does not double-handle. */
+ function v4InvEmailBlur(){
+  if(!V5||_v4InvSending) return;
+  var inp=document.getElementById('v4InvEmailInput'); if(!inp) return;
+  var v=inp.value.trim().replace(/,$/,'').trim();
+  if(!v) return;
+  if(_v4InvEmails.indexOf(v)!==-1){ inp.value=''; v4InvEmailInput(); return; }   /* already listed: just clear the field */
+  if(!V4_EMAIL_RE.test(v)){ v4InvSetEmailErr('That does not look like an email address. Try name@company.com.',v); return; }
+  _v4InvEmails.push(v); _v4InvEmailErr=''; v4RenderInvite();
+ }
+ /* v5 C2: flush a typed-but-not-yet-chipped address into the list. Returns true if the send may proceed, false if the
+    typed text is non-empty but invalid (an error is shown and send is blocked). Used by v4InvSend so a person who typed a
+    valid email and clicked Send (without Enter) still sends it. */
+ function v4InvCommitTyped(){
+  var inp=document.getElementById('v4InvEmailInput'); if(!inp) return true;
+  var v=inp.value.trim().replace(/,$/,'').trim();
+  if(!v) return true;
+  if(_v4InvEmails.indexOf(v)!==-1){ inp.value=''; return true; }
+  if(!V4_EMAIL_RE.test(v)){ v4InvSetEmailErr('That does not look like an email address. Try name@company.com.',v); return false; }
+  _v4InvEmails.push(v); inp.value=''; return true;
  }
  function v4InvRemoveEmail(i){ _v4InvEmailErr=''; _v4InvEmails.splice(i,1); v4RenderInvite(); }
  function v4InvSetRole(r){ _v4InvRole=r; v4RenderInvite(); }
@@ -2581,7 +2652,11 @@
     then transitions to the in-modal SUCCESS confirmation. Cancel is disabled while sending so the flow reads as one
     atomic action. */
  function v4InvSend(){
-  var n=_v4InvEmails.length; if(!n||_v4InvSending) return;           /* guard: Send stays disabled until >=1 email; ignore double-fire */
+  if(_v4InvSending) return;                                          /* ignore double-fire */
+  /* v5 C2: include a typed-but-not-yet-chipped valid email so Send works without Enter. If the typed text is non-empty
+     but invalid, block and show the error (v4InvCommitTyped handled the message). v4/v3 skip this (byte-identical). */
+  if(V5 && !v4InvCommitTyped()) return;
+  var n=_v4InvEmails.length; if(!n) return;                          /* guard: Send stays disabled until >=1 email */
   /* invitation-gated seat wall: if adding these people would take the plan over its seat count, stop the send and show
      the seat wall (pricing + request-from-admin) in place of the success flow. Non-invitation renders never take this
      branch (INVITATION is false), so the v5/v4/v3 invite send is unchanged. See invSeatWall() below. */
@@ -4266,6 +4341,7 @@
   try{ if(PAGE_ID==='security' && v4IsPage('Security & privacy')) v5Security(); }catch(e){}  /* Joao review: align the 2-step verification wording (drop "2FA" / "two-factor"); runs AFTER v4Security rendered */
   try{ if(v4IsPage('Transfer & offboard')) v5TransferPage(); }catch(e){}                    /* Joao review: drop "offboard" from the standalone transfer page header (title band + h2); v3/v4 keep it */
   try{ v5AnnotInit(); }catch(e){}                                                          /* pass C3: build the annotations toggle + place the note callouts (hidden until the toggle is on) */
+  try{ v5RequestSeat(); }catch(e){}                                                        /* FIX C3: make requesting a seat discoverable for a non-admin from a natural start (account flyout + the gated People page), not only after hitting the seat wall */
  }
  /* ================= v5 wording: Security 2-step verification (Joao review) =================
     v4Security renders the verification card with the heading "Two-factor authentication (2FA)" and an "Authenticator
@@ -5220,24 +5296,29 @@
     sent" without a real invite; Deny removes the request. Both keep the tab badge + the seats-left hint honest. */
  function invSeatApprove(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; if(INV_SEATS.used<INV_SEATS.total) INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); invRenderRequested(); showToast(gsEsc(r.name)+' was approved and invited to Somos.'); }
  function invSeatDeny(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; INV_SEAT_REQUESTS.splice(i,1); invRenderRequested(); showToast('Request from '+gsEsc(r.name)+' was denied.'); }
- /* Non-admin: an in-panel request form (reason + role), then a plain success state. No real submit (placeholder). */
- function invOpenSeatRequest(){
-  var mount=document.getElementById('invReqFormMount'); if(!mount) return;
+ /* Non-admin: an in-panel request form (reason + role), then a plain success state. No real submit (placeholder). The
+    optional `mount` lets the v5 discoverable entry reuse this SAME form inside its own modal without an id collision with
+    the (page-level) #invReqFormMount used by the Requested tab / gated-page augmentation. Existing callers pass nothing
+    -> byte-identical behaviour (defaults to #invReqFormMount). */
+ function invOpenSeatRequest(mount){
+  mount=mount||document.getElementById('invReqFormMount'); if(!mount) return;
   var roles=['View only','Team member','Admin'];
   mount.innerHTML='<div class="inv-req-form">'
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What access do you need?</span>'
-    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Requested role" id="invReqRoleGrid">'+roles.map(function(r,i){ return '<label class="v4-roleopt"><span class="hs-radio'+(i===1?' is-on':'')+'" role="radio" tabindex="'+(i===1?'0':'-1')+'" aria-checked="'+(i===1?'true':'false')+'" data-role="'+r+'" onclick="invReqSetRole(this)"></span><span><span class="v4-role-t">'+r+'</span></span></label>'; }).join('')+'</div></div>'
-   +'<div class="v4-inv-sec"><label class="v4-inv-lbl" for="invReqReason">Why do you need a seat? <span class="secd" style="font:var(--hs-type-body-sm)">(optional)</span></label>'
-    +'<textarea class="hs-input" id="invReqReason" placeholder="A short reason helps your admin decide."></textarea></div>'
-   +'<div class="rowflex" style="gap:10px;margin-top:4px"><button class="hs-btn hs-btn--primary" type="button" onclick="invSubmitSeatRequest()"><span class="material-symbols-outlined">send</span>Send request</button></div>'
+    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Requested role" data-reqrole="1">'+roles.map(function(r,i){ return '<label class="v4-roleopt"><span class="hs-radio'+(i===1?' is-on':'')+'" role="radio" tabindex="'+(i===1?'0':'-1')+'" aria-checked="'+(i===1?'true':'false')+'" data-role="'+r+'" onclick="invReqSetRole(this)"></span><span><span class="v4-role-t">'+r+'</span></span></label>'; }).join('')+'</div></div>'
+   +'<div class="v4-inv-sec"><label class="v4-inv-lbl">Why do you need a seat? <span class="secd" style="font:var(--hs-type-body-sm)">(optional)</span></label>'
+    +'<textarea class="hs-input" data-reqreason="1" placeholder="A short reason helps your admin decide." aria-label="Why do you need a seat"></textarea></div>'
+   +'<div class="rowflex" style="gap:10px;margin-top:4px"><button class="hs-btn hs-btn--primary" type="button" onclick="invSubmitSeatRequest(this)"><span class="material-symbols-outlined">send</span>Send request</button></div>'
    +'</div>';
   initControlA11y(mount);
-  var t=document.getElementById('invReqReason'); if(t) setTimeout(function(){ try{ t.focus(); }catch(e){} },30);
+  var t=mount.querySelector('[data-reqreason]'); if(t) setTimeout(function(){ try{ t.focus(); }catch(e){} },30);
  }
- function invReqSetRole(el){ var grid=document.getElementById('invReqRoleGrid'); if(!grid) return; Array.prototype.forEach.call(grid.querySelectorAll('.hs-radio'),function(r){ var on=(r===el); r.classList.toggle('is-on',on); r.setAttribute('aria-checked',String(on)); r.setAttribute('tabindex',on?'0':'-1'); }); }
- function invSubmitSeatRequest(){
-  var mount=document.getElementById('invReqFormMount'); if(!mount) return;
-  var sel=document.querySelector('#invReqRoleGrid .hs-radio.is-on'); var role=sel?sel.getAttribute('data-role'):'Team member';
+ function invReqSetRole(el){ var grid=el.closest('[data-reqrole]'); if(!grid) return; Array.prototype.forEach.call(grid.querySelectorAll('.hs-radio'),function(r){ var on=(r===el); r.classList.toggle('is-on',on); r.setAttribute('aria-checked',String(on)); r.setAttribute('tabindex',on?'0':'-1'); }); }
+ /* Submit resolves its own mount from the clicked button, so it works whichever instance (page or modal) is open. */
+ function invSubmitSeatRequest(btn){
+  var mount=(btn&&btn.closest)?(btn.closest('.inv-req-form')?btn.closest('.inv-req-form').parentNode:btn.closest('#invReqFormMount, [data-reqmount]')):null;
+  if(!mount) mount=document.getElementById('invReqFormMount'); if(!mount) return;
+  var grid=mount.querySelector('[data-reqrole]'); var sel=grid?grid.querySelector('.hs-radio.is-on'):null; var role=sel?sel.getAttribute('data-role'):'Team member';
   mount.innerHTML='<div class="v3-invite-done" style="align-items:flex-start;text-align:left;padding:4px 0"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent</div><div class="ok-d">Your admin will review your request for a <b>'+gsEsc(role)+'</b> seat. You will get an email when they decide.</div></div>';
  }
  /* Non-admin on the (gated) People page: the existing role gate renders the unauthorized card (a held gate, unchanged
@@ -5307,6 +5388,74 @@
   body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent to your admin</div><div class="ok-d">An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.</div></div>';
   foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
+ }
+ /* ===== v5 FIX C3: request-a-seat discoverability (runs from applyV5, so ALL v5 arms get it: v5=1, invitation=1,
+    invitation=2, while v4/v3/no-flag are untouched). The problem (UT + stakeholder feedback): a non-admin can only reach
+    "request a seat" AFTER trying to invite past the seat limit (the seat wall) or by landing on the admin-only People
+    page and being denied. Neither is a natural starting point. Fix: give the non-admin (the Paying-Member persona, the
+    only role that requests rather than grants seats, same role model as invIsAdmin/v4RoleIsMember) a quiet, discoverable
+    entry from where personal/account actions already live:
+      (a) an "Ask for a seat" item in the account / profile flyout (the avatar menu, present on every page and every arm),
+          reusing the shipped .pi menu-item markup so the roving-tabindex menu controller drives it with no extra wiring.
+          It opens a self-contained request modal (v5OpenSeatRequestModal) reusing the existing request form.
+      (b) on the (role-gated) People page a non-admin still lands on, the same constructive request block the invitation
+          build adds (invAugmentUnauthorized), now also under plain v5, so the v5=1 arm gets it too, not only invitation.
+    Non-leading: one quiet menu item + one inline block, no loud CTA, wording mirrors the existing request copy. Admins and
+    super admins never see it (they manage seats). Idempotent. All request plumbing (INV_SEATS, invOpenSeatRequest, …) is
+    top-level and available under v5 even when INVITATION is false, so nothing here depends on the invitation arms. */
+ function v5RequestSeat(){
+  if(!V5) return;
+  if(!v4RoleIsMember()) return;                                     /* only the non-admin persona requests seats */
+  try{ v5EnsureSeatRequestFlyout(); }catch(e){}
+  /* (b) the gated People page: reuse the invitation augmentation (idempotent via #invUnauthReq), so a non-admin who does
+     land there gets the same "Request a seat" path under plain v5 too. Under the invitation arms applyInvitation may also
+     call it; the id guard makes the double-call a no-op. */
+  try{ if(PAGE_ID==='members' && v4PageDenied('members')) invAugmentUnauthorized(); }catch(e){}
+ }
+ /* (a) inject the flyout entry into BOTH popover panels (explicit + simplified), matching the shipped .pi markup, right
+    after the identity header (same anchor logic the invitation=2 flyout entry uses). A real menuitem that opens the
+    request modal instead of navigating. Idempotent per panel via .v5-seat-req-entry. */
+ function v5EnsureSeatRequestFlyout(){
+  var panels=document.querySelectorAll('#popwrap .pop'); if(!panels.length) return;
+  Array.prototype.forEach.call(panels, function(panel){
+   if(panel.querySelector('.v5-seat-req-entry')) return;
+   var header=panel.querySelector('.idr'); var afterDiv=header?header.nextElementSibling:null;
+   var anchor=(afterDiv&&afterDiv.classList.contains('div'))?afterDiv.nextSibling:panel.querySelector('.pi');
+   var a=v4El('<a class="pi v5-seat-req-entry" role="menuitem" href="#" aria-label="Ask for a seat" onclick="v5OpenSeatRequestModal();return false;"><span class="material-symbols-outlined">how_to_reg</span><div class="pi-c"><div class="pt">Ask for a seat</div><div class="pd">Request access to Somos from an admin</div></div></a>');
+   if(anchor) panel.insertBefore(a, anchor); else panel.appendChild(a);
+  });
+ }
+ /* Self-contained request modal (reuses the shipped .modal-wrap / .modal shell + the existing request form via a modal-
+    scoped mount, so there is no #invReqFormMount id collision with the page-level instances). Focus trap + Escape +
+    restore focus, matching the invite modal. Idempotent build. */
+ var _v5SeatReqLastFocus=null;
+ function v5EnsureSeatRequestModal(){
+  if(document.getElementById('v5SeatReqWrap')) return;
+  var pc=document.getElementById('pageContent')||document.body; if(!pc) return;
+  var m=v4El('<div class="modal-wrap" id="v5SeatReqWrap" onclick="v5CloseSeatRequest()"><div class="modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="v5SeatReqTitle"><div class="modal-head"><div class="mt" id="v5SeatReqTitle">Ask for a seat</div><button class="hs-btn hs-btn--ghost hs-btn--icon" type="button" aria-label="Close" title="Close" onclick="v5CloseSeatRequest()"><span class="material-symbols-outlined">close</span></button></div><div class="modal-body" id="v5SeatReqBody"></div></div></div>');
+  pc.appendChild(m);
+ }
+ function v5OpenSeatRequestModal(){
+  try{ var _pw=document.getElementById('popwrap'); if(_pw&&_pw.classList.contains('open')){ _pw.classList.remove('open'); var _at=document.getElementById('avatarTrig'); if(_at)_at.setAttribute('aria-expanded','false'); } }catch(e){}   /* close the flyout the entry lives in, if open */
+  v5EnsureSeatRequestModal();
+  var body=document.getElementById('v5SeatReqBody'); var wrap=document.getElementById('v5SeatReqWrap'); if(!body||!wrap) return;
+  _v5SeatReqLastFocus=document.activeElement;
+  body.innerHTML='<p class="secd" style="margin:0 0 16px">Seats in Somos are managed by an admin. Ask for one and an admin will review your request. You will get an email when they decide.</p><div data-reqmount="1"></div>';
+  invOpenSeatRequest(body.querySelector('[data-reqmount]'));            /* reuse the existing request form in the modal mount */
+  wrap.classList.add('open'); wrap.addEventListener('keydown',v5SeatReqKeydown);
+ }
+ function v5CloseSeatRequest(){
+  var wrap=document.getElementById('v5SeatReqWrap'); if(!wrap) return;
+  wrap.classList.remove('open'); wrap.removeEventListener('keydown',v5SeatReqKeydown);
+  if(_v5SeatReqLastFocus&&_v5SeatReqLastFocus.focus){ try{ _v5SeatReqLastFocus.focus(); }catch(e){} } _v5SeatReqLastFocus=null;
+ }
+ function v5SeatReqFocusables(){ var m=document.querySelector('#v5SeatReqWrap .modal'); if(!m) return []; return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),function(el){ return !el.disabled && el.offsetParent!==null; }); }
+ function v5SeatReqKeydown(e){
+  if(e.key==='Escape'){ e.preventDefault(); v5CloseSeatRequest(); return; }
+  if(e.key!=='Tab') return;
+  var f=v5SeatReqFocusables(); if(!f.length) return; var first=f[0], last=f[f.length-1];
+  if(e.shiftKey){ if(document.activeElement===first){ e.preventDefault(); last.focus(); } }
+  else { if(document.activeElement===last){ e.preventDefault(); first.focus(); } }
  }
  function applyV3(){
   if(!V3) return;
