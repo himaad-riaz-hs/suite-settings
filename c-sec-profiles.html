@@ -930,12 +930,12 @@
  /* ===== invitation (?invitation=1) additions: all body.invitation-scoped (or scoped to invitation-only ids/classes that
     only get injected under the flag), so every non-invitation render is visually unchanged. Tokens only; no em/en dashes;
     Canadian English. See the invitation JS pass for the behaviour. =====
-    (1) rail invite entry: the injected #invRailEntry is a real .suite-navbtn, so it inherits the shipped rail button
-    sizing / hover / label styles from suite-shell.css. Give its circle the mint brand wash + a hairline so it reads as a
-    distinct, always-visible action at the bottom of the rail, not just another product icon. */
- body.invitation .suite-rail .inv-rail-entry .circle{background:var(--bento-system-sys-brand-100,#dfffde);color:var(--bento-system-sys-positive-700,#0a7d2c);box-shadow:inset 0 0 0 1px var(--bento-system-sys-positive-600,#0a7d2c);}
- body.invitation .suite-rail .inv-rail-entry:hover .circle{background:var(--bento-system-sys-brand-200,#c7f7c5);color:var(--bento-system-sys-positive-700,#0a7d2c);}
- body.invitation .suite-rail .inv-rail-entry .lbl{color:var(--bento-theme-color-text-base);}
+    (1) rail invite entry (invitation=1 arm only): the injected #invRailEntry is a real .suite-navbtn, so it inherits the
+    shipped rail button sizing / hover / label / colour from suite-shell.css with no overrides. It is a QUIET nav item that
+    reads like Home / Perch / Nest (same neutral ink glyph + label, same neutral hover wash), NOT a filled or mint CTA:
+    research shows no major tool uses a loud coloured rail button for invite, so it should sit as one more nav item. The
+    only addition is a focus ring on the whole button for keyboard reach; the resting + hover circle come straight from
+    the shared .suite-navbtn rules, so no colour is set here. */
  body.invitation .suite-rail .inv-rail-entry:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:-2px;border-radius:12px;}
  /* (2) Requested tab: the tab + panel reuse the shipped .hs-tabs / .set-card / .hs-table / .v4-empty; only the per-row
     Approve/Deny action cluster + the non-admin request form need layout. */
@@ -1124,15 +1124,22 @@
     Persists across settings pages; ?v5=0 clears just v5 (leaving v4 intact as the reference build). */
  var V5=false;
  try{ var _v5=new URLSearchParams(location.search).get('v5'); if(_v5==='1')sessionStorage.setItem('v5','1'); else if(_v5==='0')sessionStorage.removeItem('v5'); V5=(sessionStorage.getItem('v5')==='1'); }catch(e){}
- /* invitation flag (?invitation=1): the member-invitation pass on TOP of v5. Parsed/persisted EXACTLY like v5 so the
-    current v5 build renders byte-identical without ?invitation=1. INVITATION IMPLIES V5 (and therefore V4 and V3): when
-    it is on we also turn V5/V4/V3 on and add their body classes, so every v5 flow (the combined People page, the invite
-    modal, the Plan & billing page, the roles matrix) is present and the invitation deltas are pure transforms on top.
-    Everything invitation adds is gated behind body.invitation + the INVITATION flag and only runs from applyInvitation()
-    (which runs AFTER applyV5()) or from inline if(INVITATION){...} guards inside the shared render functions. Persists
-    across settings pages; ?invitation=0 clears just invitation (leaving v5 intact as the reference build). */
- var INVITATION=false;
- try{ var _inv=new URLSearchParams(location.search).get('invitation'); if(_inv==='1')sessionStorage.setItem('invitation','1'); else if(_inv==='0')sessionStorage.removeItem('invitation'); INVITATION=(sessionStorage.getItem('invitation')==='1'); }catch(e){}
+ /* invitation flag (?invitation=1 and ?invitation=2): the member-invitation pass on TOP of v5. Parsed/persisted EXACTLY
+    like v5 so the current v5 build renders byte-identical without the flag. INVITATION IMPLIES V5 (and therefore V4 and
+    V3): when it is on we also turn V5/V4/V3 on and add their body classes, so every v5 flow (the combined People page, the
+    invite modal, the Plan & billing page, the roles matrix) is present and the invitation deltas are pure transforms on
+    top. Everything invitation adds is gated behind body.invitation + the INVITATION flag and only runs from
+    applyInvitation() (which runs AFTER applyV5()) or from inline if(INVITATION){...} guards inside the shared render
+    functions. Persists across settings pages; ?invitation=0 clears just invitation (leaving v5 intact as the reference
+    build).
+      TWO ARMS, one flag: the sessionStorage key holds '1' or '2'. Both are the SAME invitation build (same v5 base, same
+    seat wall, same Requested tab, same canonical data); the ONLY difference is where the invite entry point lives.
+      - INVITATION (base, true for '1' AND '2'): drives the whole invitation build.
+      - INVITATION2 (true only for '2'): the FLYOUT-placement arm. The invite entry moves out of the far-left rail and
+        into the account / profile flyout menu (the Slack / Notion pattern); the rail entry is suppressed in this arm.
+    So invitation=1 = de-noised rail entry; invitation=2 = account-flyout entry, no rail entry. Everything else identical. */
+ var INVITATION=false, INVITATION2=false;
+ try{ var _inv=new URLSearchParams(location.search).get('invitation'); if(_inv==='1')sessionStorage.setItem('invitation','1'); else if(_inv==='2')sessionStorage.setItem('invitation','2'); else if(_inv==='0')sessionStorage.removeItem('invitation'); var _invS=sessionStorage.getItem('invitation'); INVITATION=(_invS==='1'||_invS==='2'); INVITATION2=(_invS==='2'); }catch(e){}
  if(INVITATION){ V5=true; try{ if(sessionStorage.getItem('v5')!=='1') sessionStorage.setItem('v5','1'); }catch(e){} }  /* invitation builds ON the v5 flows, so invitation implies v5 */
  if(V5){ V4=true; try{ if(sessionStorage.getItem('v4')!=='1') sessionStorage.setItem('v4','1'); }catch(e){} }  /* v5 builds ON the v4 flows, so v5 implies v4 */
  if(V4){ V3=true; try{ if(sessionStorage.getItem('v3')!=='1') sessionStorage.setItem('v3','1'); }catch(e){} }  /* v4 inherits the v3 nav direction (section 0 is already in v3) */
@@ -1140,6 +1147,7 @@
  if(V4&&document.body)document.body.classList.add('v4');
  if(V5&&document.body)document.body.classList.add('v5');
  if(INVITATION&&document.body)document.body.classList.add('invitation');
+ if(INVITATION2&&document.body)document.body.classList.add('invitation2');
  if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
@@ -5033,19 +5041,23 @@
    nameEl.parentNode.insertBefore(d, nameEl.nextSibling);                               /* directly under the role name */
   });
  }
- /* ===== invitation pass (?invitation=1). Runs AFTER applyV5() (invitation implies v5), so v5 has already rendered every
-    page and the combined People page. All invitation additions live here (or behind inline if(INVITATION){...} guards in
-    the shared render functions) and are gated on INVITATION, so the v5 reference build (and v4/v3) are untouched. Three
-    things, matching the brief:
-      (1) A global member-invite entry point in the far-left product rail, pinned at the bottom just above the avatar, so
-          you can add people without opening Settings first. Injected into the static RAIL at runtime (invRailEntry), so
-          the shipped RAIL markup stays byte-identical for every non-invitation render.
+ /* ===== invitation pass (?invitation=1 and ?invitation=2). Runs AFTER applyV5() (invitation implies v5), so v5 has
+    already rendered every page and the combined People page. All invitation additions live here (or behind inline
+    if(INVITATION){...} guards in the shared render functions) and are gated on INVITATION, so the v5 reference build (and
+    v4/v3) are untouched. Three things, matching the brief:
+      (1) A global member-invite entry point. This is the ONLY thing that differs between the two arms (see the flag block):
+          invitation=1 places a QUIET entry in the far-left product rail (invEnsureRailEntry), pinned at the bottom just
+          above the avatar; invitation=2 places it in the account / profile flyout instead (invEnsureFlyoutEntry, the Slack
+          / Notion pattern) and shows NO rail entry. Both are injected into the static RAIL / POP chrome at runtime, so the
+          shipped markup stays byte-identical for every non-invitation render. Either way it lets you add people without
+          opening Settings first, and is reachable on the Perch cold-start page too.
       (2) A "Requested" tab on the People page (alongside Members / Teams / Pending invites): an admin sees pending seat
           requests to approve or deny; a non-admin can request a seat. Placeholder Somos-style people, consistent with the
           canonical data. Added to the v5-built People toggle (invPeopleRequestedTab), so v5's own tabs are unchanged.
       (3) A clearer seat wall: when adding people would take the plan over its seats, the invite Send shows a wall with
           plain pricing (seats, price per seat, what upgrading gets you) AND a "Request from your admin" path for people
           who cannot buy. Success / placeholder only, no real purchase or payment (invShowSeatWall).
+    Items (2) and (3) and all canonical data are IDENTICAL across both arms; only the (1) entry-point placement changes.
     DIRECTIONAL / PLACEHOLDER: copy is plain and provisional (a copywriter refines later); pricing is illustrative, not a
     quote; no real purchase, payment, or brand assets. Somos-style names are fictional. ===== */
  /* Admin vs non-admin for the invitation flows follows the same role model the rest of v4 uses: the Paying-Member
@@ -5068,7 +5080,11 @@
  ];
  function applyInvitation(){
   if(!INVITATION) return;
-  try{ invEnsureRailEntry(); }catch(e){}                                        /* (1) global rail invite entry point */
+  /* (1) global member-invite entry point. Placement is the ONLY thing that differs between the two arms:
+       - invitation=1 (base, !INVITATION2): a QUIET entry in the far-left product rail (invEnsureRailEntry).
+       - invitation=2 (INVITATION2): the entry lives in the account / profile flyout instead (invEnsureFlyoutEntry),
+         and the rail entry is suppressed entirely, so this arm purely tests the flyout placement. */
+  try{ if(INVITATION2) invEnsureFlyoutEntry(); else invEnsureRailEntry(); }catch(e){}
   /* (2) Requested seats. On the People page (PAGE_ID==='members'): an ADMIN gets a fourth "Requested" tab to approve /
      deny seat requests; a NON-ADMIN (the Paying-Member persona, pm) is blocked from this org-admin page by the existing
      role gate (v4PageDenied -> the unauthorized card, a held gate we do NOT change), so instead of leaving them at a dead
@@ -5085,19 +5101,41 @@
    }
   }catch(e){}
  }
- /* ---- (1) far-left product rail: an always-visible "Invite" entry point, pinned to the bottom of the rail just above
-    the avatar. Rendered as a first-class labelled rail button (a .suite-navbtn with a circle glyph + a visible "Invite"
-    label, like the product buttons), NOT a quiet utility icon, because this is the headline: a global way to add people
-    without opening Settings first. Injected as the FIRST child of the bottom .others cluster (so order is Invite,
-    notifications, help, avatar). It routes to member management / invite people (the People page, Members view, with the
-    flag preserved). Injected at runtime and body.invitation-gated, so the shipped RAIL markup stays byte-identical for
-    every non-invitation render. Idempotent via #invRailEntry. A11y: a real link with an accessible label + a hover
-    tooltip, keyboard-reachable like the other rail buttons. */
+ /* ---- (1a) invitation=1 arm: far-left product rail invite entry. A QUIET nav item pinned to the bottom of the rail just
+    above the avatar. It is a real .suite-navbtn with a circle glyph + a visible "Invite" label, so it inherits the shipped
+    rail-button sizing / neutral colour / hover from suite-shell.css with NO overrides: it reads like one more nav item
+    (Home, Perch, Nest), not a filled or coloured call to action. (Research: no major tool uses a loud coloured rail button
+    for invite.) Injected as the FIRST child of the bottom .others cluster (so order is Invite, notifications, help,
+    avatar). Routes to member management / invite people (the People page, Members view, flag preserved). Injected at
+    runtime and body.invitation-gated, so the shipped RAIL markup stays byte-identical for every non-invitation render.
+    Suppressed in the invitation=2 arm (that arm uses the flyout entry instead). Idempotent via #invRailEntry. A11y: a real
+    link with an accessible label + a hover tooltip, keyboard-reachable like the other rail buttons. */
  function invEnsureRailEntry(){
   if(document.getElementById('invRailEntry')) return;
   var others=document.querySelector('.suite-rail .others'); if(!others) return;
   var a=v4El('<a class="suite-navbtn inv-rail-entry" id="invRailEntry" href="c-settings-members.html?invitation=1&peopletab=members" aria-label="Invite people" title="Invite people"><span class="circle"><span class="material-symbols-outlined">group_add</span></span><span class="lbl">Invite</span></a>');
   others.insertBefore(a, others.firstChild);
+ }
+ /* ---- (1b) invitation=2 arm: account / profile flyout invite entry (the Slack / Notion pattern). Instead of the rail,
+    the invite entry point is an "Invite people" item inside the avatar / account dropdown (top-right #popwrap). There are
+    two flyout panel variants (explicit + simplified) for the popover A/B question, so we inject into BOTH so the item is
+    present whichever variant is active. Inserted as the first .pi menu item right after the identity header (above
+    "Account settings"), as a real role="menuitem" link that matches the shipped .pi markup (leading Material Symbol +
+    title + description), so the roving-tabindex menu controller (popMenuItems / popMenuKey, which query .pi live) drives
+    it with no extra wiring. Routes to member management / invite people, flag preserved (?invitation=2). Injected at
+    runtime and INVITATION2-gated, so the shipped POP markup stays byte-identical for every other render. In this arm the
+    rail entry is never injected, so it purely tests the flyout placement. Idempotent via #invFlyoutEntry (one per panel).
+    Reachable on the Perch cold-start page too, since the rail + flyout chrome renders on every page including c-perch. */
+ function invEnsureFlyoutEntry(){
+  var panels=document.querySelectorAll('#popwrap .pop');
+  if(!panels.length) return;
+  Array.prototype.forEach.call(panels, function(panel){
+   if(panel.querySelector('.inv-flyout-entry')) return;                          /* idempotent per panel */
+   var header=panel.querySelector('.idr'); var afterDiv=header?header.nextElementSibling:null;  /* the .div after the identity header */
+   var anchor=(afterDiv&&afterDiv.classList.contains('div'))?afterDiv.nextSibling:panel.querySelector('.pi');
+   var a=v4El('<a class="pi inv-flyout-entry" role="menuitem" href="c-settings-members.html?invitation=2&peopletab=members" aria-label="Invite people"><span class="material-symbols-outlined">group_add</span><div class="pi-c"><div class="pt">Invite people</div><div class="pd">Add people to Somos and manage their access</div></div></a>');
+   if(anchor) panel.insertBefore(a, anchor); else panel.appendChild(a);
+  });
  }
  /* ---- (2) People page "Requested" tab. Runs after v5People() has built the People toggle (#v5PeopleToggle) + panels.
     Adds a fourth tab "Requested" and its panel, then extends the People tab set so the shipped tab switch (v5PeopleTab)
