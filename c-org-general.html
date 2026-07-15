@@ -808,6 +808,11 @@
  body.v5 .v5-role-ghead{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
  body.v5 .v5-role-ghead .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle);}
  body.v5 .v5-role-ghead .v5-role-count{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ /* Joao review: a plain one-line description under each role name in the roles matrix header, so the roles read apart
+    at a glance. Quiet subtle caption, normal weight (the role name above stays the emphasis), left-aligned to the
+    column, with a sensible measure so a wide description does not stretch the column. v5-only (injected by
+    v5RoleDescriptions); tokens only. */
+ body.v5 #v4Matrix thead th .v5-role-desc{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);font-weight:400;margin-top:4px;max-width:22ch;white-space:normal;text-transform:none;}
  /* ===== v5 People page: ONE white content surface (visual fix) =====
     The People page tab bar (Members / Teams) was floating on the grey canvas with its baseline hairline reading as
     stray text on grey, and the filter toolbar + table sat as two separately-bordered cards (card-on-card). Fix: the
@@ -3243,9 +3248,18 @@
     var cntS=document.getElementById('v4OffCount'); if(cntS){ cntS.textContent=''; cntS.classList.remove('zero'); }
     var goSz=document.getElementById('v4OffGo'); if(goSz){ goSz.disabled=false; goSz.textContent=removeLabel; }
    } else {
-    var teamNote=ctx.teams.length?('<p class="secd" style="margin:10px 0 0">Access held through '+gsEsc(ctx.teams.join(', '))+' ends automatically. Nothing to reassign there.</p>'):'';
+    /* v5 wording (Joao review): drop "held" and the "own ... directly" phrasing; match the People list ("manage
+       directly") and say plainly that team access ends on removal. v4 keeps its exact copy. */
+    var teamNote, noneLine;
+    if(V5){
+     teamNote=ctx.teams.length?('<p class="secd" style="margin:10px 0 0">Any access they get through '+gsEsc(ctx.teams.join(', '))+' ends automatically when they are removed, so there is nothing to reassign there.</p>'):'';
+     noneLine=' They do not manage any social accounts directly, so nothing gets disconnected.';
+    } else {
+     teamNote=ctx.teams.length?('<p class="secd" style="margin:10px 0 0">Access held through '+gsEsc(ctx.teams.join(', '))+' ends automatically. Nothing to reassign there.</p>'):'';
+     noneLine=' They own no social accounts directly, so nothing gets disconnected.';
+    }
     var q=ctx.multi?('Remove '+gsEsc(ctx.noun)+' from Somos?'):('Remove <b>'+gsEsc(ctx.noun)+'</b> from Somos?');
-    body.innerHTML='<p style="font:var(--hs-type-body-md);margin:0">'+q+' They own no social accounts directly, so nothing gets disconnected.'+teamNote+'</p>'+gate;
+    body.innerHTML='<p style="font:var(--hs-type-body-md);margin:0">'+q+noneLine+teamNote+'</p>'+gate;
     var cnt=document.getElementById('v4OffCount'); if(cnt){ cnt.textContent=''; cnt.classList.remove('zero'); }
     var go=document.getElementById('v4OffGo'); if(go){ go.disabled=false; go.textContent=removeLabel; }
    }
@@ -3275,9 +3289,21 @@
      +'<div>'+rows+'</div>'+teamLineS+gate;
     var goS=document.getElementById('v4OffGo'); if(goS){ goS.textContent='Transfer and delete account'; }
    } else {
-    var teamLine=ctx.teams.length?('<div class="v4-off-teamline">Access held through '+gsEsc(ctx.teams.join(', '))+' ('+ctx.teams.length+' team'+(ctx.teams.length===1?'':'s')+') ends automatically. Nothing to do there.</div>'):'';
-    var subj=ctx.multi?('These '+ctx.names.length+' members directly own '+nOwned+' social account'+(nOwned===1?'':'s')):(gsEsc(ctx.noun)+' directly owns '+nOwned+' social account'+(nOwned===1?'':'s'));
-    body.innerHTML='<div class="hs-alert hs-alert--warning" style="margin:0 0 14px"><span class="material-symbols-outlined">warning</span><div>'+subj+'. Choose who takes over each one before they can be removed, otherwise the connections would be lost.</div></div>'
+    /* v5 wording (Joao review): say plainly WHAT to do (reassign the accounts this person manages directly) and WHY,
+       and drop the unclear "held" / "access ... ends" phrasing on the team line. v4 keeps its exact copy below, so the
+       v4 reference build stays byte-identical. Behaviour (the reassign-before-remove guardrail + button state) is
+       unchanged: only the sentences differ. */
+    var teamLine, subj, warnTail;
+    if(V5){
+     teamLine=ctx.teams.length?('<div class="v4-off-teamline">Any access they get through '+gsEsc(ctx.teams.join(', '))+' ('+ctx.teams.length+' team'+(ctx.teams.length===1?'':'s')+') ends automatically when they are removed, so there is nothing to reassign there.</div>'):'';
+     subj=ctx.multi?('These '+ctx.names.length+' members manage '+nOwned+' social account'+(nOwned===1?'':'s')+' directly'):(gsEsc(ctx.noun)+' manages '+nOwned+' social account'+(nOwned===1?'':'s')+' directly');
+     warnTail='. Reassign '+(nOwned===1?'it':'each one')+' to another member before you remove them, or the connection'+(nOwned===1?'':'s')+' will be lost.';
+    } else {
+     teamLine=ctx.teams.length?('<div class="v4-off-teamline">Access held through '+gsEsc(ctx.teams.join(', '))+' ('+ctx.teams.length+' team'+(ctx.teams.length===1?'':'s')+') ends automatically. Nothing to do there.</div>'):'';
+     subj=ctx.multi?('These '+ctx.names.length+' members directly own '+nOwned+' social account'+(nOwned===1?'':'s')):(gsEsc(ctx.noun)+' directly owns '+nOwned+' social account'+(nOwned===1?'':'s'));
+     warnTail='. Choose who takes over each one before they can be removed, otherwise the connections would be lost.';
+    }
+    body.innerHTML='<div class="hs-alert hs-alert--warning" style="margin:0 0 14px"><span class="material-symbols-outlined">warning</span><div>'+subj+warnTail+'</div></div>'
      +'<div>'+rows+'</div>'+teamLine+gate;
     var go2=document.getElementById('v4OffGo'); if(go2){ go2.textContent='Transfer & remove'; }
    }
@@ -4188,10 +4214,26 @@
   if(host.getAttribute('data-v5sec')) return; host.setAttribute('data-v5sec','1');
   var heads=host.querySelectorAll('h3.sec');
   Array.prototype.forEach.call(heads,function(h){
-   if(h.textContent.trim()==='Two-factor authentication (2FA)') h.textContent='2-step verification';
+   if(h.textContent.trim()==='Two-factor authentication (2FA)'){
+    h.textContent='2-step verification';
+    /* Joao review: make the 2-step description say plainly what it does. The card's lede is the first .secd after the
+       heading. v5-only text edit. */
+    var p=h.parentNode.querySelector('p.secd');
+    if(p) p.textContent='Ask for a second step (a code) after your password when you sign in, so a stolen password alone cannot get in.';
+   }
   });
   var tog=host.querySelector('.hs-toggle[aria-label="Authenticator app two-factor"]');
   if(tog) tog.setAttribute('aria-label','Authenticator app for 2-step verification');
+  /* Joao review: the Password card had no line saying what it is for (only "Last changed 3 months ago"). Add a short
+     purpose helper under the "Password" heading, v5-only, so the section explains itself. Idempotent. The password
+     card is #v4SecPwCard; its heading is the h3.sec "Password". */
+  var pwCard=document.getElementById('v4SecPwCard');
+  var pwHead=pwCard?pwCard.querySelector('h3.sec'):null;
+  if(pwHead && pwHead.textContent.trim()==='Password' && !pwCard.querySelector('.v5-pw-help')){
+   var help=document.createElement('p'); help.className='secd v5-pw-help'; help.style.margin='0 0 12px';
+   help.textContent='The password you use to sign in to Hootsuite with your email address.';
+   pwHead.parentNode.insertBefore(help, pwHead.nextSibling);
+  }
  }
  /* ================= v5 wording: standalone Transfer page header (Joao review) =================
     The standalone c-org-transfer.html page renders the static C['transfer'] literal (shared with v3/v4), whose title
@@ -4454,8 +4496,8 @@
    +'<div class="secd" style="margin:2px 0 0">'+gsEsc(planName)+'</div></div>'
    +'<div style="font:var(--hs-type-body-md-b);white-space:nowrap">'+gsEsc(planPrice)+'</div></div>'
    +'<div class="secd" style="margin:4px 0 16px">All prices are in USD and subject to taxes unless stated otherwise.</div>'
-   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b);margin:0 0 4px">Status</div><span class="hs-badge hs-badge--positive">Active</span></div>'
-   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b)">Renews</div><div class="secd" style="margin:2px 0 0">'+gsEsc(renews)+'</div></div>'
+   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b);margin:0 0 4px">Subscription status</div><span class="hs-badge hs-badge--positive">Active</span></div>'
+   +'<div style="margin:0 0 16px"><div style="font:var(--hs-type-body-md-b)">Next billing date</div><div class="secd" style="margin:2px 0 0">'+gsEsc(renews)+'</div></div>'
    +'<div class="rowflex" style="gap:10px"><button class="hs-btn hs-btn--secondary" type="button" onclick="v5BillProto(\'Update subscription\')">Update subscription</button>'
    +'<button class="hs-btn hs-btn--ghost" type="button" onclick="v5BillProto(\'Cancel subscription\')">Cancel subscription</button></div>'
    +'</div></div>'));
@@ -4637,6 +4679,11 @@
   var summary=ov?ov.querySelector('.v4-summary'):null;
   var id=head.querySelector('.v4-mdid');
   if(summary && id){
+   /* v5 wording (Joao review): the shared access sentence (v4AccessSentence / V4_ROLE_SENTENCE) uses "held directly" /
+      "held via [team]", which the reviewer found unclear. Under v5 only, reword the moved sentence so it matches the
+      People list ("Direct" / "Through [team]") and drops "held": "assigned to them directly" / "assigned through
+      [team]". Text-only, on the moved node; the v4 sentence data is untouched, so v4 stays byte-identical. */
+   summary.textContent=summary.textContent.replace(/held via /i,'assigned through ').replace(/held directly/i,'assigned to them directly');
    summary.classList.add('v5-md-access');                                                /* header-scoped spacing (CSS below) */
    id.appendChild(summary);                                                               /* under name + role badge + meta */
    if(ov){
@@ -4770,19 +4817,33 @@
  function v5PeopleRelationship(){
   var tbl=document.getElementById('v4MembersTbl'); if(!tbl) return;
   var tb=tbl.querySelector('tbody'); if(!tb) return;
+  /* v5 wording (Joao review): the shared v4Members header + hint call this column "Access via" and the last column
+     "Owns", which a first-time admin did not understand. Relabel them here, v5-only, once (idempotent via a marker on
+     the table): "Access from" (where the role comes from: Direct, or through a team) and "Manages directly" (the social
+     accounts this person manages on their own). The hint is reworded to match. v4Members still renders the original
+     header + hint for the v4 reference build, so v4 (and v3) stay byte-identical. */
+  if(tbl.getAttribute('data-v5hdr')!=='1'){
+   var ths=tbl.querySelectorAll('thead th');
+   if(ths[3] && ths[3].textContent.trim()==='Access via') ths[3].textContent='Access from';
+   if(ths[4] && ths[4].textContent.trim()==='Owns') ths[4].textContent='Manages directly';
+   var mp=document.getElementById('v4MbrPanel-members');
+   var hint=(mp||document.getElementById('pageContent')).querySelector('.hs-field-hint');
+   if(hint) hint.innerHTML='Select people to change role, add to a team, or remove in bulk. <b>Access from</b> shows where a role comes from: <b>Direct</b> (set on the person) or through a team. <b>Manages directly</b> counts the social accounts a person manages on their own, so you can see what needs a new owner before you remove someone.';
+   tbl.setAttribute('data-v5hdr','1');
+  }
   Array.prototype.forEach.call(tb.querySelectorAll('tr.v4-rowlink'), function(tr){
    if(tr.getAttribute('data-v5rel')==='1') return;                                  /* idempotent per row */
    var name=tr.getAttribute('data-name'); var m=v4MemberByName(name); if(!m) return;
    var tds=tr.querySelectorAll('td');
    var accessTd=tds[3], ownsTd=tds[4]; if(!accessTd||!ownsTd) return;
-   /* --- ACCESS VIA: role provenance as a path + team chips --- */
+   /* --- ACCESS FROM: role provenance as a path + team chips --- */
    var teams=v4MbrTeamsFor(m);                                                       /* every team this person is on (distinct) */
    var inherited=/^via /i.test(m.via);                                               /* their ROLE comes through a team */
    var lead;
    if(inherited){
-    /* Role is inherited: "via" + the team(s). The via string names one team; render every team the person is on as a
-       chip (the naming team first if present), so multi-team people show all their chips. */
-    lead='<span class="v5-rel-via">via</span>';
+    /* Role is inherited: "Through" + the team(s). The via string names one team; render every team the person is on as
+       a chip (the naming team first if present), so multi-team people show all their chips. */
+    lead='<span class="v5-rel-via">Through</span>';
    } else {
     /* Role is direct. Say so plainly; still show any team chips so the member -> team link is visible for direct roles. */
     lead='<span class="v5-rel-direct">Direct</span>';
@@ -4902,7 +4963,32 @@
    var p=mtxLead.parentNode.querySelector('p.secd');
    if(p) p.innerHTML='What each role can do. Predefined roles are read-only; custom roles are editable. Rows marked <b>eng confirm</b> are still being resolved and are not final.';
   }
+  /* Joao review: the reviewer asked "what is the difference between these roles?" Add a short plain one-liner under each
+     role name in the matrix header so the difference reads at a glance. v5-only; see v5RoleDescriptions. */
+  v5RoleDescriptions();
   initControlA11y(lead);
+ }
+ /* v5 wording (Joao review): a short, factual one-line description under each role NAME the roles matrix lists, so an
+    admin can tell the roles apart without opening anything. Injected under each .v4-colname in the matrix header (both
+    predefined and the seeded custom role). Predefined copy is a plain rewrite of the shipped role scope; the custom
+    column reuses the role's own .desc. Idempotent (skips columns already annotated). v5-only, called from
+    v5RolesReframe; v4RenderMatrix (shared) never adds these, so the v4 matrix header stays byte-identical. Does NOT
+    touch the capability rows or the contested "eng confirm" cells. */
+ var V5_ROLE_DESC={
+  'View only':'Can view analytics and drafts, but cannot change anything.',
+  'Team member':'Creates and publishes for their teams. Cannot manage people or billing.',
+  'Admin':'Manages members, teams, and social accounts. Cannot manage billing.',
+  'Super Admin':'Full control, including billing and deleting the organization.',
+  'Contractor (limited)':'Draft-only access for temporary or external collaborators.'
+ };
+ function v5RoleDescriptions(){
+  var tbl=document.getElementById('v4Matrix'); if(!tbl) return;
+  Array.prototype.forEach.call(tbl.querySelectorAll('thead th .v4-colname'), function(nameEl){
+   var th=nameEl.closest('th'); if(!th || th.querySelector('.v5-role-desc')) return;   /* idempotent per column */
+   var desc=V5_ROLE_DESC[nameEl.textContent.trim()]; if(!desc) return;
+   var d=document.createElement('div'); d.className='v5-role-desc'; d.textContent=desc;
+   nameEl.parentNode.insertBefore(d, nameEl.nextSibling);                               /* directly under the role name */
+  });
  }
  function applyV3(){
   if(!V3) return;
