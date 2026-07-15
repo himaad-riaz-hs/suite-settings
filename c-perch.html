@@ -927,6 +927,33 @@
  @keyframes v5AnnotIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
  @keyframes v5AnnotOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(6px);}}
  @media (prefers-reduced-motion: reduce){ body.v5 .v5-annot-fab{transition:none;} body.v5.v5-annot .v5-annot-note,body.v5.v5-annot .v5-annot-note.v5-annot-leaving{animation:none;} }
+ /* ===== invitation (?invitation=1) additions: all body.invitation-scoped (or scoped to invitation-only ids/classes that
+    only get injected under the flag), so every non-invitation render is visually unchanged. Tokens only; no em/en dashes;
+    Canadian English. See the invitation JS pass for the behaviour. =====
+    (1) rail invite entry: the injected #invRailEntry is a real .suite-navbtn, so it inherits the shipped rail button
+    sizing / hover / label styles from suite-shell.css. Give its circle the mint brand wash + a hairline so it reads as a
+    distinct, always-visible action at the bottom of the rail, not just another product icon. */
+ body.invitation .suite-rail .inv-rail-entry .circle{background:var(--bento-system-sys-brand-100,#dfffde);color:var(--bento-system-sys-positive-700,#0a7d2c);box-shadow:inset 0 0 0 1px var(--bento-system-sys-positive-600,#0a7d2c);}
+ body.invitation .suite-rail .inv-rail-entry:hover .circle{background:var(--bento-system-sys-brand-200,#c7f7c5);color:var(--bento-system-sys-positive-700,#0a7d2c);}
+ body.invitation .suite-rail .inv-rail-entry .lbl{color:var(--bento-theme-color-text-base);}
+ body.invitation .suite-rail .inv-rail-entry:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:-2px;border-radius:12px;}
+ /* (2) Requested tab: the tab + panel reuse the shipped .hs-tabs / .set-card / .hs-table / .v4-empty; only the per-row
+    Approve/Deny action cluster + the non-admin request form need layout. */
+ body.invitation .inv-req-actions{display:flex;gap:6px;justify-content:flex-end;}
+ body.invitation .inv-req-form{display:flex;flex-direction:column;gap:20px;margin-top:4px;}
+ /* (3) seat wall: a self-contained pricing card + benefits list + the request alt, inside the shared modal body. */
+ body.invitation .inv-wall-card{border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:16px;margin:0 0 16px;background:var(--bento-theme-color-bg-surface);}
+ body.invitation .inv-wall-plan{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+ body.invitation .inv-wall-plan-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ body.invitation .inv-wall-price{text-align:right;flex:none;}
+ body.invitation .inv-wall-price-n{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);display:block;}
+ body.invitation .inv-wall-price-u{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);display:block;}
+ body.invitation .inv-wall-calc{border-top:1px solid var(--bento-theme-color-border-subtle);margin-top:12px;}
+ body.invitation .inv-wall-benefits{list-style:none;margin:12px 0 0;padding:12px 0 0;border-top:1px solid var(--bento-theme-color-border-subtle);display:flex;flex-direction:column;gap:8px;}
+ body.invitation .inv-wall-benefits li{display:flex;align-items:flex-start;gap:8px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ body.invitation .inv-wall-benefits li .material-symbols-outlined{font-size:18px;color:var(--bento-system-sys-positive-600,#0a7d2c);flex:none;margin-top:1px;}
+ body.invitation .inv-wall-alt{border-top:1px solid var(--bento-theme-color-border-subtle);padding-top:14px;}
+ body.invitation .inv-wall-alt-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin:0 0 4px;}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -1108,11 +1135,22 @@
     Persists across settings pages; ?v5=0 clears just v5 (leaving v4 intact as the reference build). */
  var V5=false;
  try{ var _v5=new URLSearchParams(location.search).get('v5'); if(_v5==='1')sessionStorage.setItem('v5','1'); else if(_v5==='0')sessionStorage.removeItem('v5'); V5=(sessionStorage.getItem('v5')==='1'); }catch(e){}
+ /* invitation flag (?invitation=1): the member-invitation pass on TOP of v5. Parsed/persisted EXACTLY like v5 so the
+    current v5 build renders byte-identical without ?invitation=1. INVITATION IMPLIES V5 (and therefore V4 and V3): when
+    it is on we also turn V5/V4/V3 on and add their body classes, so every v5 flow (the combined People page, the invite
+    modal, the Plan & billing page, the roles matrix) is present and the invitation deltas are pure transforms on top.
+    Everything invitation adds is gated behind body.invitation + the INVITATION flag and only runs from applyInvitation()
+    (which runs AFTER applyV5()) or from inline if(INVITATION){...} guards inside the shared render functions. Persists
+    across settings pages; ?invitation=0 clears just invitation (leaving v5 intact as the reference build). */
+ var INVITATION=false;
+ try{ var _inv=new URLSearchParams(location.search).get('invitation'); if(_inv==='1')sessionStorage.setItem('invitation','1'); else if(_inv==='0')sessionStorage.removeItem('invitation'); INVITATION=(sessionStorage.getItem('invitation')==='1'); }catch(e){}
+ if(INVITATION){ V5=true; try{ if(sessionStorage.getItem('v5')!=='1') sessionStorage.setItem('v5','1'); }catch(e){} }  /* invitation builds ON the v5 flows, so invitation implies v5 */
  if(V5){ V4=true; try{ if(sessionStorage.getItem('v4')!=='1') sessionStorage.setItem('v4','1'); }catch(e){} }  /* v5 builds ON the v4 flows, so v5 implies v4 */
  if(V4){ V3=true; try{ if(sessionStorage.getItem('v3')!=='1') sessionStorage.setItem('v3','1'); }catch(e){} }  /* v4 inherits the v3 nav direction (section 0 is already in v3) */
  if(V3&&document.body)document.body.classList.add('v3');
  if(V4&&document.body)document.body.classList.add('v4');
  if(V5&&document.body)document.body.classList.add('v5');
+ if(INVITATION&&document.body)document.body.classList.add('invitation');
  if(UT){ OPT='b'; ROLE='admin'; if(document.body)document.body.classList.add('utmode'); }
  try{ COLL=JSON.parse(sessionStorage.getItem('navColl')||'{}'); }catch(e){ COLL={}; }
  try{ POPMODE=sessionStorage.getItem('popMode')||'explicit'; }catch(e){}
@@ -2532,6 +2570,10 @@
     atomic action. */
  function v4InvSend(){
   var n=_v4InvEmails.length; if(!n||_v4InvSending) return;           /* guard: Send stays disabled until >=1 email; ignore double-fire */
+  /* invitation-gated seat wall: if adding these people would take the plan over its seat count, stop the send and show
+     the seat wall (pricing + request-from-admin) in place of the success flow. Non-invitation renders never take this
+     branch (INVITATION is false), so the v5/v4/v3 invite send is unchanged. See invSeatWall() below. */
+  if(INVITATION && invInviteWouldExceedSeats(n)){ invShowSeatWall(n); return; }
   _v4InvSending=true;
   var foot=document.getElementById('v4InvFoot'); if(!foot) return;
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" disabled>Cancel</button><button class="hs-btn hs-btn--primary" type="button" id="v4InvSendBtn" disabled aria-busy="true"><span class="material-symbols-outlined v4-spin" aria-hidden="true">progress_activity</span>Sending\u2026</button>';
@@ -5002,6 +5044,227 @@
    nameEl.parentNode.insertBefore(d, nameEl.nextSibling);                               /* directly under the role name */
   });
  }
+ /* ===== invitation pass (?invitation=1). Runs AFTER applyV5() (invitation implies v5), so v5 has already rendered every
+    page and the combined People page. All invitation additions live here (or behind inline if(INVITATION){...} guards in
+    the shared render functions) and are gated on INVITATION, so the v5 reference build (and v4/v3) are untouched. Three
+    things, matching the brief:
+      (1) A global member-invite entry point in the far-left product rail, pinned at the bottom just above the avatar, so
+          you can add people without opening Settings first. Injected into the static RAIL at runtime (invRailEntry), so
+          the shipped RAIL markup stays byte-identical for every non-invitation render.
+      (2) A "Requested" tab on the People page (alongside Members / Teams / Pending invites): an admin sees pending seat
+          requests to approve or deny; a non-admin can request a seat. Placeholder Somos-style people, consistent with the
+          canonical data. Added to the v5-built People toggle (invPeopleRequestedTab), so v5's own tabs are unchanged.
+      (3) A clearer seat wall: when adding people would take the plan over its seats, the invite Send shows a wall with
+          plain pricing (seats, price per seat, what upgrading gets you) AND a "Request from your admin" path for people
+          who cannot buy. Success / placeholder only, no real purchase or payment (invShowSeatWall).
+    DIRECTIONAL / PLACEHOLDER: copy is plain and provisional (a copywriter refines later); pricing is illustrative, not a
+    quote; no real purchase, payment, or brand assets. Somos-style names are fictional. ===== */
+ /* Admin vs non-admin for the invitation flows follows the same role model the rest of v4 uses: the Paying-Member
+    persona (ROLE==='pm') is the non-admin who can request a seat but not approve; everyone else (View only, Admin, Super
+    admin) is treated as an admin who can approve or deny requests. Matches v4RoleIsMember(). */
+ function invIsAdmin(){ return !v4RoleIsMember(); }
+ /* Seat model (invitation-only, illustrative). Kept SEPARATE from the enterprise 440/500 headcount shown elsewhere: this
+    variant tells one small-plan story so the seat wall is reachable and self-contained. total = seats on the plan; used =
+    seats already taken. remaining is derived. The wall fires when a batch of invites would push used past total. These
+    numbers are a prototype scenario, not a real account, and are never read by any non-invitation screen. */
+ var INV_SEATS={ planName:'Team plan', total:12, used:11, pricePerSeat:25, currency:'USD', billing:'per seat / month' };
+ function invSeatsRemaining(){ var r=INV_SEATS.total-INV_SEATS.used; return r>0?r:0; }
+ function invInviteWouldExceedSeats(n){ return (INV_SEATS.used + (n||0)) > INV_SEATS.total; }
+ /* Pending seat requests (admin sees these to approve / deny). Fictional Somos-style people, consistent with the
+    canonical @somos.com convention; reasons are plain and short. Mutated in memory by approve / deny (prototype only). */
+ var INV_SEAT_REQUESTS=[
+  {ini:'YT',name:'Yuki Tanaka',email:'yuki.tanaka@somos.com',role:'Team Member',reason:'Joining the Growth Team this week.',requested:'Jul 14, 2026'},
+  {ini:'MS',name:'Mateo Silva',email:'mateo.silva@somos.com',role:'Team Member',reason:'Covering regional social while a teammate is on leave.',requested:'Jul 13, 2026'},
+  {ini:'NH',name:'Nadia Haddad',email:'nadia.haddad@somos.com',role:'View Only',reason:'Needs read access to review campaign analytics.',requested:'Jul 11, 2026'}
+ ];
+ function applyInvitation(){
+  if(!INVITATION) return;
+  try{ invEnsureRailEntry(); }catch(e){}                                        /* (1) global rail invite entry point */
+  /* (2) Requested seats. On the People page (PAGE_ID==='members'): an ADMIN gets a fourth "Requested" tab to approve /
+     deny seat requests; a NON-ADMIN (the Paying-Member persona, pm) is blocked from this org-admin page by the existing
+     role gate (v4PageDenied -> the unauthorized card, a held gate we do NOT change), so instead of leaving them at a dead
+     end we augment that unauthorized card with a "Request a seat" path. Both are invitation-gated, so the v5 People page
+     and the v4 unauthorized card stay byte-identical without the flag.
+       - Gate on PAGE_ID only (not the topbar title): v5People relabels the title to "People" asynchronously, so a
+         v4IsPage('People') check would be false at boot. invPeopleRequestedTab() polls for the v5-built People toggle.
+       - For the denied (non-admin) case, augment the unauthorized card (invAugmentUnauthorized) which applyV4 already
+         rendered synchronously before this runs. */
+  try{
+   if(PAGE_ID==='members'){
+    if(v4PageDenied('members')) invAugmentUnauthorized();                       /* non-admin: add a request-a-seat path to the gated card */
+    else invPeopleRequestedTab();                                              /* admin: add the Requested tab */
+   }
+  }catch(e){}
+ }
+ /* ---- (1) far-left product rail: an always-visible "Invite" entry point, pinned to the bottom of the rail just above
+    the avatar. Rendered as a first-class labelled rail button (a .suite-navbtn with a circle glyph + a visible "Invite"
+    label, like the product buttons), NOT a quiet utility icon, because this is the headline: a global way to add people
+    without opening Settings first. Injected as the FIRST child of the bottom .others cluster (so order is Invite,
+    notifications, help, avatar). It routes to member management / invite people (the People page, Members view, with the
+    flag preserved). Injected at runtime and body.invitation-gated, so the shipped RAIL markup stays byte-identical for
+    every non-invitation render. Idempotent via #invRailEntry. A11y: a real link with an accessible label + a hover
+    tooltip, keyboard-reachable like the other rail buttons. */
+ function invEnsureRailEntry(){
+  if(document.getElementById('invRailEntry')) return;
+  var others=document.querySelector('.suite-rail .others'); if(!others) return;
+  var a=v4El('<a class="suite-navbtn inv-rail-entry" id="invRailEntry" href="c-settings-members.html?invitation=1&peopletab=members" aria-label="Invite people" title="Invite people"><span class="circle"><span class="material-symbols-outlined">group_add</span></span><span class="lbl">Invite</span></a>');
+  others.insertBefore(a, others.firstChild);
+ }
+ /* ---- (2) People page "Requested" tab. Runs after v5People() has built the People toggle (#v5PeopleToggle) + panels.
+    Adds a fourth tab "Requested" and its panel, then extends the People tab set so the shipped tab switch (v5PeopleTab)
+    drives it. The panel content depends on the role: an admin sees the pending seat requests with Approve / Deny; a
+    non-admin sees a short "request a seat" panel. v5's own three tabs are untouched (this only appends), and the whole
+    thing is invitation-gated, so the v5 People page is byte-identical without the flag. Idempotent via #v5PeopleTab-requested.
+    Because v5People polls a skeleton before it builds the toggle, retry briefly until the toggle exists. */
+ var _invReqTries=0;
+ function invPeopleRequestedTab(){
+  if(document.getElementById('v5PeopleTab-requested')) return;                   /* already added */
+  var toggle=document.getElementById('v5PeopleToggle'); var panelHost=document.getElementById('v5PeoplePanel');
+  if(!toggle||!panelHost){ if(_invReqTries++>50) return; setTimeout(invPeopleRequestedTab,80); return; }
+  var reqCount=invIsAdmin()?INV_SEAT_REQUESTS.length:0;
+  /* the tab: mirror the shipped People tab markup (role=tab, roving tabindex, arrow-key nav via v5PeopleTabKey). Admins
+     get a count badge of outstanding requests; a non-admin has no count (they make requests, they do not review them). */
+  var tab=v4El('<a class="hs-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="v5Panel-requested" id="v5PeopleTab-requested" onclick="v5PeopleTab(\'requested\')" onkeydown="v5PeopleTabKey(event,\'requested\')">Requested'+(reqCount?' <span id="v5PeopleTabReqN">'+reqCount+'</span>':'')+'</a>');
+  toggle.appendChild(tab);
+  var panel=v4El('<div id="v5Panel-requested" role="tabpanel" aria-labelledby="v5PeopleTab-requested" hidden></div>');
+  panelHost.appendChild(panel);
+  /* register the new tab with the shipped People tab controller so v5PeopleTab / v5PeopleTabKey drive it too. */
+  if(typeof _V5_PEOPLE_TABS!=='undefined' && _V5_PEOPLE_TABS.indexOf('requested')===-1) _V5_PEOPLE_TABS.push('requested');
+  /* keep the toggle's accessible name honest now that a fourth tab exists */
+  toggle.setAttribute('aria-label','Switch between members, teams, pending invites and requested seats');
+  invRenderRequested();
+  /* allow arriving straight on the Requested tab (e.g. from a link), same pattern as ?peopletab=teams|pending */
+  try{ var _pt=new URLSearchParams(location.search).get('peopletab'); if(_pt==='requested') v5PeopleTab('requested'); }catch(e){}
+ }
+ /* Render the Requested panel. Admin: a table of seat requests (person, requested role, reason, date) with Approve /
+    Deny per row, and the shipped empty state when the queue is clear. Non-admin: a short panel explaining that seats are
+    managed by an admin, with a "Request a seat" button that opens the request form. Rebuilt on every approve / deny /
+    request so counts stay honest. */
+ function invRenderRequested(){
+  var panel=document.getElementById('v5Panel-requested'); if(!panel) return;
+  var badge=document.getElementById('v5PeopleTabReqN');
+  if(invIsAdmin()){
+   if(badge) badge.textContent=INV_SEAT_REQUESTS.length;
+   if(!INV_SEAT_REQUESTS.length){
+    panel.innerHTML='<div class="set-card"><div class="v4-empty"><span class="material-symbols-outlined v4-empty-ic" aria-hidden="true">how_to_reg</span>'
+     +'<div class="v4-empty-t">No seat requests</div>'
+     +'<div class="v4-empty-d">When someone asks for a seat, their request shows here for you to approve or deny.</div></div></div>';
+    return;
+   }
+   var rows=INV_SEAT_REQUESTS.map(function(r,i){
+    return '<tr data-reqemail="'+gsEsc(r.email)+'">'
+     +'<td><div class="rowflex"><span class="mini-av">'+gsEsc(r.ini)+'</span><div><div style="font:var(--hs-type-body-md-b)">'+gsEsc(r.name)+'</div><div class="secd">'+gsEsc(r.email)+'</div></div></div></td>'
+     +'<td><span class="'+v4RoleBadge(r.role)+' rolebadge">'+gsEsc(r.role)+'</span></td>'
+     +'<td class="secd">'+gsEsc(r.reason)+'</td>'
+     +'<td class="secd">'+gsEsc(r.requested)+'</td>'
+     +'<td><div class="inv-req-actions"><button class="hs-btn hs-btn--secondary hs-btn--sm" type="button" onclick="invSeatApprove('+i+')"><span class="material-symbols-outlined">check</span>Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" type="button" onclick="invSeatDeny('+i+')">Deny</button></div></td>'
+     +'</tr>';
+   }).join('');
+   panel.innerHTML='<p class="secd" style="margin:0 0 16px">People who have asked for a seat in Somos. Approving a request uses one seat and sends them an invite to join.</p>'
+    +'<div class="set-card"><table class="hs-table" id="invReqTbl"><thead><tr><th>Person</th><th>Requested role</th><th>Reason</th><th>Requested</th><th style="text-align:right">Decision</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+    +'<div class="hs-field-hint" style="margin-top:8px">Approving uses a seat and invites the person. Denying removes the request and notifies them. Seats left on your plan: '+invSeatsRemaining()+' of '+INV_SEATS.total+'.</div>';
+   initControlA11y(panel);
+   return;
+  }
+  /* non-admin: request a seat */
+  panel.innerHTML='<div class="set-card"><div class="pad"><h3 class="sec">Need a seat?</h3>'
+   +'<p class="secd">Seats in Somos are managed by an admin. Ask for one and an admin will review your request. You will get an email when they decide.</p>'
+   +'<div id="invReqFormMount"><button class="hs-btn hs-btn--primary" type="button" onclick="invOpenSeatRequest()"><span class="material-symbols-outlined">how_to_reg</span>Request a seat</button></div>'
+   +'</div></div>';
+  initControlA11y(panel);
+ }
+ /* Admin decisions (prototype: mutate the in-memory queue, re-render, toast). Approve reads as "seat granted + invite
+    sent" without a real invite; Deny removes the request. Both keep the tab badge + the seats-left hint honest. */
+ function invSeatApprove(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; if(INV_SEATS.used<INV_SEATS.total) INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); invRenderRequested(); showToast(gsEsc(r.name)+' was approved and invited to Somos.'); }
+ function invSeatDeny(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; INV_SEAT_REQUESTS.splice(i,1); invRenderRequested(); showToast('Request from '+gsEsc(r.name)+' was denied.'); }
+ /* Non-admin: an in-panel request form (reason + role), then a plain success state. No real submit (placeholder). */
+ function invOpenSeatRequest(){
+  var mount=document.getElementById('invReqFormMount'); if(!mount) return;
+  var roles=['View only','Team member','Admin'];
+  mount.innerHTML='<div class="inv-req-form">'
+   +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What access do you need?</span>'
+    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Requested role" id="invReqRoleGrid">'+roles.map(function(r,i){ return '<label class="v4-roleopt"><span class="hs-radio'+(i===1?' is-on':'')+'" role="radio" tabindex="'+(i===1?'0':'-1')+'" aria-checked="'+(i===1?'true':'false')+'" data-role="'+r+'" onclick="invReqSetRole(this)"></span><span><span class="v4-role-t">'+r+'</span></span></label>'; }).join('')+'</div></div>'
+   +'<div class="v4-inv-sec"><label class="v4-inv-lbl" for="invReqReason">Why do you need a seat? <span class="secd" style="font:var(--hs-type-body-sm)">(optional)</span></label>'
+    +'<textarea class="hs-input" id="invReqReason" placeholder="A short reason helps your admin decide."></textarea></div>'
+   +'<div class="rowflex" style="gap:10px;margin-top:4px"><button class="hs-btn hs-btn--primary" type="button" onclick="invSubmitSeatRequest()"><span class="material-symbols-outlined">send</span>Send request</button></div>'
+   +'</div>';
+  initControlA11y(mount);
+  var t=document.getElementById('invReqReason'); if(t) setTimeout(function(){ try{ t.focus(); }catch(e){} },30);
+ }
+ function invReqSetRole(el){ var grid=document.getElementById('invReqRoleGrid'); if(!grid) return; Array.prototype.forEach.call(grid.querySelectorAll('.hs-radio'),function(r){ var on=(r===el); r.classList.toggle('is-on',on); r.setAttribute('aria-checked',String(on)); r.setAttribute('tabindex',on?'0':'-1'); }); }
+ function invSubmitSeatRequest(){
+  var mount=document.getElementById('invReqFormMount'); if(!mount) return;
+  var sel=document.querySelector('#invReqRoleGrid .hs-radio.is-on'); var role=sel?sel.getAttribute('data-role'):'Team member';
+  mount.innerHTML='<div class="v3-invite-done" style="align-items:flex-start;text-align:left;padding:4px 0"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent</div><div class="ok-d">Your admin will review your request for a <b>'+gsEsc(role)+'</b> seat. You will get an email when they decide.</div></div>';
+ }
+ /* Non-admin on the (gated) People page: the existing role gate renders the unauthorized card (a held gate, unchanged
+    for non-invitation). Under INVITATION we add a constructive "Request a seat" path to that card so a non-admin is not
+    at a dead end: a short line + a "Request a seat" button that opens the SAME request form (invOpenSeatRequest, via a
+    #invReqFormMount here). The gate's own copy + the "Back to your settings" action are left untouched. Idempotent. */
+ function invAugmentUnauthorized(){
+  var card=document.querySelector('#pageContent .v4-unauth'); if(!card) return;
+  if(document.getElementById('invUnauthReq')) return;                            /* idempotent */
+  var act=card.querySelector('.v4-unauth-act'); if(!act) return;
+  var block=v4El('<div id="invUnauthReq" style="margin-top:18px;padding-top:18px;border-top:1px solid var(--bento-theme-color-border-subtle);max-width:520px;width:100%">'
+   +'<div style="font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin:0 0 4px">Need a seat?</div>'
+   +'<p class="secd" style="margin:0 0 12px">You can ask an admin for a seat. They will review your request and you will get an email when they decide.</p>'
+   +'<div id="invReqFormMount"><button class="hs-btn hs-btn--primary" type="button" onclick="invOpenSeatRequest()"><span class="material-symbols-outlined">how_to_reg</span>Request a seat</button></div>'
+   +'</div>');
+  act.parentNode.insertBefore(block, act.nextSibling);
+  initControlA11y(block);
+ }
+ /* ---- (3) seat wall. Shown from the invite Send when the batch would take the plan over its seats. Replaces the invite
+    modal body + foot with a clear wall: how many seats are needed, the plan + price per seat, what upgrading gets you,
+    and TWO paths: "Upgrade" (a placeholder success, no real purchase or payment) for someone who can buy, and "Request
+    from your admin" for someone who cannot. Reuses the shipped .modal / .hs-alert / .set-card-less layout inside the
+    modal body; tokens only. Invitation-gated (only reached behind the INVITATION guard in v4InvSend). */
+ function invShowSeatWall(n){
+  v4EnsureInviteModal(document.getElementById('pageContent'));
+  var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
+  if(!body||!foot) return;
+  var remaining=invSeatsRemaining();
+  var need=n-remaining; if(need<0) need=0;                                      /* extra seats this invite needs */
+  var addTotal=need*INV_SEATS.pricePerSeat;
+  title.textContent='You need more seats';
+  var seatWord=(n===1?'person':(n+' people'));
+  var haveLine=remaining>0
+   ? ('You are inviting '+seatWord+', but only <b>'+remaining+' seat'+(remaining===1?'':'s')+'</b> '+(remaining===1?'is':'are')+' left on your '+gsEsc(INV_SEATS.planName)+'.')
+   : ('You are inviting '+seatWord+', but your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used).');
+  body.innerHTML=''
+   +'<div class="hs-alert hs-alert--warning" style="margin:0 0 16px"><span class="material-symbols-outlined">info</span><div>'+haveLine+' Add '+need+' more seat'+(need===1?'':'s')+' to invite everyone.</div></div>'
+   /* pricing card: seats needed x price per seat = added cost. Illustrative, not a quote; no payment fields. */
+   +'<div class="inv-wall-card"><div class="inv-wall-plan"><div><div class="inv-wall-plan-t">'+gsEsc(INV_SEATS.planName)+'</div><div class="secd" style="margin:0">'+INV_SEATS.used+' of '+INV_SEATS.total+' seats used</div></div><div class="inv-wall-price"><span class="inv-wall-price-n">$'+INV_SEATS.pricePerSeat+'</span><span class="inv-wall-price-u">'+gsEsc(INV_SEATS.currency)+' '+gsEsc(INV_SEATS.billing)+'</span></div></div>'
+    +'<div class="inv-wall-calc"><div class="between" style="padding:10px 0"><span>'+need+' more seat'+(need===1?'':'s')+'</span><span style="font:var(--hs-type-body-md-b)">$'+addTotal+' '+gsEsc(INV_SEATS.currency)+' / month</span></div></div>'
+    +'<ul class="inv-wall-benefits"><li><span class="material-symbols-outlined">check</span>Room for '+need+' more '+(need===1?'person':'people')+' right away</li><li><span class="material-symbols-outlined">check</span>Everyone keeps the access you set in the invite</li><li><span class="material-symbols-outlined">check</span>One bill, prorated for the rest of this month</li></ul>'
+   +'</div>'
+   /* the request path, for people who cannot buy */
+   +'<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">Ask an admin to add seats or approve your invite. They will get your request with the details.</p></div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button>'
+   +'<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallRequest('+need+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>'
+   +'<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>';
+  initControlA11y(body);
+  var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
+ }
+ /* Upgrade path: placeholder success (no real purchase or payment). Bumps the in-memory seat count so a re-try of the
+    invite would now fit, then confirms in the modal. */
+ function invSeatWallUpgrade(need){
+  INV_SEATS.total+=need;
+  var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
+  if(!body||!foot) return;
+  title.textContent='Seats added';
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+need+' seat'+(need===1?'':'s')+' added</div><div class="ok-d">Your '+gsEsc(INV_SEATS.planName)+' now has '+INV_SEATS.total+' seats. This is a prototype, so nothing was purchased or charged. Go back to finish inviting.</div></div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4RenderInvite()">Back to invite</button>';
+  var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
+ }
+ /* Request path: placeholder success. Confirms the ask was sent to an admin (no real submit). */
+ function invSeatWallRequest(need){
+  var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
+  if(!body||!foot) return;
+  title.textContent='Request sent';
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent to your admin</div><div class="ok-d">An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.</div></div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
+  var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
+ }
  function applyV3(){
   if(!V3) return;
   try{ v3Flyout(); }catch(e){}
@@ -5011,6 +5274,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
