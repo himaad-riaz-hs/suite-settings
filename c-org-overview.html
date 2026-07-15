@@ -3346,6 +3346,16 @@
    }
    v4OffTally();
   }
+  /* v5 wording (Joao review): the member/members remove flow is opened from a "Transfer & remove" button, so make the
+     modal match it. Under v5 only, set BOTH the header and the confirm button to "Transfer & remove" for the member and
+     members contexts, replacing the "Remove <name>" header and dropping the "offboard" jargon. Org-delete and
+     self-delete are a separate destructive flow (not reached from a Transfer button) and keep their own accurate
+     "Delete ..." labels. Labels only: the reassign-before-remove tally + the button's disabled state set above are
+     left exactly as-is. v4-without-v5 never enters this block, so its labels stay byte-identical. */
+  if(V5 && (ctx.kind==='member' || ctx.kind==='members')){
+   if(title) title.textContent='Transfer & remove';
+   var goV5=document.getElementById('v4OffGo'); if(goV5) goV5.textContent='Transfer & remove';
+  }
   var w=document.getElementById('v4OffWrap'); w.classList.add('open'); w.addEventListener('keydown',v4OffKeydown);
   initControlA11y(body);
   setTimeout(function(){ var f=document.querySelector('#v4OffWrap .modal button:not([disabled]), #v4OffWrap .v4-off-sel'); if(f)f.focus(); },30);
@@ -4224,7 +4234,41 @@
   try{ if(PAGE_ID==='contact' && v4IsPage('Contact us')) v5Contact(); }catch(e){}         /* v5b: Contact us becomes a light in-product links page (drops the v4 form) */
   try{ if(v4IsPage('General')) v5OrgGeneral(); }catch(e){}                                  /* FIX 2 (task 23): reframe the Org General visibility control as a clearly-scoped RESTRICT setting + render the provisional marker cleanly */
   try{ if(PAGE_ID==='billing' && v4IsPage('Billing & plan')) v5Billing(); }catch(e){}       /* TASK 22: replace the v4 entry-only stub with the real Plan & billing card page (role-gated at the nav via acc HHRE) */
+  try{ if(PAGE_ID==='security' && v4IsPage('Security & privacy')) v5Security(); }catch(e){}  /* Joao review: align the 2-step verification wording (drop "2FA" / "two-factor"); runs AFTER v4Security rendered */
+  try{ if(v4IsPage('Transfer & offboard')) v5TransferPage(); }catch(e){}                    /* Joao review: drop "offboard" from the standalone transfer page header (title band + h2); v3/v4 keep it */
   try{ v5AnnotInit(); }catch(e){}                                                          /* pass C3: build the annotations toggle + place the note callouts (hidden until the toggle is on) */
+ }
+ /* ================= v5 wording: Security 2-step verification (Joao review) =================
+    v4Security renders the verification card with the heading "Two-factor authentication (2FA)" and an "Authenticator
+    app two-factor" toggle aria-label. A reviewer noted that 2-step verification is not necessarily 2FA, so under v5
+    only we align the copy on "2-step verification" and stop mixing in "2FA" / "two-factor". Runs from applyV5() AFTER
+    applyV4() built the v4 security page, and edits only text (the card heading + the toggle's accessible name); the
+    Authenticator affordance, the toggle state, and every other card are untouched. Idempotent. v4-without-v5 never
+    calls this, so its wording stays byte-identical. The description line ("Require a second step at sign-in ...") is
+    already free of "2FA"/"two-factor" and stays as-is. */
+ function v5Security(){
+  var host=document.getElementById('v4Sec'); if(!host) return;
+  if(host.getAttribute('data-v5sec')) return; host.setAttribute('data-v5sec','1');
+  var heads=host.querySelectorAll('h3.sec');
+  Array.prototype.forEach.call(heads,function(h){
+   if(h.textContent.trim()==='Two-factor authentication (2FA)') h.textContent='2-step verification';
+  });
+  var tog=host.querySelector('.hs-toggle[aria-label="Authenticator app two-factor"]');
+  if(tog) tog.setAttribute('aria-label','Authenticator app for 2-step verification');
+ }
+ /* ================= v5 wording: standalone Transfer page header (Joao review) =================
+    The standalone c-org-transfer.html page renders the static C['transfer'] literal (shared with v3/v4), whose title
+    band and h2 read "Transfer & offboard". Under v5 only, drop the "offboard" jargon to "Transfer & remove". Guarded by
+    the topbar title so it never fires on the real Members/People page (PAGE_ID is 'members' on both, but only this page
+    has the "Transfer & offboard" title). Text-only; idempotent. v3/v4 keep the original literal byte-for-byte. Note:
+    under v5 the member flow opens the Transfer & remove modal instead, so this page is not linked from the v5 UI, but
+    it is fixed here for completeness in case it is opened directly. */
+ function v5TransferPage(){
+  var tb=document.querySelector('.suite-topbar .tb-title');
+  if(tb && tb.textContent.trim()==='Transfer & offboard') tb.textContent='Transfer & remove';
+  var pc=document.getElementById('pageContent'); if(!pc) return;
+  var h=pc.querySelector('h2.set-head');
+  if(h && h.textContent.trim()==='Transfer & offboard') h.textContent='Transfer & remove';
  }
  /* ================= v5 pass C3: UX-annotations layer =================
     A prototype-only, toggleable layer that explains the thinking behind the design. Built here from applyV5() AFTER the
@@ -4644,6 +4688,11 @@
   /* (1) Remove the in-body back arrow v4MemberDetail appended at the top of #v4MdPage (aria-label "Back to members"). */
   var inBody=page.querySelector('a[aria-label="Back to members"]'); if(inBody && inBody.parentNode) inBody.parentNode.removeChild(inBody);
   var head=page.querySelector('.v4-mdhead'); if(!head) return;
+  /* (0) v5 wording (Joao review): the identity-header action button reads "Transfer & offboard" from v4MemberDetail.
+     Under v5 drop the jargon so it matches the modal it opens ("Transfer & remove"). Keep the leading icon; only the
+     text label changes. v5-only (this whole function runs solely under v5), so the v4-without-v5 header is untouched. */
+  var offBtn=head.querySelector('.v4-mdactions button[onclick*="v4OpenOffboard"]');
+  if(offBtn){ var offIc=offBtn.querySelector('.material-symbols-outlined'); offBtn.textContent=''; if(offIc) offBtn.appendChild(offIc); offBtn.appendChild(document.createTextNode('Transfer & remove')); }
   /* (3) Lift the Overview access sentence into the identity block, under the meta line. The sentence lives in the
      Overview panel's first card as <p class="v4-summary">; move that node up (keeps its text + tokens), then relabel
      the Overview card so it no longer reads as a duplicate "Access summary" (it now leads with the person's Teams). */
