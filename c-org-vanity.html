@@ -160,6 +160,11 @@
  .demodock.min{width:auto;max-width:280px;}
  /* User-test link (?ut=1): hide all prototype chrome so participants see only the product. */
  body.utmode .demodock, body.utmode .protobar{display:none !important;}
+ /* User-test safety net: the v5 UX-annotations layer (FAB + mint note callouts) must NEVER show to participants,
+    in any arm. v5AnnotInit already early-returns when UT is true so nothing is built; this is the belt-and-braces
+    display guard in case any annotation node exists. Gated to body.utmode only, so normal (non-ut) v5 browsing keeps
+    the annotations feature. */
+ body.utmode #v5AnnotFab, body.utmode .v5-annot-note, body.utmode .v5-annot-leaving{display:none !important;}
  .demodock select{width:100%;box-sizing:border-box;border:1px solid var(--bento-theme-color-border-base);border-radius:8px;background:var(--bento-theme-color-bg-surface);font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);cursor:pointer;padding:9px 10px;}
  .demodock .dd-reveal{display:flex;align-items:center;gap:8px;cursor:pointer;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
  .demodock .dd-reveal input{width:16px;height:16px;cursor:pointer;flex:none;}
@@ -4384,6 +4389,7 @@
     settings page (not the Perch stage). Page-specific notes attach to their area's host. All are idempotent. */
  function v5AnnotInit(){
   if(!V5) return;
+  if(UT) return;                                                                /* user-test mode: never build the FAB or place any notes, in ANY arm (invitation=1/2 + v5 control are all v5-based). CSS body.utmode net backs this up. */
   v5AnnotBuildFab();
   /* LEFT NAV (every standard v5 page): a lead note at the top of the drawer body. */
   v5AnnotPlace('v5AnnotNav',
@@ -5303,6 +5309,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT){ /* user-test only: the Perch cold-start backdrop has many decorative dead anchors (rail buttons, sub-nav items) and a couple of handler-less Create-a-post buttons. Left alone they jump-to-top or do nothing, and participants read the whole prototype as broken and bail. A delegated capture-phase handler catches a click on one of these dead/backdrop elements, cancels the "#" jump, and shows a neutral toast. It never touches genuinely working controls: any anchor with a real onclick (e.g. #avatarTrig, the invite flyout item) or a real route (href starting with "c-", e.g. the invite rail entry, the Calendar item) is left to behave normally, and among buttons only the handler-less Create-a-post is caught (the gear and every other topbar/plan button are untouched). Wording is fixed + neutral: it names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. Gated to UT, so non-ut renders are unaffected. */ var _utDeadAt=0; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick')) isDead=true; } else { var b=el2.closest('button'); if(b && !b.hasAttribute('onclick') && (b.textContent||'').indexOf('Create a post')!==-1) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
