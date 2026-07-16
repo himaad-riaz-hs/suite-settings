@@ -5535,6 +5535,10 @@
   v4EnsureInviteModal(document.getElementById('pageContent'));
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
+  /* Standalone open (from v5AdminGetSeats, no invite in progress): capture the trigger for focus return, and reset the
+     invite state so a follow-on "Invite people" (invSeatWallUpgrade standalone success) starts clean. An invite-triggered
+     wall (standalone falsy) leaves the already-open modal + its in-progress invite state untouched -> byte-identical. */
+  if(standalone){ _v4InvLastFocus=document.activeElement; _v4InvEmails=[]; _v4InvRole='Team member'; _v4InvTeams={}; _v4InvPreTeam=null; _v4InvEmailErr=''; _v4InvSending=false; }
   var remaining=invSeatsRemaining();
   var need, haveLine;
   if(standalone){
@@ -5577,8 +5581,12 @@
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button>'
    +(invIsAdmin()
      ? '<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
-     : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
+     : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
   initControlA11y(body);
+  /* The invite-triggered wall reuses the modal the user already opened (it is already .open); the standalone entry has no
+     open modal, so ACTUALLY SHOW the shell here (the original bug: the body was filled but #v4InviteWrap stayed display:none).
+     Mirror v4OpenInvite: add .open + the shared keydown (Escape/tab-trap) handler. Idempotent (classList.add / no dup listener). */
+  if(standalone){ var w=document.getElementById('v4InviteWrap'); if(w){ w.classList.add('open'); w.removeEventListener('keydown',v4InvKeydown); w.addEventListener('keydown',v4InvKeydown); } }
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
  /* Upgrade path: placeholder success (no real purchase or payment). Bumps the in-memory seat count so a re-try of the
@@ -5602,21 +5610,29 @@
     pending row per invited email, with the role chosen in the invite), so an admin can then approve or deny them. The
     email local-part is used as a readable name + initials so each row shows who / what / when. No real submit; prototype
     only. */
- function invSeatWallRequest(need){
+ /* `standalone` (optional): the discoverable "get more seats" wall has no invite in progress (no invitees to queue), so
+    when true the confirmation just speaks to the seat request itself and does not reference "the people you are inviting".
+    Invite callers pass only `need` -> `standalone` is undefined -> the original invitee-queueing + copy are byte-identical. */
+ function invSeatWallRequest(need,standalone){
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
-  try{
-   var role=(typeof _v4InvRole!=='undefined'&&_v4InvRole)?_v4InvRole:'Team member';
-   (_v4InvEmails||[]).forEach(function(em){
-    var local=String(em).split('@')[0].replace(/[._-]+/g,' ').trim();
-    var nm=local?local.replace(/\b\w/g,function(c){return c.toUpperCase();}):em;
-    var ini=(nm.split(' ').map(function(w){return w.charAt(0);}).join('').slice(0,2)||'').toUpperCase()||'??';
-    INV_SEAT_REQUESTS.push({ ini:ini, name:nm, email:em, role:role, reason:'Invite pending a seat, sent for admin approval.', requested:INV_TODAY });
-   });
-   if(document.getElementById('v5Panel-requested')) invRenderRequested();
-  }catch(e){}
+  if(!standalone){
+   try{
+    var role=(typeof _v4InvRole!=='undefined'&&_v4InvRole)?_v4InvRole:'Team member';
+    (_v4InvEmails||[]).forEach(function(em){
+     var local=String(em).split('@')[0].replace(/[._-]+/g,' ').trim();
+     var nm=local?local.replace(/\b\w/g,function(c){return c.toUpperCase();}):em;
+     var ini=(nm.split(' ').map(function(w){return w.charAt(0);}).join('').slice(0,2)||'').toUpperCase()||'??';
+     INV_SEAT_REQUESTS.push({ ini:ini, name:nm, email:em, role:role, reason:'Invite pending a seat, sent for admin approval.', requested:INV_TODAY });
+    });
+    if(document.getElementById('v5Panel-requested')) invRenderRequested();
+   }catch(e){}
+  }
   title.textContent='Request sent';
-  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent to your admin</div><div class="ok-d">An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.</div></div>';
+  var reqDesc=standalone
+   ? ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+'. You will get an email when they decide.')
+   : ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.');
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent to your admin</div><div class="ok-d">'+reqDesc+'</div></div>';
   foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
