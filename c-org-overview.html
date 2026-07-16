@@ -943,27 +943,40 @@
     the shared .suite-navbtn rules, so no colour is set here. */
  body.invitation .suite-rail .inv-rail-entry:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:-2px;border-radius:12px;}
  /* (2) Requested tab: the tab + panel reuse the shipped .hs-tabs / .set-card / .hs-table / .v4-empty; only the per-row
-    Approve/Deny action cluster + the non-admin request form need layout. */
- body.invitation .inv-req-actions{display:flex;gap:6px;justify-content:flex-end;}
- body.invitation .inv-req-form{display:flex;flex-direction:column;gap:20px;margin-top:4px;}
+    Approve/Deny action cluster + the non-admin request form need layout.
+    NOTE (r2): these seat surfaces are gated to V5 in JS (invitation implies v5, plus plain v5=1), so the selectors are
+    scoped to body.v5 (a superset of body.invitation) rather than body.invitation only, so the wall + affordances render
+    for the v5=1 arm too. v4/v3/no-flag never carry body.v5 and never inject these classes, so their rendering is
+    unchanged; <style> is also stripped from the byte-identical DOM check. */
+ body.v5 .inv-req-actions{display:flex;gap:6px;justify-content:flex-end;}
+ body.v5 .inv-req-form{display:flex;flex-direction:column;gap:20px;margin-top:4px;}
  /* (3) seat wall: a self-contained pricing card + benefits list + the request alt, inside the shared modal body. */
- body.invitation .inv-wall-card{border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:16px;margin:0 0 16px;background:var(--bento-theme-color-bg-surface);}
- body.invitation .inv-wall-plan{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
- body.invitation .inv-wall-plan-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
- body.invitation .inv-wall-price{text-align:right;flex:none;}
- body.invitation .inv-wall-price-n{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);display:block;}
- body.invitation .inv-wall-price-u{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);display:block;}
- body.invitation .inv-wall-calc{border-top:1px solid var(--bento-theme-color-border-subtle);margin-top:12px;}
- body.invitation .inv-wall-benefits{list-style:none;margin:12px 0 0;padding:12px 0 0;border-top:1px solid var(--bento-theme-color-border-subtle);display:flex;flex-direction:column;gap:8px;}
- body.invitation .inv-wall-benefits li{display:flex;align-items:flex-start;gap:8px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
- body.invitation .inv-wall-benefits li .material-symbols-outlined{font-size:18px;color:var(--bento-system-sys-positive-600,#0a7d2c);flex:none;margin-top:1px;}
- body.invitation .inv-wall-alt{border-top:1px solid var(--bento-theme-color-border-subtle);padding-top:14px;}
- body.invitation .inv-wall-alt-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin:0 0 4px;}
+ body.v5 .inv-wall-card{border:1px solid var(--bento-theme-color-border-subtle);border-radius:12px;padding:16px;margin:0 0 16px;background:var(--bento-theme-color-bg-surface);}
+ body.v5 .inv-wall-plan{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+ body.v5 .inv-wall-plan-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);}
+ body.v5 .inv-wall-price{text-align:right;flex:none;}
+ body.v5 .inv-wall-price-n{font:var(--hs-type-title-sub);color:var(--bento-theme-color-text-base);display:block;}
+ body.v5 .inv-wall-price-u{font:var(--hs-type-meta);color:var(--bento-theme-color-text-subtle);display:block;}
+ body.v5 .inv-wall-calc{border-top:1px solid var(--bento-theme-color-border-subtle);margin-top:12px;}
+ body.v5 .inv-wall-benefits{list-style:none;margin:12px 0 0;padding:12px 0 0;border-top:1px solid var(--bento-theme-color-border-subtle);display:flex;flex-direction:column;gap:8px;}
+ body.v5 .inv-wall-benefits li{display:flex;align-items:flex-start;gap:8px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-base);}
+ body.v5 .inv-wall-benefits li .material-symbols-outlined{font-size:18px;color:var(--bento-system-sys-positive-600,#0a7d2c);flex:none;margin-top:1px;}
+ body.v5 .inv-wall-alt{border-top:1px solid var(--bento-theme-color-border-subtle);padding-top:14px;}
+ body.v5 .inv-wall-alt-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin:0 0 4px;}
  /* FIX #5: quiet seats affordance on the People header. A ghost button (shared .hs-btn--ghost sizing); this only tones
     the label + glyph down to subtle so it reads as status, not a call to action, and keeps it aligned beside Invite. */
- body.invitation .inv-seats-afford{color:var(--bento-theme-color-text-subtle);font:var(--hs-type-body-sm);white-space:nowrap;}
- body.invitation .inv-seats-afford .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-text-subtle);}
- body.invitation .inv-seats-afford:hover{color:var(--bento-theme-color-text-base);}
+ body.v5 .inv-seats-afford{color:var(--bento-theme-color-text-subtle);font:var(--hs-type-body-sm);white-space:nowrap;}
+ body.v5 .inv-seats-afford .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-text-subtle);}
+ body.v5 .inv-seats-afford:hover{color:var(--bento-theme-color-text-base);}
+ /* FIX 2 (r2): the discoverable "Get more seats" action beside the seats indicator. A quiet ghost button that reads as
+    an action (base ink, not the subtle status tone of the indicator), with its leading + glyph. Shares .inv-seats-afford
+    sizing above; this override just restores the base ink so it is clearly actionable next to the status read. */
+ body.v5 .inv-get-seats{color:var(--bento-theme-color-text-base);}
+ body.v5 .inv-get-seats .material-symbols-outlined{color:var(--bento-theme-color-text-base);}
+ /* FIX 3 (r2): the per-account "Reassign" affordance in the Owner cell of the Social & ad accounts table. A quiet inline
+    ghost button under/after the owner name; base sizing from .hs-btn--ghost .hs-btn--sm, only spacing tuned here. */
+ body.v5 .v5-reassign-owner{margin-top:4px;}
+ body.v5 .v5-owner-cell{display:flex;flex-direction:column;align-items:flex-start;gap:0;}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -3403,8 +3416,12 @@
   /* multi = genuinely more than one person; a 1-name bulk selection reads as that single named person, so bulk-remove
      of Bryn is worded exactly like the row/detail single-remove ("Remove Bryn Morales", not "Remove 1 member"). */
   var multi=(names.length>1);
-  var noun=multi?(names.length+' members'):(members[0]?members[0].name:(context&&context.name)||'this member');
-  return { kind:kind, names:names, members:members, multi:multi, noun:noun, owned:owned, teams:teams };
+  /* FIX 3 (r2): reassign-owner context ({type:'account'}) carries the account handle + its current direct owner so the
+     modal can name the account and offer everyone-but-the-current-owner as candidates. noun is the account handle. */
+  var acctHandle=(kind==='account')?context.handle:null;
+  var curOwner=(kind==='account'&&owned[0])?owned[0].owner:null;
+  var noun=(kind==='account')?(acctHandle||'this account'):(multi?(names.length+' members'):(members[0]?members[0].name:(context&&context.name)||'this member'));
+  return { kind:kind, names:names, members:members, multi:multi, noun:noun, owned:owned, teams:teams, handle:acctHandle, curOwner:curOwner };
  }
  /* Owner candidates for a given account: everyone EXCEPT the members being removed, with equivalent-or-higher access
     first (Super Admin, Admin, then the rest), so the safest choice is at the top of the list. */
@@ -3419,6 +3436,32 @@
   var ctx=v4OffNormalize(context); _v4OffCtx=ctx; _v4OffLastFocus=document.activeElement;
   var title=document.getElementById('v4OffTitle'), body=document.getElementById('v4OffBody');
   var nOwned=ctx.owned.length;
+  /* FIX 3 (r2): reassign-owner context ({type:'account', handle}). A SECOND ENTRANCE to the SAME reassignment step the
+     offboard guardrail uses (the .v4-off-row owner-picker + v4OffTally gating), reached from the Social & ad accounts
+     page instead of from a member row. It does NOT remove anyone: it just moves ONE account's direct owner to a new
+     member. Reuses the exact owner-picker row markup, the v4OffTally gate (confirm disabled until an owner is chosen),
+     and the shared modal shell. Only reachable under V5 (the entry point v5SocialReassign is gated to applyV5), so
+     v4/v3/no-flag never enter this branch and their behaviour is unchanged. Returns early so none of the remove/delete
+     copy below runs. */
+  if(ctx.kind==='account'){
+   var a=ctx.owned[0];
+   if(!a){ v4CloseOffboard(); showToast('This account has no direct owner to reassign.'); return; }
+   title.textContent='Reassign owner';
+   var acands=v4OffCandidates(ctx.curOwner?[ctx.curOwner]:[]);   /* everyone except the current owner, safest role first */
+   var aopts='<option value="" selected>Choose owner\u2026</option>'+acands.map(function(c){ return '<option value="'+gsEsc(c)+'">'+gsEsc(c)+'</option>'; }).join('');
+   var arow='<div class="v4-off-row"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span>'
+    +'<div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+' \u00b7 owned by '+gsEsc(a.owner)+'</div></div>'
+    +'<div class="v4-off-pick"><select class="hs-select v4-off-sel" aria-label="New owner for '+gsEsc(a.handle)+'" onchange="v4OffTally()">'+aopts+'</select></div></div>';
+   var agate='<div class="v4-off-gate"><span class="material-symbols-outlined" aria-hidden="true">lock</span><span>Prototype flow, pending sign-off. Nothing is actually reassigned here.</span></div>';
+   body.innerHTML='<p style="font:var(--hs-type-body-md);margin:0 0 14px"><b>'+gsEsc(a.handle)+'</b> is owned by <b>'+gsEsc(a.owner)+'</b>. Choose who should own it instead. The new owner can manage and publish to it; nothing is disconnected.</p>'
+    +'<div>'+arow+'</div>'+agate;
+   var goA=document.getElementById('v4OffGo'); if(goA) goA.textContent='Reassign owner';
+   var w=document.getElementById('v4OffWrap'); w.classList.add('open'); w.addEventListener('keydown',v4OffKeydown);
+   v4OffTally();                                                 /* disables confirm until an owner is chosen */
+   initControlA11y(body);
+   setTimeout(function(){ var f=document.querySelector('#v4OffWrap .v4-off-sel'); if(f)f.focus(); },30);
+   return;
+  }
   /* Org-delete context ({type:'org'}): the SAME guardrail, but the noun is the whole organization, not a person.
      Deleting the org cascades (every member loses access; every directly-owned account needs a new home or its
      connection is lost), so the copy and the confirm label speak to that whole consequence while the reassignment
@@ -3537,6 +3580,19 @@
   var ctx=_v4OffCtx||{noun:'this member'};
   var sels=Array.prototype.slice.call(document.querySelectorAll('.v4-off-sel'));
   if(sels.length && sels.some(function(s){return !s.value;})) return;   /* guardrail: disabled until every account has an owner/new home */
+  /* FIX 3 (r2): reassign-owner confirm. Applies the chosen new owner to the ONE account in the canonical V4_ACCOUNTS
+     (single source), re-renders the Social table so the Owner column + the reassign affordance stay honest, toasts, and
+     stays on the page (no member is removed, so no redirect). Only reachable under V5 (entry point is v5-gated). */
+  if(ctx.kind==='account'){
+   var to=sels[0]?sels[0].value:''; if(!to) return;
+   var idx=v4AcctIndex(ctx.handle);
+   if(idx>-1){ V4_ACCOUNTS[idx].owner=to; }                                     /* move direct ownership only; the approver grant is separate and left as-is */
+   v4CloseOffboard();
+   /* rebuild the Social table from the mutated canonical data so the new owner shows immediately */
+   try{ var tbl=document.getElementById('v4SocialTbl'); if(tbl){ tbl.removeAttribute('id'); var pc=document.getElementById('pageContent'); if(pc){ v4Social(pc); v5SocialReassign(true); } } }catch(e){}
+   showToast(gsEsc(ctx.handle)+' is now owned by '+gsEsc(to)+'. This is a prototype; nothing is saved.');
+   return;
+  }
   if(ctx.kind==='org'){
    /* Org delete: prototype success-state only. No redirect to Members (the org "no longer exists"); a success toast
       confirms the reassignment happened and the org would be deleted. Nothing is persisted. */
@@ -4403,6 +4459,8 @@
   try{ if(v4IsPage('Transfer & offboard')) v5TransferPage(); }catch(e){}                    /* Joao review: drop "offboard" from the standalone transfer page header (title band + h2); v3/v4 keep it */
   try{ v5AnnotInit(); }catch(e){}                                                          /* pass C3: build the annotations toggle + place the note callouts (hidden until the toggle is on) */
   try{ v5RequestSeat(); }catch(e){}                                                        /* FIX C3: make requesting a seat discoverable for a non-admin from a natural start (account flyout + the gated People page), not only after hitting the seat wall */
+  try{ v5AdminSeatsEntry(); }catch(e){}                                                    /* FIX 2 (r2): make "request / get more seats" discoverable for the ADMIN (the ut persona) from the People header, opening the EXISTING seat wall without inviting past the limit first */
+  try{ v5SocialReassign(); }catch(e){}                                                     /* FIX 3 (r2): a second entrance to the EXISTING transfer/reassign flow from the Social & ad accounts page (per-account "Reassign owner" opens v4OpenOffboard) */
  }
  /* ================= v5 wording: Security 2-step verification (Joao review) =================
     v4Security renders the verification card with the heading "Two-factor authentication (2FA)" and an "Authenticator
@@ -5294,6 +5352,74 @@
   try{ if(typeof v5PeopleTab==='function') v5PeopleTab('requested'); }catch(e){}
   try{ var t=document.getElementById('v5PeopleTab-requested'); if(t) t.focus(); }catch(e){}
  }
+ /* ===== FIX 2 (r2): discoverable "request / get more seats" for the ADMIN persona =====
+    Problem (UT + stakeholder): the ut task uses the ADMIN persona (ROLE forced to admin), and the only door to the
+    seat wall / add-seats flow is trying to invite MORE people than there are free seats. So an admin who wants to get
+    more seats cannot FIND that flow without first tripping the wall. This adds a discoverable entry from the People
+    page header, next to the existing "N of M seats used" indicator: a quiet "Get more seats" action that opens the
+    SAME seat wall (invShowSeatWall) in standalone mode (the admin "Add N seats" buy path), with no invite in progress.
+    Gated to V5 (runs from applyV5), so invitation=1/2 AND v5=1 all get it; v4/v3/no-flag never call applyV5, so their
+    DOM stays byte-identical. Admin-only (invIsAdmin): a non-admin uses the existing "Ask for a seat" flyout item + the
+    request form instead (v5RequestSeat), which is left untouched. The existing "N of M seats used" indicator keeps its
+    job (jump to the Requested tab to approve/deny others' requests); this only ADDS the get-more-seats action beside it.
+    Reuses invEnsureSeatsAffordance to render the indicator (idempotent via #invSeatsAfford, so the invitation arms' own
+    later call is a no-op). Retries briefly because v5People builds #v4MbrHead asynchronously. */
+ var _v5SeatsEntryTries=0;
+ function v5AdminSeatsEntry(){
+  if(!V5) return;
+  if(PAGE_ID!=='members') return;                                              /* People page only */
+  if(!invIsAdmin()) return;                                                     /* the admin persona; a non-admin uses the request-a-seat path */
+  if(v4PageDenied('members')) return;                                          /* a denied (non-admin) page is handled by v5RequestSeat, not here */
+  if(document.getElementById('v5GetSeats')) return;                            /* already added */
+  var head=document.getElementById('v4MbrHead');
+  if(!head){ if(_v5SeatsEntryTries++>50) return; setTimeout(v5AdminSeatsEntry,80); return; }
+  try{ invEnsureSeatsAffordance(); }catch(e){}                                 /* reuse the existing "N of M seats used" indicator (idempotent) */
+  var btn=v4El('<button class="hs-btn hs-btn--ghost hs-btn--sm inv-seats-afford inv-get-seats" id="v5GetSeats" type="button" title="Add more seats to your plan" aria-label="Get more seats" onclick="v5AdminGetSeats()"><span class="material-symbols-outlined">add</span>Get more seats</button>');
+  /* place it right after the seats-used indicator, before the Invite button, so reading order is: seats used, get more
+     seats, then the primary Invite action. Fall back to the actions cluster if the indicator did not mount. */
+  var afford=document.getElementById('invSeatsAfford');
+  if(afford && afford.parentNode){ afford.parentNode.insertBefore(btn, afford.nextSibling); }
+  else { var actions=head.lastElementChild; if(actions && actions!==head.firstElementChild){ actions.insertBefore(btn, actions.firstChild); } else { head.appendChild(btn); } }
+ }
+ /* Open the EXISTING seat wall as a standalone "get more seats" surface (admin buy path). No invite is in progress, so
+    pass standalone=true; invShowSeatWall handles the copy + the "Add N seats" -> invSeatWallUpgrade flow. Reuse only, no
+    parallel flow. */
+ function v5AdminGetSeats(){ try{ invShowSeatWall(5,true); }catch(e){} }
+ /* ===== FIX 3 (r2): reassign a social account's owner starting from the Social & ad accounts page =====
+    Problem (UT finding NEW-1, seen in both arms): offboard/transfer (reassigning who owns a social account) is only
+    reachable from a member row (People > row > Remove > the owner-picker step). Participants who START on the Social
+    accounts page to reassign an owner get stuck, because that page shows the owner but offers no way to change it.
+    Fix: on the Social accounts page, every account that has a DIRECT owner gets a quiet "Reassign" affordance in the
+    Owner cell that opens the EXISTING guardrail's reassignment step (v4OpenOffboard with an {type:'account'} context),
+    i.e. a SECOND ENTRANCE to the same flow, not a new one. Team-held accounts (no direct owner) show nothing to
+    reassign, matching the offboard model (team access simply ends / is shared). Gated to V5 (runs from applyV5), so
+    v4/v3/no-flag never inject this and their Social page stays byte-identical. Idempotent via a per-row data marker;
+    retries briefly because v4Social builds #v4SocialTbl behind a skeleton. `force` re-scans after an in-place rebuild
+    (post-reassign) without waiting. */
+ var _v5SocReassignTries=0;
+ function v5SocialReassign(force){
+  if(!V5) return;
+  if(PAGE_ID!=='social') return;                                               /* Social & ad accounts page only */
+  var tbl=document.getElementById('v4SocialTbl');
+  if(!tbl){ if(!force && _v5SocReassignTries++>50) return; if(!force){ setTimeout(v5SocialReassign,80); } return; }
+  var rows=tbl.querySelectorAll('tbody tr[data-idx]');
+  Array.prototype.forEach.call(rows, function(tr){
+   var idx=parseInt(tr.getAttribute('data-idx'),10); var a=V4_ACCOUNTS[idx]; if(!a) return;
+   var ownerTd=tr.children[4];                                                  /* Owner column (Account,Type,Health,See,Owner,Approvals,Actions) */
+   if(!ownerTd) return;
+   if(ownerTd.querySelector('.v5-reassign-owner')) return;                      /* already augmented */
+   if(!a.owner) return;                                                         /* team-held: nothing to reassign here */
+   /* wrap the existing owner name + a quiet Reassign action, so the owner stays visible and the action sits under it.
+      Pass the account INDEX (not the handle string) so no handle characters ever have to be escaped into onclick. */
+   var ownerName=gsEsc(a.owner);
+   ownerTd.innerHTML='<div class="v5-owner-cell"><span>'+ownerName+'</span>'
+    +'<button class="hs-btn hs-btn--ghost hs-btn--sm v5-reassign-owner" type="button" aria-label="Reassign owner of '+gsEsc(a.handle)+'" title="Reassign owner" onclick="v5OpenReassignOwner('+idx+')"><span class="material-symbols-outlined">swap_horiz</span>Reassign</button></div>';
+  });
+  try{ initControlA11y(tbl); }catch(e){}
+ }
+ /* Open the EXISTING transfer/reassign step for a single account (by canonical index). Reuses v4OpenOffboard's
+    {type:'account'} context (the same owner-picker + tally the offboard guardrail uses); does NOT remove anyone. */
+ function v5OpenReassignOwner(idx){ var a=V4_ACCOUNTS[idx]; if(!a) return; try{ v4OpenOffboard({type:'account',handle:a.handle}); }catch(e){} }
  /* ---- (1a) invitation=1 arm: far-left product rail invite entry. A QUIET nav item pinned to the bottom of the rail just
     above the avatar. It is a real .suite-navbtn with a circle glyph + a visible "Invite" label, so it inherits the shipped
     rail-button sizing / neutral colour / hover from suite-shell.css with NO overrides: it reads like one more nav item
@@ -5462,51 +5588,76 @@
     and TWO paths: "Upgrade" (a placeholder success, no real purchase or payment) for someone who can buy, and "Request
     from your admin" for someone who cannot. Reuses the shipped .modal / .hs-alert / .set-card-less layout inside the
     modal body; tokens only. Invitation-gated (only reached behind the INVITATION guard in v4InvSend). */
- function invShowSeatWall(n){
+ /* `standalone` (optional): when true, the wall is opened directly as a "get more seats" surface (the discoverable admin
+    entry from the People page, v5AdminGetSeats), NOT from an invite that overshot the limit. In that mode there is no
+    batch of invitees, so `n` is read as "seats to add" (a small sensible default when omitted) and the intro copy speaks
+    to adding seats to the plan rather than "you are inviting N people". Everything else (pricing card, benefits, the admin
+    Add-N-seats buy path via invSeatWallUpgrade) is the SAME flow, so no parallel wall is built. Existing invite callers
+    pass only `n` -> `standalone` is undefined -> byte-identical behaviour. */
+ function invShowSeatWall(n,standalone){
   v4EnsureInviteModal(document.getElementById('pageContent'));
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
   var remaining=invSeatsRemaining();
-  var need=n-remaining; if(need<0) need=0;                                      /* extra seats this invite needs */
+  var need, haveLine;
+  if(standalone){
+   /* discoverable "get more seats": `n` is how many seats to add (default 5), independent of any invite. */
+   need=(n&&n>0)?n:5;
+   title.textContent='Get more seats';
+   haveLine=(remaining>0)
+    ? ('Your '+gsEsc(INV_SEATS.planName)+' has <b>'+INV_SEATS.used+' of '+INV_SEATS.total+' seats used</b> ('+remaining+' free). Add seats now so you have room to invite more people.')
+    : ('Your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used). Add seats to make room for more people.');
+  } else {
+   need=n-remaining; if(need<0) need=0;                                         /* extra seats this invite needs */
+   title.textContent='You need more seats';
+   var seatWord=(n===1?'person':(n+' people'));
+   haveLine=remaining>0
+    ? ('You are inviting '+seatWord+', but only <b>'+remaining+' seat'+(remaining===1?'':'s')+'</b> '+(remaining===1?'is':'are')+' left on your '+gsEsc(INV_SEATS.planName)+'.')
+    : ('You are inviting '+seatWord+', but your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used).');
+  }
   var addTotal=need*INV_SEATS.pricePerSeat;
-  title.textContent='You need more seats';
-  var seatWord=(n===1?'person':(n+' people'));
-  var haveLine=remaining>0
-   ? ('You are inviting '+seatWord+', but only <b>'+remaining+' seat'+(remaining===1?'':'s')+'</b> '+(remaining===1?'is':'are')+' left on your '+gsEsc(INV_SEATS.planName)+'.')
-   : ('You are inviting '+seatWord+', but your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used).');
+  var addMore=standalone
+   ? ('Add '+need+' seat'+(need===1?'':'s')+' to your plan.')
+   : ('Add '+need+' more seat'+(need===1?'':'s')+' to invite everyone.');
   body.innerHTML=''
-   +'<div class="hs-alert hs-alert--warning" style="margin:0 0 16px"><span class="material-symbols-outlined">info</span><div>'+haveLine+' Add '+need+' more seat'+(need===1?'':'s')+' to invite everyone.</div></div>'
+   +'<div class="hs-alert hs-alert--'+(standalone?'info':'warning')+'" style="margin:0 0 16px"><span class="material-symbols-outlined">info</span><div>'+haveLine+' '+addMore+'</div></div>'
    /* pricing card: seats needed x price per seat = added cost. Illustrative, not a quote; no payment fields. */
    +'<div class="inv-wall-card"><div class="inv-wall-plan"><div><div class="inv-wall-plan-t">'+gsEsc(INV_SEATS.planName)+'</div><div class="secd" style="margin:0">'+INV_SEATS.used+' of '+INV_SEATS.total+' seats used</div></div><div class="inv-wall-price"><span class="inv-wall-price-n">$'+INV_SEATS.pricePerSeat+'</span><span class="inv-wall-price-u">'+gsEsc(INV_SEATS.currency)+' '+gsEsc(INV_SEATS.billing)+'</span></div></div>'
     +'<div class="inv-wall-calc"><div class="between" style="padding:10px 0"><span>'+need+' more seat'+(need===1?'':'s')+'</span><span style="font:var(--hs-type-body-md-b)">$'+addTotal+' '+gsEsc(INV_SEATS.currency)+' / month</span></div></div>'
-    +'<ul class="inv-wall-benefits"><li><span class="material-symbols-outlined">check</span>Room for '+need+' more '+(need===1?'person':'people')+' right away</li><li><span class="material-symbols-outlined">check</span>Everyone keeps the access you set in the invite</li><li><span class="material-symbols-outlined">check</span>One bill, prorated for the rest of this month</li></ul>'
+    +'<ul class="inv-wall-benefits"><li><span class="material-symbols-outlined">check</span>Room for '+need+' more '+(need===1?'person':'people')+' right away</li><li><span class="material-symbols-outlined">check</span>'+(standalone?'The people you invite keep the access you give them':'Everyone keeps the access you set in the invite')+'</li><li><span class="material-symbols-outlined">check</span>One bill, prorated for the rest of this month</li></ul>'
    +'</div>'
    /* Persona-aware alt line (stakeholder walkthrough: the participant IS an admin, so "request from your admin" was contradictory).
       An ADMIN buys seats (the primary action) and does not ask anyone, so their alt line just names the non-admin path
       as context. A NON-admin cannot buy, so their alt line is the actionable "ask an admin" path (the footer gives them
-      the request button). invIsAdmin() follows the same role model as the rest of the invitation flows. */
+      the request button). invIsAdmin() follows the same role model as the rest of the invitation flows. The standalone
+      "get more seats" entry is admin-only in practice, so its alt line drops the invite-specific "approve their invite". */
    +(invIsAdmin()
-     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Not an admin?</div><p class="secd" style="margin:0">Someone without billing access would ask an admin to add seats or approve their invite, rather than buy directly.</p></div>'
-     : '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">Ask an admin to add seats or approve your invite. They will get your request with the details.</p></div>');
+     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Not an admin?</div><p class="secd" style="margin:0">'+(standalone?'Someone without billing access would ask an admin to add seats, rather than buy directly.':'Someone without billing access would ask an admin to add seats or approve their invite, rather than buy directly.')+'</p></div>'
+     : '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">'+(standalone?'Ask an admin to add seats. They will get your request with the details.':'Ask an admin to add seats or approve your invite. They will get your request with the details.')+'</p></div>');
   /* Footer actions are persona-aware. ADMIN: primary is "Add N seats" (buy); no self-request button (an admin does not
      request from themselves). NON-admin: primary is "Request from your admin" (they cannot buy), with buying offered as
      a quiet secondary in case they do have billing access. Cancel is always present. */
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button>'
    +(invIsAdmin()
-     ? '<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
-     : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
+     ? '<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
+     : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
   initControlA11y(body);
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
  /* Upgrade path: placeholder success (no real purchase or payment). Bumps the in-memory seat count so a re-try of the
-    invite would now fit, then confirms in the modal. */
- function invSeatWallUpgrade(need){
+    invite would now fit, then confirms in the modal. `standalone` (from the discoverable "get more seats" entry) changes
+    only the closing line + the follow-on button: an invite-triggered wall goes "Back to invite"; a standalone open goes
+    "Invite people" (start an invite into the new seats) since there is no invite in progress to return to. */
+ function invSeatWallUpgrade(need,standalone){
   INV_SEATS.total+=need;
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
   title.textContent='Seats added';
-  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+need+' seat'+(need===1?'':'s')+' added</div><div class="ok-d">Your '+gsEsc(INV_SEATS.planName)+' now has '+INV_SEATS.total+' seats. This is a prototype, so nothing was purchased or charged. Go back to finish inviting.</div></div>';
-  foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4RenderInvite()">Back to invite</button>';
+  var tail=standalone?'You now have room to invite more people.':'Go back to finish inviting.';
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+need+' seat'+(need===1?'':'s')+' added</div><div class="ok-d">Your '+gsEsc(INV_SEATS.planName)+' now has '+INV_SEATS.total+' seats. This is a prototype, so nothing was purchased or charged. '+tail+'</div></div>';
+  foot.innerHTML=standalone
+   ? '<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Done</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4RenderInvite()"><span class="material-symbols-outlined">group_add</span>Invite people</button>'
+   : '<button class="hs-btn hs-btn--primary" type="button" onclick="v4RenderInvite()">Back to invite</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
  /* Request path (non-admin only after the persona fix): placeholder success. CLOSES THE LOOP too: the people this
