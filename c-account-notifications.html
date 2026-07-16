@@ -905,6 +905,18 @@
  body.v5 .v5-rolepanel .hs-table td.v5-rp-cell{text-align:center;}
  body.v5 .v5-rolepanel .hs-table td.v5-rp-cell .material-symbols-outlined{font-size:20px;}
  body.v5 .v5-rolepanel .hs-table td.v5-rp-cell .hs-badge .material-symbols-outlined{font-size:16px;}
+ /* P3-1: worded access-level cell labels ("Can view" / "Can edit" / "None"), used under v5 in both the Roles matrix and the
+    in-invite roles panel. Icon + text so colour never carries meaning alone (Bento rule #2); tokens only. body.v5-scoped so
+    v4/v3 are unaffected. The label icons are sized to 16px (not the 20px cell-icon rule) via the .v5-cap-lvl scope. */
+ body.v5 .v5-cap-lvl{display:inline-flex;align-items:center;gap:4px;font:var(--hs-type-body-sm);white-space:nowrap;}
+ body.v5 .v5-cap-lvl .material-symbols-outlined{font-size:16px;line-height:1;}
+ body.v5 #v4Matrix td.v4-rolecell .v5-cap-lvl .material-symbols-outlined,body.v5 .v5-rolepanel .hs-table td.v5-rp-cell .v5-cap-lvl .material-symbols-outlined{font-size:16px;}
+ body.v5 .v5-cap-view{color:var(--bento-theme-color-text-base);}
+ body.v5 .v5-cap-view .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);}
+ body.v5 .v5-cap-edit{color:var(--bento-theme-color-text-base);}
+ body.v5 .v5-cap-edit .material-symbols-outlined{color:var(--bento-theme-color-icon-positive);}
+ body.v5 .v5-cap-none{color:var(--bento-theme-color-text-subtle);}
+ body.v5 .v5-cap-none .material-symbols-outlined{color:var(--bento-theme-color-icon-subtle);}
  /* ===== v5 pass C3: UX-annotations layer (prototype-only, body.v5-scoped, built + toggled by v5AnnotInit() after load).
     A floating PROTOTYPE control (bottom-left pill, clear of the demo dock at bottom-right and the toast at
     bottom-centre) flips body.v5-annot, which SMOOTHLY reveals note callouts placed beside the real areas. OFF by
@@ -2548,7 +2560,9 @@
     on the Roles page). */
  function v5InvRolesPanelHTML(){
   var head='<thead><tr><th class="v5-rp-cap">Capability</th>'+V4_MATRIX_ROLES.map(function(r){ return '<th class="v5-rp-role">'+gsEsc(r)+'</th>'; }).join('')+'</tr></thead>';
-  var rows=V4_MATRIX.map(function(row){ return '<tr><td class="v5-rp-cap">'+gsEsc(row[0])+'</td>'+row[1].map(function(v){ return '<td class="v5-rp-cell">'+v4MatrixCell(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+  /* P3-1: worded access labels here too (this is the in-invite "See what each role can do" panel, exactly where the
+     contractor view-vs-edit decision is made). v5-only surface; contested rows stay stubbed via v4MatrixCell('?'). */
+  var rows=V4_MATRIX.map(function(row){ return '<tr><td class="v5-rp-cap">'+gsEsc(row[0])+'</td>'+row[1].map(function(v,ci){ return '<td class="v5-rp-cell">'+(V5?v5MatrixCellLabeled(v,row[0],V4_MATRIX_ROLES[ci]):v4MatrixCell(v))+'</td>'; }).join('')+'</tr>'; }).join('');
   return '<p class="secd" style="margin:0 0 14px">Compare what each role can do, then pick one. You can change a person\u2019s role later.</p>'
    +'<div class="v4-matrix-scroll"><table class="hs-table">'+head+'<tbody>'+rows+'</tbody></table></div>'
    +'<div class="hs-alert hs-alert--warning" style="margin:14px 0 0"><span class="material-symbols-outlined">warning</span><div>Rows marked <b>eng confirm</b> are still being resolved and are not final.</div></div>';
@@ -2589,9 +2603,12 @@
       ?'<div class="hs-field-hint" id="v4InvEmailErr" style="color:var(--bento-theme-color-text-negative)"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">error</span> '+gsEsc(_v4InvEmailErr)+'</div>'
       :'<div class="hs-field-hint">'+(V5?'Type an email address and it is added automatically. Inviting many people? ':'Type an email and press Enter to add each person. Inviting many people? ')+'<a href="#" onclick="return v4InvCsv()">Upload a CSV</a> (up to 500 rows).</div>')
     +'</div>'
-   /* Role */
+   /* Role. P3-1 (invitation/UT finding: participants cannot tell VIEW from CREATE/EDIT from the role labels). Under v5
+      the per-role one-liner uses the clearer view-vs-edit copy already written for the Roles matrix (V5_ROLE_DESC), which
+      spells out "Can view ... but cannot change anything" vs "Creates and publishes ...". v4/v3 keep V4_INVITE_ROLES_DESC
+      verbatim, and the modal is injected at runtime, so the shipped/static DOM stays byte-identical. */
    +'<div class="v4-inv-sec"><span class="v4-inv-lbl">What can they do?</span><p class="v4-inv-cap">Pick the closest role. You can change it later.</p>'
-    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(V4_INVITE_ROLES_DESC[r])+'</span></span></label>'; }).join('')
+    +'<div class="v4-rolegrid" role="radiogroup" aria-label="Role" id="v4InvRoleGrid">'+roles.map(function(r){ var _rd=(V5&&V5_ROLE_DESC[r])?V5_ROLE_DESC[r]:V4_INVITE_ROLES_DESC[r]; return '<label class="v4-roleopt"><span class="hs-radio'+(r===_v4InvRole?' is-on':'')+'" role="radio" tabindex="'+(r===_v4InvRole?'0':'-1')+'" aria-checked="'+(r===_v4InvRole?'true':'false')+'" data-role="'+r+'" onclick="v4InvSetRole(\''+r+'\')"></span><span><span class="v4-role-t">'+r+'</span><span class="v4-role-d">'+gsEsc(_rd)+'</span></span></label>'; }).join('')
     /* v5 C1 FIX 2 (task 32): "See what each role can do" -> opens the compact all-roles capability panel IN-CONTEXT
        (a slide-in side panel within the invite; does NOT navigate away). v5-gated: appended only under body.v5, so the
        v4/v3 invite radio grid is byte-identical. The per-role one-line descriptors above stay. */
@@ -2718,6 +2735,9 @@
   body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+n+' invite'+(n===1?'':'s')+' sent</div><div class="ok-d">They will get an email to join Somos as <b>'+gsEsc(_v4InvRole)+'</b>.'+teamLine+' They appear under pending until they accept.</div></div>';
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4OpenInvite(_v4InvPreTeam)">Invite more</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{d.focus();}catch(e){} },0);
+  /* P3-2: keep every seat readout in sync after a send. The send does not change INV_SEATS.used here, but syncing keeps the
+     header pill + Requested footer agreeing with the rest of the flow. Invitation-gated + guarded, so v4/v3 are unaffected. */
+  try{ if(INVITATION && typeof invSyncSeatReadouts==='function') invSyncSeatReadouts(); }catch(e){}
  }
 
  /* ================= Section 5: Teams page (card grid) ================= */
@@ -3000,6 +3020,23 @@
   if(v==='?') return '<span class="hs-badge hs-badge--warning" title="Contested: pending eng confirm (Mandy Xiao)"><span class="material-symbols-outlined">warning</span>eng confirm</span>';
   return v?'<span class="material-symbols-outlined" title="Allowed" style="color:var(--bento-theme-color-icon-positive)">check</span>':'<span class="material-symbols-outlined" title="Not allowed" style="color:var(--bento-theme-color-icon-subtle)">remove</span>';
  }
+ /* P3-1 (v5-only): a WORDED access label for a DEFINED capability cell, so a bare checkmark no longer misreads (invitation/UT
+    finding: participants could not tell "view drafts" from "create drafts"). Reads "Can view" / "Can edit" / "None" with an
+    icon + text (colour never carries meaning alone). A contested cell ('?') is UNCHANGED: it delegates to v4MatrixCell so the
+    7 held-gate "eng confirm" cells stay stubbed. The three-way label is derived from the shipped binary V4_MATRIX (no data
+    change, so the v4 matrix is untouched): value 0 -> None; value 1 -> "Can view" for read-only capabilities OR for the
+    View only role (whose granted capabilities are view-level, e.g. it can VIEW drafts and analytics, not create), otherwise
+    "Can edit". Called only from the shared render sites when V5 is true; v4/v3 keep the bare glyph, so their (runtime-built)
+    matrix stays byte-identical. */
+ var V4_VIEW_CAPS={ 'See analytics':1 };   /* defined capabilities that are read-only in nature -> "Can view" when granted */
+ function v5MatrixCellLabeled(v,capName,roleName){
+  if(v==='?') return v4MatrixCell(v);                                          /* held gate: never relabel the contested cells */
+  if(!v) return '<span class="v5-cap-lvl v5-cap-none"><span class="material-symbols-outlined" aria-hidden="true">remove</span>None</span>';
+  var view=(V4_VIEW_CAPS[capName]===1)||(roleName==='View only');
+  return view
+   ? '<span class="v5-cap-lvl v5-cap-view"><span class="material-symbols-outlined" aria-hidden="true">visibility</span>Can view</span>'
+   : '<span class="v5-cap-lvl v5-cap-edit"><span class="material-symbols-outlined" aria-hidden="true">edit</span>Can edit</span>';
+ }
  /* One cell for a CUSTOM column at capability row i: contested rows stay stubbed; otherwise the role's own value. */
  function v4CustomCell(role,i){ return v4RowIsContested(i)?v4MatrixCell('?'):v4MatrixCell(role.caps[i]?1:0); }
  /* Custom-role creation is a Business/Enterprise entitlement. The prototype models two tiers (Standard vs the
@@ -3037,8 +3074,10 @@
   }).join('');
   var head='<thead><tr><th class="v4-cap">Capability</th>'+predefinedHead+customHead+'</tr></thead>';
   var bodyRows=V4_MATRIX.map(function(row,i){
-   var predefinedCells=row[1].map(function(v){ return '<td class="v4-rolecell">'+v4MatrixCell(v)+'</td>'; }).join('');
-   var customCells=V4_CUSTOM_ROLES.map(function(r){ return '<td class="v4-rolecell v4-rolecell--custom">'+v4CustomCell(r,i)+'</td>'; }).join('');
+   /* P3-1: under v5 render worded access labels ("Can view"/"Can edit"/"None") instead of a bare glyph so scoping reads
+      unambiguously; v4/v3 keep v4MatrixCell (byte-identical). Contested rows always stay stubbed via v4MatrixCell('?'). */
+   var predefinedCells=row[1].map(function(v,ci){ return '<td class="v4-rolecell">'+(V5?v5MatrixCellLabeled(v,row[0],V4_MATRIX_ROLES[ci]):v4MatrixCell(v))+'</td>'; }).join('');
+   var customCells=V4_CUSTOM_ROLES.map(function(r){ return '<td class="v4-rolecell v4-rolecell--custom">'+(V5?(v4RowIsContested(i)?v4MatrixCell('?'):v5MatrixCellLabeled(r.caps[i]?1:0,row[0],r.name)):v4CustomCell(r,i))+'</td>'; }).join('');
    return '<tr><td class="v4-cap">'+gsEsc(row[0])+'</td>'+predefinedCells+customCells+'</tr>';
   }).join('');
   var upgradeNote=v4CustomRolesUnlocked()?'':'<p class="secd" style="margin:8px 0 0"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px">workspace_premium</span> Custom roles are a Business and Enterprise feature. <a href="#" onclick="return v4CustomUpsell()">See plans</a> to add your own roles.</p>';
@@ -5316,12 +5355,95 @@
   if(actions && actions!==head.firstElementChild){ actions.insertBefore(btn, actions.firstChild); }
   else { head.appendChild(btn); }
  }
+ /* P3-2 (invitation/UT finding: after Approve/Deny/Send the People-header seat pill #invSeatsAfford stayed stale while the
+    Requested-tab footer updated, so two seat readouts on the same screen disagreed until reload). One place that re-renders
+    EVERY seat readout from the current INV_SEATS: (1) the header pill text + aria-label (built once by invEnsureSeatsAffordance,
+    never refreshed before); (2) the Requested-tab footer + tab badge (invRenderRequested rebuilds the "N of M seats free (used)"
+    hint and the count badge), re-run only if that panel is already built so we never construct it as a side effect. Called from
+    approve/deny/send. Only invSeatApprove changes INV_SEATS.used; send does not change the count here, but we sync on all three
+    so the readouts always agree. Invitation-only surface; guarded, so it is a no-op when the pill/panel are absent. */
+ function invSyncSeatReadouts(){
+  try{
+   var pill=document.getElementById('invSeatsAfford');
+   if(pill){
+    var used=INV_SEATS.used, total=INV_SEATS.total;
+    var icon='<span class="material-symbols-outlined">event_seat</span>';
+    pill.innerHTML=icon+used+' of '+total+' seats used';
+    pill.setAttribute('aria-label',used+' of '+total+' seats used. Manage seats.');
+   }
+  }catch(e){}
+  try{ if(document.getElementById('v5Panel-requested')) invRenderRequested(); }catch(e){}  /* refresh footer hint + tab badge if the panel exists */
+ }
  /* Admin "manage seats" from the header affordance: jump to the Requested tab (the seat-management surface: seats left +
     pending requests to approve or deny). If the tab is not built yet, build it, then switch. */
  function invGoManageSeats(){
   try{ if(!document.getElementById('v5PeopleTab-requested')) invPeopleRequestedTab(); }catch(e){}
   try{ if(typeof v5PeopleTab==='function') v5PeopleTab('requested'); }catch(e){}
   try{ var t=document.getElementById('v5PeopleTab-requested'); if(t) t.focus(); }catch(e){}
+ }
+ /* ===== P3-3 (v5/ut-gated runtime hygiene) =====
+    Two participant-facing leaks found on the fixed build, both baked into STATIC page content (so the ut-mode annotation
+    suppression + the byte-identical gate do not catch them). Fixed at RUNTIME under V5||UT, so the static DOM stays
+    byte-identical for v3/v4/no-flag and the em dash goes away only in the rendered page a participant sees:
+      (1) c-org-vanity.html carries an internal rationale callout ("Moved here from Account settings ... Usage under review;
+          confirm before launch") in a .hs-alert--info. That is designer/annotation language, not product copy, and it
+          contains an em dash. Remove the whole callout (which also removes its em dash). Only that one note is targeted;
+          the legit destructive-domain warning on the same page is left alone.
+      (2) The participant-facing PLAN NAME is inconsistent: the seat wall says "Business plan" while the account flyout
+          badge and the Billing heading say "Enterprise plan". Reconcile the participant-facing name to "Business plan"
+          (the flyout .plan badge on every page + the Billing h3). Legit feature-tier copy ("Business and Enterprise ...")
+          and the "Enterprise add-on" badges are NOT touched. The hidden "Previewing as ... Enterprise" dev note (in the
+          demodock, already hidden under body.utmode) is left as-is.
+    Idempotent + guarded; runs on every page from the boot IIFE. */
+ function invHygiene(){
+  /* (1) drop the leaked vanity rationale callout */
+  try{
+   if(PAGE_ID==='vanity'){
+    Array.prototype.forEach.call(document.querySelectorAll('.hs-alert--info'), function(al){
+     if((al.textContent||'').indexOf('Moved here from Account settings')!==-1){ if(al.parentNode) al.parentNode.removeChild(al); }
+    });
+   }
+  }catch(e){}
+  /* (2a) flyout plan badge -> Business plan (present on every page via the shared POP chrome) */
+  try{
+   Array.prototype.forEach.call(document.querySelectorAll('#popwrap .plan'), function(sp){
+    if((sp.textContent||'').trim()==='Enterprise plan') sp.textContent='Business plan';
+   });
+  }catch(e){}
+  /* (2b) Billing heading -> Business plan (billing page only; match the exact heading, not feature-tier copy) */
+  try{
+   if(PAGE_ID==='billing'){
+    Array.prototype.forEach.call(document.querySelectorAll('h3.sec'), function(h){
+     if((h.textContent||'').trim()==='Enterprise plan') h.textContent='Business plan';
+    });
+   }
+  }catch(e){}
+ }
+ /* ===== P3-4 (ut-gated URL honesty) =====
+    Internal nav to c-*.html pages drops ?ut=1 + the active arm flag from the URL bar (the mode survives via sessionStorage,
+    lines ~1327/1373, so behaviour is unaffected; this is purely URL-bar honesty). Mirror the brand-link fix: rewrite the
+    HREF of each internal c-*.html anchor to carry ut=1 + the current arm flag. HREF-ONLY: no click interception, so working
+    handlers (the dead-link toast, the invite entries, real routes) are untouched. Idempotent (skips anchors that already
+    carry ut=1) and query-safe (merges into an existing query string, and never adds a second arm flag when the link already
+    carries one, e.g. the rail entry's ?invitation=1&peopletab=members). ut-gated, so non-ut renders are unaffected. */
+ function invStampFlagOnLinks(){
+  try{
+   var _vf=INVITATION2?'invitation=2':(INVITATION?'invitation=1':(V5?'v5=1':(V4?'v4=1':(V3?'v3=1':''))));   /* the active arm flag as a bare key=value */
+   var armKeys={invitation:1,v5:1,v4:1,v3:1};
+   Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function(a){
+    var h=a.getAttribute('href'); if(!h) return;
+    var hash=''; var hi=h.indexOf('#'); if(hi!==-1){ hash=h.slice(hi); h=h.slice(0,hi); }
+    var q=''; var qi=h.indexOf('?'); var path=h; if(qi!==-1){ path=h.slice(0,qi); q=h.slice(qi+1); }
+    if(!/^c-[\w-]+\.html$/.test(path)) return;                                  /* internal page anchors only */
+    var parts=q?q.split('&').filter(Boolean):[];
+    var keys={}; parts.forEach(function(p){ var k=p.split('=')[0]; if(k) keys[k]=1; });
+    var changed=false;
+    if(!keys.ut){ parts.push('ut=1'); keys.ut=1; changed=true; }                 /* add ut=1 if missing */
+    var hasArm=false; for(var k in armKeys){ if(keys[k]){ hasArm=true; break; } }
+    if(_vf && !hasArm){ parts.push(_vf); changed=true; }                          /* add the arm flag only if none present */
+    if(changed){ a.setAttribute('href', path+(parts.length?('?'+parts.join('&')):'')+hash); }
+   });
+  }catch(e){}
  }
  /* ===== FIX 2 (r2): discoverable "request / get more seats" for the ADMIN persona =====
     Problem (UT + stakeholder): the ut task uses the ADMIN persona (ROLE forced to admin), and the only door to the
@@ -5494,8 +5616,11 @@
  }
  /* Admin decisions (prototype: mutate the in-memory queue, re-render, toast). Approve reads as "seat granted + invite
     sent" without a real invite; Deny removes the request. Both keep the tab badge + the seats-left hint honest. */
- function invSeatApprove(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; if(INV_SEATS.used<INV_SEATS.total) INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); invRenderRequested(); showToast(gsEsc(r.name)+' was approved and invited to Somos.'); }
- function invSeatDeny(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; INV_SEAT_REQUESTS.splice(i,1); invRenderRequested(); showToast('Request from '+gsEsc(r.name)+' was denied.'); }
+ /* P3-2: route the post-mutation re-render through invSyncSeatReadouts so the header pill AND the Requested panel (table +
+    footer hint + badge) all refresh together and never disagree. invSyncSeatReadouts re-renders the panel when it exists
+    (it always does here, since these buttons live in it), so it replaces the prior direct invRenderRequested() call. */
+ function invSeatApprove(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; if(INV_SEATS.used<INV_SEATS.total) INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); invSyncSeatReadouts(); showToast(gsEsc(r.name)+' was approved and invited to Somos.'); }
+ function invSeatDeny(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; INV_SEAT_REQUESTS.splice(i,1); invSyncSeatReadouts(); showToast('Request from '+gsEsc(r.name)+' was denied.'); }
  /* Non-admin: an in-panel request form (reason + role), then a plain success state. No real submit (placeholder). The
     optional `mount` lets the v5 discoverable entry reuse this SAME form inside its own modal without an id collision with
     the (page-level) #invReqFormMount used by the Requested tab / gated-page augmentation. Existing callers pass nothing
@@ -5747,6 +5872,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT){ /* user-test only: the Perch cold-start backdrop has many decorative dead anchors (rail buttons, sub-nav items) and a couple of handler-less Create-a-post buttons. Left alone they jump-to-top or do nothing, and participants read the whole prototype as broken and bail. A delegated capture-phase handler catches a click on one of these dead/backdrop elements, cancels the "#" jump, and shows a neutral toast. It never touches genuinely working controls: any anchor with a real onclick (e.g. #avatarTrig, the invite flyout item) or a real route (href starting with "c-", e.g. the invite rail entry, the Calendar item) is left to behave normally, and among buttons only the handler-less Create-a-post is caught (the gear and every other topbar/plan button are untouched). Wording is fixed + neutral: it names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. Gated to UT, so non-ut renders are unaffected. */ var _utDeadAt=0; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick')) isDead=true; } else { var b=el2.closest('button'); if(b && !b.hasAttribute('onclick') && (b.textContent||'').indexOf('Create a post')!==-1) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT){ /* user-test only: the Perch cold-start backdrop has many decorative dead anchors (rail buttons, sub-nav items) and a couple of handler-less Create-a-post buttons. Left alone they jump-to-top or do nothing, and participants read the whole prototype as broken and bail. A delegated capture-phase handler catches a click on one of these dead/backdrop elements, cancels the "#" jump, and shows a neutral toast. It never touches genuinely working controls: any anchor with a real onclick (e.g. #avatarTrig, the invite flyout item) or a real route (href starting with "c-", e.g. the invite rail entry, the Calendar item) is left to behave normally, and among buttons only the handler-less Create-a-post is caught (the gear and every other topbar/plan button are untouched). Wording is fixed + neutral: it names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. Gated to UT, so non-ut renders are unaffected. */ var _utDeadAt=0; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick')) isDead=true; } else { var b=el2.closest('button'); if(b && !b.hasAttribute('onclick') && (b.textContent||'').indexOf('Create a post')!==-1) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ if(V5||UT) invHygiene(); }catch(e){} try{ if(UT) invStampFlagOnLinks(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
