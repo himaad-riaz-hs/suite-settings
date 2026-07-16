@@ -959,6 +959,11 @@
  body.invitation .inv-wall-benefits li .material-symbols-outlined{font-size:18px;color:var(--bento-system-sys-positive-600,#0a7d2c);flex:none;margin-top:1px;}
  body.invitation .inv-wall-alt{border-top:1px solid var(--bento-theme-color-border-subtle);padding-top:14px;}
  body.invitation .inv-wall-alt-t{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);margin:0 0 4px;}
+ /* FIX #5: quiet seats affordance on the People header. A ghost button (shared .hs-btn--ghost sizing); this only tones
+    the label + glyph down to subtle so it reads as status, not a call to action, and keeps it aligned beside Invite. */
+ body.invitation .inv-seats-afford{color:var(--bento-theme-color-text-subtle);font:var(--hs-type-body-sm);white-space:nowrap;}
+ body.invitation .inv-seats-afford .material-symbols-outlined{font-size:18px;color:var(--bento-theme-color-text-subtle);}
+ body.invitation .inv-seats-afford:hover{color:var(--bento-theme-color-text-base);}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -3443,8 +3448,12 @@
      members contexts, replacing the "Remove <name>" header and dropping the "offboard" jargon. Org-delete and
      self-delete are a separate destructive flow (not reached from a Transfer button) and keep their own accurate
      "Delete ..." labels. Labels only: the reassign-before-remove tally + the button's disabled state set above are
-     left exactly as-is. v4-without-v5 never enters this block, so its labels stay byte-identical. */
-  if(V5 && (ctx.kind==='member' || ctx.kind==='members')){
+     left exactly as-is. v4-without-v5 never enters this block, so its labels stay byte-identical.
+       WALKTHROUGH FIX: only say "Transfer & remove" when there is actually something to transfer (nOwned>0). A
+     view-only person who owns nothing has no accounts to reassign, so "transfer" is misleading: for the nOwned===0 case
+     keep the plain "Remove <name>" label set above. So the label now honestly reflects the person: Bryn (owns 3) reads
+     "Transfer & remove"; Dar Khan (View Only, owns nothing) reads "Remove Dar Khan". */
+  if(V5 && (ctx.kind==='member' || ctx.kind==='members') && nOwned>0){
    if(title) title.textContent='Transfer & remove';
    var goV5=document.getElementById('v4OffGo'); if(goV5) goV5.textContent='Transfer & remove';
   }
@@ -4799,10 +4808,18 @@
   var inBody=page.querySelector('a[aria-label="Back to members"]'); if(inBody && inBody.parentNode) inBody.parentNode.removeChild(inBody);
   var head=page.querySelector('.v4-mdhead'); if(!head) return;
   /* (0) v5 wording (Joao review): the identity-header action button reads "Transfer & offboard" from v4MemberDetail.
-     Under v5 drop the jargon so it matches the modal it opens ("Transfer & remove"). Keep the leading icon; only the
-     text label changes. v5-only (this whole function runs solely under v5), so the v4-without-v5 header is untouched. */
+     Under v5 drop the jargon so it matches the modal it opens. Keep the leading icon; only the text label changes.
+     v5-only (this whole function runs solely under v5), so the v4-without-v5 header is untouched.
+       WALKTHROUGH FIX: the label depends on whether this person owns anything to transfer. If they directly own social
+     accounts the label is "Transfer & remove"; a view-only person who owns nothing (e.g. Dar Khan) has nothing to
+     transfer, so the button reads plain "Remove". Ownership comes from the canonical V4_ACCOUNTS via v4OwnsCount, keyed
+     off the member on this page (?m=, same resolution v4MemberDetail uses), so it agrees with the list + the modal. */
   var offBtn=head.querySelector('.v4-mdactions button[onclick*="v4OpenOffboard"]');
-  if(offBtn){ var offIc=offBtn.querySelector('.material-symbols-outlined'); offBtn.textContent=''; if(offIc) offBtn.appendChild(offIc); offBtn.appendChild(document.createTextNode('Transfer & remove')); }
+  if(offBtn){
+   var _mdName; try{ _mdName=new URLSearchParams(location.search).get('m'); }catch(e){} if(!_mdName) _mdName='Bryn Morales';
+   var _mdOwns=(typeof v4OwnsCount==='function')?v4OwnsCount(_mdName):1;
+   var offIc=offBtn.querySelector('.material-symbols-outlined'); offBtn.textContent=''; if(offIc) offBtn.appendChild(offIc); offBtn.appendChild(document.createTextNode(_mdOwns>0?'Transfer & remove':'Remove'));
+  }
   /* (3) Lift the Overview access sentence into the identity block, under the meta line. The sentence lives in the
      Overview panel's first card as <p class="v4-summary">; move that node up (keeps its text + tokens), then relabel
      the Overview card so it no longer reads as a duplicate "Access summary" (it now leads with the person's Teams). */
@@ -5144,11 +5161,13 @@
     persona (ROLE==='pm') is the non-admin who can request a seat but not approve; everyone else (View only, Admin, Super
     admin) is treated as an admin who can approve or deny requests. Matches v4RoleIsMember(). */
  function invIsAdmin(){ return !v4RoleIsMember(); }
- /* Seat model (invitation-only, illustrative). Kept SEPARATE from the enterprise 440/500 headcount shown elsewhere: this
-    variant tells one small-plan story so the seat wall is reachable and self-contained. total = seats on the plan; used =
-    seats already taken. remaining is derived. The wall fires when a batch of invites would push used past total. These
-    numbers are a prototype scenario, not a real account, and are never read by any non-invitation screen. */
- var INV_SEATS={ planName:'Team plan', total:12, used:11, pricePerSeat:25, currency:'USD', billing:'per seat / month' };
+ /* Seat model (invitation-only, illustrative). RECONCILED with the 440-person org header (stakeholder walkthrough: an
+    "11 of 12 seats used, Team plan" wall read as nonsensical next to "440 people"). Now sized to the org: a Business plan of 450
+    seats with 441 used, so 9 are free. total = seats on the plan; used = seats already taken; remaining is derived. The
+    wall still fires when a batch of invites would push used past total, i.e. inviting MORE than the 9 free seats. These
+    numbers are a prototype scenario, not a real account, and are never read by any non-invitation screen. Kept
+    consistent everywhere it appears (wall, seats affordance on the People header, request / approve copy). */
+ var INV_SEATS={ planName:'Business plan', total:450, used:441, pricePerSeat:25, currency:'USD', billing:'per seat / month' };
  function invSeatsRemaining(){ var r=INV_SEATS.total-INV_SEATS.used; return r>0?r:0; }
  function invInviteWouldExceedSeats(n){ return (INV_SEATS.used + (n||0)) > INV_SEATS.total; }
  /* Pending seat requests (admin sees these to approve / deny). Fictional Somos-style people, consistent with the
@@ -5177,9 +5196,39 @@
   try{
    if(PAGE_ID==='members'){
     if(v4PageDenied('members')) invAugmentUnauthorized();                       /* non-admin: add a request-a-seat path to the gated card */
-    else invPeopleRequestedTab();                                              /* admin: add the Requested tab */
+    else { invPeopleRequestedTab(); invEnsureSeatsAffordance(); }              /* admin: add the Requested tab + a quiet seats affordance on the header */
    }
   }catch(e){}
+ }
+ /* (2b) FIX #5 (stakeholder walkthrough: the request/approve flow should not depend on tripping the seat wall). A QUIET, always-
+    visible seats affordance on the People page header (next to Invite people), so an admin can see seat usage and reach
+    seat management without inviting past the limit first. Reads "441 of 450 seats used" (from INV_SEATS, so it matches
+    the wall + the Requested tab) and is a plain ghost button that jumps to the Requested tab, which is where an admin
+    manages seats (approve / deny requests, see seats left). Not a loud CTA: a ghost button with a leading chair glyph,
+    right-sized to sit beside Invite. Admin-only in practice (a non-admin never reaches this page; they get the augmented
+    unauthorized card instead). Invitation-gated (called only from applyInvitation) and injected at runtime into the
+    v5-built header, so the shipped + non-invitation DOM stays byte-identical. Idempotent via #invSeatsAfford. Retries
+    briefly because v5People builds #v4MbrHead asynchronously after a skeleton. */
+ var _invSeatsAffTries=0;
+ function invEnsureSeatsAffordance(){
+  if(document.getElementById('invSeatsAfford')) return;                          /* already added */
+  var head=document.getElementById('v4MbrHead');
+  if(!head){ if(_invSeatsAffTries++>50) return; setTimeout(invEnsureSeatsAffordance,80); return; }
+  var used=INV_SEATS.used, total=INV_SEATS.total;
+  var btn=v4El('<button class="hs-btn hs-btn--ghost hs-btn--sm inv-seats-afford" id="invSeatsAfford" type="button" title="View and manage seats" aria-label="'+used+' of '+total+' seats used. Manage seats." onclick="invGoManageSeats()"><span class="material-symbols-outlined">event_seat</span>'+used+' of '+total+' seats used</button>');
+  /* place it just before the Invite button (the last child of the header actions cluster), so reading order is seats
+     status then the primary Invite action. The header holds [subtitle] + [actions wrap]; the actions wrap is the last
+     child. Insert into that wrap before its first button (Invite). */
+  var actions=head.lastElementChild;
+  if(actions && actions!==head.firstElementChild){ actions.insertBefore(btn, actions.firstChild); }
+  else { head.appendChild(btn); }
+ }
+ /* Admin "manage seats" from the header affordance: jump to the Requested tab (the seat-management surface: seats left +
+    pending requests to approve or deny). If the tab is not built yet, build it, then switch. */
+ function invGoManageSeats(){
+  try{ if(!document.getElementById('v5PeopleTab-requested')) invPeopleRequestedTab(); }catch(e){}
+  try{ if(typeof v5PeopleTab==='function') v5PeopleTab('requested'); }catch(e){}
+  try{ var t=document.getElementById('v5PeopleTab-requested'); if(t) t.focus(); }catch(e){}
  }
  /* ---- (1a) invitation=1 arm: far-left product rail invite entry. A QUIET nav item pinned to the bottom of the rail just
     above the avatar. It is a real .suite-navbtn with a circle glyph + a visible "Invite" label, so it inherits the shipped
@@ -5251,7 +5300,9 @@
   var panel=document.getElementById('v5Panel-requested'); if(!panel) return;
   var badge=document.getElementById('v5PeopleTabReqN');
   if(invIsAdmin()){
-   if(badge) badge.textContent=INV_SEAT_REQUESTS.length;
+   /* keep the tab count honest, and hide the badge entirely at zero so the tab reads "Requested" (not "Requested 0"),
+      matching how the tab is first built without a badge when there are no requests. */
+   if(badge){ badge.textContent=INV_SEAT_REQUESTS.length; badge.style.display=INV_SEAT_REQUESTS.length?'':'none'; }
    if(!INV_SEAT_REQUESTS.length){
     panel.innerHTML='<div class="set-card"><div class="v4-empty"><span class="material-symbols-outlined v4-empty-ic" aria-hidden="true">how_to_reg</span>'
      +'<div class="v4-empty-t">No seat requests</div>'
@@ -5269,7 +5320,7 @@
    }).join('');
    panel.innerHTML='<p class="secd" style="margin:0 0 16px">People who have asked for a seat in Somos. Approving a request uses one seat and sends them an invite to join.</p>'
     +'<div class="set-card"><table class="hs-table" id="invReqTbl"><thead><tr><th>Person</th><th>Requested role</th><th>Reason</th><th>Requested</th><th style="text-align:right">Decision</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
-    +'<div class="hs-field-hint" style="margin-top:8px">Approving uses a seat and invites the person. Denying removes the request and notifies them. Seats left on your plan: '+invSeatsRemaining()+' of '+INV_SEATS.total+'.</div>';
+    +'<div class="hs-field-hint" style="margin-top:8px">Approving uses a seat and invites the person. Denying removes the request and notifies them. Your '+gsEsc(INV_SEATS.planName)+' has '+invSeatsRemaining()+' of '+INV_SEATS.total+' seats free ('+INV_SEATS.used+' used).</div>';
    initControlA11y(panel);
    return;
   }
@@ -5302,11 +5353,28 @@
   var t=mount.querySelector('[data-reqreason]'); if(t) setTimeout(function(){ try{ t.focus(); }catch(e){} },30);
  }
  function invReqSetRole(el){ var grid=el.closest('[data-reqrole]'); if(!grid) return; Array.prototype.forEach.call(grid.querySelectorAll('.hs-radio'),function(r){ var on=(r===el); r.classList.toggle('is-on',on); r.setAttribute('aria-checked',String(on)); r.setAttribute('tabindex',on?'0':'-1'); }); }
+ /* CLOSE THE LOOP (stakeholder walkthrough: submitting a request should actually show up for the admin to approve). A submitted
+    request is appended to the SAME in-memory INV_SEAT_REQUESTS queue the admin's Requested tab reads, so the request ->
+    approve loop is real and testable: submit here, then an admin sees a matching pending row (who / what / when) and can
+    Approve or Deny it. The requester is the current user (v4SelfMember: name / email / initials), the role is what they
+    picked, the reason is what they typed (a short fallback if blank), and the date is today. Idempotent-ish: we do not
+    de-dupe (a person could legitimately re-ask), but we refresh any open Requested tab so its count + list stay honest.
+    Prototype only: nothing is persisted. Today's date matches the seeded requests' format ("Jul 15, 2026"). */
+ var INV_TODAY='Jul 15, 2026';
+ function invAddOwnRequest(role,reason){
+  var self=(typeof v4SelfMember==='function')?v4SelfMember():null;
+  var name=(self&&self.name)||'You', email=(self&&self.email)||'', ini=(self&&self.ini)||'YO';
+  INV_SEAT_REQUESTS.push({ ini:ini, name:name, email:email, role:role||'Team member',
+   reason:(reason&&reason.trim())?reason.trim():'Requested a seat to join Somos.', requested:INV_TODAY });
+  try{ if(document.getElementById('v5Panel-requested')) invRenderRequested(); }catch(e){}   /* keep an open Requested tab in sync */
+ }
  /* Submit resolves its own mount from the clicked button, so it works whichever instance (page or modal) is open. */
  function invSubmitSeatRequest(btn){
   var mount=(btn&&btn.closest)?(btn.closest('.inv-req-form')?btn.closest('.inv-req-form').parentNode:btn.closest('#invReqFormMount, [data-reqmount]')):null;
   if(!mount) mount=document.getElementById('invReqFormMount'); if(!mount) return;
   var grid=mount.querySelector('[data-reqrole]'); var sel=grid?grid.querySelector('.hs-radio.is-on'):null; var role=sel?sel.getAttribute('data-role'):'Team member';
+  var reasonEl=mount.querySelector('[data-reqreason]'); var reason=reasonEl?reasonEl.value:'';
+  invAddOwnRequest(role,reason);                                                 /* append to the admin's Requested queue so the loop closes */
   mount.innerHTML='<div class="v3-invite-done" style="align-items:flex-start;text-align:left;padding:4px 0"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent</div><div class="ok-d">Your admin will review your request for a <b>'+gsEsc(role)+'</b> seat. You will get an email when they decide.</div></div>';
  }
  /* Non-admin on the (gated) People page: the existing role gate renders the unauthorized card (a held gate, unchanged
@@ -5349,11 +5417,20 @@
     +'<div class="inv-wall-calc"><div class="between" style="padding:10px 0"><span>'+need+' more seat'+(need===1?'':'s')+'</span><span style="font:var(--hs-type-body-md-b)">$'+addTotal+' '+gsEsc(INV_SEATS.currency)+' / month</span></div></div>'
     +'<ul class="inv-wall-benefits"><li><span class="material-symbols-outlined">check</span>Room for '+need+' more '+(need===1?'person':'people')+' right away</li><li><span class="material-symbols-outlined">check</span>Everyone keeps the access you set in the invite</li><li><span class="material-symbols-outlined">check</span>One bill, prorated for the rest of this month</li></ul>'
    +'</div>'
-   /* the request path, for people who cannot buy */
-   +'<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">Ask an admin to add seats or approve your invite. They will get your request with the details.</p></div>';
+   /* Persona-aware alt line (stakeholder walkthrough: the participant IS an admin, so "request from your admin" was contradictory).
+      An ADMIN buys seats (the primary action) and does not ask anyone, so their alt line just names the non-admin path
+      as context. A NON-admin cannot buy, so their alt line is the actionable "ask an admin" path (the footer gives them
+      the request button). invIsAdmin() follows the same role model as the rest of the invitation flows. */
+   +(invIsAdmin()
+     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Not an admin?</div><p class="secd" style="margin:0">Someone without billing access would ask an admin to add seats or approve their invite, rather than buy directly.</p></div>'
+     : '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">Ask an admin to add seats or approve your invite. They will get your request with the details.</p></div>');
+  /* Footer actions are persona-aware. ADMIN: primary is "Add N seats" (buy); no self-request button (an admin does not
+     request from themselves). NON-admin: primary is "Request from your admin" (they cannot buy), with buying offered as
+     a quiet secondary in case they do have billing access. Cancel is always present. */
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button>'
-   +'<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallRequest('+need+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>'
-   +'<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>';
+   +(invIsAdmin()
+     ? '<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
+     : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
   initControlA11y(body);
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
@@ -5368,10 +5445,24 @@
   foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4RenderInvite()">Back to invite</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
- /* Request path: placeholder success. Confirms the ask was sent to an admin (no real submit). */
+ /* Request path (non-admin only after the persona fix): placeholder success. CLOSES THE LOOP too: the people this
+    non-admin was trying to invite are appended to the SAME INV_SEAT_REQUESTS queue the admin's Requested tab reads (one
+    pending row per invited email, with the role chosen in the invite), so an admin can then approve or deny them. The
+    email local-part is used as a readable name + initials so each row shows who / what / when. No real submit; prototype
+    only. */
  function invSeatWallRequest(need){
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
+  try{
+   var role=(typeof _v4InvRole!=='undefined'&&_v4InvRole)?_v4InvRole:'Team member';
+   (_v4InvEmails||[]).forEach(function(em){
+    var local=String(em).split('@')[0].replace(/[._-]+/g,' ').trim();
+    var nm=local?local.replace(/\b\w/g,function(c){return c.toUpperCase();}):em;
+    var ini=(nm.split(' ').map(function(w){return w.charAt(0);}).join('').slice(0,2)||'').toUpperCase()||'??';
+    INV_SEAT_REQUESTS.push({ ini:ini, name:nm, email:em, role:role, reason:'Invite pending a seat, sent for admin approval.', requested:INV_TODAY });
+   });
+   if(document.getElementById('v5Panel-requested')) invRenderRequested();
+  }catch(e){}
   title.textContent='Request sent';
   body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent to your admin</div><div class="ok-d">An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.</div></div>';
   foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
