@@ -2701,8 +2701,13 @@
   body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+n+' invite'+(n===1?'':'s')+' sent</div><div class="ok-d">They will get an email to join Somos as <b>'+gsEsc(_v4InvRole)+'</b>.'+teamLine+' They appear under pending until they accept.</div></div>';
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4OpenInvite(_v4InvPreTeam)">Invite more</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{d.focus();}catch(e){} },0);
-  /* P3-2: keep every seat readout in sync after a send. The send does not change INV_SEATS.used here, but syncing keeps the
-     header pill + Requested footer agreeing with the rest of the flow. Invitation-gated + guarded, so v4/v3 are unaffected. */
+  /* Blocker 2: a successful send now CONSUMES its seats so the seat scenario is coherent across the two tasks. v4InvSend only
+     reaches here after invInviteWouldExceedSeats(n) was false, so (used + n) <= total always holds and this never overshoots.
+     With the 449/450 seed, T1's single invite (Jordan) takes used to 450 (org full), so T2's next add trips the seat wall.
+     Invitation-gated so v4/v3/no-flag are byte-identical (INVITATION is false there and this branch never runs). */
+  try{ if(INVITATION){ INV_SEATS.used+=n; if(INV_SEATS.used>INV_SEATS.total) INV_SEATS.used=INV_SEATS.total; } }catch(e){}
+  /* P3-2: keep every seat readout in sync after a send, so the header pill + Requested footer agree with the new count.
+     Invitation-gated + guarded, so v4/v3 are unaffected. */
   try{ if(INVITATION && typeof invSyncSeatReadouts==='function') invSyncSeatReadouts(); }catch(e){}
  }
 
@@ -5260,12 +5265,17 @@
     admin) is treated as an admin who can approve or deny requests. Matches v4RoleIsMember(). */
  function invIsAdmin(){ return !v4RoleIsMember(); }
  /* Seat model (invitation-only, illustrative). RECONCILED with the 440-person org header (stakeholder walkthrough: an
-    "11 of 12 seats used, Team plan" wall read as nonsensical next to "440 people"). Now sized to the org: a Business plan of 450
-    seats with 441 used, so 9 are free. total = seats on the plan; used = seats already taken; remaining is derived. The
-    wall still fires when a batch of invites would push used past total, i.e. inviting MORE than the 9 free seats. These
-    numbers are a prototype scenario, not a real account, and are never read by any non-invitation screen. Kept
-    consistent everywhere it appears (wall, seats affordance on the People header, request / approve copy). */
- var INV_SEATS={ planName:'Business plan', total:450, used:441, pricePerSeat:25, currency:'USD', billing:'per seat / month' };
+    "11 of 12 seats used, Team plan" wall read as nonsensical next to "440 people"). Sized to the org: a Business plan of 450
+    seats. total = seats on the plan; used = seats already taken; remaining is derived.
+    SEAT SCENARIO (blocker 2): seeded to EXACTLY ONE free seat (449 of 450 used) so the two invitation tasks are both
+    reachable and coherent for the ADMIN persona. Logic trace: T1 invites one person (Jordan) -> invInviteWouldExceedSeats(1)
+    is (449+1)>450 = false, so the invite goes through the normal send and SUCCEEDS; a successful send now consumes its seats
+    (v4InvSendDone bumps used by the batch size, invitation-gated), so used becomes 450 and the org is FULL. T2 then tries to
+    add ANOTHER teammate -> invInviteWouldExceedSeats(1) is (450+1)>450 = true, so the seat wall fires and the out-of-seats /
+    get-more-seats state is reached. The wall still fires whenever a batch would push used past total. These numbers are a
+    prototype scenario, not a real account, and are never read by any non-invitation screen. Kept consistent everywhere it
+    appears (wall, seats affordance on the People header, request / approve copy). */
+ var INV_SEATS={ planName:'Business plan', total:450, used:449, pricePerSeat:25, currency:'USD', billing:'per seat / month' };
  function invSeatsRemaining(){ var r=INV_SEATS.total-INV_SEATS.used; return r>0?r:0; }
  function invInviteWouldExceedSeats(n){ return (INV_SEATS.used + (n||0)) > INV_SEATS.total; }
  /* Pending seat requests (admin sees these to approve / deny). Fictional Somos-style people, consistent with the
@@ -5300,7 +5310,7 @@
  }
  /* (2b) FIX #5 (stakeholder walkthrough: the request/approve flow should not depend on tripping the seat wall). A QUIET, always-
     visible seats affordance on the People page header (next to Invite people), so an admin can see seat usage and reach
-    seat management without inviting past the limit first. Reads "441 of 450 seats used" (from INV_SEATS, so it matches
+    seat management without inviting past the limit first. Reads "449 of 450 seats used" (from INV_SEATS, so it matches
     the wall + the Requested tab) and is a plain ghost button that jumps to the Requested tab, which is where an admin
     manages seats (approve / deny requests, see seats left). Not a loud CTA: a ghost button with a leading chair glyph,
     right-sized to sit beside Invite. Admin-only in practice (a non-admin never reaches this page; they get the augmented
@@ -5692,20 +5702,23 @@
     +'<div class="inv-wall-calc"><div class="between" style="padding:10px 0"><span>'+need+' more seat'+(need===1?'':'s')+'</span><span style="font:var(--hs-type-body-md-b)">$'+addTotal+' '+gsEsc(INV_SEATS.currency)+' / month</span></div></div>'
     +'<ul class="inv-wall-benefits"><li><span class="material-symbols-outlined">check</span>Room for '+need+' more '+(need===1?'person':'people')+' right away</li><li><span class="material-symbols-outlined">check</span>'+(standalone?'The people you invite keep the access you give them':'Everyone keeps the access you set in the invite')+'</li><li><span class="material-symbols-outlined">check</span>One bill, prorated for the rest of this month</li></ul>'
    +'</div>'
-   /* Persona-aware alt line (stakeholder walkthrough: the participant IS an admin, so "request from your admin" was contradictory).
-      An ADMIN buys seats (the primary action) and does not ask anyone, so their alt line just names the non-admin path
-      as context. A NON-admin cannot buy, so their alt line is the actionable "ask an admin" path (the footer gives them
-      the request button). invIsAdmin() follows the same role model as the rest of the invitation flows. The standalone
-      "get more seats" entry is admin-only in practice, so its alt line drops the invite-specific "approve their invite". */
+   /* Persona-aware alt line. Blocker 2 (coherence): the wall keeps BOTH paths for an ADMIN, because an admin who manages
+      people may not hold billing and can either buy directly (if they have billing access) or ask the person who owns
+      billing to add seats. So the admin alt line frames the request as a real second option (its button is in the footer),
+      not just passive "someone else would" context. A NON-admin cannot buy, so their alt line is the actionable "ask an
+      admin" path. invIsAdmin() follows the same role model as the rest of the invitation flows. The standalone "get more
+      seats" entry drops the invite-specific "approve their invite". */
    +(invIsAdmin()
-     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Not an admin?</div><p class="secd" style="margin:0">'+(standalone?'Someone without billing access would ask an admin to add seats, rather than buy directly.':'Someone without billing access would ask an admin to add seats or approve their invite, rather than buy directly.')+'</p></div>'
+     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Do not have billing access?</div><p class="secd" style="margin:0">'+(standalone?'You can ask the person who owns billing to add seats instead of buying directly. They will get your request with the details.':'You can ask the person who owns billing to add seats instead of buying directly. They will get your request with the details.')+'</p></div>'
      : '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">'+(standalone?'Ask an admin to add seats. They will get your request with the details.':'Ask an admin to add seats or approve your invite. They will get your request with the details.')+'</p></div>');
-  /* Footer actions are persona-aware. ADMIN: primary is "Add N seats" (buy); no self-request button (an admin does not
-     request from themselves). NON-admin: primary is "Request from your admin" (they cannot buy), with buying offered as
-     a quiet secondary in case they do have billing access. Cancel is always present. */
+  /* Footer actions are persona-aware. Blocker 2: the wall now offers BOTH paths to an ADMIN so the test can read which they
+     choose: "Add N seats" (buy, if they hold billing) plus "Request more seats" (ask the billing owner). NON-admin: primary
+     is "Request from your admin" (they cannot buy), with buying offered as a quiet secondary in case they do have billing
+     access. Cancel is always present. Both admin actions are actionable and reach a confirmation (invSeatWallUpgrade /
+     invSeatWallRequest). */
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button>'
    +(invIsAdmin()
-     ? '<button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
+     ? '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request more seats</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
      : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
   initControlA11y(body);
   /* The invite-triggered wall reuses the modal the user already opened (it is already .open); the standalone entry has no
@@ -5720,6 +5733,10 @@
     "Invite people" (start an invite into the new seats) since there is no invite in progress to return to. */
  function invSeatWallUpgrade(need,standalone){
   INV_SEATS.total+=need;
+  /* Blocker 3: adding seats changes the plan total, so re-sync every seat readout (header pill #invSeatsAfford + the
+     Requested-tab footer/badge) to the new total. Without this the header pill stayed stale after a buy while the modal
+     showed the new count. Guarded + invitation/v5 surface only, so it is a no-op when the pill/panel are absent. */
+  try{ if(typeof invSyncSeatReadouts==='function') invSyncSeatReadouts(); }catch(e){}
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
   title.textContent='Seats added';
@@ -5730,18 +5747,22 @@
    : '<button class="hs-btn hs-btn--primary" type="button" onclick="v4RenderInvite()">Back to invite</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
- /* Request path (non-admin only after the persona fix): placeholder success. CLOSES THE LOOP too: the people this
-    non-admin was trying to invite are appended to the SAME INV_SEAT_REQUESTS queue the admin's Requested tab reads (one
-    pending row per invited email, with the role chosen in the invite), so an admin can then approve or deny them. The
-    email local-part is used as a readable name + initials so each row shows who / what / when. No real submit; prototype
-    only. */
- /* `standalone` (optional): the discoverable "get more seats" wall has no invite in progress (no invitees to queue), so
-    when true the confirmation just speaks to the seat request itself and does not reference "the people you are inviting".
-    Invite callers pass only `need` -> `standalone` is undefined -> the original invitee-queueing + copy are byte-identical. */
+ /* Request path: placeholder success (no real submit; prototype only). Persona-aware after blocker 2:
+      - ADMIN (the UT persona): "request more seats" goes to whoever OWNS BILLING. An admin manages people but may not hold
+        billing, so this is a real alternative to buying. It does NOT queue the invitees into INV_SEAT_REQUESTS, because that
+        tab is where THIS admin approves OTHER people's seat requests; seeding it with the admin's own invitees would be
+        incoherent (they would be approving themselves). The confirmation just speaks to the seat request.
+      - NON-admin: unchanged. CLOSES THE LOOP: the people this non-admin was trying to invite are appended to the SAME
+        INV_SEAT_REQUESTS queue the admin's Requested tab reads (one pending row per invited email, with the role chosen in
+        the invite), so an admin can then approve or deny them. The email local-part is used as a readable name + initials so
+        each row shows who / what / when.
+    `standalone` (optional): the discoverable "get more seats" wall has no invite in progress (no invitees to queue), so when
+    true the confirmation speaks to the seat request itself and does not reference "the people you are inviting". */
  function invSeatWallRequest(need,standalone){
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
-  if(!standalone){
+  var admin=invIsAdmin();
+  if(!standalone && !admin){
    try{
     var role=(typeof _v4InvRole!=='undefined'&&_v4InvRole)?_v4InvRole:'Team member';
     (_v4InvEmails||[]).forEach(function(em){
@@ -5754,10 +5775,16 @@
    }catch(e){}
   }
   title.textContent='Request sent';
-  var reqDesc=standalone
-   ? ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+'. You will get an email when they decide.')
-   : ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.');
-  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">Request sent to your admin</div><div class="ok-d">'+reqDesc+'</div></div>';
+  var okTitle=admin?'Request sent to your billing owner':'Request sent to your admin';
+  var reqDesc;
+  if(admin){
+   reqDesc='The person who owns billing will review your request for '+need+' more seat'+(need===1?'':'s')+'. You will get an email when they decide.';
+  } else {
+   reqDesc=standalone
+    ? ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+'. You will get an email when they decide.')
+    : ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+' and the people you are inviting. You will get an email when they decide.');
+  }
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+okTitle+'</div><div class="ok-d">'+reqDesc+'</div></div>';
   foot.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
   var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{ d.focus(); }catch(e){} },0);
  }
