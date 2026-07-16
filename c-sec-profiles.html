@@ -2171,6 +2171,24 @@
  var V4_CURRENT_USER='Aisha Patel';
  function v4SelfMember(){ return v4MemberByName(V4_CURRENT_USER)||V4_MEMBERS[0]; }
  function v4IsSoleOwner(name){ var o=(V4_ORG.owners||[]); return o.length===1 && o[0]===name; }
+ /* ===== FIX 1 (relaunch): seed a contractor who is ALREADY a member but has NO access set yet, so the T4 task
+    ("Sam Rivera is already added, but with no access set up yet. Give Sam view-only access to Analytics and Drafts
+    only") is actually possible. Sam is pushed into the canonical V4_MEMBERS ONLY under V5 (invitation implies v5, plus
+    the plain v5=1 control), so he appears in every V5+ arm and NOT under v4/v3/no-flag, keeping the v4 reference
+    build's rendered DOM byte-identical. He is added before applyV4() runs (called at the top of the boot IIFE), so he
+    flows through the SAME shipped renderers every other member uses: the People/Members table (findable by the members
+    filter typing "Sam" or "Rivera" since it matches the row's name + email), the member-detail page (?m=Sam Rivera),
+    and the Permissions tab where the participant scopes him. His role is 'No access' (a value NOT in the Permissions
+    role list, so no role radio is pre-selected, reflecting "no access yet"); via 'Direct'; and he owns NO social
+    accounts directly and is on NO team, so v4OwnsCount(Sam)===0 (no offboarding risk) and he grants no billing/people
+    access. To give him view-only Analytics + Drafts the participant opens Sam -> Permissions -> picks "View only",
+    whose capability summary is exactly [See analytics and drafts, Create drafts] with publish/people/billing off.
+    Fake, non-colliding email on the partner.example domain (no @somos.com, no PII). Idempotent. */
+ function v5SeedSam(){
+  if(typeof V5==='undefined' || !V5) return;                          /* V5+ arms only (invitation implies v5) */
+  if(v4MemberByName('Sam Rivera')) return;                            /* idempotent: never double-add */
+  V4_MEMBERS.push({ini:'SR',name:'Sam Rivera',email:'sam.rivera@partner.example',role:'No access',via:'Direct',joined:'Jul 2026', direct:[], team:[]});
+ }
  /* ================= 6a-4 ROLE-GATED RENDERING: ONE access check =================
     A single role -> allowed-pages map, used for BOTH v4 nav filtering (v4ApplyNav drops the disallowed items) AND the
     direct-URL UNAUTHORIZED state (applyV4 renders the unauthorized card instead of the page). The dock role model is
@@ -3445,10 +3463,13 @@
     component the invite/change-role flows use), a plain "what this role can do" capability summary, and any
     per-account overrides. The 7 contested matrix cells are NOT resolved here: capabilities that touch them are
     STUBBED "eng confirm" via the shipped .hs-badge--warning, never fabricated. ---- */
- var V4_MD_ROLE_KEYS={ 'super admin':'Super Admin','admin':'Admin','team member':'Team member','view only':'View only','view':'View only' };
+ var V4_MD_ROLE_KEYS={ 'super admin':'Super Admin','admin':'Admin','team member':'Team member','view only':'View only','view':'View only','no access':'No access' };
  /* Capability summary per org role. true = allowed, false = not, 'eng' = contested (one of the 7 stubbed cells). Copy
     is plain-language; the contested items map to the matrix's unresolved cells (disconnect / SSO-MFA / data export). */
  var V4_MD_CAPS={
+  /* FIX 1: a member seeded with 'No access' has nothing granted yet. The Permissions tab renders every capability as
+     "not allowed" so the participant can SEE there is no access set, then pick a role (e.g. View only) to grant it. */
+  'No access':[['See analytics and drafts',false],['Create drafts',false],['Publish or reply',false],['Manage people and teams',false],['Manage billing',false]],
   'View only':[['See analytics and drafts',true],['Create drafts',true],['Publish or reply',false],['Manage people and teams',false],['Manage billing',false]],
   'Team member':[['Create and publish for their teams',true],['Reply to comments and messages',true],['See analytics',true],['Manage people and teams',false],['Export data','eng']],
   'Admin':[['Manage people, teams, and settings',true],['Connect accounts',true],['Publish and reply',true],['Disconnect profiles','eng'],['Manage SSO / MFA','eng'],['Manage billing',false]],
@@ -3764,6 +3785,37 @@
    return;
   }
   var who=ctx.noun;                                                    /* member name, or "N members" for a true multi-select */
+  /* FIX 3 (T5): the member/members terminal used to showToast then setTimeout -> location.href='c-settings-members.html'.
+     That RELOADED to a BARE, param-less Members page: it dropped the ut mode + the arm flag (invitation/v5), lost the
+     toast (so there was no confirmation the participant could read), and left Bryn present anyway. Under V5 (invitation
+     implies v5), replace that broken redirect with a clean in-place SUCCESS STATE inside the SAME offboard modal (the
+     shipped .v3-invite-done card the invite flow uses): it names where the accounts went and that the person was
+     removed, and it does NOT navigate, so ut + the arm flag are never dropped and the session survives. Success-state
+     stub only (held gate: no real removal/persistence is required). The v4-without-v5 path keeps its exact prior
+     behaviour (toast + redirect) so the v4 reference build is untouched. */
+  if(typeof V5!=='undefined' && V5 && (ctx.kind==='member' || ctx.kind==='members')){
+   var _newOwners=[]; sels.forEach(function(s){ if(s.value && _newOwners.indexOf(s.value)===-1) _newOwners.push(s.value); });
+   var _moved;
+   if(!sels.length){ _moved='No accounts needed a new owner.'; }              /* owned nothing directly */
+   else if(_newOwners.length===1){ _moved=(ctx.multi?'Their accounts':(gsEsc(who)+'\u2019s accounts'))+' moved to '+gsEsc(_newOwners[0])+'.'; }
+   else { _moved=(ctx.multi?'Their accounts':(gsEsc(who)+'\u2019s accounts'))+' were reassigned to their new owners.'; }
+   var _removed=(ctx.multi?(gsEsc(who)+' were removed.'):(gsEsc(who)+' was removed.'));
+   var body2=document.getElementById('v4OffBody'), foot2=document.getElementById('v4OffFoot');
+   if(!foot2){ var _fh=document.querySelector('#v4OffWrap .modal-foot'); foot2=_fh||null; }
+   if(body2){
+    body2.innerHTML='<div class="v3-invite-done" style="align-items:flex-start;text-align:left;padding:4px 0"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div>'
+     +'<div class="ok-t">'+_removed+'</div>'
+     +'<div class="ok-d">'+_moved+' This is a prototype, so nothing is saved.</div></div>';
+   }
+   var titleD=document.getElementById('v4OffTitle'); if(titleD) titleD.textContent='Done';
+   /* Collapse the footer to a single Done button that just closes the modal in place (no navigation, no param drop). */
+   if(foot2){ foot2.innerHTML='<button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseOffboard()">Done</button>'; }
+   var goD=document.getElementById('v4OffGo'); if(goD && !foot2){ goD.textContent='Done'; goD.disabled=false; goD.setAttribute('onclick','v4CloseOffboard()'); }
+   initControlA11y(body2||document.getElementById('v4OffWrap'));
+   showToast(sels.length?('Accounts reassigned. '+who+' removed from Somos.'):(who+' removed from Somos.'));
+   var _done=document.querySelector('#v4OffWrap .modal-foot .hs-btn--primary'); if(_done) setTimeout(function(){ try{ _done.focus(); }catch(e){} },30);
+   return;
+  }
   v4CloseOffboard();
   showToast(sels.length?('Accounts reassigned. '+who+' removed from Somos.'):(who+' removed from Somos.'));
   setTimeout(function(){ location.href='c-settings-members.html'; },900);
@@ -5611,6 +5663,17 @@
    }
   }catch(e){}
   try{ if(document.getElementById('v5Panel-requested')) invRenderRequested(); }catch(e){}  /* refresh footer hint + tab badge if the panel exists */
+  /* FIX 2 (T3): approving moves a person into V4_PENDING, so the Pending invites count/tab/list must refresh too, not
+     just the seat pill + Requested tab. Update both the v5 top-level Pending badge (#v5PeopleTabPendN) and the v4 inner
+     badge (#v4TabPendN, retired under v5 but harmless when present), and re-render the pending panel list via
+     v4RenderPending() when it is built, so the newly-approved person shows immediately without a reload. Guarded, so it
+     is a no-op when the People page / pending panel are not on screen. */
+  try{
+   var _pn=(typeof V4_PENDING!=='undefined'&&V4_PENDING)?V4_PENDING.length:0;
+   var _pb5=document.getElementById('v5PeopleTabPendN'); if(_pb5) _pb5.textContent=_pn;
+   var _pb4=document.getElementById('v4TabPendN'); if(_pb4) _pb4.textContent=_pn;
+   if(document.getElementById('v4MbrPanel-pending') && typeof v4RenderPending==='function') v4RenderPending();
+  }catch(e){}
  }
  /* Admin "manage seats" from the header affordance: jump to the Requested tab (the seat-management surface: seats left +
     pending requests to approve or deny). If the tab is not built yet, build it, then switch. */
@@ -5873,7 +5936,16 @@
    try{ invShowSeatWall(1,true,{approve:true,name:r.name}); }catch(e){}
    return;
   }
-  INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); _invApprovePending=-1; invSyncSeatReadouts();
+  INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); _invApprovePending=-1;
+  /* FIX 2 (T3): an approved request is "approved AND invited" (see the toast + the tab copy), so the person becomes a
+     PENDING INVITE, exactly like sending an invite. Push them onto the canonical V4_PENDING that the Pending invites
+     tab + count read, so the approved person does NOT vanish: they move from Requested (3->2) to Pending (3->4) and are
+     shown there, while the seat pill goes +1 (INV_SEATS.used was just incremented; a pending invite holds a seat, which
+     is exactly what invPendingCount()/the pill aria already assume). invitedBy is the current admin (v4SelfMember). No
+     de-dupe (matches invAddOwnRequest): approving twice would legitimately create two pending invites. invSyncSeatReadouts
+     below now also refreshes the Pending count/tab/panel so every seat + pending readout agrees without a reload. */
+  try{ if(typeof V4_PENDING!=='undefined' && V4_PENDING){ var _self=(typeof v4SelfMember==='function')?v4SelfMember():null; V4_PENDING.push({email:r.email, role:r.role, team:(r.team||null), invitedBy:(_self&&_self.name)||'an admin', sent:(typeof INV_TODAY!=='undefined'?INV_TODAY:'today')}); } }catch(e){}
+  invSyncSeatReadouts();
   /* relaunch #2: post-action seat-impact confirmation after approve, matching the send confirmation ("N of M seats now
      used"). Approving used one seat, and INV_SEATS was just incremented, so the count is current. */
   showToast(gsEsc(r.name)+' was approved and invited. '+INV_SEATS.used+' of '+INV_SEATS.total+' seats now used.');
@@ -6185,6 +6257,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT||V5){ /* relaunch #10 (dead-click hardening, ALL study arms): the prototype chrome has decorative dead anchors (rail product buttons Perch/Nest/Lumen/Parliament/Wisdom/Vigil, notifications, help, sub-nav items, Sign out) and handler-less topbar buttons (View options, the Share control, Create a post). Left alone they jump-to-top or do nothing, and a dead spot reads as a broken product and poisons every rating that follows. A delegated capture-phase handler catches a click on any of these dead elements, cancels the "#" jump, and shows a neutral, non-blocking toast so the tester knows the click registered and moves on. GATED TO UT OR V5, so it is active in every study arm (invitation=1/2 imply v5, and the v5 control), while v4/v3/no-flag are unaffected. SAFELY narrow so it never swallows a real control: (1) any anchor with a real route (href starts with "c-") or a real onclick is left alone; a dead anchor (href missing/#) with no onclick is caught. (2) For buttons we ONLY catch a handler-less button whose click DID NOT already do something: we check BOTH the onclick attribute AND the onclick property (buttons wired via el.onclick=fn, e.g. the Create-team button, set the property not the attribute, so they must be treated as working), the button is not disabled, and it is not inside a known-interactive region (an open modal, a menu, the demo dock, a filter bar, a row-menu, or the seat pills). This catches the named decorative topbar/rail buttons without touching any wired control. The gear is wired (invWireGear) so it routes and is never caught. Wording names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. */ var _utDeadAt=0; var _inWiredRegion=function(el){ return !!(el.closest('.modal')||el.closest('[role="menu"]')||el.closest('.v4-rowmenu')||el.closest('#demodock')||el.closest('.v4-filterbar')||el.closest('.bb-menu')||el.closest('.pop')); }; var _appWired=function(el){ /* wired via the app's own addEventListener (no onclick attr/prop), marked by a data flag OR a known aria-controls popup trigger; must NOT be treated as dead */ return !!(el.getAttribute('data-inv-gear')==='1' || el.getAttribute('data-v4wired') || el.hasAttribute('aria-controls') || el.id==='avatarTrig' || el.id==='orgTrig'); }; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick') && (typeof a.onclick!=='function') && !_appWired(a)) isDead=true; } else { var b=el2.closest('button'); if(b && !b.disabled && !b.hasAttribute('onclick') && (typeof b.onclick!=='function') && !_inWiredRegion(b) && !_appWired(b)) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ if(V5||UT) invHygiene(); }catch(e){} try{ if(UT) invStampFlagOnLinks(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT||V5){ /* relaunch #10 (dead-click hardening, ALL study arms): the prototype chrome has decorative dead anchors (rail product buttons Perch/Nest/Lumen/Parliament/Wisdom/Vigil, notifications, help, sub-nav items, Sign out) and handler-less topbar buttons (View options, the Share control, Create a post). Left alone they jump-to-top or do nothing, and a dead spot reads as a broken product and poisons every rating that follows. A delegated capture-phase handler catches a click on any of these dead elements, cancels the "#" jump, and shows a neutral, non-blocking toast so the tester knows the click registered and moves on. GATED TO UT OR V5, so it is active in every study arm (invitation=1/2 imply v5, and the v5 control), while v4/v3/no-flag are unaffected. SAFELY narrow so it never swallows a real control: (1) any anchor with a real route (href starts with "c-") or a real onclick is left alone; a dead anchor (href missing/#) with no onclick is caught. (2) For buttons we ONLY catch a handler-less button whose click DID NOT already do something: we check BOTH the onclick attribute AND the onclick property (buttons wired via el.onclick=fn, e.g. the Create-team button, set the property not the attribute, so they must be treated as working), the button is not disabled, and it is not inside a known-interactive region (an open modal, a menu, the demo dock, a filter bar, a row-menu, or the seat pills). This catches the named decorative topbar/rail buttons without touching any wired control. The gear is wired (invWireGear) so it routes and is never caught. Wording names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. */ var _utDeadAt=0; var _inWiredRegion=function(el){ return !!(el.closest('.modal')||el.closest('[role="menu"]')||el.closest('.v4-rowmenu')||el.closest('#demodock')||el.closest('.v4-filterbar')||el.closest('.bb-menu')||el.closest('.pop')); }; var _appWired=function(el){ /* wired via the app's own addEventListener (no onclick attr/prop), marked by a data flag OR a known aria-controls popup trigger; must NOT be treated as dead */ return !!(el.getAttribute('data-inv-gear')==='1' || el.getAttribute('data-v4wired') || el.hasAttribute('aria-controls') || el.id==='avatarTrig' || el.id==='orgTrig'); }; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick') && (typeof a.onclick!=='function') && !_appWired(a)) isDead=true; } else { var b=el2.closest('button'); if(b && !b.disabled && !b.hasAttribute('onclick') && (typeof b.onclick!=='function') && !_inWiredRegion(b) && !_appWired(b)) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} try{ v5SeedSam(); }catch(e){} /* FIX 1: seed the no-access contractor into V4_MEMBERS under V5 BEFORE applyV4 renders the members table/detail */ syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ if(V5||UT) invHygiene(); }catch(e){} try{ if(UT) invStampFlagOnLinks(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
