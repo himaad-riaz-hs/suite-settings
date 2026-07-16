@@ -989,6 +989,39 @@
     ghost button under/after the owner name; base sizing from .hs-btn--ghost .hs-btn--sm, only spacing tuned here. */
  body.v5 .v5-reassign-owner{margin-top:4px;}
  body.v5 .v5-owner-cell{display:flex;flex-direction:column;align-items:flex-start;gap:0;}
+ /* relaunch #2 + #13: plain one-line seat explainer on the People header, directly under the subtitle + Invite row.
+    Reads as page guidance (a quiet caption, an icon + one sentence), NOT a widget or a card: it explains what a seat is
+    and that pending invites hold one, addressing the two invisible parts testers hit. Tokens only; v5-gated so v4/v3 stay
+    byte-identical. Sits full-width under #v4MbrHead. */
+ body.v5 .inv-seat-explain{display:flex;align-items:flex-start;gap:6px;margin:-6px 0 16px;max-width:70ch;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
+ body.v5 .inv-seat-explain .material-symbols-outlined{font-size:16px;line-height:18px;flex:none;color:var(--bento-theme-color-icon-subtle);margin-top:1px;}
+ /* relaunch #1: gear-icon signpost. A quiet WAYFINDING ROW (not a card, not a toggle): a full-width link row with a
+    leading compass glyph, one line of text, and a trailing arrow, set on a subtle hairline so it reads as navigation
+    guidance above the page heading. Mirrors the quiet pointer-row pattern. Tokens only; v5-gated so v4/v3 stay
+    byte-identical. Hover/focus give it a faint fill + the focus ring, like the other link rows. */
+ body.v5 .inv-gear-signpost{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding:10px 12px;border-radius:var(--bento-radius-sm,6px);border:1px solid var(--bento-theme-color-border-subtle);background:var(--bento-theme-color-bg-surface);text-decoration:none;color:var(--bento-theme-color-text-subtle);font:var(--hs-type-body-sm);}
+ body.v5 .inv-gear-signpost .inv-gsp-txt{flex:1 1 auto;min-width:0;}
+ body.v5 .inv-gear-signpost .inv-gsp-txt b{color:var(--bento-theme-color-text-base);font-weight:var(--hs-font-weight-bold,700);}
+ body.v5 .inv-gear-signpost > .material-symbols-outlined{font-size:20px;flex:none;color:var(--bento-theme-color-icon-subtle);}
+ body.v5 .inv-gear-signpost .inv-gsp-arrow{font-size:18px;}
+ body.v5 .inv-gear-signpost:hover{background:var(--bento-component-list-item-fill-hovered);color:var(--bento-theme-color-text-base);}
+ body.v5 .inv-gear-signpost:hover .inv-gsp-arrow{color:var(--bento-theme-color-text-base);}
+ body.v5 .inv-gear-signpost:focus-visible{outline:2px solid var(--bento-theme-color-border-focus);outline-offset:2px;}
+ /* relaunch #13: name typeahead in the invite email field. A results list that drops under the field as you type a name
+    or email, matching existing MEMBERS (from the org directory) and PENDING INVITES, each with an inline status
+    ("Already a member" / "Already invited") so a duplicate invite is caught before it goes out and "is this person
+    already here" is answerable. A listbox (APG combobox-ish): rows are option-like, keyboard navigable. Tokens only;
+    v5-gated so the v4/v3 invite field is byte-identical (the container is only injected under v5). */
+ body.v5 .inv-ta-wrap{position:relative;}
+ body.v5 .inv-typeahead{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--bento-theme-color-bg-surface);border:1px solid var(--bento-theme-color-border-base);border-radius:var(--bento-radius-md,10px);box-shadow:var(--bento-theme-elevation-shadow-overlay-bottom);max-height:264px;overflow:auto;padding:4px;}
+ body.v5 .inv-ta-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--bento-radius-sm,6px);cursor:pointer;}
+ body.v5 .inv-ta-opt:hover,body.v5 .inv-ta-opt.inv-ta-active{background:var(--bento-component-list-item-fill-hovered);}
+ body.v5 .inv-ta-opt .mini-av{flex:none;}
+ body.v5 .inv-ta-id{flex:1 1 auto;min-width:0;}
+ body.v5 .inv-ta-nm{font:var(--hs-type-body-md-b);color:var(--bento-theme-color-text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ body.v5 .inv-ta-em{font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ body.v5 .inv-ta-status{flex:none;font:var(--hs-type-meta-b);text-transform:none;padding:2px 8px;border-radius:999px;background:var(--bento-theme-color-bg-subtle,#eef0f2);color:var(--bento-theme-color-text-subtle);white-space:nowrap;}
+ body.v5 .inv-ta-empty{padding:10px 12px;font:var(--hs-type-body-sm);color:var(--bento-theme-color-text-subtle);}
 </style></head><body>
 <div class="suite-app">
 <aside class="suite-rail">
@@ -2040,7 +2073,13 @@
  var V4_PENDING=[
   {email:'noa.levi@somos.com',role:'Team Member',team:'Growth Team',invitedBy:'Bryn Morales',sent:'Jul 7, 2026'},
   {email:'theo.marsh@partner.example',role:'View Only',team:null,invitedBy:'Aisha Patel',sent:'Jul 8, 2026'},
-  {email:'priya.rao@somos.com',role:'Admin',team:null,invitedBy:'Aisha Patel',sent:'Jul 8, 2026'}
+  /* SEED-VS-TASK AUDIT (relaunch #5): the previous seed carried a pending invite for a second "Priya" here. Priya is the
+     exact name that contaminated the last round (a tester found a pre-seeded Priya and assumed the invite task was done),
+     and the relaunch task plan deliberately avoids the name Priya for that reason (T2 uses Marco Silva precisely to dodge
+     it). Once the name typeahead lands (relaunch #13), typing "Priya" would surface that pending row AND the member Priya
+     Nair, re-creating the same confusion. Replaced with a fresh, non-colliding name (no member, no task persona is named
+     Renata) so no seeded pending invite echoes a task persona or the contaminating name. */
+  {email:'renata.cruz@somos.com',role:'Admin',team:null,invitedBy:'Aisha Patel',sent:'Jul 8, 2026'}
  ];
  /* Social & ad accounts, canonical. owner = the member who owns it DIRECTLY (null when a team holds it, so it is not
     counted in anyone's direct "Owns"). health: one of the SIX shipped states (connected | disconnected | reconnect |
@@ -2445,7 +2484,9 @@
    if(V5){
     /* mirror the bulk bar's remaining actions for a single member (same handlers) */
     existing.appendChild(v4RowMenuItem('group_add','Add to team',function(){ v4RowAddTeam(name); }));
-    existing.appendChild(v4RowMenuItem('person_remove','Remove',function(){ v4OpenOffboard(name); }));
+    /* relaunch #4: the row Remove item flips to match the modal it opens, from the canonical dataset: "Transfer &
+       remove" (owns accounts) vs "Remove <name>" (owns nothing), with a matching icon. Same v4OpenOffboard handler. */
+    existing.appendChild(v4RowMenuItem(invMemberOwnsCount(name)>0?'swap_horiz':'person_remove',invRemoveLabelFor(name,true),function(){ v4OpenOffboard(name); }));
    }
    cell.appendChild(existing);
   }
@@ -2619,6 +2660,15 @@
     text stays in the field so the person can fix it. Duplicate -> quiet no-op error. */
  function v4InvEmailKey(e){
   var inp=e.target;
+  /* relaunch #13: when the typeahead is open, arrows move the active option, Enter picks it (instead of committing a
+     chip), Escape closes it. v5-only (the dropdown only exists under v5), so v4/v3 keying is byte-identical. */
+  if(V5){
+   var ddOpen=(function(){ var dd=document.getElementById('v4InvTypeahead'); return dd && dd.style.display!=='none' && _invTaMatches.length; })();
+   if(e.key==='ArrowDown'){ if(ddOpen){ e.preventDefault(); invTaMove(1); return; } }
+   else if(e.key==='ArrowUp'){ if(ddOpen){ e.preventDefault(); invTaMove(-1); return; } }
+   else if(e.key==='Escape'){ if(document.getElementById('v4InvTypeahead') && document.getElementById('v4InvTypeahead').style.display!=='none'){ e.preventDefault(); invCloseTypeahead(); return; } }
+   else if(e.key==='Enter' && ddOpen && _invTaActive>=0){ e.preventDefault(); invPickTypeahead(_invTaActive); return; }
+  }
   if(e.key==='Enter'||e.key===','||e.key===' '){
    e.preventDefault();
    var v=inp.value.trim().replace(/,$/,'').trim();
@@ -2660,12 +2710,14 @@
    hintEl.style.color=''; hintEl.innerHTML=v4InvEmailHintHTML();
   }
   v4InvSyncSendBtn();
+  try{ invRenderTypeahead(v); }catch(e){}                        /* relaunch #13: name/email typeahead against members + pending invites */
  }
  /* v5 C2: commit a typed address when the field loses focus, so a valid email becomes a pill with NO Enter. Valid+new ->
     pill; non-empty but invalid -> inline error (kept editable); empty or duplicate -> no-op. Skipped while sending so a
     click on Send does not double-handle. */
  function v4InvEmailBlur(){
   if(!V5||_v4InvSending) return;
+  try{ invCloseTypeahead(); }catch(e){}                                          /* relaunch #13: options use onmousedown+preventDefault, so a pick fires before this blur; closing here is safe */
   var inp=document.getElementById('v4InvEmailInput'); if(!inp) return;
   var v=inp.value.trim().replace(/,$/,'').trim();
   if(!v) return;
@@ -2688,6 +2740,101 @@
  function v4InvSetRole(r){ _v4InvRole=r; v4RenderInvite(); }
  function v4InvToggleTeam(t){ _v4InvTeams[t]=!_v4InvTeams[t]; v4RenderInvite(); }
  function v4InvCsv(){ showToast('Bulk CSV upload is a prototype control. Up to 500 rows per file.'); return false; }
+ /* ===== relaunch #13: name typeahead against existing members + pending invites =====
+    Finding (Arm A, two testers independently): people type a NAME ("Priya") into the invite field expecting a company
+    directory to surface the person, especially when they do not know the email. This adds typeahead: as you type a name
+    or an email fragment, matching org MEMBERS and PENDING INVITES drop down with an inline status ("Already a member" /
+    "Already invited"), so a duplicate invite is caught before it is sent and "is this person already here?" is answered
+    in place. All v5-gated + runtime, so the v4/v3 invite field stays byte-identical.
+      DIRECTORY: org members come from the shipped search index (SEARCH, type 'Members' = name + email + role); pending
+      invites come from the canonical V4_PENDING (email; a readable name is derived from the local-part). One source each,
+      no fabricated people.
+      BEHAVIOUR: every match is someone ALREADY in the org or ALREADY invited, so choosing one does NOT add a duplicate
+      chip; it surfaces the status inline (and a toast) and clears the field. A name that matches nobody simply shows the
+      "no match, type their email to invite" hint, so inviting a genuinely new person (e.g. Jordan Lee) is unaffected. */
+ function invInviteDirectory(){
+  var out=[];
+  try{
+   if(typeof SEARCH!=='undefined' && SEARCH && SEARCH.length){
+    SEARCH.forEach(function(s){ if(s && s.type==='Members'){ out.push({name:s.label, email:s.sub, status:'member', role:s.kw||''}); } });
+   }
+  }catch(e){}
+  /* also fold in the seeded canonical members (in case any is not in the search index) */
+  try{ (V4_MEMBERS||[]).forEach(function(m){ if(!out.some(function(o){return o.email===m.email;})) out.push({name:m.name, email:m.email, status:'member', role:m.role}); }); }catch(e){}
+  /* pending invites -> "already invited" */
+  try{
+   (V4_PENDING||[]).forEach(function(p){
+    var local=String(p.email).split('@')[0].replace(/[._-]+/g,' ').trim();
+    var nm=local?local.replace(/\b\w/g,function(c){return c.toUpperCase();}):p.email;
+    out.push({name:nm, email:p.email, status:'invited', role:p.role||''});
+   });
+  }catch(e){}
+  return out;
+ }
+ function invInvInitials(name){ var parts=String(name).trim().split(/\s+/); var a=(parts[0]||'').charAt(0); var b=(parts.length>1?parts[parts.length-1].charAt(0):''); return (a+b).toUpperCase()||'?'; }
+ var _invTaActive=-1, _invTaMatches=[];
+ /* Ensure the input container is wrapped in a positioned .inv-ta-wrap and a dropdown host exists (lazy, v5-only, so the
+    static markup is untouched). Returns the dropdown element or null. */
+ function invEnsureTypeaheadHost(){
+  var box=document.querySelector('#v4InvBody .v4-inv-emails'); if(!box) return null;
+  var wrap=box.parentNode;
+  if(!wrap || !wrap.classList || !wrap.classList.contains('inv-ta-wrap')){
+   var w=document.createElement('div'); w.className='inv-ta-wrap';
+   box.parentNode.insertBefore(w, box); w.appendChild(box); wrap=w;
+  }
+  var dd=document.getElementById('v4InvTypeahead');
+  if(!dd){ dd=document.createElement('div'); dd.id='v4InvTypeahead'; dd.className='inv-typeahead'; dd.setAttribute('role','listbox'); dd.style.display='none'; wrap.appendChild(dd); }
+  return dd;
+ }
+ function invCloseTypeahead(){ var dd=document.getElementById('v4InvTypeahead'); if(dd){ dd.style.display='none'; dd.innerHTML=''; } _invTaActive=-1; _invTaMatches=[]; var inp=document.getElementById('v4InvEmailInput'); if(inp) inp.setAttribute('aria-expanded','false'); }
+ /* Render matches for the current query (name or email fragment). Only fires under v5 (called from the v5 path of
+    v4InvEmailInput). Shows up to 6 matches; if the query looks like a partial name (has letters) and there are no
+    matches, shows a gentle "no match" line so the person knows to type the email to invite someone new. */
+ function invRenderTypeahead(q){
+  if(!V5) return;
+  var dd=invEnsureTypeaheadHost(); if(!dd) return;
+  q=(q||'').trim().toLowerCase();
+  var inp=document.getElementById('v4InvEmailInput');
+  if(q.length<2){ invCloseTypeahead(); return; }
+  var dir=invInviteDirectory();
+  var matches=dir.filter(function(d){ return (d.name||'').toLowerCase().indexOf(q)!==-1 || (d.email||'').toLowerCase().indexOf(q)!==-1; }).slice(0,6);
+  _invTaMatches=matches; _invTaActive=-1;
+  if(!matches.length){
+   /* only show the "no match" affordance when the query looks like a name (letters, not a half-typed email with @). */
+   if(/@/.test(q)){ invCloseTypeahead(); return; }
+   dd.innerHTML='<div class="inv-ta-empty">No one by that name is in Somos yet. Type their full email to invite them.</div>';
+   dd.style.display=''; if(inp) inp.setAttribute('aria-expanded','true');
+   return;
+  }
+  dd.innerHTML=matches.map(function(m,i){
+   var label=m.status==='invited'?'Already invited':'Already a member';
+   return '<div class="inv-ta-opt" role="option" id="invTaOpt'+i+'" aria-selected="false" data-i="'+i+'" onmousedown="event.preventDefault();invPickTypeahead('+i+')">'
+    +'<span class="mini-av">'+gsEsc(invInvInitials(m.name))+'</span>'
+    +'<div class="inv-ta-id"><div class="inv-ta-nm">'+gsEsc(m.name)+'</div><div class="inv-ta-em">'+gsEsc(m.email)+'</div></div>'
+    +'<span class="inv-ta-status">'+label+'</span></div>';
+  }).join('');
+  dd.style.display=''; if(inp){ inp.setAttribute('aria-expanded','true'); inp.setAttribute('role','combobox'); inp.setAttribute('aria-autocomplete','list'); inp.setAttribute('aria-controls','v4InvTypeahead'); }
+ }
+ function invTaMove(dir){
+  if(!_invTaMatches.length) return;
+  var n=_invTaMatches.length;
+  _invTaActive=(_invTaActive+dir+n)%n;
+  var dd=document.getElementById('v4InvTypeahead'); if(!dd) return;
+  Array.prototype.forEach.call(dd.querySelectorAll('.inv-ta-opt'), function(o,i){ var on=(i===_invTaActive); o.classList.toggle('inv-ta-active',on); o.setAttribute('aria-selected',on?'true':'false'); });
+  var inp=document.getElementById('v4InvEmailInput'); if(inp) inp.setAttribute('aria-activedescendant','invTaOpt'+_invTaActive);
+ }
+ /* Choose a match: it is always someone already here / already invited, so we do NOT create a duplicate invite. Surface
+    the status clearly (toast) and clear the field, closing the dropdown. This is exactly the duplicate-prevention the
+    finding asked for. */
+ function invPickTypeahead(i){
+  var m=_invTaMatches[i]; if(!m) return;
+  var word=m.status==='invited'?'already has a pending invite':'is already a member of Somos';
+  showToast(gsEsc(m.name)+' '+word+'. No new invite is needed.');
+  var inp=document.getElementById('v4InvEmailInput'); if(inp){ inp.value=''; }
+  invCloseTypeahead();
+  try{ if(typeof v4InvEmailInput==='function') v4InvEmailInput(); }catch(e){}
+  if(inp) setTimeout(function(){ try{ inp.focus(); }catch(e){} },0);
+ }
  /* Send: no real submit or persistence (held gate a). Shows a SENDING state on the primary (disabled + spinner label),
     then transitions to the in-modal SUCCESS confirmation. Cancel is disabled while sending so the flow reads as one
     atomic action. */
@@ -2714,14 +2861,18 @@
   if(!body||!foot) return;
   title.textContent='Invites sent';
   var teamLine=teams.length?(' They join <b>'+gsEsc(teams.join(', '))+'</b>.'):'';
-  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+n+' invite'+(n===1?'':'s')+' sent</div><div class="ok-d">They will get an email to join Somos as <b>'+gsEsc(_v4InvRole)+'</b>.'+teamLine+' They appear under pending until they accept.</div></div>';
-  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4OpenInvite(_v4InvPreTeam)">Invite more</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
-  var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{d.focus();}catch(e){} },0);
   /* Blocker 2: a successful send now CONSUMES its seats so the seat scenario is coherent across the two tasks. v4InvSend only
      reaches here after invInviteWouldExceedSeats(n) was false, so (used + n) <= total always holds and this never overshoots.
      With the 449/450 seed, T1's single invite (Jordan) takes used to 450 (org full), so T2's next add trips the seat wall.
      Invitation-gated so v4/v3/no-flag are byte-identical (INVITATION is false there and this branch never runs). */
   try{ if(INVITATION){ INV_SEATS.used+=n; if(INV_SEATS.used>INV_SEATS.total) INV_SEATS.used=INV_SEATS.total; } }catch(e){}
+  /* relaunch #2: a post-action seat-impact line, so the send explicitly states what it did to the seat count ("15 of 15
+     seats now used"). The seat count was just bumped above, so INV_SEATS is current. A pending invite holds a seat, which
+     is exactly why the count moved; the line names that. Invitation-only (INV_SEATS exists only under the flag). */
+  var seatImpact=INVITATION?('<div class="ok-d" style="margin-top:8px"><b>'+INV_SEATS.used+' of '+INV_SEATS.total+' seats now used.</b> '+(n===1?'This invite holds a seat':'These invites hold '+n+' seats')+' until '+(n===1?'it is':'they are')+' accepted or revoked.</div>'):'';
+  body.innerHTML='<div class="v3-invite-done"><div class="ok-ic"><span class="material-symbols-outlined">check</span></div><div class="ok-t">'+n+' invite'+(n===1?'':'s')+' sent</div><div class="ok-d">They will get an email to join Somos as <b>'+gsEsc(_v4InvRole)+'</b>.'+teamLine+' They appear under pending until they accept.</div>'+seatImpact+'</div>';
+  foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4OpenInvite(_v4InvPreTeam)">Invite more</button><button class="hs-btn hs-btn--primary" type="button" onclick="v4CloseInvite()">Done</button>';
+  var d=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(d) setTimeout(function(){ try{d.focus();}catch(e){} },0);
   /* P3-2: keep every seat readout in sync after a send, so the header pill + Requested footer agree with the new count.
      Invitation-gated + guarded, so v4/v3 are unaffected. */
   try{ if(INVITATION && typeof invSyncSeatReadouts==='function') invSyncSeatReadouts(); }catch(e){}
@@ -3194,7 +3345,10 @@
    +'<div class="v4-mdid"><div class="v4-mdname">'+gsEsc(m.name)+' <span class="'+v4RoleBadge(m.role)+'">'+gsEsc(m.role)+'</span></div>'
    +'<div class="v4-mdmeta">'+gsEsc(m.email)+' \u00b7 joined '+gsEsc(m.joined||'2024')+'</div></div>'
    +'<div class="v4-mdactions"><button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenChangeRole(\''+gsEsc(m.name)+'\')"><span class="material-symbols-outlined">badge</span>Change role</button>'
-   +'<button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenOffboard(\''+gsEsc(m.name)+'\')"><span class="material-symbols-outlined">swap_horiz</span>Transfer &amp; offboard</button></div></div>'));
+   /* relaunch #4: under v5 the remove trigger flips to match the modal it opens (Transfer & remove when they own
+      accounts, plain Remove when they own nothing), derived from the canonical dataset via invRemoveLabelFor. v4 keeps
+      the "Transfer & offboard" label + swap_horiz icon so the v4 reference build stays byte-identical. */
+   +'<button class="hs-btn hs-btn--secondary" type="button" onclick="v4OpenOffboard(\''+gsEsc(m.name)+'\')"><span class="material-symbols-outlined">'+((typeof V5!=='undefined'&&V5)?(invMemberOwnsCount(m.name)>0?'swap_horiz':'person_remove'):'swap_horiz')+'</span>'+((typeof V5!=='undefined'&&V5)?gsEsc(invRemoveLabelFor(m.name,false)):'Transfer &amp; offboard')+'</button></div></div>'));
   /* tabs */
   var nDirect=m.direct.length, nTeam=m.team.length, nAccts=nDirect+nTeam;
   var teams=[]; m.team.forEach(function(a){ if(teams.indexOf(a.team)===-1) teams.push(a.team); });
@@ -3229,16 +3383,23 @@
  /* social-account rows with Direct owner (amber) / via {Team} (neutral) badges; withTransfer adds a per-account action */
  function v4AcctRows(m,withTransfer){
   var rows='';
+  /* relaunch #9: align the per-account connection provenance to the current-system vocabulary under v5, so the words a
+     participant sees match Hootsuite's social-account access model ("Connected by {name}" for a direct grant on this
+     person, "through {Team}" for a team grant, "Added individually" as the plain direct-connection phrase). v4 keeps its
+     existing "Direct owner" / "via {team}" badges so the v4 reference build stays byte-identical. */
+  var _v5=(typeof V5!=='undefined'&&V5);
   m.direct.forEach(function(a){
+   var badge=_v5?'<span class="hs-badge hs-badge--warning" title="Connected by '+gsEsc(m.name)+' (added individually)">Connected by '+gsEsc(m.name)+'</span>':'<span class="hs-badge hs-badge--warning" title="Owned directly by this person">Direct owner</span>';
    rows+='<div class="v4-acct"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span>'
     +'<div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+'</div></div>'
-    +'<div class="v4-acct-right rowflex" style="gap:10px"><span class="hs-badge hs-badge--warning" title="Owned directly by this person">Direct owner</span>'
+    +'<div class="v4-acct-right rowflex" style="gap:10px">'+badge
     +(withTransfer?'<button class="hs-btn hs-btn--ghost hs-btn--sm" type="button" onclick="v4MdTransferAcct(\''+gsEsc(m.name)+'\',\''+gsEsc(a.handle)+'\')">Transfer</button>':'')+'</div></div>';
   });
   m.team.forEach(function(a){
+   var tbadge=_v5?'<span class="hs-badge hs-badge--neutral" title="Connected through the '+gsEsc(a.team)+' team">through '+gsEsc(a.team)+'</span>':'<span class="hs-badge hs-badge--neutral" title="Reaches this person through a team">via '+gsEsc(a.team)+'</span>';
    rows+='<div class="v4-acct"><span class="v4-acct-ic"><span class="material-symbols-outlined">'+v4AcctIcon(a.net)+'</span></span>'
     +'<div class="v4-acct-id"><div class="v4-acct-handle">'+gsEsc(a.handle)+'</div><div class="v4-acct-net">'+gsEsc(a.net)+'</div></div>'
-    +'<div class="v4-acct-right"><span class="hs-badge hs-badge--neutral" title="Reaches this person through a team">via '+gsEsc(a.team)+'</span></div></div>';
+    +'<div class="v4-acct-right">'+tbadge+'</div></div>';
   });
   return rows||'<p class="secd" style="margin:0">No social accounts.</p>';
  }
@@ -3420,6 +3581,19 @@
   var noun=(kind==='account')?(acctHandle||'this account'):(multi?(names.length+' members'):(members[0]?members[0].name:(context&&context.name)||'this member'));
   return { kind:kind, names:names, members:members, multi:multi, noun:noun, owned:owned, teams:teams, handle:acctHandle, curOwner:curOwner };
  }
+ /* ===== relaunch #4: adaptive removal label on the TRIGGER (button/row that OPENS the offboard modal) =====
+    The offboard MODAL already flips its header + confirm to "Transfer & remove" (owns accounts) vs "Remove <name>"
+    (owns nothing) under v5 (see v4OpenOffboard). The Joao rule is that the button that OPENS a modal must match the
+    header it opens, so the trigger label has to flip the same way. This helper derives the label from the SAME canonical
+    source the modal counts from (V4_ACCOUNTS where owner===name), so trigger and header can never disagree:
+      owns >=1 account -> "Transfer & remove" (there is something to hand over first)
+      owns nothing     -> "Remove <name>"    (a plain confirm; nothing to transfer)
+    A member who owns nothing (e.g. Dar Khan, View Only) reads "Remove Dar Khan"; Bryn (owns 3) reads "Transfer &
+    remove". Used only under v5 to relabel the member-detail action button and the members-row "Remove" menu item; v4/v3
+    keep their existing labels so their DOM stays byte-identical. `withName` gives the row-menu the person's name in the
+    plain-Remove case (so the menu item reads "Remove Dar Khan"), matching the modal header. */
+ function invMemberOwnsCount(name){ try{ return V4_ACCOUNTS.filter(function(a){ return a.owner===name; }).length; }catch(e){ return 0; } }
+ function invRemoveLabelFor(name, withName){ return invMemberOwnsCount(name)>0 ? 'Transfer & remove' : (withName?('Remove '+name):'Remove'); }
  /* Owner candidates for a given account: everyone EXCEPT the members being removed, with equivalent-or-higher access
     first (Super Admin, Admin, then the rest), so the safest choice is at the top of the list. */
  var V4_ROLE_RANK={ 'Super Admin':3,'Admin':2,'Team Member':1,'View Only':0 };
@@ -4458,6 +4632,8 @@
   try{ v5RequestSeat(); }catch(e){}                                                        /* FIX C3: make requesting a seat discoverable for a non-admin from a natural start (account flyout + the gated People page), not only after hitting the seat wall */
   try{ v5AdminSeatsEntry(); }catch(e){}                                                    /* FIX 2 (r2): make "request / get more seats" discoverable for the ADMIN (the ut persona) from the People header, opening the EXISTING seat wall without inviting past the limit first */
   try{ v5SocialReassign(); }catch(e){}                                                     /* FIX 3 (r2): a second entrance to the EXISTING transfer/reassign flow from the Social & ad accounts page (per-account "Reassign owner" opens v4OpenOffboard) */
+  try{ if(typeof invGearSignpost==='function') invGearSignpost(); }catch(e){}              /* relaunch #1: gear signpost on every settings page (v5 control arm; the invitation arms also call it from applyInvitation, idempotent) */
+  try{ if(typeof invWireGear==='function') invWireGear(); }catch(e){}                       /* relaunch #1/#10: wire the Perch gear (v5 control arm) */
  }
  /* ================= v5 wording: Security 2-step verification (Joao review) =================
     v4Security renders the verification card with the heading "Two-factor authentication (2FA)" and an "Authenticator
@@ -5280,6 +5456,69 @@
     persona (ROLE==='pm') is the non-admin who can request a seat but not approve; everyone else (View only, Admin, Super
     admin) is treated as an admin who can approve or deny requests. Matches v4RoleIsMember(). */
  function invIsAdmin(){ return !v4RoleIsMember(); }
+ /* ===== relaunch instrumentation (client-side prototype) =====
+    This is a static GitHub Pages click-through with no analytics backend, so "instrument the click" means: make the click
+    observable to a session recording / an observer, in a stable, greppable way. invInstr pushes a timestamped record onto
+    window.__invEvents AND writes a stable console breadcrumb ("[inv-instr] <loc> ..."), so first-click location (#11) and
+    gear-signpost usage (#1) can be read off the recording or the console without a real pipeline. loc is a stable key
+    (e.g. 'entry:rail', 'entry:flyout', 'gear', 'gear-signpost'); detail is optional context. Guarded so it never throws. */
+ function invInstr(loc, detail){
+  try{
+   window.__invEvents=window.__invEvents||[];
+   var rec={loc:loc, detail:detail||null, page:(typeof PAGE_ID!=='undefined'?PAGE_ID:null), arm:(typeof INVITATION2!=='undefined'&&INVITATION2)?'invitation=2':((typeof INVITATION!=='undefined'&&INVITATION)?'invitation=1':((typeof V5!=='undefined'&&V5)?'v5=1':'')), t:Date.now()};
+   window.__invEvents.push(rec);
+   if(window.console&&console.info) console.info('[inv-instr] '+loc+(detail?(' '+detail):'')+' (arm '+rec.arm+', page '+rec.page+')');
+  }catch(e){}
+ }
+ /* ===== relaunch #1: gear-icon signpost (wayfinding row) =====
+    Finding: in every arm, people who wanted to add a member clicked the product GEAR. That gear is not a menu, it opens
+    the product's own settings page directly, so there is nothing to "add" there. Fix (recovery, not a fight): a subtle
+    wayfinding ROW near the top of the settings page the gear opens, pointing to the settings home. Same pattern as the
+    Profile -> Preferences time-zone pointer row: a quiet, scannable link row, NOT a card and NOT a toggle.
+      - Appears on EVERY product/settings page the gear can open (every c-*.html settings page), not just one. It is
+        skipped on the settings HOME itself (Settings Overview) since you are already there, and on the Perch product
+        page (that is the product surface, not a settings page).
+      - Links to the settings home (Settings Overview) with the active arm flag preserved (invStampFlagOnLinks also
+        stamps it under ut, but we add the flag here too so it is correct even outside ut).
+      - The click is instrumented (invInstr 'gear-signpost') so the relaunch can read how often the gear path is used as a
+        route to member/team/account management.
+    Gated to V5 (runs from applyInvitation AND applyV5 is not needed since invitation implies v5; we call it from
+    applyInvitation so it is present in every invitation arm, and separately from applyV5 for the v5 control). Injected at
+    runtime + v5-scoped class, so v4/v3/no-flag settings pages stay byte-identical. Idempotent via #invGearSignpost. */
+ function invSettingsHomeHref(){
+  var flag=(typeof INVITATION2!=='undefined'&&INVITATION2)?'?invitation=2':((typeof INVITATION!=='undefined'&&INVITATION)?'?invitation=1':((typeof V5!=='undefined'&&V5)?'?v5=1':''));
+  return 'c-settings-overview.html'+flag;
+ }
+ /* relaunch #1 + #10: wire the product GEAR (the Perch topbar "Settings" icon) so it actually opens the settings home
+    instead of being a dead click, and instrument it. Done at RUNTIME under v5 so the static Perch DOM stays byte-identical
+    for v4/v3/no-flag. The gear is the shipped .suite-topbar button with aria-label="Settings" (no onclick in the static
+    markup). We attach a handler that instruments ('gear') then navigates to the settings home (arm flag preserved). This
+    is the real product behaviour (a product gear opens that product's settings), and the signpost row (invGearSignpost)
+    then lives at the top of the page it lands on. Idempotent via a data marker. */
+ function invWireGear(){
+  if(!(typeof V5!=='undefined'&&V5)) return;
+  try{
+   Array.prototype.forEach.call(document.querySelectorAll('.suite-topbar button[aria-label="Settings"]'), function(g){
+    if(g.getAttribute('data-inv-gear')==='1') return;
+    g.setAttribute('data-inv-gear','1');
+    g.addEventListener('click', function(e){ e.preventDefault(); invInstr('gear'); location.href=invSettingsHomeHref(); });
+   });
+  }catch(e){}
+ }
+ var _invGearTries=0;
+ function invGearSignpost(){
+  if(!(typeof V5!=='undefined'&&V5)) return;                                    /* v5 + both invitation arms; v4/v3 untouched */
+  if(PAGE_ID==='perch') return;                                                 /* the product surface, not a settings page */
+  if(PAGE_ID==='soverview') return;                                            /* already the settings home */
+  if(document.getElementById('invGearSignpost')) return;                        /* idempotent */
+  var pc=document.getElementById('pageContent'); if(!pc){ if(_invGearTries++>50) return; setTimeout(invGearSignpost,80); return; }
+  /* anchor at the very top of the page content, above the page heading, so it reads as page-level wayfinding. */
+  var row=v4El('<a class="inv-gear-signpost" id="invGearSignpost" href="'+invSettingsHomeHref()+'" onclick="invInstr(\'gear-signpost\')">'
+   +'<span class="material-symbols-outlined" aria-hidden="true">explore</span>'
+   +'<span class="inv-gsp-txt"><b>Looking for members, teams, or account settings?</b> All settings</span>'
+   +'<span class="material-symbols-outlined inv-gsp-arrow" aria-hidden="true">arrow_forward</span></a>');
+  pc.insertBefore(row, pc.firstChild);
+ }
  /* Seat model (invitation-only, illustrative). RECONCILED with the 440-person org header (stakeholder walkthrough: an
     "11 of 12 seats used, Team plan" wall read as nonsensical next to "440 people"). Sized to the org: a Business plan of 450
     seats. total = seats on the plan; used = seats already taken; remaining is derived.
@@ -5308,6 +5547,8 @@
        - invitation=2 (INVITATION2): the entry lives in the account / profile flyout instead (invEnsureFlyoutEntry),
          and the rail entry is suppressed entirely, so this arm purely tests the flyout placement. */
   try{ if(INVITATION2) invEnsureFlyoutEntry(); else invEnsureRailEntry(); }catch(e){}
+  try{ invGearSignpost(); }catch(e){}                                            /* relaunch #1: gear signpost on every settings page (both invitation arms) */
+  try{ invWireGear(); }catch(e){}                                                /* relaunch #1/#10: make the Perch gear open settings + instrument (both invitation arms) */
   /* (2) Requested seats. On the People page (PAGE_ID==='members'): an ADMIN gets a fourth "Requested" tab to approve /
      deny seat requests; a NON-ADMIN (the Paying-Member persona, pm) is blocked from this org-admin page by the existing
      role gate (v4PageDenied -> the unauthorized card, a held gate we do NOT change), so instead of leaving them at a dead
@@ -5334,18 +5575,38 @@
     v5-built header, so the shipped + non-invitation DOM stays byte-identical. Idempotent via #invSeatsAfford. Retries
     briefly because v5People builds #v4MbrHead asynchronously after a skeleton. */
  var _invSeatsAffTries=0;
+ /* relaunch #2: pending invites hold a seat, so the seat readouts must COUNT them and SAY so (that was the invisible
+    part testers hit). INV_SEATS.used is the ONE canonical seat count and already includes the pending invites' seats;
+    invPendingCount() reports how many of the used seats are pending so the copy can name them. Kept as a small helper so
+    the pill aria-label, the header explainer, and the Requested-tab footer all say the same thing. */
+ function invPendingCount(){ try{ return (typeof V4_PENDING!=='undefined'&&V4_PENDING)?V4_PENDING.length:0; }catch(e){ return 0; } }
+ function invSeatsUsedAria(){ var used=INV_SEATS.used, total=INV_SEATS.total, p=invPendingCount(); return used+' of '+total+' seats used'+(p?(', including '+p+' pending invite'+(p===1?'':'s')+' that each hold a seat'):'')+'. Manage seats.'; }
  function invEnsureSeatsAffordance(){
   if(document.getElementById('invSeatsAfford')) return;                          /* already added */
   var head=document.getElementById('v4MbrHead');
   if(!head){ if(_invSeatsAffTries++>50) return; setTimeout(invEnsureSeatsAffordance,80); return; }
   var used=INV_SEATS.used, total=INV_SEATS.total;
-  var btn=v4El('<button class="hs-btn hs-btn--ghost hs-btn--sm inv-seats-afford" id="invSeatsAfford" type="button" title="View and manage seats" aria-label="'+used+' of '+total+' seats used. Manage seats." onclick="invGoManageSeats()"><span class="material-symbols-outlined">event_seat</span>'+used+' of '+total+' seats used</button>');
+  var btn=v4El('<button class="hs-btn hs-btn--ghost hs-btn--sm inv-seats-afford" id="invSeatsAfford" type="button" title="View and manage seats" aria-label="'+invSeatsUsedAria()+'" onclick="invGoManageSeats()"><span class="material-symbols-outlined">event_seat</span>'+used+' of '+total+' seats used</button>');
   /* place it just before the Invite button (the last child of the header actions cluster), so reading order is seats
      status then the primary Invite action. The header holds [subtitle] + [actions wrap]; the actions wrap is the last
      child. Insert into that wrap before its first button (Invite). */
   var actions=head.lastElementChild;
   if(actions && actions!==head.firstElementChild){ actions.insertBefore(btn, actions.firstChild); }
   else { head.appendChild(btn); }
+  try{ invEnsureSeatExplainer(); }catch(e){}
+ }
+ /* relaunch #2 + #13: one plain sentence under the People header saying WHAT a seat is and that PENDING INVITES HOLD A
+    SEAT (the two invisible parts). Not a widget/card: a quiet caption row (icon + one line) inserted right after
+    #v4MbrHead. Idempotent via #invSeatExplain. Retries briefly because the header is built async behind a skeleton. */
+ var _invSeatExpTries=0;
+ function invEnsureSeatExplainer(){
+  if(document.getElementById('invSeatExplain')) return;
+  var head=document.getElementById('v4MbrHead');
+  if(!head){ if(_invSeatExpTries++>50) return; setTimeout(invEnsureSeatExplainer,80); return; }
+  var p=invPendingCount();
+  var pendLine=p?(' Pending invites hold a seat until the person accepts or you revoke the invite, so your '+p+' pending invite'+(p===1?'':'s')+' '+(p===1?'is':'are')+' counted here.'):' Pending invites hold a seat until the person accepts or you revoke the invite.';
+  var cap=v4El('<div class="inv-seat-explain" id="invSeatExplain"><span class="material-symbols-outlined" aria-hidden="true">info</span><span>A seat is one person\u2019s access to Somos.'+pendLine+'</span></div>');
+  if(head.parentNode) head.parentNode.insertBefore(cap, head.nextSibling); else head.appendChild(cap);
  }
  /* P3-2 (invitation/UT finding: after Approve/Deny/Send the People-header seat pill #invSeatsAfford stayed stale while the
     Requested-tab footer updated, so two seat readouts on the same screen disagreed until reload). One place that re-renders
@@ -5361,7 +5622,7 @@
     var used=INV_SEATS.used, total=INV_SEATS.total;
     var icon='<span class="material-symbols-outlined">event_seat</span>';
     pill.innerHTML=icon+used+' of '+total+' seats used';
-    pill.setAttribute('aria-label',used+' of '+total+' seats used. Manage seats.');
+    pill.setAttribute('aria-label',invSeatsUsedAria());          /* relaunch #2: aria keeps naming the pending seats */
    }
   }catch(e){}
   try{ if(document.getElementById('v5Panel-requested')) invRenderRequested(); }catch(e){}  /* refresh footer hint + tab badge if the panel exists */
@@ -5517,7 +5778,9 @@
  function invEnsureRailEntry(){
   if(document.getElementById('invRailEntry')) return;
   var others=document.querySelector('.suite-rail .others'); if(!others) return;
-  var a=v4El('<a class="suite-navbtn inv-rail-entry" id="invRailEntry" href="c-settings-members.html?invitation=1&peopletab=members" aria-label="Invite people" title="Invite people"><span class="circle"><span class="material-symbols-outlined">group_add</span></span><span class="lbl">Invite</span></a>');
+  /* relaunch #11: instrument first-click location of the invite entry (does NOT relocate it; placement is what the test
+     measures). invInstr records the rail location so the recording/console shows where the participant first went. */
+  var a=v4El('<a class="suite-navbtn inv-rail-entry" id="invRailEntry" href="c-settings-members.html?invitation=1&peopletab=members" aria-label="Invite people" title="Invite people" onclick="invInstr(\'entry:rail\')"><span class="circle"><span class="material-symbols-outlined">group_add</span></span><span class="lbl">Invite</span></a>');
   others.insertBefore(a, others.firstChild);
  }
  /* ---- (1b) invitation=2 arm: account / profile flyout invite entry (the Slack / Notion pattern). Instead of the rail,
@@ -5537,7 +5800,7 @@
    if(panel.querySelector('.inv-flyout-entry')) return;                          /* idempotent per panel */
    var header=panel.querySelector('.idr'); var afterDiv=header?header.nextElementSibling:null;  /* the .div after the identity header */
    var anchor=(afterDiv&&afterDiv.classList.contains('div'))?afterDiv.nextSibling:panel.querySelector('.pi');
-   var a=v4El('<a class="pi inv-flyout-entry" role="menuitem" href="c-settings-members.html?invitation=2&peopletab=members" aria-label="Invite people"><span class="material-symbols-outlined">group_add</span><div class="pi-c"><div class="pt">Invite people</div><div class="pd">Add people to Somos and manage their access</div></div></a>');
+   var a=v4El('<a class="pi inv-flyout-entry" role="menuitem" href="c-settings-members.html?invitation=2&peopletab=members" aria-label="Invite people" onclick="invInstr(\'entry:flyout\')"><span class="material-symbols-outlined">group_add</span><div class="pi-c"><div class="pt">Invite people</div><div class="pd">Add people to Somos and manage their access</div></div></a>');
    if(anchor) panel.insertBefore(a, anchor); else panel.appendChild(a);
   });
  }
@@ -5611,7 +5874,25 @@
  /* P3-2: route the post-mutation re-render through invSyncSeatReadouts so the header pill AND the Requested panel (table +
     footer hint + badge) all refresh together and never disagree. invSyncSeatReadouts re-renders the panel when it exists
     (it always does here, since these buttons live in it), so it replaces the prior direct invRenderRequested() call. */
- function invSeatApprove(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; if(INV_SEATS.used<INV_SEATS.total) INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); invSyncSeatReadouts(); showToast(gsEsc(r.name)+' was approved and invited to Somos.'); }
+ /* relaunch #12 (enforce the seat math): approving a request USES a seat, so it must respect the ONE canonical count
+    (INV_SEATS) exactly like the invite Send does. Previously this silently no-opped the increment when the org was full
+    but STILL removed the request and toasted success, which taught testers the limit was not real. Now, at zero free
+    seats, approving hits the SAME seat wall the invite hits (invShowSeatWall), with the same explanation of what to do
+    next (add seats, or ask whoever owns billing). The request is NOT consumed in that case: it stays in the queue so the
+    admin can approve it after making room. When there IS a free seat, approve consumes it and re-syncs every readout. */
+ var _invApprovePending=-1;   /* index of a request whose approval is waiting on more seats (set when the wall fires from approve) */
+ function invSeatApprove(i){
+  var r=INV_SEAT_REQUESTS[i]; if(!r) return;
+  if(invInviteWouldExceedSeats(1)){                                 /* out of seats: same wall as invite, request stays pending */
+   _invApprovePending=i;
+   try{ invShowSeatWall(1,true,{approve:true,name:r.name}); }catch(e){}
+   return;
+  }
+  INV_SEATS.used++; INV_SEAT_REQUESTS.splice(i,1); _invApprovePending=-1; invSyncSeatReadouts();
+  /* relaunch #2: post-action seat-impact confirmation after approve, matching the send confirmation ("N of M seats now
+     used"). Approving used one seat, and INV_SEATS was just incremented, so the count is current. */
+  showToast(gsEsc(r.name)+' was approved and invited. '+INV_SEATS.used+' of '+INV_SEATS.total+' seats now used.');
+ }
  function invSeatDeny(i){ var r=INV_SEAT_REQUESTS[i]; if(!r) return; INV_SEAT_REQUESTS.splice(i,1); invSyncSeatReadouts(); showToast('Request from '+gsEsc(r.name)+' was denied.'); }
  /* Non-admin: an in-panel request form (reason + role), then a plain success state. No real submit (placeholder). The
     optional `mount` lets the v5 discoverable entry reuse this SAME form inside its own modal without an id collision with
@@ -5682,7 +5963,11 @@
     to adding seats to the plan rather than "you are inviting N people". Everything else (pricing card, benefits, the admin
     Add-N-seats buy path via invSeatWallUpgrade) is the SAME flow, so no parallel wall is built. Existing invite callers
     pass only `n` -> `standalone` is undefined -> byte-identical behaviour. */
- function invShowSeatWall(n,standalone){
+ /* `ctx` (optional, relaunch #12): when the standalone wall is opened from APPROVING a seat request at zero free seats,
+    ctx={approve:true,name:<requester>} lets the intro name the blocked action ("Approving <name>'s request needs a
+    seat...") so the admin sees WHY the wall fired. Absent for the invite-triggered and plain get-more-seats opens, which
+    keep their existing copy, so those paths are unchanged. */
+ function invShowSeatWall(n,standalone,ctx){
   v4EnsureInviteModal(document.getElementById('pageContent'));
   var body=document.getElementById('v4InvBody'), foot=document.getElementById('v4InvFoot'), title=document.getElementById('v4InvTitle');
   if(!body||!foot) return;
@@ -5695,10 +5980,18 @@
   if(standalone){
    /* discoverable "get more seats": `n` is how many seats to add (default 5), independent of any invite. */
    need=(n&&n>0)?n:5;
-   title.textContent='Get more seats';
-   haveLine=(remaining>0)
-    ? ('Your '+gsEsc(INV_SEATS.planName)+' has <b>'+INV_SEATS.used+' of '+INV_SEATS.total+' seats used</b> ('+remaining+' free). Add seats now so you have room to invite more people.')
-    : ('Your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used). Add seats to make room for more people.');
+   var _appr=(ctx&&ctx.approve);
+   title.textContent=_appr?'You need a seat to approve this':'Get more seats';
+   if(_appr){
+    /* relaunch #12: approving a request consumes a seat, and there are none free. Name the blocked action + the same
+       explanation of what to do next (add seats / ask billing), matching the invite wall. */
+    haveLine='Approving '+gsEsc(ctx.name||'this request')+' uses a seat, but your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used). Add a seat to approve, or ask whoever owns billing.';
+    need=(n&&n>0)?n:1;
+   } else {
+    haveLine=(remaining>0)
+     ? ('Your '+gsEsc(INV_SEATS.planName)+' has <b>'+INV_SEATS.used+' of '+INV_SEATS.total+' seats used</b> ('+remaining+' free). Add seats now so you have room to invite more people.')
+     : ('Your '+gsEsc(INV_SEATS.planName)+' has <b>no seats left</b> ('+INV_SEATS.used+' of '+INV_SEATS.total+' used). Add seats to make room for more people.');
+   }
   } else {
    need=n-remaining; if(need<0) need=0;                                         /* extra seats this invite needs */
    title.textContent='You need more seats';
@@ -5725,7 +6018,7 @@
       admin" path. invIsAdmin() follows the same role model as the rest of the invitation flows. The standalone "get more
       seats" entry drops the invite-specific "approve their invite". */
    +(invIsAdmin()
-     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Do not have billing access?</div><p class="secd" style="margin:0">'+(standalone?'You can ask the person who owns billing to add seats instead of buying directly. They will get your request with the details.':'You can ask the person who owns billing to add seats instead of buying directly. They will get your request with the details.')+'</p></div>'
+     ? '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Who adds seats?</div><p class="secd" style="margin:0">Adding seats to your plan is handled by whoever owns billing, not you. Send them a request and they get the details.</p></div>'
      : '<div class="inv-wall-alt"><div class="inv-wall-alt-t">Cannot buy seats?</div><p class="secd" style="margin:0">'+(standalone?'Ask an admin to add seats. They will get your request with the details.':'Ask an admin to add seats or approve your invite. They will get your request with the details.')+'</p></div>');
   /* Footer actions are persona-aware. Blocker 2: the wall now offers BOTH paths to an ADMIN so the test can read which they
      choose: "Add N seats" (buy, if they hold billing) plus "Request more seats" (ask the billing owner). NON-admin: primary
@@ -5734,7 +6027,7 @@
      invSeatWallRequest). */
   foot.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button>'
    +(invIsAdmin()
-     ? '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request more seats</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button>'
+     ? '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request more seats</button>'
      : '<button class="hs-btn hs-btn--secondary" type="button" onclick="invSeatWallUpgrade('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">add_shopping_cart</span>Add '+need+' seat'+(need===1?'':'s')+'</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Request from your admin</button>');
   initControlA11y(body);
   /* The invite-triggered wall reuses the modal the user already opened (it is already .open); the standalone entry has no
@@ -5748,6 +6041,19 @@
     only the closing line + the follow-on button: an invite-triggered wall goes "Back to invite"; a standalone open goes
     "Invite people" (start an invite into the new seats) since there is no invite in progress to return to. */
  function invSeatWallUpgrade(need,standalone){
+  if(invIsAdmin()){
+   /* B (invitation relaunch): the UT admin persona does NOT hold billing, so buying seats is not self-serve. A click on
+      "Add seats" is routed to an owner-approval step (a comprehension moment: they tried to buy and learn that adding seats
+      goes through whoever owns billing), then on to the same request path. No capacity is added here. Non-admin synthetic
+      personas (never the UT persona) keep the self-serve buy below. */
+   var ub=document.getElementById('v4InvBody'), uf=document.getElementById('v4InvFoot'), utl=document.getElementById('v4InvTitle');
+   if(!ub||!uf) return;
+   if(utl) utl.textContent='Adding seats needs billing';
+   ub.innerHTML='<div class="hs-alert hs-alert--info" style="margin:0"><span class="material-symbols-outlined">info</span><div>Adding seats to your '+gsEsc(INV_SEATS.planName)+' is handled by whoever owns billing, not you. Send them a request for <b>'+need+' more seat'+(need===1?'':'s')+'</b> and they will add them.</div></div>';
+   uf.innerHTML='<button class="hs-btn hs-btn--ghost" type="button" onclick="v4CloseInvite()">Cancel</button><button class="hs-btn hs-btn--primary" type="button" onclick="invSeatWallRequest('+need+','+(standalone?'true':'false')+')"><span class="material-symbols-outlined">forward_to_inbox</span>Send request</button>';
+   var ud=document.querySelector('#v4InviteWrap .modal .hs-btn--primary'); if(ud) setTimeout(function(){ try{ ud.focus(); }catch(e){} },0);
+   return;
+  }
   INV_SEATS.total+=need;
   /* Blocker 3: adding seats changes the plan total, so re-sync every seat readout (header pill #invSeatsAfford + the
      Requested-tab footer/badge) to the new total. Without this the header pill stayed stale after a buy while the modal
@@ -5790,11 +6096,24 @@
     if(document.getElementById('v5Panel-requested')) invRenderRequested();
    }catch(e){}
   }
-  title.textContent='Request sent';
-  var okTitle=admin?'Request sent to your billing owner':'Request sent to your admin';
+  /* B (invitation relaunch): the admin's request goes to whoever owns billing, who (for this walkthrough) approves it and
+     adds the seats in-session, so the session stays coherent: the org gets room and any approval that was blocked on seats
+     can complete. Non-admin is unchanged (a passive request to an admin; no capacity change). */
+  var grantedApprove='';
+  if(admin){
+   INV_SEATS.total+=need;                                                        /* owner adds the requested seats */
+   if(_invApprovePending>=0 && INV_SEAT_REQUESTS[_invApprovePending]){           /* request came from an approve blocked on seats (T3): finish it */
+    var _ar=INV_SEAT_REQUESTS[_invApprovePending];
+    INV_SEATS.used++; INV_SEAT_REQUESTS.splice(_invApprovePending,1); _invApprovePending=-1;
+    grantedApprove=' The request from '+gsEsc(_ar.name)+' is now approved.';
+   }
+   try{ if(typeof invSyncSeatReadouts==='function') invSyncSeatReadouts(); }catch(e){}
+  }
+  title.textContent=admin?'Seats added':'Request sent';
+  var okTitle=admin?'Seats added by your billing owner':'Request sent to your admin';
   var reqDesc;
   if(admin){
-   reqDesc='The person who owns billing will review your request for '+need+' more seat'+(need===1?'':'s')+'. You will get an email when they decide.';
+   reqDesc='Your request went to whoever owns billing, who approved it and added '+need+' seat'+(need===1?'':'s')+' to your '+gsEsc(INV_SEATS.planName)+'.'+grantedApprove+' Your organization now has '+INV_SEATS.used+' of '+INV_SEATS.total+' seats used.';
   } else {
    reqDesc=standalone
     ? ('An admin will review your request for '+need+' more seat'+(need===1?'':'s')+'. You will get an email when they decide.')
@@ -5881,6 +6200,6 @@
   try{ v3Page(); }catch(e){}
   try{ v3WireKebabs(); }catch(e){}
  }
- (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT){ /* user-test only: the Perch cold-start backdrop has many decorative dead anchors (rail buttons, sub-nav items) and a couple of handler-less Create-a-post buttons. Left alone they jump-to-top or do nothing, and participants read the whole prototype as broken and bail. A delegated capture-phase handler catches a click on one of these dead/backdrop elements, cancels the "#" jump, and shows a neutral toast. It never touches genuinely working controls: any anchor with a real onclick (e.g. #avatarTrig, the invite flyout item) or a real route (href starting with "c-", e.g. the invite rail entry, the Calendar item) is left to behave normally, and among buttons only the handler-less Create-a-post is caught (the gear and every other topbar/plan button are untouched). Wording is fixed + neutral: it names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. Gated to UT, so non-ut renders are unaffected. */ var _utDeadAt=0; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick')) isDead=true; } else { var b=el2.closest('button'); if(b && !b.hasAttribute('onclick') && (b.textContent||'').indexOf('Create a post')!==-1) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ if(V5||UT) invHygiene(); }catch(e){} try{ if(UT) invStampFlagOnLinks(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
+ (function(){ try{ if(PAGE_ID==='soverview')document.body.classList.add('ovpage'); if(PAGE_ID==='perch')document.body.classList.add('perchpage'); }catch(e){} try{ if(OV){document.querySelectorAll('#popwrap a[href="c-account-profile.html"]').forEach(function(a){a.setAttribute('href','c-settings-overview.html');});} }catch(e){} try{ if(UT){var _b=document.querySelector('a.suite-brand'); if(_b){var _vf=INVITATION2?'&invitation=2':(INVITATION?'&invitation=1':(V5?'&v5=1':(V4?'&v4=1':(V3?'&v3=1':'')))); _b.setAttribute('href','c-perch.html?ut=1'+_vf);}} }catch(e){} try{ if(UT||V5){ /* relaunch #10 (dead-click hardening, ALL study arms): the prototype chrome has decorative dead anchors (rail product buttons Perch/Nest/Lumen/Parliament/Wisdom/Vigil, notifications, help, sub-nav items, Sign out) and handler-less topbar buttons (View options, the Share control, Create a post). Left alone they jump-to-top or do nothing, and a dead spot reads as a broken product and poisons every rating that follows. A delegated capture-phase handler catches a click on any of these dead elements, cancels the "#" jump, and shows a neutral, non-blocking toast so the tester knows the click registered and moves on. GATED TO UT OR V5, so it is active in every study arm (invitation=1/2 imply v5, and the v5 control), while v4/v3/no-flag are unaffected. SAFELY narrow so it never swallows a real control: (1) any anchor with a real route (href starts with "c-") or a real onclick is left alone; a dead anchor (href missing/#) with no onclick is caught. (2) For buttons we ONLY catch a handler-less button whose click DID NOT already do something: we check BOTH the onclick attribute AND the onclick property (buttons wired via el.onclick=fn, e.g. the Create-team button, set the property not the attribute, so they must be treated as working), the button is not disabled, and it is not inside a known-interactive region (an open modal, a menu, the demo dock, a filter bar, a row-menu, or the seat pills). This catches the named decorative topbar/rail buttons without touching any wired control. The gear is wired (invWireGear) so it routes and is never caught. Wording names no destination, so it cannot bias the invite-discoverability comparison across arms. Throttled so rapid repeats do not stack. */ var _utDeadAt=0; var _inWiredRegion=function(el){ return !!(el.closest('.modal')||el.closest('[role="menu"]')||el.closest('.v4-rowmenu')||el.closest('#demodock')||el.closest('.v4-filterbar')||el.closest('.bb-menu')||el.closest('.pop')); }; var _appWired=function(el){ /* wired via the app's own addEventListener (no onclick attr/prop), marked by a data flag OR a known aria-controls popup trigger; must NOT be treated as dead */ return !!(el.getAttribute('data-inv-gear')==='1' || el.getAttribute('data-v4wired') || el.hasAttribute('aria-controls') || el.id==='avatarTrig' || el.id==='orgTrig'); }; document.addEventListener('click',function(e){ var el2=e.target; if(!el2||!el2.closest) return; var a=el2.closest('a'); var isDead=false; if(a){ var _h=a.getAttribute('href'); var _real=(_h!==null&&_h!==''&&_h!=='#'); if(!_real && !a.hasAttribute('onclick') && (typeof a.onclick!=='function') && !_appWired(a)) isDead=true; } else { var b=el2.closest('button'); if(b && !b.disabled && !b.hasAttribute('onclick') && (typeof b.onclick!=='function') && !_inWiredRegion(b) && !_appWired(b)) isDead=true; } if(!isDead) return; e.preventDefault(); var _n=Date.now(); if(_n-_utDeadAt<1500) return; _utDeadAt=_n; showToast('This is a prototype, so not every area here is interactive. The parts you need to finish your task do work.'); }, true); } }catch(e){} try{ if(sessionStorage.getItem('navCollapsed')==='1' && window.innerWidth>860) document.body.classList.add('nav-collapsed'); }catch(e){} try{ v3ApplyNav(); }catch(e){} try{ v4ApplyNav(); }catch(e){} try{ v5ApplyNav(); }catch(e){} syncControls(); renderNav(); applyV3(); try{ applyV4(); }catch(e){} try{ applyV5(); }catch(e){} try{ applyInvitation(); }catch(e){} try{ if(V5||UT) invHygiene(); }catch(e){} try{ if(UT) invStampFlagOnLinks(); }catch(e){} try{ v4WireOrgSwitcher(); }catch(e){} initControlA11y(); initFilters(); })();
 </script>
 </body></html>
