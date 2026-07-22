@@ -37,6 +37,9 @@ html, body { margin: 0; height: 100%; }
 }
 .banner .material-symbols-outlined { color: var(--bento-theme-color-icon-info); font-size: 20px; flex-shrink: 0; }
 .banner p { font: var(--hs-type-body-md); color: var(--hs-fg); margin: 0; }
+/* warning tone for the banner (bg + icon both flip, so no tone mismatch) */
+.banner--warning { background: var(--hs-bg-warning); }
+.banner--warning .material-symbols-outlined { color: var(--hs-fg-warning); }
 .banner a { color: var(--hs-fg-link); font-weight: var(--bento-theme-font-weights-semibold); text-decoration: underline; }
 
 /* section card (one-off surface, tokens only) */
@@ -83,7 +86,9 @@ html, body { margin: 0; height: 100%; }
 .sel > :first-child { flex: 1; min-width: 0; }
 .sel .chev { color: var(--bento-theme-color-icon-base); font-size: 20px; }
 .sel:hover { border-color: var(--bento-theme-color-text-base); }
-.sel:focus { border-color: var(--hs-border-focus); box-shadow: 0 0 0 2px var(--hs-focus-halo); outline: none; }
+.sel:focus-visible { border-color: var(--hs-border-focus); box-shadow: 0 0 0 2px var(--hs-focus-halo); outline: none; }
+/* keyboard focus rings on the shell's interactive controls (a11y) */
+.hs-toggle:focus-visible, .icon-btn:focus-visible, .hs-check:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: 2px; }
 
 /* subgroup label inside a card (e.g. Notifications sections) */
 .subgroup { font: var(--hs-type-meta-b); color: var(--bento-theme-color-text-subtle); margin: var(--bento-space-04) 0 4px; }

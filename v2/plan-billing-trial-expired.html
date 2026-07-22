@@ -60,7 +60,7 @@
       <div class="inner">
         <p class="subhead">Visible to admins and the billing owner.</p>
 
-        <div class="banner" style="background: var(--hs-bg-warning)">
+        <div class="banner banner--warning">
           <span class="material-symbols-outlined">warning</span>
           <p>Your trial has ended and publishing is paused. Nothing was deleted, your members, teams, and connected accounts are intact. Reactivate to pick up where you left off.</p>
           <div class="trail" style="flex-shrink: 0; align-self: center"><button class="hs-btn hs-btn--primary">Reactivate</button></div>
@@ -76,7 +76,7 @@
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Core publishing</div>
             </div>
             <div style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-text-base); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
-              <div style="display: flex; align-items: center; gap: 8px"><span style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Business</span><span class="pill warn"><span class="material-symbols-outlined">warning</span>Trial expired</span></div>
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Business</span><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">warning</span>Trial expired</span></div>
               <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">$249/mo</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">455 seats (450 + 5 added)</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Approvals, teams, roles</div>
@@ -112,7 +112,7 @@
 
         <section class="card">
           <h2 class="card-title">Invoices</h2>
-          <table class="dtable">
+          <div class="table-card"><table class="hs-table">
             <thead>
               <tr><th>Date</th><th>Amount</th><th>Status</th><th></th></tr>
             </thead>
@@ -120,23 +120,23 @@
               <tr>
                 <td>Jun 1, 2026</td>
                 <td>$249.00</td>
-                <td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
+                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
                 <td style="text-align: right"><button class="icon-btn ne-tooltipbtn" aria-label="Download invoice for Jun 1, 2026"><span class="material-symbols-outlined">download</span></button></td>
               </tr>
               <tr>
                 <td>May 1, 2026</td>
                 <td>$249.00</td>
-                <td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
+                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
                 <td style="text-align: right"><button class="icon-btn ne-tooltipbtn" aria-label="Download invoice for May 1, 2026"><span class="material-symbols-outlined">download</span></button></td>
               </tr>
               <tr>
                 <td>Apr 1, 2026</td>
                 <td>$249.00</td>
-                <td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
+                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
                 <td style="text-align: right"><button class="icon-btn ne-tooltipbtn" aria-label="Download invoice for Apr 1, 2026"><span class="material-symbols-outlined">download</span></button></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </section>
       </div>
     </div>
