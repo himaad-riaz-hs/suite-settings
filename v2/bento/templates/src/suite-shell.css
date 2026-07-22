@@ -1,0 +1,215 @@
+/* ── Suite shell — shared rail + chrome for every product template.
+   Source: social-os-reboot.fig /Navigation. Bento-backed; per-product
+   accents from --suite-* tokens. Spec: templates/suite-shell.md ────── */
+
+:root {
+  --suite-rail-w: 80px;
+  --suite-surface: var(--bento-theme-color-bg-surface);   /* #FDFDFD */
+  --suite-border:  var(--bento-theme-color-border-subtle);/* #EBEBEB */
+  --suite-page:    var(--bento-theme-color-bg-app);       /* #F4F5F6 */
+  --suite-ink:     var(--bento-system-sys-neutral-800);   /* #1C1C1C */
+  --suite-font:    var(--bento-theme-font-families-primary);
+}
+
+/* App layout: rail + optional product drawer + content, in a row. */
+.suite-app { display: flex; flex-direction: row; height: 100vh; }
+.suite-app > .suite-main, .suite-app > .lm, .suite-app > .composer, .suite-app > .planner, .suite-app > .an { flex: 1; min-width: 0; }
+
+/* ── Rail ────────────────────────────────────────────────────────── */
+.suite-rail {
+  width: var(--suite-rail-w);
+  flex-shrink: 0;
+  height: 100%;
+  background: var(--suite-surface);
+  border-right: 1px solid var(--suite-border);
+  display: flex; flex-direction: column; justify-content: space-between;
+  align-items: center; overflow: hidden;
+}
+.suite-rail .main, .suite-rail .others { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.suite-rail .others { padding-bottom: 8px; }
+
+/* Brand (Home) */
+.suite-brand {
+  width: 100%; padding: 8px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: transparent; border: 0; cursor: pointer;
+}
+.suite-brand img { width: 48px; height: 48px; display: block; }
+.suite-brand .lbl { font-family: var(--suite-font); font-size: 14px; line-height: 24px; color: var(--suite-ink); }
+
+.suite-brand { text-decoration: none; }
+.suite-navbtn { text-decoration: none; }
+.suite-navbtn .lbl { text-decoration: none; }
+
+/* Product / utility nav button (80×88; 48px circle + label) */
+.suite-navbtn {
+  width: 80px; height: 88px; box-sizing: border-box;
+  padding: 8px 0; border: 0; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.suite-navbtn.util { height: 48px; padding: 0; justify-content: center; }
+.suite-navbtn.util .lbl { display: none; } /* utility icons are compact — no text label */
+.suite-navbtn .circle {
+  width: 48px; height: 48px; border-radius: 999px;
+  display: grid; place-items: center;
+  color: var(--suite-ink); position: relative;
+  transition: background-color 120ms, color 120ms;
+}
+.suite-navbtn .circle .material-symbols-outlined { font-size: 24px; }
+/* Custom product nav glyphs — exact SVGs from the Suite Figma, tinted via mask */
+.suite-navbtn .circle .nav-svg {
+  width: 24px; height: 24px; display: inline-block;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: 24px 24px; mask-size: 24px 24px;
+}
+.suite-navbtn .lbl {
+  font-family: var(--suite-font); font-size: 14px; line-height: 24px;
+  color: var(--suite-ink); text-align: center;
+}
+/* unread hint dot */
+.suite-navbtn .hint {
+  position: absolute; right: 2px; top: 2px;
+  width: 8px; height: 8px; border-radius: 999px;
+  background: var(--bento-theme-color-icon-info);
+  box-shadow: 0 0 0 2px var(--suite-surface);
+}
+
+/* Unselected hover/pressed */
+.suite-navbtn:hover .circle { background: var(--suite-nav-hover-wash); color: var(--bento-suite-nav-glyph-hover); }
+.suite-navbtn:active .circle { color: var(--bento-suite-nav-glyph-pressed); }
+
+/* Selected — per-product accent. Set .is-selected + data-product on the button.
+   Keys verified against HS-Bento-master /navigation (real app names). Accent
+   tokens are reused from the original product palette; Create + Analytics use
+   the navy primary fill. */
+.suite-navbtn.is-selected .circle .material-symbols-outlined { font-variation-settings: "FILL" 1; }
+.suite-navbtn.is-selected[data-product="perch"]      .circle { background: var(--suite-perch-fill);      color: var(--suite-perch-icon); }
+.suite-navbtn.is-selected[data-product="nest"]       .circle { background: var(--suite-nest-fill);       color: var(--suite-nest-icon); }
+.suite-navbtn.is-selected[data-product="lumen"]      .circle { background: var(--suite-lumen-fill);      color: var(--suite-lumen-icon); }
+.suite-navbtn.is-selected[data-product="parliament"] .circle { background: var(--suite-parliament-fill); color: var(--suite-parliament-icon); }
+.suite-navbtn.is-selected[data-product="wisdom"]     .circle { background: var(--suite-wisdom-fill);     color: var(--suite-wisdom-icon); }
+.suite-navbtn.is-selected[data-product="vigil"]      .circle { background: var(--suite-vigil-fill);      color: var(--suite-vigil-icon); }
+
+.suite-navbtn.is-selected[data-product="perch"]:hover      .circle { background: var(--bento-suite-perch-fill-hover); }
+.suite-navbtn.is-selected[data-product="nest"]:hover       .circle { background: var(--bento-suite-nest-fill-hover); }
+.suite-navbtn.is-selected[data-product="lumen"]:hover      .circle { background: var(--bento-suite-lumen-fill-hover); }
+.suite-navbtn.is-selected[data-product="parliament"]:hover .circle { background: var(--bento-suite-parliament-fill-hover); }
+.suite-navbtn.is-selected[data-product="wisdom"]:hover     .circle { background: var(--bento-suite-wisdom-fill-hover); }
+.suite-navbtn.is-selected[data-product="vigil"]:hover      .circle { background: var(--bento-suite-vigil-fill-hover); }
+
+/* Profile avatar in the bottom group */
+.suite-rail .avatar {
+  width: 32px; height: 32px; border-radius: 999px; margin: 4px 0 8px;
+  display: grid; place-items: center;
+  font-family: var(--suite-font); font-weight: 600; font-size: 12px;
+  background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg);
+}
+
+/* ── Product drawer (304px sub-nav) ──────────────────────────────── */
+.suite-drawer {
+  background: var(--suite-surface);
+  border-right: 1px solid var(--suite-border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.suite-drawer .dh {
+  height: 64px; padding: 0 20px; display: flex; align-items: center;
+  border-bottom: 1px solid var(--suite-border);
+  font-family: var(--suite-font); font-weight: 700; font-size: 22px; color: var(--suite-ink);
+}
+.suite-drawer .dgroup {
+  padding: 14px 20px 4px; font-family: var(--suite-font); font-weight: 700;
+  font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--bento-theme-color-text-subtle);
+}
+.suite-drawer .ditem {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; cursor: pointer;
+  font-family: var(--suite-font); font-size: 16px; color: var(--suite-ink);
+}
+.suite-drawer .ditem:hover { background: var(--bento-component-list-item-fill-hovered); }
+.suite-drawer .ditem.is-selected { background: var(--bento-component-list-item-fill-selected); font-weight: 600; }
+.suite-drawer .ditem .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+
+/* ── Product column ──────────────────────────────────────────────── */
+.suite-main { display: flex; flex-direction: column; min-width: 0; background: var(--suite-page); }
+.suite-topbar {
+  height: 64px; background: var(--suite-surface); border-bottom: 1px solid var(--suite-border);
+  display: flex; align-items: center; gap: 20px; padding: 12px 24px; flex-shrink: 0;
+}
+.suite-topbar h1 { font-family: var(--suite-font); font-weight: 700; font-size: 26px; line-height: 32px; color: var(--suite-ink); margin: 0; }
+.suite-topbar .spacer { flex: 1; }
+
+/* ── Global a11y: visible focus ring (Bento rule 3 — true-blue #0065FF) ── */
+.suite-app a:focus-visible,
+.suite-app button:focus-visible,
+.suite-app input:focus-visible,
+.suite-app textarea:focus-visible,
+.suite-app [tabindex]:focus-visible {
+  outline: 2px solid var(--bento-theme-color-border-focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.suite-app :focus:not(:focus-visible) { outline: none; }
+
+/* ── Icon-button hover/focus tooltip (CLAUDE rule 5 — mandatory on icon buttons) ── */
+.ne-tooltipbtn { position: relative; }
+.ne-tooltipbtn::after {
+  content: attr(aria-label);
+  position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  padding: 4px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none;
+  background: var(--bento-theme-color-bg-inverse, #1C1C1C); color: #fff;
+  font-family: var(--bento-theme-font-families-primary); font-weight: 600; font-size: 12px; line-height: 16px;
+  opacity: 0; transition: opacity .12s ease .25s; z-index: 60;
+}
+.ne-tooltipbtn:hover::after,
+.ne-tooltipbtn:focus-visible::after { opacity: 1; }
+
+/* ── Demo-state switcher (shared, review aid — not product chrome) ──── */
+.suite-demo { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 70;
+              display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 999px;
+              background: var(--bento-theme-color-text-base); box-shadow: 0 8px 28px rgba(0,0,0,0.28); }
+.suite-demo .lab { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.55); padding: 0 8px 0 10px; }
+.suite-demo button { appearance: none; border: 0; cursor: pointer; font-family: var(--suite-font); font-size: 13px; font-weight: 600;
+                     padding: 7px 13px; border-radius: 999px; background: transparent; color: rgba(255,255,255,0.8); }
+.suite-demo button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.suite-demo button.on { background: #fff; color: var(--bento-theme-color-text-base); }
+.suite-demo button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+
+/* ── Shared state surfaces: empty / error / loading ────────────────── */
+.suite-state { flex: 1; min-height: 0; display: grid; place-items: center; padding: 48px; }
+.suite-state-inner { max-width: 460px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.suite-state .ico { width: 88px; height: 88px; border-radius: 999px; display: grid; place-items: center; margin-bottom: 12px; }
+.suite-state .ico .material-symbols-outlined { font-size: 44px; }
+.suite-state.empty .ico { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-subtle); }
+/* error uses amber (warning), never red — per Bento "no red" rule */
+.suite-state.error .ico { background: var(--bento-system-sys-warning-100); color: var(--bento-system-sys-warning-700); }
+.suite-state h2 { font-family: var(--suite-font); font-weight: 700; font-size: 22px; margin: 0; color: var(--bento-theme-color-text-base); }
+.suite-state p { font-family: var(--suite-font); color: var(--bento-theme-color-text-subtle); font-size: 15px; line-height: 1.5; margin: 0 0 8px; }
+.suite-state .acts { display: flex; gap: 10px; margin-top: 8px; }
+
+/* Loading skeleton shimmer */
+@keyframes suite-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+.suite-sk { background: var(--bento-system-sys-neutral-alt-100); border-radius: 6px;
+            background-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            background-size: 400px 100%; background-repeat: no-repeat; animation: suite-shimmer 1.3s infinite; }
+@media (prefers-reduced-motion: reduce) { .suite-sk { animation: none; } }
+
+/* ── Rail "More" overflow popover (holds non-master apps: Ads, Explore,
+   Governance, Hootbio — flagged as not-yet-in-master-nav) ──────────── */
+.suite-more-menu {
+  position: absolute; left: calc(100% + 8px); bottom: 0; z-index: 80;
+  min-width: 200px; background: var(--bento-theme-color-bg-surface);
+  border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.18); padding: 6px;
+}
+.suite-more-item {
+  display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px;
+  border-radius: 8px; cursor: pointer; text-decoration: none;
+  font-family: var(--suite-font); font-weight: 600; font-size: 15px;
+  color: var(--bento-theme-color-text-base);
+}
+.suite-more-item:hover { background: var(--bento-component-list-item-fill-hovered, var(--bento-system-sys-neutral-alt-50)); }
+.suite-more-item.on { background: var(--bento-component-list-item-fill-selected, var(--bento-system-sys-neutral-alt-100)); }
+.suite-more-item .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }

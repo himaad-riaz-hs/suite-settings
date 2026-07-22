@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile: Suite Settings</title>
+  <link rel="stylesheet" href="bento/colors_and_type.css">
+  <link rel="stylesheet" href="bento/components.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="suite-app">
+
+  <!-- Global product rail -->
+  <aside class="suite-rail">
+    <div class="main">
+      <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+      <a class="suite-navbtn" data-product="perch" href="#"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+      <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">forum</span></span><span class="lbl">Nest</span></a>
+      <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
+      <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">hearing</span></span><span class="lbl">Lumen</span></a>
+      <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+      <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">shield</span></span><span class="lbl">Vigil</span></a>
+    </div>
+    <div class="others">
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
+      <div class="avatar" title="Melanie Torres">MT</div>
+    </div>
+  </aside>
+
+  <!-- Settings sub-nav drawer -->
+  <aside class="suite-drawer">
+    <div class="sd-head">Settings
+      <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+    </div>
+    <nav class="sd-body" aria-label="Settings">
+      <div class="sd-group">Account</div>
+      <a class="sd-item on" href="profile.html" aria-current="page"><span class="material-symbols-outlined">person</span>Profile</a>
+      <a class="sd-item" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
+      <a class="sd-item" href="security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy</a>
+      <a class="sd-item" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+      <a class="sd-item" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan &amp; billing</a>
+      <div class="sd-group">Organization</div>
+      <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
+      <a class="sd-item" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
+      <a class="sd-item" href="teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
+      <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
+      <div class="sd-group">Publishing</div>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">sell</span>Tags</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Vanity URLs</a>
+    </nav>
+  </aside>
+
+  <!-- Content -->
+  <main class="suite-main">
+    <header class="suite-topbar">
+      <h1>Profile</h1>
+      <div class="spacer"></div>
+      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
+    </header>
+
+    <div class="content">
+      <div class="inner">
+        <p class="subhead">Your name and personal details. Every change confirms, nothing saves silently.</p>
+
+        <div class="banner">
+          <span class="material-symbols-outlined">info</span>
+          <p>Looking for time zone and language? They moved to <a href="preferences.html">Preferences</a>. Password and sign-in are in <a href="security.html">Security &amp; privacy</a>. One tap away, no dead ends.</p>
+        </div>
+
+        <section class="card">
+          <h2 class="card-title">User information</h2>
+          <div class="row first">
+            <div class="avatar-lg"><span class="material-symbols-outlined">person</span></div>
+            <div class="kv"><div class="k">Profile photo</div><div class="v">JPG or PNG, we crop it square for you.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">photo_camera</span>Change photo</button></div>
+          </div>
+          <div class="row">
+            <div class="kv"><div class="k">Name</div><div class="v">Melanie Torres, the name teammates see across Hootsuite.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined">Edit name</button></div>
+          </div>
+          <div class="row">
+            <div class="kv"><div class="k">Email</div><div class="v">melanie@somos.co, used for sign-in and account notifications.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined">Change email</button></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Danger zone</h2>
+          <div class="row first">
+            <div class="kv"><div class="k">Delete my account</div><div class="v">Blocked while you own social accounts or the org.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined">Delete account</button></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

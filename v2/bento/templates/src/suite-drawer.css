@@ -1,0 +1,54 @@
+/* Suite product drawer (304px) — reusable across products (Perch, Nest, …).
+   social-os-reboot.fig product sub-nav. Bento-backed. Mount <SuiteDrawer>. */
+
+.suite-drawer {
+  width: 304px; flex-shrink: 0;
+  background: var(--bento-theme-color-bg-surface);
+  border-right: 1px solid var(--bento-theme-color-border-subtle);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.suite-drawer .sd-head {
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px 0 24px; flex-shrink: 0;
+  font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 26px; line-height: 32px;
+  color: var(--bento-theme-color-text-base);
+}
+.suite-drawer .sd-collapse { width: 32px; height: 32px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.suite-drawer .sd-collapse:hover { background: rgba(28,28,28,0.06); }
+.suite-drawer .sd-collapse .material-symbols-outlined { font-size: 18px; }
+
+.suite-drawer .sd-body { flex: 1; overflow: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; }
+
+/* Optional compose split button (Perch). */
+.sd-compose { display: flex; gap: 1px; margin: 4px 4px 8px; }
+.sd-compose .main {
+  height: 40px; padding: 0 16px; border: 0; cursor: pointer; text-decoration: none;
+  background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base);
+  border-radius: 8px 0 0 8px; font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.sd-compose .main:hover { background: var(--bento-system-sys-neutral-alt-300); }
+.sd-compose .chev {
+  width: 40px; height: 40px; border: 0; cursor: pointer;
+  background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base);
+  border-radius: 0 8px 8px 0; display: grid; place-items: center;
+}
+.sd-compose .chev:hover { background: var(--bento-system-sys-neutral-alt-300); }
+.sd-compose .main .material-symbols-outlined { font-size: 20px; }
+.sd-compose .chev .material-symbols-outlined { font-size: 18px; }
+
+.sd-group {
+  padding: 18px 12px 6px; font-family: var(--bento-theme-font-families-primary);
+  font-weight: 600; font-size: 14px; line-height: 20px; color: var(--bento-theme-color-text-subtle);
+}
+.sd-item {
+  display: flex; align-items: center; gap: 14px; height: 48px; padding: 0 12px;
+  border-radius: 8px; cursor: pointer; text-decoration: none;
+  font-family: var(--bento-theme-font-families-primary); font-weight: 400; font-size: 16px;
+  color: var(--bento-theme-color-text-base);
+}
+.sd-item:hover { background: var(--bento-component-list-item-fill-hovered); }
+.sd-item.on { background: var(--bento-component-list-item-fill-selected); font-weight: 600; }
+.sd-item .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+.sd-item.on .material-symbols-outlined { font-variation-settings: "FILL" 1; }
+.sd-item .sd-badge { margin-left: auto; font-size: 14px; font-weight: 400; color: var(--bento-theme-color-text-subtle); }

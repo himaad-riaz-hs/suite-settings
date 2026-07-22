@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Growth Team: Suite Settings</title>
+  <link rel="stylesheet" href="bento/colors_and_type.css">
+  <link rel="stylesheet" href="bento/components.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="suite-app">
+<aside class="suite-rail">
+  <div class="main">
+    <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+    <a class="suite-navbtn" data-product="perch" href="#"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+    <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">forum</span></span><span class="lbl">Nest</span></a>
+    <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
+    <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">hearing</span></span><span class="lbl">Lumen</span></a>
+    <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+    <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">shield</span></span><span class="lbl">Vigil</span></a>
+  </div>
+  <div class="others">
+    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
+    <div class="avatar" title="Melanie Torres">MT</div>
+  </div>
+</aside>
+  <aside class="suite-drawer">
+    <div class="sd-head">Settings
+      <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+    </div>
+    <nav class="sd-body" aria-label="Settings">
+      <div class="sd-group">Account</div>
+      <a class="sd-item" href="profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
+      <a class="sd-item" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
+      <a class="sd-item" href="security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy</a>
+      <a class="sd-item" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+      <a class="sd-item" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan &amp; billing</a>
+      <div class="sd-group">Organization</div>
+      <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
+      <a class="sd-item" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
+      <a class="sd-item on" href="teams.html" aria-current="page"><span class="material-symbols-outlined">groups</span>Teams</a>
+      <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
+      <div class="sd-group">Publishing</div>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">sell</span>Tags</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Vanity URLs</a>
+    </nav>
+  </aside>
+  <main class="suite-main">
+    <header class="suite-topbar">
+      <button class="backbtn" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></button>
+      <h1>Growth Team</h1>
+      <div class="spacer"></div>
+      <button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
+      <button class="hs-btn hs-btn--outlined">Add members</button>
+      <button class="hs-btn hs-btn--primary">Assign social account</button>
+    </header>
+
+    <div class="pagebar">
+      <nav class="tabs" aria-label="Team sections">
+        <a class="on" href="#" aria-current="page">Members</a>
+        <a href="#">Social accounts</a>
+      </nav>
+      <div class="grow"></div>
+      <div class="searchbox">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Search members" aria-label="Search members">
+      </div>
+      <button class="sel"><span>Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+      <button class="sel"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+    </div>
+
+    <div class="content">
+      <div class="inner wide">
+        <div class="count-h">
+          <h2>12 members in Growth Team</h2>
+          <div class="meta">3 admins &#183; 9 editors</div>
+        </div>
+
+        <div class="table-card">
+          <table class="hs-table">
+          <thead>
+            <tr>
+              <th style="width:48px"><span class="hs-check indeterminate"></span></th>
+              <th>Member</th>
+              <th>Role</th>
+              <th>Added on</th>
+              <th>Social accounts</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">MT</span><span>Melanie Torres</span></div></td>
+              <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Jan 12, 2026</td>
+              <td>8</td>
+              <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">DR</span><span>Diego Ramos</span></div></td>
+              <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Jan 18, 2026</td>
+              <td>6</td>
+              <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">PK</span><span>Priya Khanna</span></div></td>
+              <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Feb 03, 2026</td>
+              <td>5</td>
+              <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">SN</span><span>Samuel Njoroge</span></div></td>
+              <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Feb 22, 2026</td>
+              <td>3</td>
+              <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">LC</span><span>Lucia Costa</span></div></td>
+              <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Mar 09, 2026</td>
+              <td>4</td>
+              <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">TW</span><span>Thomas Wren</span></div></td>
+              <td><button class="sel"><span>Viewer</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Mar 27, 2026</td>
+              <td>0</td>
+              <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+            <tr>
+              <td><span class="hs-check"></span></td>
+              <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">AO</span><span>Amara Okafor</span></div></td>
+              <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td class="hs-small">Jul 14, 2026</td>
+              <td>0</td>
+              <td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td>
+              <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+            </tr>
+          </tbody>
+          </table>
+          <div class="pagination">
+            <button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button>
+            <div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div>
+            <span class="hs-small">of 12</span>
+            <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

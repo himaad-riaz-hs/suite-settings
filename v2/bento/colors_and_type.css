@@ -1,0 +1,197 @@
+/* ──────────────────────────────────────────────────────────────────
+   Bento — Hootsuite design system
+   ─────────────────────────────────────────────────────────────────
+   This file is a thin ALIAS LAYER on top of the Figma-derived
+   --bento-* tokens shipped in tokens/colors.css, tokens/typography.css,
+   tokens/layout.css. Bento tokens are the single source of truth;
+   --hs-* names below are convenience aliases for older preview cards
+   and quick reads in the asset pane.
+
+   Anything you build inside this project should use Bento tokens
+   directly (--bento-theme-color-bg-primary, var(--bento-space-04), the
+   .bento-text-* classes from typography.css). If you reach for a value
+   that isn't here, add a token — never hard-code a hex.
+   ────────────────────────────────────────────────────────────────── */
+
+@import url("./fonts/fonts.css");
+@import url("./tokens/colors.css");
+@import url("./tokens/typography.css");
+@import url("./tokens/layout.css");
+
+:root {
+  /* ── Surfaces ─────────────────────────────────────────────────── */
+  --hs-surface:         var(--bento-theme-color-bg-surface);             /* #FDFDFD */
+  --hs-surface-subtle:  var(--bento-theme-color-bg-surface-hovered);     /* #F7F8F9 */
+  --hs-surface-muted:   var(--bento-theme-color-bg-app);                 /* #FDFDFD */
+  --hs-surface-strong:  var(--bento-system-sys-neutral-alt-300);         /* #EEF1F2 */
+  --hs-surface-inverse: var(--bento-system-sys-primary-500);             /* #012B3A */
+  --hs-surface-white:   var(--bento-palette-ref-palette-white);
+
+  /* ── Borders ──────────────────────────────────────────────────── */
+  --hs-border:          var(--bento-theme-color-border-subtle);          /* #EBEBEB */
+  --hs-border-strong:   var(--bento-theme-color-border-btn-outlined);    /* #1C1C1C — outlined-button stroke */
+  --hs-border-subtle:   var(--bento-system-sys-neutral-50);              /* #EBEBEB */
+  --hs-border-input:    var(--bento-system-sys-neutral-300);             /* #767676 — Figma input/textarea border */
+  --hs-border-focus:    var(--bento-theme-color-border-focus);           /* #0065FF — true blue focus ring */
+  --hs-focus-halo:      color-mix(in srgb, var(--bento-theme-color-border-focus) 20%, transparent);
+
+  /* ── Text / foreground ────────────────────────────────────────── */
+  --hs-fg:              var(--bento-theme-color-text-base);              /* #1C1C1C */
+  --hs-fg-secondary:    var(--bento-system-sys-neutral-400);             /* #5C5C5C */
+  --hs-fg-disabled:     var(--bento-theme-color-text-disabled);          /* #5C5C5C */
+  --hs-fg-inverse:      var(--bento-theme-color-text-inverse);
+  --hs-fg-link:         var(--bento-theme-color-text-link);              /* #1F60C9 */
+  --hs-fg-info:         var(--bento-theme-color-text-link);
+  --hs-fg-positive:     var(--bento-theme-color-text-positive);          /* #01781B */
+  --hs-fg-negative:     var(--bento-theme-color-text-negative);          /* #C00803 */
+  --hs-fg-warning:      var(--bento-palette-ref-palette-yellow-900);     /* #6B4B15 */
+  --hs-fg-discovery:    var(--bento-system-sys-discovery-500);           /* #7356BF */
+
+  /* ── Action / interactive ─────────────────────────────────────── */
+  --hs-action-primary:           var(--bento-theme-color-bg-primary);            /* #012B3A */
+  --hs-action-primary-hover:     var(--bento-theme-color-bg-primary-hovered);    /* #55717B */
+  --hs-action-primary-pressed:   var(--bento-theme-color-bg-primary-pressed);    /* #345561 */
+  --hs-action-secondary:         var(--bento-system-sys-neutral-alt-300);        /* #EEF1F2 */
+  --hs-action-secondary-hover:   var(--bento-system-sys-neutral-alt-400);        /* #EBEEEF */
+  --hs-action-secondary-pressed: var(--bento-system-sys-neutral-alt-500);        /* #E6EAEB */
+  --hs-action-disabled:          var(--bento-palette-ref-palette-grey-100);      /* #F7F8F9 */
+
+  /* ── Brand ────────────────────────────────────────────────────── */
+  --hs-brand-saffron: var(--bento-theme-color-brand-decorative-1); /* Owly coral */
+  --hs-brand-deep:    var(--bento-system-sys-primary-500);
+
+  /* ── Semantic surfaces ────────────────────────────────────────── */
+  --hs-bg-neutral:   var(--bento-palette-ref-palette-grey-300);      /* #EEF1F2 */
+  --hs-on-neutral:   var(--bento-theme-color-text-base);
+  --hs-bg-info:      var(--bento-theme-color-bg-info);               /* #E9F0FC */
+  --hs-bg-positive:  var(--bento-theme-color-bg-positive);           /* #E6F3E9 */
+  --hs-bg-negative:  var(--bento-palette-ref-palette-red-50);        /* #FBE6E6 */
+  --hs-bg-warning:   var(--bento-palette-ref-palette-yellow-100);    /* #FFE7C0 */
+  --hs-bg-discovery: var(--bento-theme-color-bg-discovery);          /* #F1EEF9 */
+
+  /* Hover overlay applied on top of interactive badges. */
+  --hs-overlay-hover: var(--bento-component-overlay-button-filled-fill);
+
+  /* ── Categorical (chart, network, tags) — solid hues ──────────── */
+  --hs-cat-1:  #658CF1; --hs-cat-2:  #3FC8CD; --hs-cat-3:  #5859AA;
+  --hs-cat-4:  #FDC86F; --hs-cat-5:  #E97A99; --hs-cat-6:  #85D4F3;
+  --hs-cat-7:  #9258B3; --hs-cat-8:  #FE9F6C; --hs-cat-9:  #31A19C;
+  --hs-cat-10: #DE93C3;
+
+  /* Tinted pairings — avatars, calendar event-chips, tag pills. */
+  --hs-cat-1-bg:  var(--bento-global-categorical-color-1-fill);  --hs-cat-1-fg:  var(--bento-global-categorical-color-1-text);
+  --hs-cat-2-bg:  var(--bento-global-categorical-color-2-fill);  --hs-cat-2-fg:  var(--bento-global-categorical-color-2-text);
+  --hs-cat-3-bg:  var(--bento-global-categorical-color-3-fill);  --hs-cat-3-fg:  var(--bento-global-categorical-color-3-text);
+  --hs-cat-4-bg:  var(--bento-global-categorical-color-4-fill);  --hs-cat-4-fg:  var(--bento-global-categorical-color-4-text);
+  --hs-cat-5-bg:  var(--bento-global-categorical-color-5-fill);  --hs-cat-5-fg:  var(--bento-global-categorical-color-5-text);
+  --hs-cat-6-bg:  var(--bento-global-categorical-color-6-fill);  --hs-cat-6-fg:  var(--bento-global-categorical-color-6-text);
+  --hs-cat-7-bg:  var(--bento-global-categorical-color-7-fill);  --hs-cat-7-fg:  var(--bento-global-categorical-color-7-text);
+  --hs-cat-8-bg:  var(--bento-global-categorical-color-8-fill);  --hs-cat-8-fg:  var(--bento-global-categorical-color-8-text);
+  --hs-cat-9-bg:  var(--bento-global-categorical-color-9-fill);  --hs-cat-9-fg:  var(--bento-global-categorical-color-9-text);
+  --hs-cat-10-bg: var(--bento-global-categorical-color-10-fill); --hs-cat-10-fg: var(--bento-global-categorical-color-10-text);
+
+  /* ── Suite shell nav accents (alias) ──────────────────────────── */
+  --suite-perch-fill: var(--bento-suite-perch-fill);           --suite-perch-icon: var(--bento-suite-perch-icon);
+  --suite-nest-fill: var(--bento-suite-nest-fill);             --suite-nest-icon: var(--bento-suite-nest-icon);
+  --suite-lumen-fill: var(--bento-suite-lumen-fill);           --suite-lumen-icon: var(--bento-suite-lumen-icon);
+  --suite-parliament-fill: var(--bento-suite-parliament-fill); --suite-parliament-icon: var(--bento-suite-parliament-icon);
+  --suite-wisdom-fill: var(--bento-suite-wisdom-fill);         --suite-wisdom-icon: var(--bento-suite-wisdom-icon);
+  --suite-vigil-fill: var(--bento-suite-vigil-fill);           --suite-vigil-icon: var(--bento-suite-vigil-icon);
+  --suite-settings-fill: var(--bento-suite-settings-fill);     --suite-settings-icon: var(--bento-suite-settings-icon);
+  --suite-nav-hover-wash: var(--bento-suite-nav-hover-wash);
+
+  /* ── Radii (alias to Bento) ───────────────────────────────────── */
+  --hs-radii-none: var(--bento-theme-border-radii-none);
+  --hs-radii-xs:   var(--bento-theme-border-radii-01);   /*  2px */
+  --hs-radii-sm:   var(--bento-theme-border-radii-01);
+  --hs-radii-md:   var(--bento-theme-border-radii-03);   /*  8px (small button, chip) */
+  --hs-radii-lg:   var(--bento-theme-border-radii-03);   /*  8px (card, button, input) */
+  --hs-radii-xl:   var(--bento-theme-border-radii-02);   /* 16px (large card / modal) */
+  --hs-radii-full: 999px;
+
+  /* ── Elevation ────────────────────────────────────────────────── */
+  --hs-elev-raised:        var(--bento-theme-elevation-shadow-raised);
+  --hs-elev-overlay-top:   var(--bento-theme-elevation-shadow-overlay-top);
+  --hs-elev-overlay-bot:   var(--bento-theme-elevation-shadow-overlay-bottom);
+  --hs-elev-overflow-top:  var(--bento-theme-elevation-shadow-overflow-top);
+  --hs-elev-overflow-bot:  var(--bento-theme-elevation-shadow-overflow-bottom);
+  --hs-elev-card:          var(--bento-theme-elevation-shadow-overlay-bottom);
+  --hs-elev-side:          var(--bento-theme-elevation-shadow-drawer-from-left);
+
+  /* ── Spacing (alias to Bento) ─────────────────────────────────── */
+  --hs-sp-0:  0;
+  --hs-sp-1:  var(--bento-space-01);   /*  4px */
+  --hs-sp-2:  var(--bento-space-02);   /*  8px */
+  --hs-sp-3:  var(--bento-space-03);   /* 12px */
+  --hs-sp-4:  var(--bento-space-04);   /* 16px */
+  --hs-sp-5:  var(--bento-space-05);   /* 24px */
+  --hs-sp-6:  var(--bento-space-06);   /* 32px */
+  --hs-sp-8:  var(--bento-space-08);   /* 48px */
+  --hs-sp-10: var(--bento-space-10);   /* 64px */
+  --hs-sp-12: 80px;
+  --hs-sp-14: 96px;
+  --hs-sp-16: 112px;
+
+  /* ── Typography pairings (alias to Bento sizes) ───────────────── */
+  --hs-font-body:    var(--bento-theme-font-families-primary);
+  --hs-font-display: var(--bento-theme-font-families-secondary);
+
+  --hs-type-display-1:  var(--bento-theme-font-weights-semibold) var(--bento-theme-font-size-8)/var(--bento-theme-line-heights-8) var(--hs-font-display); /* 56/76 — Figma display line-height (node 4490:40960); was raw 72px */
+  --hs-type-display-2:  var(--bento-theme-font-weights-semibold) var(--bento-theme-font-size-7)/var(--bento-theme-line-heights-7) var(--hs-font-display); /* 44/60; was raw 64px */
+  --hs-type-display-3:  var(--bento-theme-font-weights-semibold) var(--bento-theme-font-size-6)/var(--bento-theme-line-heights-6) var(--hs-font-display); /* 36/48 */
+
+  --hs-type-title-hero:    var(--bento-theme-font-weights-semibold) 96px/96px var(--hs-font-body);
+  --hs-type-title-screen:  var(--bento-theme-font-weights-semibold) 30px/40px var(--hs-font-body);
+  --hs-type-title-section: var(--bento-theme-font-weights-semibold) 26px/32px var(--hs-font-body);
+  --hs-type-title-sub:     var(--bento-theme-font-weights-semibold) 22px/32px var(--hs-font-body);
+  --hs-type-title-base:    var(--bento-theme-font-weights-semibold) 18px/24px var(--hs-font-body);
+
+  --hs-type-body-md:    var(--bento-theme-font-weights-regular)   var(--bento-theme-font-size-2)/var(--bento-theme-line-heights-2) var(--hs-font-body);
+  --hs-type-body-md-b:  var(--bento-theme-font-weights-semibold)  var(--bento-theme-font-size-2)/var(--bento-theme-line-heights-2) var(--hs-font-body);
+  --hs-type-body-sm:    var(--bento-theme-font-weights-regular)   var(--bento-theme-font-size-1)/var(--bento-theme-line-heights-2) var(--hs-font-body);
+  --hs-type-body-sm-b:  var(--bento-theme-font-weights-semibold)  var(--bento-theme-font-size-1)/var(--bento-theme-line-heights-2) var(--hs-font-body);
+  --hs-type-button:     var(--bento-theme-font-weights-bold)      var(--bento-theme-font-size-1)/var(--bento-theme-line-heights-2) var(--hs-font-body); /* bold 700, matches tokens/typography.css .bento-text-button */
+  --hs-type-meta:       var(--bento-theme-font-weights-regular)   12px/16px var(--hs-font-body);
+  --hs-type-meta-b:     var(--bento-theme-font-weights-semibold)  12px/16px var(--hs-font-body);
+}
+
+/* ── Semantic element styles ────────────────────────────────────── */
+body {
+  font: var(--hs-type-body-md);
+  color: var(--hs-fg);
+  background: var(--hs-surface);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .hs-h1 { font: var(--hs-type-title-screen);  color: var(--hs-fg); margin: 0; }
+h2, .hs-h2 { font: var(--hs-type-title-section); color: var(--hs-fg); margin: 0; }
+h3, .hs-h3 { font: var(--hs-type-title-sub);     color: var(--hs-fg); margin: 0; }
+h4, .hs-h4 { font: var(--hs-type-title-base);    color: var(--hs-fg); margin: 0; }
+
+.hs-display-1 { font: var(--hs-type-display-1); }
+.hs-display-2 { font: var(--hs-type-display-2); }
+.hs-display-3 { font: var(--hs-type-display-3); }
+
+.hs-hero-metric { font: var(--hs-type-title-hero); letter-spacing: -0.02em; }
+
+p, .hs-p           { font: var(--hs-type-body-md);   color: var(--hs-fg); margin: 0; }
+.hs-p-strong       { font: var(--hs-type-body-md-b); color: var(--hs-fg); }
+small, .hs-small   { font: var(--hs-type-body-sm);   color: var(--hs-fg-secondary); }
+.hs-meta           { font: var(--hs-type-meta);      color: var(--hs-fg-secondary); }
+
+a, .hs-link {
+  color: var(--hs-fg-link);
+  text-decoration: underline;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+  text-decoration-thickness: auto;
+  text-decoration-skip-ink: none;
+  font-weight: var(--bento-theme-font-weights-semibold);
+}
+a:hover { text-decoration-thickness: 2px; }
+
+code, .hs-mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+}

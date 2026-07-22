@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teams: Suite Settings</title>
+  <link rel="stylesheet" href="bento/colors_and_type.css">
+  <link rel="stylesheet" href="bento/components.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="suite-app">
+<aside class="suite-rail">
+  <div class="main">
+    <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+    <a class="suite-navbtn" data-product="perch" href="#"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+    <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">forum</span></span><span class="lbl">Nest</span></a>
+    <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
+    <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">hearing</span></span><span class="lbl">Lumen</span></a>
+    <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+    <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">shield</span></span><span class="lbl">Vigil</span></a>
+  </div>
+  <div class="others">
+    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
+    <div class="avatar" title="Melanie Torres">MT</div>
+  </div>
+</aside>
+  <aside class="suite-drawer">
+    <div class="sd-head">Settings
+      <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+    </div>
+    <nav class="sd-body" aria-label="Settings">
+      <div class="sd-group">Account</div>
+      <a class="sd-item" href="profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
+      <a class="sd-item" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
+      <a class="sd-item" href="security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy</a>
+      <a class="sd-item" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+      <a class="sd-item" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan &amp; billing</a>
+      <div class="sd-group">Organization</div>
+      <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
+      <a class="sd-item" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
+      <a class="sd-item on" href="teams.html" aria-current="page"><span class="material-symbols-outlined">groups</span>Teams</a>
+      <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
+      <div class="sd-group">Publishing</div>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">sell</span>Tags</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Vanity URLs</a>
+    </nav>
+  </aside>
+  <main class="suite-main">
+    <header class="suite-topbar">
+      <h1>Teams</h1>
+      <div class="spacer"></div>
+      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
+      <button class="hs-btn hs-btn--outlined">Create organization</button>
+      <button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">add</span>Create team</button>
+    </header>
+
+    <div class="pagebar">
+      <div class="searchbox">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Search teams" aria-label="Search teams">
+      </div>
+      <div class="grow"></div>
+      <div class="viewseg" role="group" aria-label="View">
+  <button id="cardBtn" class="on" aria-pressed="true" onclick="setView('card')"><span class="material-symbols-outlined">grid_view</span>Cards</button>
+  <button id="colBtn" aria-pressed="false" onclick="setView('column')"><span class="material-symbols-outlined">view_list</span>Columns</button>
+</div>
+      <button class="sel"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+    </div>
+
+    <div class="content">
+      <div class="inner wide">
+        <div class="count-h">
+          <h2>6 teams in Somos</h2>
+          <div class="meta">2 with no accounts yet</div>
+        </div>
+
+        <div class="grid" id="gridView">
+          <section class="ecard">
+            <div class="top">
+              <div class="av"><span class="material-symbols-outlined">groups</span></div>
+              <div class="nm">
+                <div class="n"><a href="team-detail.html">Growth Team</a></div>
+                <div class="e">12 members &#183; 8 social accounts</div>
+              </div>
+              <button class="icon-btn ne-tooltipbtn" aria-label="Team options"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+            <div class="foot">
+              <span class="av-stack">
+                <span class="av">MT</span>
+                <span class="av">RK</span>
+                <span class="av">JP</span>
+              </span>
+              <span class="pill neutral"><span class="material-symbols-outlined">shield</span>Admin</span>
+            </div>
+          </section>
+
+          <section class="ecard">
+            <div class="top">
+              <div class="av"><span class="material-symbols-outlined">groups</span></div>
+              <div class="nm">
+                <div class="n"><a href="team-detail.html">Content Team</a></div>
+                <div class="e">9 members &#183; 6 social accounts</div>
+              </div>
+              <button class="icon-btn ne-tooltipbtn" aria-label="Team options"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+            <div class="foot">
+              <span class="av-stack">
+                <span class="av">AL</span>
+                <span class="av">DM</span>
+                <span class="av">SB</span>
+              </span>
+              <span class="pill neutral"><span class="material-symbols-outlined">edit</span>Editor</span>
+            </div>
+          </section>
+
+          <section class="ecard">
+            <div class="top">
+              <div class="av"><span class="material-symbols-outlined">groups</span></div>
+              <div class="nm">
+                <div class="n"><a href="team-detail.html">Support</a></div>
+                <div class="e">7 members &#183; 4 social accounts</div>
+              </div>
+              <button class="icon-btn ne-tooltipbtn" aria-label="Team options"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+            <div class="foot">
+              <span class="av-stack">
+                <span class="av">NG</span>
+                <span class="av">TE</span>
+                <span class="av">HW</span>
+              </span>
+              <span class="pill neutral"><span class="material-symbols-outlined">edit</span>Editor</span>
+            </div>
+          </section>
+
+          <section class="ecard">
+            <div class="top">
+              <div class="av"><span class="material-symbols-outlined">groups</span></div>
+              <div class="nm">
+                <div class="n"><a href="team-detail.html">Paid Media</a></div>
+                <div class="e">5 members &#183; 3 social accounts</div>
+              </div>
+              <button class="icon-btn ne-tooltipbtn" aria-label="Team options"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+            <div class="foot">
+              <span class="av-stack">
+                <span class="av">CV</span>
+                <span class="av">FO</span>
+                <span class="av">LR</span>
+              </span>
+              <span class="pill neutral"><span class="material-symbols-outlined">edit</span>Editor</span>
+            </div>
+          </section>
+
+          <section class="ecard">
+            <div class="top">
+              <div class="av"><span class="material-symbols-outlined">groups</span></div>
+              <div class="nm">
+                <div class="n"><a href="team-detail.html">Comms</a></div>
+                <div class="e">4 members &#183; no accounts yet</div>
+              </div>
+              <button class="icon-btn ne-tooltipbtn" aria-label="Team options"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+            <div class="foot">
+              <span class="av-stack">
+                <span class="av">EM</span>
+                <span class="av">YK</span>
+                <span class="av">PN</span>
+              </span>
+              <span class="pill neutral"><span class="material-symbols-outlined">edit</span>Editor</span>
+            </div>
+          </section>
+
+          <section class="ecard">
+            <div class="top">
+              <div class="av"><span class="material-symbols-outlined">groups</span></div>
+              <div class="nm">
+                <div class="n"><a href="team-detail.html">Brand</a></div>
+                <div class="e">3 members &#183; no accounts yet</div>
+              </div>
+              <button class="icon-btn ne-tooltipbtn" aria-label="Team options"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+            <div class="foot">
+              <span class="av-stack">
+                <span class="av">GA</span>
+                <span class="av">ID</span>
+                <span class="av">BC</span>
+              </span>
+              <span class="pill neutral"><span class="material-symbols-outlined">edit</span>Editor</span>
+            </div>
+          </section>
+        </div>
+
+        <div id="tableView" hidden>
+          <div class="table-card">
+            <table class="hs-table">
+              <thead>
+                <tr>
+                  <th style="width:48px"><span class="hs-check indeterminate"></span></th>
+                  <th>Team name</th>
+                  <th>Members</th>
+                  <th>Social accounts</th>
+                  <th>Admins</th>
+                  <th>Permission</th>
+                  <th style="width:48px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="hs-check"></span></td>
+                  <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Growth Team</span></div></td>
+                  <td>12</td>
+                  <td>8</td>
+                  <td><span class="av-stack"><span class="av">MT</span><span class="av">RK</span><span class="av">JP</span></span></td>
+                  <td><span class="hs-badge hs-badge--neutral">Editor</span></td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="hs-check"></span></td>
+                  <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Content Team</span></div></td>
+                  <td>9</td>
+                  <td>6</td>
+                  <td><span class="av-stack"><span class="av">AL</span><span class="av">DM</span><span class="av">SB</span></span></td>
+                  <td><span class="hs-badge hs-badge--neutral">Editor</span></td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="hs-check"></span></td>
+                  <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Support</span></div></td>
+                  <td>7</td>
+                  <td>4</td>
+                  <td><span class="av-stack"><span class="av">NG</span><span class="av">TE</span><span class="av">HW</span></span></td>
+                  <td><span class="hs-badge hs-badge--neutral">Editor</span></td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="hs-check"></span></td>
+                  <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Paid Media</span></div></td>
+                  <td>5</td>
+                  <td>3</td>
+                  <td><span class="av-stack"><span class="av">CV</span><span class="av">FO</span><span class="av">LR</span></span></td>
+                  <td><span class="hs-badge hs-badge--neutral">Editor</span></td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="hs-check"></span></td>
+                  <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Comms</span></div></td>
+                  <td>4</td>
+                  <td><span class="hs-small">No accounts yet</span></td>
+                  <td><span class="av-stack"><span class="av">EM</span><span class="av">YK</span><span class="av">PN</span></span></td>
+                  <td><span class="hs-badge hs-badge--neutral">Editor</span></td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="hs-check"></span></td>
+                  <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Brand</span></div></td>
+                  <td>3</td>
+                  <td><span class="hs-small">No accounts yet</span></td>
+                  <td><span class="av-stack"><span class="av">GA</span><span class="av">ID</span><span class="av">BC</span></span></td>
+                  <td><span class="hs-badge hs-badge--neutral">Editor</span></td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button>
+              <div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div>
+              <span class="hs-small">of 6</span>
+              <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+<script>
+  function setView(v){
+    var g=document.getElementById('gridView'), t=document.getElementById('tableView');
+    var c=document.getElementById('cardBtn'), k=document.getElementById('colBtn');
+    if(g) g.hidden = v!=='card'; if(t) t.hidden = v!=='column';
+    if(c){ c.classList.toggle('on', v==='card'); c.setAttribute('aria-pressed', v==='card'); }
+    if(k){ k.classList.toggle('on', v==='column'); k.setAttribute('aria-pressed', v==='column'); }
+  }
+</script>
+</body>
+</html>
