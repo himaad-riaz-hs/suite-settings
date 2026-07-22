@@ -189,3 +189,78 @@ html, body { margin: 0; height: 100%; }
 
 /* wide content variant for list/table pages (roomier than the 860 account column) */
 .inner.wide { max-width: 1180px; }
+
+/* ============================================================
+   Interactive layer — permissions scoping + custom roles
+   (person-detail Permissions tab, Change role + Create role
+   modals, save confirmation). Tokens only; modal + menu markup
+   lifted from bento/patterns + bento/preview. No destructive red.
+   ============================================================ */
+
+/* role chip shown beside a person's name / in a roles list */
+.rolechip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 10px; border-radius: 999px;
+  background: var(--bento-system-sys-neutral-alt-100);
+  color: var(--hs-fg); font: var(--hs-type-meta-b); white-space: nowrap;
+}
+.rolechip .material-symbols-outlined { font-size: 16px; color: var(--bento-theme-color-icon-subtle); }
+
+/* modal + scrim (lifted from bento/patterns/confirmation-modal.html, de-reddened) */
+.scrim { position: fixed; inset: 0; background: var(--bento-theme-color-overlay-scrim); z-index: 40; }
+.modal {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 560px; max-width: 92vw; max-height: 88vh; display: flex; flex-direction: column;
+  background: var(--bento-theme-color-bg-surface);
+  border-radius: var(--bento-theme-border-radii-03);
+  box-shadow: var(--bento-theme-elevation-shadow-overlay-bottom);
+  z-index: 41;
+}
+.modal-head { display: flex; align-items: flex-start; gap: 12px; padding: 20px 20px 12px; }
+.modal-head .modal-title { font: var(--hs-type-title-base); color: var(--hs-fg); margin: 0; flex: 1; }
+.modal-head .modal-sub { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin: 4px 0 0; }
+.modal-body { padding: 4px 20px 12px; font: var(--hs-type-body-md); color: var(--hs-fg); overflow: auto; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--bento-theme-color-border-subtle); }
+
+/* selectable option row (Change role picker) — from preview/select.html .opt */
+.opt { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--hs-fg); }
+.opt:hover { background: var(--bento-component-list-item-fill-hovered, var(--bento-system-sys-neutral-alt-100)); }
+.opt.selected { background: var(--bento-component-list-item-fill-selected, var(--hs-bg-info)); }
+.opt .lead { width: 32px; height: 32px; border-radius: 999px; background: var(--bento-system-sys-neutral-alt-100); display: grid; place-items: center; color: var(--bento-theme-color-icon-subtle); flex-shrink: 0; }
+.opt .lead .material-symbols-outlined { font-size: 18px; }
+.opt .txt { flex: 1; min-width: 0; }
+.opt .txt .n { font: var(--hs-type-body-md-b); }
+.opt .txt .d { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+.opt .check { color: var(--bento-theme-color-icon-base); font-size: 20px; visibility: hidden; }
+.opt.selected .check { visibility: visible; }
+
+/* granular access editor (Permissions tab + Create role builder) */
+.perm-list { display: flex; flex-direction: column; }
+.perm-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--hs-border); }
+.perm-row:first-child { border-top: 0; }
+.perm-row .lead { width: 36px; height: 36px; border-radius: 8px; background: var(--bento-system-sys-neutral-alt-100); display: grid; place-items: center; color: var(--bento-theme-color-icon-subtle); flex-shrink: 0; }
+.perm-row .lead .material-symbols-outlined { font-size: 20px; }
+.perm-row .meta { flex: 1; min-width: 0; }
+.perm-row .meta .k { font: var(--hs-type-body-md-b); color: var(--hs-fg); }
+.perm-row .meta .d { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 1px; }
+
+/* access-level segmented control (No access / View only / Can manage) */
+.lvlseg { display: inline-flex; border: 1px solid var(--hs-border-input); border-radius: var(--hs-radii-md); overflow: hidden; flex-shrink: 0; }
+.lvlseg button { appearance: none; border: 0; background: transparent; cursor: pointer; height: 36px; padding: 0 12px; font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); white-space: nowrap; }
+.lvlseg button + button { border-left: 1px solid var(--hs-border-input); }
+.lvlseg button.on { background: var(--bento-system-sys-neutral-alt-100); color: var(--hs-fg); font-weight: var(--bento-theme-font-weights-semibold); }
+.lvlseg button:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; }
+
+/* toast confirmation (bottom-centre, positive) */
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(8px); z-index: 60;
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--hs-radii-md);
+  background: var(--hs-bg-positive); color: var(--hs-fg-positive); font: var(--hs-type-body-md-b);
+  box-shadow: var(--bento-theme-elevation-shadow-overlay-bottom); opacity: 0; pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast .material-symbols-outlined { font-size: 20px; }
+
+/* Permissions-tab helpers */
+.perm-intro { font: var(--hs-type-body-md); color: var(--bento-theme-color-text-subtle); margin: var(--bento-space-05) 0 var(--bento-space-04); }
+.perm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--bento-space-05); }
+.saved-note { margin: var(--bento-space-04) 0 0; }

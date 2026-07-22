@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jordan Lee: Suite Settings</title>
+  <title>Person: Suite Settings</title>
   <link rel="stylesheet" href="bento/colors_and_type.css">
   <link rel="stylesheet" href="bento/components.css">
   <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
@@ -42,6 +42,7 @@
       <div class="sd-group">Organization</div>
       <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
       <a class="sd-item on" href="people.html" aria-current="page"><span class="material-symbols-outlined">group</span>People</a>
+      <a class="sd-item" href="roles.html"><span class="material-symbols-outlined">manage_accounts</span>Roles</a>
       <a class="sd-item" href="teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
       <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
       <div class="sd-group">Publishing</div>
@@ -51,18 +52,20 @@
   </aside>
   <main class="suite-main">
     <header class="suite-topbar">
-      <button class="backbtn" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></button>
-      <h1>Jordan Lee</h1>
+      <button class="backbtn" aria-label="Back" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button>
+      <h1 id="pdName">Jordan Lee</h1>
+      <span class="rolechip" id="pdRole"><span class="material-symbols-outlined">shield_person</span>Super admin</span>
       <div class="spacer"></div>
-      <button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
+      <button class="hs-btn hs-btn--outlined" id="changeRoleBtn">Change role</button>
       <button class="hs-btn hs-btn--outlined">Add to teams</button>
       <button class="hs-btn hs-btn--primary">Assign social account</button>
     </header>
 
     <div class="pagebar">
       <nav class="tabs" aria-label="Person detail views">
-        <a class="on" href="#" aria-current="page">Teams</a>
-        <a href="#">Social accounts</a>
+        <a class="on" href="#" data-tab="teams" aria-current="page">Teams</a>
+        <a href="#" data-tab="social">Social accounts</a>
+        <a href="#" data-tab="perms">Permissions</a>
       </nav>
       <div class="grow"></div>
       <div class="searchbox">
@@ -75,146 +78,172 @@
 
     <div class="content">
       <div class="inner wide">
-        <div class="count-h">
-          <h2>12 teams including Jordan Lee</h2>
-          <div class="meta">1 with no account yet &#183; 8 with connected accounts</div>
+
+        <!-- Teams panel -->
+        <div data-panel="teams">
+          <div class="count-h">
+            <h2>12 teams including <span id="pdCountName">Jordan Lee</span></h2>
+            <div class="meta">1 with no account yet &#183; 8 with connected accounts</div>
+          </div>
+          <div class="table-card">
+          <table class="hs-table">
+            <thead>
+              <tr>
+                <th style="width:48px"><span class="hs-check indeterminate"></span></th>
+                <th>Team name</th>
+                <th>Created on</th>
+                <th>Admins</th>
+                <th>Members</th>
+                <th>Social accounts</th>
+                <th>Permission</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Growth marketing</span></div></td>
+                <td>Mar 4, 2024</td>
+                <td><span class="av-stack"><span class="av">MT</span><span class="av">RK</span></span></td>
+                <td>14</td>
+                <td>6</td>
+                <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Customer support</span></div></td>
+                <td>Jan 18, 2024</td>
+                <td><span class="av-stack"><span class="av">JL</span></span></td>
+                <td>9</td>
+                <td>3</td>
+                <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Brand and PR</span></div></td>
+                <td>Nov 2, 2023</td>
+                <td><span class="av-stack"><span class="av">MT</span><span class="av">DL</span><span class="av">FA</span></span></td>
+                <td>7</td>
+                <td>4</td>
+                <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Regional Europe</span></div></td>
+                <td>Aug 21, 2023</td>
+                <td><span class="av-stack"><span class="av">RK</span><span class="av">JL</span></span></td>
+                <td>11</td>
+                <td>0</td>
+                <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Product launches</span></div></td>
+                <td>May 9, 2023</td>
+                <td><span class="av-stack"><span class="av">DL</span><span class="av">MT</span></span></td>
+                <td>8</td>
+                <td>5</td>
+                <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Social listening</span></div></td>
+                <td>Feb 27, 2023</td>
+                <td><span class="av-stack"><span class="av">FA</span><span class="av">RK</span><span class="av">JL</span></span></td>
+                <td>6</td>
+                <td>2</td>
+                <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button>
+            <div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div>
+            <span class="hs-small">of 12</span>
+            <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
+          </div>
+          </div>
         </div>
 
-        <!-- The Permission select is the point where a role change must save and confirm (DX-3804). -->
-        <div class="table-card">
-        <table class="hs-table">
-          <thead>
-            <tr>
-              <th style="width:48px"><span class="hs-check indeterminate"></span></th>
-              <th>Team name</th>
-              <th>Created on</th>
-              <th>Admins</th>
-              <th>Members</th>
-              <th>Social accounts</th>
-              <th>Permission</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="hs-check"></span></td>
-              <td>
-                <div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Growth marketing</span></div>
-              </td>
-              <td>Mar 4, 2024</td>
-              <td>
-                <span class="av-stack"><span class="av">MT</span><span class="av">RK</span></span>
-              </td>
-              <td>14</td>
-              <td>6</td>
-              <td>
-                <button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-              </td>
-              <td>
-                <button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="hs-check"></span></td>
-              <td>
-                <div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Customer support</span></div>
-              </td>
-              <td>Jan 18, 2024</td>
-              <td>
-                <span class="av-stack"><span class="av">JL</span></span>
-              </td>
-              <td>9</td>
-              <td>3</td>
-              <td>
-                <button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-              </td>
-              <td>
-                <button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="hs-check"></span></td>
-              <td>
-                <div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Brand and PR</span></div>
-              </td>
-              <td>Nov 2, 2023</td>
-              <td>
-                <span class="av-stack"><span class="av">MT</span><span class="av">DL</span><span class="av">FA</span></span>
-              </td>
-              <td>7</td>
-              <td>4</td>
-              <td>
-                <button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-              </td>
-              <td>
-                <button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="hs-check"></span></td>
-              <td>
-                <div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Regional Europe</span></div>
-              </td>
-              <td>Aug 21, 2023</td>
-              <td>
-                <span class="av-stack"><span class="av">RK</span><span class="av">JL</span></span>
-              </td>
-              <td>11</td>
-              <td>0</td>
-              <td>
-                <button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-              </td>
-              <td>
-                <button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="hs-check"></span></td>
-              <td>
-                <div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Product launches</span></div>
-              </td>
-              <td>May 9, 2023</td>
-              <td>
-                <span class="av-stack"><span class="av">DL</span><span class="av">MT</span></span>
-              </td>
-              <td>8</td>
-              <td>5</td>
-              <td>
-                <button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-              </td>
-              <td>
-                <button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button>
-              </td>
-            </tr>
-            <tr>
-              <td><span class="hs-check"></span></td>
-              <td>
-                <div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Social listening</span></div>
-              </td>
-              <td>Feb 27, 2023</td>
-              <td>
-                <span class="av-stack"><span class="av">FA</span><span class="av">RK</span><span class="av">JL</span></span>
-              </td>
-              <td>6</td>
-              <td>2</td>
-              <td>
-                <button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-              </td>
-              <td>
-                <button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="pagination">
-          <button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button>
-          <div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div>
-          <span class="hs-small">of 12</span>
-          <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
+        <!-- Social accounts panel -->
+        <div data-panel="social" hidden>
+          <div class="count-h">
+            <h2>3 social accounts</h2>
+            <div class="meta">Accounts this person can publish to</div>
+          </div>
+          <div class="table-card">
+            <table class="hs-table">
+              <thead>
+                <tr><th style="width:48px"></th><th>Account</th><th>Network</th><th>Access</th><th style="width:56px"></th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="thumb"><span class="material-symbols-outlined">photo_camera</span></span></td>
+                  <td>@somos</td><td>Instagram</td><td>Can publish</td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="thumb"><span class="material-symbols-outlined">tag</span></span></td>
+                  <td>Somos</td><td>LinkedIn</td><td>Can publish</td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+                <tr>
+                  <td><span class="thumb"><span class="material-symbols-outlined">forum</span></span></td>
+                  <td>@somos</td><td>X</td><td>View only</td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <!-- Permissions panel -->
+        <div data-panel="perms" hidden>
+          <p class="perm-intro">Control what <span id="permIntroName">this person</span> can see and do across Somos. Changes save immediately and apply everywhere.</p>
+          <div class="hs-alert hs-alert--positive saved-note" id="permSaved" hidden role="status">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span data-saved-text></span>
+          </div>
+          <div class="card">
+            <div class="perm-list" id="permList"></div>
+          </div>
+          <div class="perm-actions">
+            <button class="hs-btn hs-btn--ghost">Cancel</button>
+            <button class="hs-btn hs-btn--primary" id="permSave">Save changes</button>
+          </div>
         </div>
+
       </div>
     </div>
   </main>
+
+  <!-- Change role modal -->
+  <div id="roleModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="roleModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="roleModalTitle">Change role</h2>
+          <p class="modal-sub" data-role-sub>Choose a role for this person.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div id="roleOptions"></div>
+        <p style="margin:14px 4px 0; font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle)">Need something more specific? <a href="#" id="roleCustomLink" style="color: var(--hs-fg-link); font-weight: var(--bento-theme-font-weights-semibold)">Set custom access</a>.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<script src="app.js"></script>
 </body>
 </html>

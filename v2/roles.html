@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@somos: Suite Settings</title>
+  <title>Roles: Suite Settings</title>
   <link rel="stylesheet" href="bento/colors_and_type.css">
   <link rel="stylesheet" href="bento/components.css">
   <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
@@ -42,9 +42,9 @@
       <div class="sd-group">Organization</div>
       <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
       <a class="sd-item" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
-      <a class="sd-item" href="roles.html"><span class="material-symbols-outlined">manage_accounts</span>Roles</a>
+      <a class="sd-item on" href="roles.html" aria-current="page"><span class="material-symbols-outlined">manage_accounts</span>Roles</a>
       <a class="sd-item" href="teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
-      <a class="sd-item on" href="social-accounts.html" aria-current="page"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
+      <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
       <div class="sd-group">Publishing</div>
       <a class="sd-item" href="#"><span class="material-symbols-outlined">sell</span>Tags</a>
       <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Vanity URLs</a>
@@ -52,55 +52,63 @@
   </aside>
   <main class="suite-main">
     <header class="suite-topbar">
-      <button class="backbtn" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></button>
-      <h1>@somos</h1>
+      <h1>Roles</h1>
       <div class="spacer"></div>
-      <button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
-      <button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">sync</span>Reconnect</button>
+      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
+      <button class="hs-btn hs-btn--primary" id="createRoleBtn"><span class="material-symbols-outlined">add</span>Create role</button>
     </header>
 
     <div class="content">
-      <div class="inner">
-        <p class="subhead">Instagram account connected to Somos.</p>
-
-        <div class="banner" style="background: var(--hs-bg-warning)">
-          <span class="material-symbols-outlined">warning</span>
-          <p>This account needs to be reconnected. Scheduled posts are paused until you reconnect.</p>
+      <div class="inner wide">
+        <div class="count-h">
+          <h2 id="rolesCount">4 roles in Somos</h2>
+          <div class="meta">Roles decide what each person can see and do. Assign them from a person's profile.</div>
         </div>
 
-        <section class="card">
-          <h2 class="card-title">Account</h2>
-          <div class="row first">
-            <div class="kv"><div class="k">Network</div><div class="v">Instagram</div></div>
-            <div class="trail"><span class="pill ok"><span class="material-symbols-outlined">photo_camera</span>Instagram</span></div>
-          </div>
-          <div class="row">
-            <div class="kv"><div class="k">Status</div><div class="v">Token expired 2 days ago.</div></div>
-            <div class="trail"><span class="pill warn"><span class="material-symbols-outlined">error</span>Reconnect</span></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2 class="card-title">Access</h2>
-          <div class="row first">
-            <div class="kv"><div class="k">Owner</div><div class="v">Marisol Chen &#183; marisol@somos.co</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Reassign</button></div>
-          </div>
-          <div class="row">
-            <div class="kv"><div class="k">Teams with access</div><div class="v">Growth Team, Content Team, Paid Media</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Manage access</button></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2 class="card-title">Danger zone</h2>
-          <div class="row first">
-            <div class="kv"><div class="k">Disconnect account</div><div class="v">Removes it from Somos and stops all scheduling.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Disconnect account</button></div>
-          </div>
-        </section>
+        <div class="table-card">
+          <table class="hs-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>What it can do</th>
+                <th style="width:120px">People</th>
+                <th style="width:56px"></th>
+              </tr>
+            </thead>
+            <tbody id="rolesBody"><!-- rendered by app.js --></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
+
+  <!-- Create role modal -->
+  <div id="createRoleModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="createRoleTitle" style="width:640px">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="createRoleTitle">Create role</h2>
+          <p class="modal-sub">Name the role and choose what it can do. You can assign it to people afterwards.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="hs-field" style="margin-bottom:8px">
+          <label class="hs-field-label" for="newRoleName">Role name</label>
+          <input class="hs-input" id="newRoleName" type="text" placeholder="e.g. Content lead" data-autofocus>
+          <div class="hs-field-hint" id="newRoleErr" hidden style="color: var(--bento-theme-color-text-negative)"></div>
+        </div>
+        <div class="subgroup" style="margin-top:16px">Permissions</div>
+        <div class="perm-list" id="newRolePerms"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="newRoleCreate">Create role</button>
+      </div>
+    </div>
+  </div>
+
+<script src="app.js"></script>
 </body>
 </html>
