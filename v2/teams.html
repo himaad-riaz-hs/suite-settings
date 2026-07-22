@@ -10,6 +10,28 @@
   <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
+  <style>
+    /* Create team modal (mirrors people.html invite modal, tokens only) */
+    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl.open { display:flex; }
+    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
+    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
+    /* form fields inside the modal */
+    .ctfield { margin-bottom:16px; }
+    .ctfield label { display:block; font: var(--hs-type-body-md-b); color: var(--hs-fg); margin-bottom:6px; }
+    .ctfield input { width:100%; height:40px; padding:0 12px; border:1px solid var(--hs-border-input); border-radius: var(--bento-component-input-border-radius); background: var(--bento-component-input-fill); font: var(--hs-type-body-md); color: var(--bento-theme-color-text-base); box-sizing:border-box; }
+    .ctfield input:focus { border-color: var(--hs-border-focus); box-shadow: 0 0 0 2px var(--hs-focus-halo); outline:none; }
+    .ctsection { font: var(--hs-type-meta-b); color: var(--bento-theme-color-text-subtle); margin: 4px 0 8px; }
+    .ctlist { margin: 8px 0 4px; }
+    .ctopt { display:flex; align-items:center; gap:10px; min-height:44px; padding:0 8px; border-radius: var(--hs-radii-md); cursor:pointer; user-select:none; }
+    .ctopt:hover { background: var(--bento-system-sys-neutral-alt-100); }
+    .ctopt .ctkv { flex:1; min-width:0; }
+    .ctopt .ctkv .k { font: var(--hs-type-body-md); color: var(--hs-fg); }
+    .ctopt .ctkv .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+  </style>
 </head>
 <body class="suite-app">
 <aside class="suite-rail">
@@ -53,6 +75,7 @@
     <header class="suite-topbar">
       <h1>Teams</h1>
       <div class="spacer"></div>
+      <button class="hs-btn hs-btn--primary" onclick="openCreateTeam()"><span class="material-symbols-outlined">add</span>Create team</button>
       <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
     </header>
 
@@ -163,6 +186,51 @@
       </div>
     </div>
   </main>
+
+  <!-- Create team modal -->
+  <div class="ovl" id="createTeamOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="ctTitle">
+      <div class="mh">
+        <h2 id="ctTitle">Create team</h2>
+        <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeCreateTeam()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="mb">
+        <div class="ctfield">
+          <label for="teamNameInput">Team name</label>
+          <input type="text" id="teamNameInput" placeholder="e.g. Paid Media" autocomplete="off">
+        </div>
+        <div class="ctfield">
+          <label for="teamDescInput">Description (optional)</label>
+          <input type="text" id="teamDescInput" placeholder="What this team works on" autocomplete="off">
+        </div>
+
+        <div class="ctsection">Add members</div>
+        <div class="searchbox" style="min-width:auto">
+          <span class="material-symbols-outlined">search</span>
+          <input type="search" placeholder="Search people" aria-label="Search people">
+        </div>
+        <div class="ctlist" id="ctMembers">
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-member></span><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-6-bg);color:var(--hs-cat-6-fg)">MS</span><span class="ctkv"><div class="k">Marco Silva</div><div class="m">marco@somos.co</div></span></div>
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-member></span><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-2-bg);color:var(--hs-cat-2-fg)">YT</span><span class="ctkv"><div class="k">Yuki Tanaka</div><div class="m">yuki@somos.co</div></span></div>
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-member></span><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-8-bg);color:var(--hs-cat-8-fg)">SR</span><span class="ctkv"><div class="k">Sam Rivera</div><div class="m">sam@somos.co</div></span></div>
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-member></span><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-9-bg);color:var(--hs-cat-9-fg)">DO</span><span class="ctkv"><div class="k">Devin Okafor</div><div class="m">devin@somos.co</div></span></div>
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-member></span><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-4-bg);color:var(--hs-cat-4-fg)">PA</span><span class="ctkv"><div class="k">Priya Anand</div><div class="m">priya@somos.co</div></span></div>
+        </div>
+
+        <div class="ctsection">Assign social accounts (optional)</div>
+        <div class="ctlist" id="ctAccounts">
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-account></span><span class="ctkv"><div class="k">@somos</div><div class="m">Instagram</div></span></div>
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-account></span><span class="ctkv"><div class="k">Somos</div><div class="m">LinkedIn</div></span></div>
+          <div class="ctopt" onclick="ctToggle(this)"><span class="hs-check" data-account></span><span class="ctkv"><div class="k">@somos</div><div class="m">TikTok</div></span></div>
+        </div>
+      </div>
+      <div class="mf">
+        <button class="hs-btn hs-btn--ghost" onclick="closeCreateTeam()">Cancel</button>
+        <button class="hs-btn hs-btn--primary" onclick="submitCreateTeam()">Create team</button>
+      </div>
+    </div>
+  </div>
+
 <script>
   function toggleView(){
     var t=document.getElementById('tableView'), g=document.getElementById('gridView'), l=document.getElementById('viewPickLabel');
@@ -170,6 +238,55 @@
     if(t) t.hidden = toCard; if(g) g.hidden = !toCard;
     if(l) l.textContent = toCard ? 'Card view' : 'Column view';
   }
+
+  /* Create team flow */
+  function ctToggle(row){
+    var chk = row.querySelector('.hs-check');
+    if(chk) chk.classList.toggle('is-on');
+  }
+  function openCreateTeam(){
+    var name = document.getElementById('teamNameInput'); if(name) name.value = '';
+    var desc = document.getElementById('teamDescInput'); if(desc) desc.value = '';
+    document.querySelectorAll('#createTeamOvl .hs-check.is-on').forEach(function(c){ c.classList.remove('is-on'); });
+    var ovl = document.getElementById('createTeamOvl');
+    if(ovl) ovl.classList.add('open');
+    if(name) name.focus();
+  }
+  function closeCreateTeam(){
+    var ovl = document.getElementById('createTeamOvl');
+    if(ovl) ovl.classList.remove('open');
+  }
+  function submitCreateTeam(){
+    var nameEl = document.getElementById('teamNameInput');
+    var name = nameEl ? nameEl.value.trim() : '';
+    if(!name){ if(nameEl) nameEl.focus(); return; }
+
+    var memberCount = document.querySelectorAll('#ctMembers .hs-check.is-on').length;
+    var accountCount = document.querySelectorAll('#ctAccounts .hs-check.is-on').length;
+
+    var tbody = document.querySelector('#tableView .hs-table tbody');
+    if(tbody){
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><span class="hs-check"></span></td>' +
+        '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><a href="team-detail.html"></a></div></td>' +
+        '<td class="hs-small">Just now</td>' +
+        '<td><span class="av-stack"><span class="av">You</span></span></td>' +
+        '<td>' + memberCount + '</td><td>' + accountCount + '</td>' +
+        '<td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+      tr.querySelector('a').textContent = name;
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    var heading = document.querySelector('.count-h h2');
+    if(heading){
+      var m = heading.textContent.match(/(\d+)/);
+      if(m){ heading.textContent = heading.textContent.replace(/\d+/, (parseInt(m[1],10) + 1)); }
+    }
+
+    closeCreateTeam();
+  }
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCreateTeam(); });
 </script>
 <script src="app.js"></script>
 </body>

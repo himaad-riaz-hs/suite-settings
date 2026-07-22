@@ -288,7 +288,7 @@ html, body { margin: 0; height: 100%; }
 .opt.selected { background: var(--bento-component-list-item-fill-selected, var(--hs-bg-info)); }
 .opt .lead { width: 32px; height: 32px; border-radius: 999px; background: var(--bento-system-sys-neutral-alt-100); display: grid; place-items: center; color: var(--bento-theme-color-icon-subtle); flex-shrink: 0; }
 .opt .lead .material-symbols-outlined { font-size: 18px; }
-.opt .txt { flex: 1; min-width: 0; }
+.opt .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
 .opt .txt .n { font: var(--hs-type-body-md-b); }
 .opt .txt .d { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
 .opt .check { color: var(--bento-theme-color-icon-base); font-size: 20px; visibility: hidden; }

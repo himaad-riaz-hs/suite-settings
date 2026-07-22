@@ -10,6 +10,30 @@
   <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
+  <style>
+    /* T6 offboard: overflow menu + reassign/remove modal (tokens only; mirrors people.html invite modal) */
+    .pdmenu { position:absolute; top:56px; right:40px; z-index:45; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:230px; padding:6px; }
+    .pdmenu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:10px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .pdmenu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .pdmenu .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl.open { display:flex; }
+    .invmodal { width:540px; max-width:100%; background:var(--bento-theme-color-bg-surface); border-radius:var(--hs-radii-xl); box-shadow:0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh h2 { font:var(--hs-type-title-sub); margin:0; }
+    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; font:var(--hs-type-body-md); color:var(--hs-fg); }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
+    .ofnote { display:flex; gap:10px; align-items:flex-start; background:var(--hs-bg-warning); border-radius:var(--hs-radii-md); padding:12px 14px; margin-bottom:14px; font:var(--hs-type-body-sm); }
+    .ofnote .material-symbols-outlined { color:var(--hs-fg-warning); font-size:20px; flex:none; }
+    .oflist { display:flex; flex-direction:column; gap:2px; margin-top:8px; }
+    .ofopt { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; cursor:pointer; border:1px solid transparent; }
+    .ofopt:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .ofopt.sel { background:var(--hs-bg-info); border-color:var(--hs-fg-link); }
+    .ofopt .av { width:32px;height:32px;border-radius:999px;background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg);display:grid;place-items:center;font:var(--hs-type-meta-b);flex:none; }
+    .ofopt .nm { flex:1; display:flex; flex-direction:column; line-height:1.25; } .ofopt .nm .n { font:var(--hs-type-body-md-b); } .ofopt .nm .e { font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); }
+    .ofopt .chk { color:var(--hs-fg-link); font-size:20px; visibility:hidden; } .ofopt.sel .chk { visibility:visible; }
+    .ofsent { text-align:center; padding:8px 0; } .ofsent .big { width:64px;height:64px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 12px; } .ofsent .big .material-symbols-outlined{font-size:34px;}
+  </style>
 </head>
 <body class="suite-app">
 <aside class="suite-rail">
@@ -58,6 +82,10 @@
       <button class="hs-btn hs-btn--outlined" id="changeRoleBtn">Change role</button>
       <button class="hs-btn hs-btn--outlined">Add to teams</button>
       <button class="hs-btn hs-btn--primary">Assign social account</button>
+      <button class="icon-btn ne-tooltipbtn" id="pdMoreBtn" aria-label="More actions" onclick="togglePdMenu(event)"><span class="material-symbols-outlined">more_horiz</span></button>
+      <div class="pdmenu" id="pdMenu" hidden>
+        <button onclick="openOffboard()"><span class="material-symbols-outlined">person_remove</span>Remove from organization</button>
+      </div>
     </header>
 
     <div class="pagebar">
@@ -243,6 +271,42 @@
     </div>
   </div>
 
+  <!-- T6 offboard: reassign then remove -->
+  <div class="ovl" id="offboardOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="ofTitle">
+      <div data-ofstep="1">
+        <div class="mh"><h2 id="ofTitle">Remove from organization</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeOffboard()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb">
+          <div class="ofnote"><span class="material-symbols-outlined">warning</span><span>Removing <strong id="ofName">this person</strong> frees their seat and revokes their access to Somos. Reassign their teams and social accounts first so nothing is lost.</span></div>
+          <label style="font:var(--hs-type-body-md-b)">Reassign their teams and social accounts to</label>
+          <div class="oflist" id="ofList">
+            <div class="ofopt" data-name="Aisha Patel" onclick="pickReassign(this)"><span class="av">AP</span><span class="nm"><span class="n">Aisha Patel</span><span class="e">aisha@somos.co</span></span><span class="material-symbols-outlined chk">check</span></div>
+            <div class="ofopt" data-name="Sam Rivera" onclick="pickReassign(this)"><span class="av">SR</span><span class="nm"><span class="n">Sam Rivera</span><span class="e">sam@somos.co</span></span><span class="material-symbols-outlined chk">check</span></div>
+            <div class="ofopt" data-name="Devin Okafor" onclick="pickReassign(this)"><span class="av">DO</span><span class="nm"><span class="n">Devin Okafor</span><span class="e">devin@somos.co</span></span><span class="material-symbols-outlined chk">check</span></div>
+            <div class="ofopt" data-name="Marisol Chen" onclick="pickReassign(this)"><span class="av">MC</span><span class="nm"><span class="n">Marisol Chen</span><span class="e">marisol@somos.co</span></span><span class="material-symbols-outlined chk">check</span></div>
+          </div>
+        </div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeOffboard()">Cancel</button><button class="hs-btn hs-btn--primary" id="ofConfirmBtn" onclick="submitOffboard()">Remove and reassign</button></div>
+      </div>
+      <div data-ofstep="2" hidden>
+        <div class="mh"><h2>Done</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeOffboard()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb"><div class="ofsent"><div class="big"><span class="material-symbols-outlined">check</span></div><p><strong id="ofDoneName">This person</strong> has been removed from Somos. Their teams and social accounts moved to <strong id="ofDoneTo">the new owner</strong>, and their seat is now free.</p></div></div>
+        <div class="mf"><button class="hs-btn hs-btn--primary" onclick="location.href='people.html'">Back to People</button></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function togglePdMenu(e){ if(e) e.stopPropagation(); var m=document.getElementById('pdMenu'); m.hidden=!m.hidden; }
+    document.addEventListener('click', function(e){ var m=document.getElementById('pdMenu'), b=document.getElementById('pdMoreBtn'); if(m && !m.hidden && b && !m.contains(e.target) && e.target!==b && !b.contains(e.target)) m.hidden=true; });
+    function ofPersonName(){ var el=document.getElementById('pdName'); return el ? el.textContent.trim() : 'this person'; }
+    function openOffboard(){ document.getElementById('pdMenu').hidden=true; var nm=ofPersonName(); document.getElementById('ofName').textContent=nm; document.getElementById('ofTitle').textContent='Remove '+nm+' from Somos'; document.querySelectorAll('#ofList .ofopt').forEach(function(o){o.classList.remove('sel');}); ofPick=null; ofStep(1); document.getElementById('offboardOvl').classList.add('open'); }
+    function closeOffboard(){ document.getElementById('offboardOvl').classList.remove('open'); }
+    function ofStep(s){ document.querySelectorAll('#offboardOvl [data-ofstep]').forEach(function(d){ d.hidden = (+d.dataset.ofstep)!==s; }); }
+    var ofPick=null;
+    function pickReassign(el){ document.querySelectorAll('#ofList .ofopt').forEach(function(o){o.classList.remove('sel');}); el.classList.add('sel'); ofPick=el.dataset.name; }
+    function submitOffboard(){ if(!ofPick) return; document.getElementById('ofDoneName').textContent=ofPersonName(); document.getElementById('ofDoneTo').textContent=ofPick; ofStep(2); }
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeOffboard(); });
+  </script>
 <script src="app.js"></script>
 </body>
 </html>

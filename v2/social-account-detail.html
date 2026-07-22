@@ -10,6 +10,22 @@
   <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
+  <style>
+    /* Reassign owner + reconnect modals (mirrors people.html invite modal pattern, tokens only) */
+    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl.open { display:flex; }
+    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
+    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
+    .sent { text-align:center; padding:12px 0; }
+    .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 14px; }
+    .sent .big .material-symbols-outlined { font-size:40px; }
+    /* inline saved confirmation next to the Owner value */
+    .savednote { display:inline-flex; align-items:center; gap:4px; margin-left:10px; font: var(--hs-type-body-sm); color: var(--hs-fg-positive); vertical-align:middle; }
+    .savednote .material-symbols-outlined { font-size:16px; }
+  </style>
 </head>
 <body class="suite-app">
 <aside class="suite-rail">
@@ -55,14 +71,14 @@
       <h1>@somos</h1>
       <div class="spacer"></div>
       <button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
-      <button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">sync</span>Reconnect</button>
+      <button class="hs-btn hs-btn--primary" id="headerReconnectBtn" onclick="openReconnect()"><span class="material-symbols-outlined">sync</span>Reconnect</button>
     </header>
 
     <div class="content">
       <div class="inner">
         <p class="subhead">Instagram account connected to Somos.</p>
 
-        <div class="banner" style="background: var(--hs-bg-warning)">
+        <div class="banner" id="reconnectBanner" style="background: var(--hs-bg-warning)">
           <span class="material-symbols-outlined">warning</span>
           <p>This account needs to be reconnected. Scheduled posts are paused until you reconnect.</p>
         </div>
@@ -74,16 +90,16 @@
             <div class="trail"><span class="pill ok"><span class="material-symbols-outlined">photo_camera</span>Instagram</span></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Status</div><div class="v">Token expired 2 days ago.</div></div>
-            <div class="trail"><span class="pill warn"><span class="material-symbols-outlined">error</span>Reconnect</span></div>
+            <div class="kv"><div class="k">Status</div><div class="v" id="statusValue">Token expired 2 days ago.</div></div>
+            <div class="trail"><span class="pill warn" data-detail-status><span class="material-symbols-outlined">error</span>Reconnect</span></div>
           </div>
         </section>
 
         <section class="card">
           <h2 class="card-title">Access</h2>
           <div class="row first">
-            <div class="kv"><div class="k">Owner</div><div class="v">Marisol Chen &#183; marisol@somos.co</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Reassign</button></div>
+            <div class="kv"><div class="k">Owner</div><div class="v"><span id="ownerValue">Priya Anand &#183; priya@somos.co</span><span class="savednote" id="ownerSaved" hidden><span class="material-symbols-outlined">check_circle</span>Owner updated</span></div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="openReassign()">Change owner</button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Teams with access</div><div class="v">Growth Team, Content Team, Paid Media</div></div>
@@ -101,5 +117,81 @@
       </div>
     </div>
   </main>
+
+  <!-- Change owner modal (T5): reassign the @somos owner -->
+  <div class="ovl" id="reassignOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="reassignTitle">
+      <div class="mh"><h2 id="reassignTitle">Change owner</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeReassign()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb">
+        <p class="subhead">Choose who owns @somos. The owner manages the connection and its access.</p>
+        <div id="ownerOptions" role="radiogroup" aria-label="Select an owner">
+          <div class="opt" role="radio" aria-checked="false" tabindex="0" data-name="Marisol Chen" data-email="marisol@somos.co" onclick="selectOwner(this)"><span class="lead"><span class="material-symbols-outlined">person</span></span><span class="txt"><span class="n">Marisol Chen</span><span class="d">marisol@somos.co</span></span><span class="material-symbols-outlined check">check</span></div>
+          <div class="opt" role="radio" aria-checked="false" tabindex="0" data-name="Aisha Patel" data-email="aisha@somos.co" onclick="selectOwner(this)"><span class="lead"><span class="material-symbols-outlined">person</span></span><span class="txt"><span class="n">Aisha Patel</span><span class="d">aisha@somos.co</span></span><span class="material-symbols-outlined check">check</span></div>
+          <div class="opt" role="radio" aria-checked="false" tabindex="0" data-name="Sam Rivera" data-email="sam@somos.co" onclick="selectOwner(this)"><span class="lead"><span class="material-symbols-outlined">person</span></span><span class="txt"><span class="n">Sam Rivera</span><span class="d">sam@somos.co</span></span><span class="material-symbols-outlined check">check</span></div>
+          <div class="opt" role="radio" aria-checked="false" tabindex="0" data-name="Devin Okafor" data-email="devin@somos.co" onclick="selectOwner(this)"><span class="lead"><span class="material-symbols-outlined">person</span></span><span class="txt"><span class="n">Devin Okafor</span><span class="d">devin@somos.co</span></span><span class="material-symbols-outlined check">check</span></div>
+        </div>
+      </div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeReassign()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="saveOwner()">Save</button></div>
+    </div>
+  </div>
+
+  <!-- Reconnect modal (T5): restore the expired @somos Instagram connection -->
+  <div class="ovl" id="reconnectOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="reconnectTitle">
+      <!-- start -->
+      <div data-step="1">
+        <div class="mh"><h2 id="reconnectTitle">Reconnect @somos</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeReconnect()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb">
+          <p class="subhead">The Instagram connection for @somos expired, so publishing and analytics are paused. Reconnecting signs back in with Instagram and restores publishing and analytics for this account.</p>
+        </div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeReconnect()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="doReconnect()"><span class="material-symbols-outlined">photo_camera</span>Continue with Instagram</button></div>
+      </div>
+      <!-- success -->
+      <div data-step="2" hidden>
+        <div class="mh"><h2>Reconnected</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeReconnect()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb"><div class="sent"><div class="big"><span class="material-symbols-outlined">check</span></div><p><strong>@somos is reconnected.</strong> Publishing and analytics are restored and scheduled posts will resume.</p></div></div>
+        <div class="mf"><button class="hs-btn hs-btn--primary" onclick="closeReconnect()">Done</button></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Change owner flow (T5)
+  function openReassign(){ document.getElementById('reassignOvl').classList.add('open'); }
+  function closeReassign(){ document.getElementById('reassignOvl').classList.remove('open'); }
+  function selectOwner(el){
+    document.querySelectorAll('#ownerOptions .opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-checked','false'); });
+    el.classList.add('selected'); el.setAttribute('aria-checked','true');
+  }
+  function saveOwner(){
+    var sel = document.querySelector('#ownerOptions .opt.selected');
+    if(!sel) return; // nothing selected, do nothing
+    var name = sel.getAttribute('data-name');
+    var email = sel.getAttribute('data-email');
+    var val = document.getElementById('ownerValue');
+    if(val) val.innerHTML = name + ' &#183; ' + email;
+    var note = document.getElementById('ownerSaved');
+    if(note) note.hidden = false;
+    closeReassign();
+  }
+
+  // Reconnect flow (T5)
+  function reconnectStep(s){ document.querySelectorAll('#reconnectOvl [data-step]').forEach(function(d){ d.hidden = (+d.dataset.step)!==s; }); }
+  function openReconnect(){ reconnectStep(1); document.getElementById('reconnectOvl').classList.add('open'); }
+  function closeReconnect(){ document.getElementById('reconnectOvl').classList.remove('open'); }
+  function doReconnect(){
+    reconnectStep(2);
+    // Flip the on-page Status pill from warn/Reconnect to ok/Connected
+    var pill = document.querySelector('[data-detail-status]');
+    if(pill){ pill.className = 'pill ok'; pill.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Connected'; }
+    var statusV = document.getElementById('statusValue');
+    if(statusV) statusV.textContent = 'Connected. Publishing and analytics are active.';
+    var banner = document.getElementById('reconnectBanner');
+    if(banner) banner.hidden = true;
+    var hdrBtn = document.getElementById('headerReconnectBtn');
+    if(hdrBtn) hdrBtn.hidden = true;
+  }
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReassign(); closeReconnect(); } });
+</script>
 </body>
 </html>
