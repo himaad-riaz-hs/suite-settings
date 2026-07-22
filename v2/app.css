@@ -21,8 +21,11 @@ html, body { margin: 0; height: 100%; }
 }
 .orgsw .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-subtle); }
 
-/* scrolling content column */
-.content { flex: 1; overflow: auto; }
+/* scrolling content column — grey Bento canvas (#f4f5f6) so flat white panels read as panels.
+   NB: --bento-theme-color-bg-app is white in this kit; neutral-alt-200 is the real #f4f5f6. */
+.content { flex: 1; overflow: auto; background: var(--bento-system-sys-neutral-alt-200); }
+/* chrome above the canvas stays white surface */
+.suite-topbar, .pagebar { background: var(--bento-theme-color-bg-surface); }
 .inner { max-width: 860px; padding: var(--bento-space-05) 40px var(--bento-space-10); }
 .subhead { font: var(--hs-type-body-md); color: var(--bento-theme-color-text-subtle); margin: 0 0 var(--bento-space-05); }
 
