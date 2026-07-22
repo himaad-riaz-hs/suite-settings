@@ -483,6 +483,15 @@
         c.setAttribute("aria-label", head ? "Select all" : ("Select " + (nameEl ? nameEl.textContent.trim() : "row")));
       }
     });
+    // decorative sort carets are not read by SR
+    document.querySelectorAll(".th-sort .material-symbols-outlined").forEach(function(i){ i.setAttribute("aria-hidden","true"); });
+    // give generic row-action buttons an entity-specific label + popup semantics
+    var GEN=["more actions","actions","role actions","account actions","team actions"];
+    function rowName(el){ if(!el) return ""; var sels=[".cell-with-thumb a",".cell-with-thumb span:last-child",".nm .n a",".nm .n",".n a",".n",".k"]; for(var i=0;i<sels.length;i++){ var e=el.querySelector(sels[i]); if(e && e.textContent.trim()) return e.textContent.trim(); } var td=el.querySelector("td:nth-child(2), td"); return td ? td.textContent.trim() : ""; }
+    document.querySelectorAll(".icon-btn, .hs-btn--icon").forEach(function(b){
+      var lbl=(b.getAttribute("aria-label")||"").trim().toLowerCase();
+      if(GEN.indexOf(lbl)>=0){ var row=b.closest("tr")||b.closest(".ecard")||b.closest(".listrow"); var n=rowName(row); if(n) b.setAttribute("aria-label","Actions for "+n); b.setAttribute("aria-haspopup","menu"); b.setAttribute("aria-expanded","false"); }
+    });
   }
   document.addEventListener("keydown", function(e){
     if(e.key!==" " && e.key!=="Enter") return;

@@ -177,6 +177,9 @@
       document.querySelectorAll("table.hs-table .hs-check").forEach(function(c){ c.setAttribute("role","checkbox"); if(!c.hasAttribute("tabindex")) c.setAttribute("tabindex","0");
         c.setAttribute("aria-checked", c.classList.contains("is-on")?"true":"false");
         if(!c.getAttribute("aria-label")){ var head=c.closest("thead"), tr=c.closest("tr"); var nameEl=tr&&tr.querySelector(".cell-with-thumb a, .cell-with-thumb span:last-child"); c.setAttribute("aria-label", head?"Select all":("Select "+(nameEl?nameEl.textContent.trim():"row"))); } });
+      document.querySelectorAll(".th-sort .material-symbols-outlined").forEach(function(i){ i.setAttribute("aria-hidden","true"); });
+      var GEN=["more actions","actions","role actions","account actions","team actions"];
+      document.querySelectorAll(".icon-btn, .hs-btn--icon").forEach(function(b){ var lbl=(b.getAttribute("aria-label")||"").trim().toLowerCase(); if(GEN.indexOf(lbl)>=0){ var row=b.closest("tr")||b.closest(".ecard")||b.closest(".listrow"); var e=row&&(row.querySelector(".cell-with-thumb a, .cell-with-thumb span:last-child, .nm .n, .n")||row.querySelector("td:nth-child(2), td")); if(e&&e.textContent.trim()) b.setAttribute("aria-label","Actions for "+e.textContent.trim()); b.setAttribute("aria-haspopup","menu"); b.setAttribute("aria-expanded","false"); } });
       document.addEventListener("keydown", function(e){ if(e.key!==" "&&e.key!=="Enter") return; var c=e.target.closest&&e.target.closest("table.hs-table .hs-check"); if(c){ e.preventDefault(); c.click(); c.setAttribute("aria-checked", c.classList.contains("is-on")?"true":"false"); } });
     })();
   </script>
