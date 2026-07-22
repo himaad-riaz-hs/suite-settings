@@ -172,7 +172,8 @@ html, body { margin: 0; height: 100%; }
 .hs-table tbody tr:hover { background: var(--bento-component-table-fill-hovered); }
 .hs-table tbody tr.is-selected { background: var(--bento-component-table-selected-fill); }
 .cell-with-thumb { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.cell-with-thumb > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cell-with-thumb > span:last-child, .cell-with-thumb > a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs-table .cell-with-thumb a { white-space: nowrap; }
 .thumb { width: 28px; height: 28px; border-radius: 6px; background: var(--hs-surface-strong); display: inline-flex; align-items: center; justify-content: center; color: var(--hs-fg-secondary); flex-shrink: 0; }
 .thumb .material-symbols-outlined { font-size: 18px; }
 .pagination { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--hs-border); }
