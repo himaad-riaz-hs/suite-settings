@@ -12,9 +12,9 @@
   <link rel="stylesheet" href="app.css">
   <style>
     /* Reassign owner + reconnect modals (mirrors people.html invite modal pattern, tokens only) */
-    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl { position:fixed; inset:0; background:var(--bento-theme-color-overlay-scrim, rgba(1,43,58,.32)); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
     .ovl.open { display:flex; }
-    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); overflow:hidden; }
     .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
     .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
     .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
@@ -26,7 +26,7 @@
     .savednote { display:inline-flex; align-items:center; gap:4px; margin-left:10px; font: var(--hs-type-body-sm); color: var(--hs-fg-positive); vertical-align:middle; }
     .savednote .material-symbols-outlined { font-size:16px; }
     /* floating action menu (mirrors people.html .menu, tokens only) */
-    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:210px; padding:6px; }
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
     .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
     .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
     .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
@@ -191,7 +191,7 @@
     if(k==='disconnect'){ toast('@somos disconnected'); return; }
   }
   function toast(msg){ var t=document.getElementById('acctToast'); if(!t){ t=document.createElement('div'); t.id='acctToast';
-    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s'; document.body.appendChild(t); }
+    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s'; document.body.appendChild(t); }
     t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800); }
 
   // Change owner flow (T5)

@@ -16,7 +16,7 @@
        that app.js renders and let the role name lead cleanly. */
     #rolesBody .cell-with-thumb .thumb { display: none; }
 
-    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:210px; padding:6px; }
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
     .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
     .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
     .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
@@ -159,7 +159,7 @@
         t = document.createElement("div");
         t.id = "rolesToast";
         t.setAttribute("role", "status");
-        t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s";
+        t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s";
         document.body.appendChild(t);
       }
       t.textContent = msg;

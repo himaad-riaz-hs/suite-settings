@@ -12,9 +12,9 @@
   <link rel="stylesheet" href="app.css">
   <style>
     /* Create team modal (mirrors people.html invite modal, tokens only) */
-    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl { position:fixed; inset:0; background:var(--bento-theme-color-overlay-scrim, rgba(1,43,58,.32)); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
     .ovl.open { display:flex; }
-    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); overflow:hidden; }
     .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
     .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
     .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }

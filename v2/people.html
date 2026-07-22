@@ -26,9 +26,9 @@
     .listrow .av { width:36px; height:36px; border-radius:999px; background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg); display:grid; place-items:center; font: var(--hs-type-meta-b); flex:none; }
     .listrow .kv { flex:1; min-width:0; } .listrow .k { font: var(--hs-type-body-md-b); } .listrow .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
     /* invite modal — Layla's seats flow. Two arms via ?flow=a|b, plus non-admin ?role=member. */
-    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl { position:fixed; inset:0; background:var(--bento-theme-color-overlay-scrim, rgba(1,43,58,.32)); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
     .ovl.open { display:flex; }
-    .invmodal { width:600px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal { width:600px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); overflow:hidden; }
     .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
     .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
     .invmodal .mb { padding:18px 20px; max-height:60vh; overflow:auto; }
@@ -71,7 +71,7 @@
     .payln { display:flex; align-items:center; justify-content:space-between; margin-top:14px; font: var(--hs-type-body-md); }
     .sent { text-align:center; padding:12px 0; } .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 14px; } .sent .big .material-symbols-outlined { font-size:40px; }
     /* interactivity: floating menus, bulk bar, notifications, checkbox state */
-    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:210px; padding:6px; }
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
     .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
     .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
     .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
@@ -83,7 +83,7 @@
     .bulkbar .n { font:var(--hs-type-body-md-b); color:var(--hs-fg); }
     .bulkbar .grow { flex:1; }
     .filtered-out { display:none !important; }
-    .notifpanel { position:fixed; left:74px; bottom:56px; width:372px; max-height:72vh; overflow:auto; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-lg); box-shadow:0 12px 36px rgba(1,43,58,.20); z-index:70; display:none; }
+    .notifpanel { position:fixed; left:74px; bottom:56px; width:372px; max-height:72vh; overflow:auto; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-lg); box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); z-index:70; display:none; }
     .notifpanel.open { display:block; }
     .notifpanel .nh { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--hs-border); }
     .notifpanel .nh h3 { margin:0; font:var(--hs-type-title-sub); }
@@ -351,7 +351,7 @@
       if(_apRow){ reqFree--; reqMark(_apRow,'approved'); _apRow=null; } reqSetFree(); toast('Seats added. You can approve the rest.'); }
     // toast
     function toast(msg){ var t=document.getElementById('pplToast'); if(!t){ t=document.createElement('div'); t.id='pplToast';
-      t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s'; document.body.appendChild(t); }
+      t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s'; document.body.appendChild(t); }
       t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800); }
     // delegation
     document.addEventListener('click', function(e){
