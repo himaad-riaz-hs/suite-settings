@@ -116,9 +116,17 @@ html, body { margin: 0; height: 100%; }
 .pagebar .grow { flex: 1; }
 
 /* in-page tab bar (used on detail pages: Teams / Social accounts) */
-.tabs { display: flex; gap: var(--bento-space-05); height: 100%; }
-.tabs a { display: inline-flex; align-items: center; height: 100%; font: var(--hs-type-body-md); color: var(--bento-theme-color-text-subtle); text-decoration: none; border-bottom: 2px solid transparent; }
-.tabs a.on { color: var(--hs-fg); font-weight: var(--bento-theme-font-weights-semibold); border-bottom-color: var(--bento-theme-color-text-base); }
+/* Tabs — match the Bento .hs-tab component: bold, secondary when inactive,
+   hover to base, active = base + a 2px underline hugging the text (inset 16px).
+   Accent uses the app primary (the blue) for consistency with buttons/toggles. */
+.tabs { display: flex; gap: 0; height: 100%; }
+.tabs a { position: relative; display: inline-flex; align-items: center; height: 100%; padding: 0 16px; font: var(--hs-type-body-md); font-weight: var(--bento-theme-font-weights-bold, 700); color: var(--hs-fg-secondary); text-decoration: none; transition: color 150ms; }
+.tabs a:hover { color: var(--hs-fg); }
+.tabs a.on { color: var(--hs-fg); }
+.tabs a.on::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 2px; border-radius: 2px; background: var(--hs-action-primary); }
+
+/* Toggle on-state uses the app primary (the blue), not the Bento default teal track */
+.hs-toggle.is-on { background: var(--hs-action-primary); }
 
 /* compact search box */
 .searchbox { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; min-width: 300px;

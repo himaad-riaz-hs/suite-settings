@@ -74,8 +74,12 @@
             <div class="kv"><div class="k">Email</div><div class="v">melanie@somos.co</div></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Selected plan</div><div class="v">Standard</div></div>
-            <div class="trail"><span class="pill neutral">Trial</span></div>
+            <div class="kv"><div class="k">Selected plan</div><div class="v">Standard (up to 10 social accounts, 3 users).</div></div>
+            <div class="trail">
+              <span class="pill neutral">Trial</span>
+              <button class="hs-btn hs-btn--outlined">Change plan</button>
+              <button class="hs-btn hs-btn--outlined">Manage subscription</button>
+            </div>
           </div>
         </section>
 
@@ -88,8 +92,11 @@
             </div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Payment method</div><div class="v">Visa ending 4242.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Update card</button></div>
+            <div class="kv">
+              <div class="k">Payment method</div>
+              <div class="v">Visa ending in 4242 (expires 08/2028). Charged automatically each cycle.</div>
+            </div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined">Update payment method</button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Billing owner</div><div class="v">Marisol Chen &#183; marisol@somos.co. Receives receipts and seat requests.</div></div>
@@ -97,43 +104,64 @@
           </div>
         </section>
 
-        <section class="card">
-          <h2 class="card-title">Invoices</h2>
-          <table class="dtable">
+        <h2 class="card-title" style="margin: 0 0 var(--bento-space-04)">Invoices</h2>
+        <div class="table-card">
+          <table class="hs-table">
             <thead>
               <tr>
-                <th>Issued</th>
                 <th>Invoice</th>
+                <th>Date</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th></th>
+                <th style="text-align: right">Download</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>1 Jul 2026</td>
-                <td>INV-2026-014</td>
-                <td>$268.00</td>
-                <td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Download PDF"><span class="material-symbols-outlined">download</span></button></td>
+                <td>INV-2026-0007</td>
+                <td>1 July 2026</td>
+                <td>US$268.00</td>
+                <td><span class="hs-badge hs-badge--positive">Paid</span></td>
+                <td style="text-align: right"><button class="hs-btn hs-btn--ghost hs-btn--icon ne-tooltipbtn" aria-label="Download invoice INV-2026-0007 (PDF)"><span class="material-symbols-outlined">download</span></button></td>
               </tr>
               <tr>
-                <td>1 Jun 2026</td>
-                <td>INV-2026-013</td>
-                <td>$249.00</td>
-                <td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Download PDF"><span class="material-symbols-outlined">download</span></button></td>
+                <td>INV-2026-0006</td>
+                <td>1 June 2026</td>
+                <td>US$249.00</td>
+                <td><span class="hs-badge hs-badge--positive">Paid</span></td>
+                <td style="text-align: right"><button class="hs-btn hs-btn--ghost hs-btn--icon ne-tooltipbtn" aria-label="Download invoice INV-2026-0006 (PDF)"><span class="material-symbols-outlined">download</span></button></td>
               </tr>
               <tr>
+                <td>INV-2026-0005</td>
                 <td>1 May 2026</td>
-                <td>INV-2026-012</td>
-                <td>$249.00</td>
-                <td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Paid</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Download PDF"><span class="material-symbols-outlined">download</span></button></td>
+                <td>US$249.00</td>
+                <td><span class="hs-badge hs-badge--positive">Paid</span></td>
+                <td style="text-align: right"><button class="hs-btn hs-btn--ghost hs-btn--icon ne-tooltipbtn" aria-label="Download invoice INV-2026-0005 (PDF)"><span class="material-symbols-outlined">download</span></button></td>
+              </tr>
+              <tr>
+                <td>INV-2026-0004</td>
+                <td>1 April 2026</td>
+                <td>US$249.00</td>
+                <td><span class="hs-badge hs-badge--positive">Paid</span></td>
+                <td style="text-align: right"><button class="hs-btn hs-btn--ghost hs-btn--icon ne-tooltipbtn" aria-label="Download invoice INV-2026-0004 (PDF)"><span class="material-symbols-outlined">download</span></button></td>
+              </tr>
+              <tr>
+                <td>INV-2026-0003</td>
+                <td>1 March 2026</td>
+                <td>US$249.00</td>
+                <td><span class="hs-badge hs-badge--positive">Paid</span></td>
+                <td style="text-align: right"><button class="hs-btn hs-btn--ghost hs-btn--icon ne-tooltipbtn" aria-label="Download invoice INV-2026-0003 (PDF)"><span class="material-symbols-outlined">download</span></button></td>
+              </tr>
+              <tr>
+                <td>INV-2026-0002</td>
+                <td>1 February 2026</td>
+                <td>US$249.00</td>
+                <td><span class="hs-badge hs-badge--positive">Paid</span></td>
+                <td style="text-align: right"><button class="hs-btn hs-btn--ghost hs-btn--icon ne-tooltipbtn" aria-label="Download invoice INV-2026-0002 (PDF)"><span class="material-symbols-outlined">download</span></button></td>
               </tr>
             </tbody>
           </table>
-        </section>
+        </div>
       </div>
     </div>
   </main>

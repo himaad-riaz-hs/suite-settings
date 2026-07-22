@@ -10,6 +10,18 @@
   <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
+  <style>
+    /* Roles page, page-local only (tokens only). Mirrors people.html's floating .menu pattern. */
+    /* Designer note: roles do not need a decorative leading glyph per row, so hide the shield thumb
+       that app.js renders and let the role name lead cleanly. */
+    #rolesBody .cell-with-thumb .thumb { display: none; }
+
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:210px; padding:6px; }
+    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+  </style>
 </head>
 <body class="suite-app">
 <aside class="suite-rail">
@@ -53,16 +65,16 @@
     <header class="suite-topbar">
       <h1>Roles &amp; permissions</h1>
       <div class="spacer"></div>
+      <button class="hs-btn hs-btn--primary" id="createRoleBtn"><span class="material-symbols-outlined">add</span>Create role</button>
       <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
     </header>
 
     <div class="pagebar">
-      <div class="grow"></div>
-      <div class="searchbox" style="min-width:200px">
+      <div class="searchbox" style="min-width:240px">
         <span class="material-symbols-outlined">search</span>
-        <input type="search" placeholder="Search roles" aria-label="Search roles">
+        <input type="search" id="rolesSearch" placeholder="Search roles" aria-label="Search roles">
       </div>
-      <button class="hs-btn hs-btn--primary" id="createRoleBtn"><span class="material-symbols-outlined">add</span>Create role</button>
+      <div class="grow"></div>
     </div>
 
     <div class="content">
@@ -116,6 +128,111 @@
     </div>
   </div>
 
+<div class="menu" id="rolesMenu" hidden></div>
+
 <script src="app.js"></script>
+<script>
+  // Roles page-local interactivity: row action menus, confirmation toasts, and role search.
+  // Self-contained. Does not touch app.js or app.css.
+  (function () {
+    var menu = document.getElementById("rolesMenu");
+
+    function closeMenu() { if (menu) menu.hidden = true; }
+
+    function showMenu(anchor, items) {
+      menu.innerHTML = items.map(function (it) {
+        return it.sep
+          ? '<div class="sep"></div>'
+          : '<button type="button" data-act="' + it.act + '"><span class="material-symbols-outlined">' + it.icon + '</span>' + it.label + "</button>";
+      }).join("");
+      var r = anchor.getBoundingClientRect();
+      menu.style.left = Math.min(r.left, window.innerWidth - 226) + "px";
+      menu.style.top = (r.bottom + 4) + "px";
+      menu.hidden = false;
+      menu._roleName = anchor.getAttribute("data-role-name") || "this role";
+    }
+
+    // Reuse app.js's toast styling if present; otherwise show a brief page-local toast.
+    function roleToast(msg) {
+      var t = document.getElementById("rolesToast");
+      if (!t) {
+        t = document.createElement("div");
+        t.id = "rolesToast";
+        t.setAttribute("role", "status");
+        t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s";
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity = "1";
+      clearTimeout(t._t);
+      t._t = setTimeout(function () { t.style.opacity = "0"; }, 1800);
+    }
+
+    function roleMenuItems() {
+      return [
+        { act: "edit", icon: "edit", label: "Edit role" },
+        { act: "duplicate", icon: "content_copy", label: "Duplicate" },
+        { act: "rename", icon: "drive_file_rename_outline", label: "Rename" },
+        { sep: true },
+        { act: "delete", icon: "delete", label: "Delete role" }
+      ];
+    }
+
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      // Open menu when a row's action button is clicked (app.js renders it with aria-label "Role actions").
+      var btn = t.closest && t.closest('#rolesBody [aria-label="Role actions"]');
+      if (btn) {
+        e.stopPropagation();
+        var open = !menu.hidden && menu._anchor === btn;
+        if (open) { closeMenu(); menu._anchor = null; return; }
+        var tr = btn.closest("tr");
+        var nameEl = tr && tr.querySelector("td:first-child .cell-with-thumb > span:not(.thumb)");
+        // Take the name text only, dropping any trailing badge ("Custom") text.
+        var roleName = "this role";
+        if (nameEl) {
+          var first = nameEl.firstChild;
+          roleName = (first && first.nodeType === 3 ? first.textContent : nameEl.textContent).trim();
+        }
+        btn.setAttribute("data-role-name", roleName);
+        menu._anchor = btn;
+        showMenu(btn, roleMenuItems());
+        return;
+      }
+      // Act on a menu option.
+      var opt = t.closest && t.closest("#rolesMenu button[data-act]");
+      if (opt) {
+        var name = menu._roleName || "this role";
+        var msgs = {
+          edit: 'Editing "' + name + '"',
+          duplicate: '"' + name + '" duplicated',
+          rename: 'Renaming "' + name + '"',
+          delete: '"' + name + '" deleted'
+        };
+        closeMenu();
+        menu._anchor = null;
+        roleToast(msgs[opt.getAttribute("data-act")] || "Done");
+        return;
+      }
+      // Click elsewhere closes the menu.
+      if (!(t.closest && t.closest("#rolesMenu"))) { closeMenu(); menu._anchor = null; }
+    });
+
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeMenu(); menu._anchor = null; } });
+
+    // Search: filter role rows by name or by what the role can do.
+    var search = document.getElementById("rolesSearch");
+    if (search) {
+      search.addEventListener("input", function () {
+        var q = search.value.trim().toLowerCase();
+        var rows = document.querySelectorAll("#rolesBody tr");
+        rows.forEach(function (tr) {
+          var text = (tr.textContent || "").toLowerCase();
+          tr.style.display = (!q || text.indexOf(q) >= 0) ? "" : "none";
+        });
+      });
+    }
+  })();
+</script>
 </body>
 </html>

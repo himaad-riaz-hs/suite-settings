@@ -25,6 +25,12 @@
     /* inline saved confirmation next to the Owner value */
     .savednote { display:inline-flex; align-items:center; gap:4px; margin-left:10px; font: var(--hs-type-body-sm); color: var(--hs-fg-positive); vertical-align:middle; }
     .savednote .material-symbols-outlined { font-size:16px; }
+    /* floating action menu (mirrors people.html .menu, tokens only) */
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:210px; padding:6px; }
+    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
   </style>
 </head>
 <body class="suite-app">
@@ -70,7 +76,7 @@
       <button class="backbtn" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></button>
       <h1>@somos</h1>
       <div class="spacer"></div>
-      <button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
+      <button class="icon-btn ne-tooltipbtn" id="headerMoreBtn" aria-label="More actions" onclick="openHeaderMenu(event)"><span class="material-symbols-outlined">more_horiz</span></button>
       <button class="hs-btn hs-btn--primary" id="headerReconnectBtn" onclick="openReconnect()"><span class="material-symbols-outlined">sync</span>Reconnect</button>
     </header>
 
@@ -91,7 +97,7 @@
           </div>
           <div class="row">
             <div class="kv"><div class="k">Status</div><div class="v" id="statusValue">Token expired 2 days ago.</div></div>
-            <div class="trail"><span class="pill warn" data-detail-status><span class="material-symbols-outlined">error</span>Reconnect</span></div>
+            <div class="trail"><span class="hs-badge hs-badge--warning" data-detail-status><span class="material-symbols-outlined">error</span>Reconnect</span></div>
           </div>
         </section>
 
@@ -117,6 +123,9 @@
       </div>
     </div>
   </main>
+
+  <!-- Floating header action menu (mirrors people.html .menu) -->
+  <div class="menu" id="floatMenu" hidden></div>
 
   <!-- Change owner modal (T5): reassign the @somos owner -->
   <div class="ovl" id="reassignOvl">
@@ -156,6 +165,35 @@
   </div>
 
 <script>
+  // ---------- floating header action menu (mirrors people.html) ----------
+  function closeMenus(){ var m=document.getElementById('floatMenu'); if(m) m.hidden=true; }
+  function showMenu(anchor, items){
+    var m=document.getElementById('floatMenu');
+    m.innerHTML = items.map(function(it){ return it.sep ? '<div class="sep"></div>'
+      : '<button onclick="'+it.fn+'"><span class="material-symbols-outlined">'+it.icon+'</span>'+it.label+'</button>'; }).join('');
+    var r=anchor.getBoundingClientRect();
+    m.style.left=Math.min(r.left, window.innerWidth-244)+'px'; m.style.top=(r.bottom+4)+'px'; m.hidden=false;
+  }
+  function openHeaderMenu(e){ e.stopPropagation();
+    var needsReconnect = !document.getElementById('headerReconnectBtn').hidden;
+    var items=[];
+    if(needsReconnect) items.push({label:'Reconnect', icon:'sync', fn:'headerDo(\'reconnect\')'});
+    items.push({label:'Change owner', icon:'person', fn:'headerDo(\'owner\')'});
+    items.push({label:'Manage access', icon:'groups', fn:'headerDo(\'access\')'});
+    items.push({sep:true});
+    items.push({label:'Disconnect account', icon:'link_off', fn:'headerDo(\'disconnect\')'});
+    showMenu(document.getElementById('headerMoreBtn'), items);
+  }
+  function headerDo(k){ closeMenus();
+    if(k==='reconnect'){ openReconnect(); return; }
+    if(k==='owner'){ openReassign(); return; }
+    if(k==='access'){ toast('Manage access'); return; }
+    if(k==='disconnect'){ toast('@somos disconnected'); return; }
+  }
+  function toast(msg){ var t=document.getElementById('acctToast'); if(!t){ t=document.createElement('div'); t.id='acctToast';
+    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s'; document.body.appendChild(t); }
+    t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800); }
+
   // Change owner flow (T5)
   function openReassign(){ document.getElementById('reassignOvl').classList.add('open'); }
   function closeReassign(){ document.getElementById('reassignOvl').classList.remove('open'); }
@@ -183,7 +221,7 @@
     reconnectStep(2);
     // Flip the on-page Status pill from warn/Reconnect to ok/Connected
     var pill = document.querySelector('[data-detail-status]');
-    if(pill){ pill.className = 'pill ok'; pill.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Connected'; }
+    if(pill){ pill.className = 'hs-badge hs-badge--positive'; pill.innerHTML = '<span class="material-symbols-outlined">check</span>Connected'; }
     var statusV = document.getElementById('statusValue');
     if(statusV) statusV.textContent = 'Connected. Publishing and analytics are active.';
     var banner = document.getElementById('reconnectBanner');
@@ -191,7 +229,10 @@
     var hdrBtn = document.getElementById('headerReconnectBtn');
     if(hdrBtn) hdrBtn.hidden = true;
   }
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReassign(); closeReconnect(); } });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReassign(); closeReconnect(); closeMenus(); } });
+  document.addEventListener('click', function(e){ var t=e.target;
+    if(!(t.closest && (t.closest('#floatMenu')||t.closest('#headerMoreBtn')))) closeMenus();
+  });
 </script>
 </body>
 </html>

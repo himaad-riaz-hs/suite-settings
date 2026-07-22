@@ -22,6 +22,15 @@
     .sent { text-align:center; padding:12px 0; }
     .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 14px; }
     .sent .big .material-symbols-outlined { font-size:40px; }
+    /* floating action / filter menu (mirrors people.html .menu, tokens only) */
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:0 8px 24px rgba(1,43,58,.16); min-width:210px; padding:6px; }
+    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .menu button .ck { margin-left:auto; color:var(--hs-fg-link); font-size:18px; visibility:hidden; }
+    .menu button.on .ck { visibility:visible; }
+    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+    .filtered-out { display:none !important; }
   </style>
 </head>
 <body class="suite-app">
@@ -70,13 +79,13 @@
     </header>
 
     <div class="pagebar">
-      <div class="grow"></div>
-      <div class="searchbox" style="min-width:240px">
+      <div class="searchbox" style="flex:1; min-width:240px">
         <span class="material-symbols-outlined">search</span>
-        <input type="search" placeholder="Search users, teams or accounts" aria-label="Search users, teams or accounts">
+        <input type="search" id="acctSearch" placeholder="Search users, teams or accounts" aria-label="Search users, teams or accounts" oninput="applyFilters()">
       </div>
-      <button class="sel viewpick" id="viewPick" onclick="toggleView()"><span class="material-symbols-outlined" style="font-size:18px">view_column</span><span id="viewPickLabel">Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-      <button class="sel"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+      <button class="sel" id="networkFilter" style="min-width:150px" onclick="openNetworkMenu(event)"><span>Network</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+      <button class="sel" id="statusFilter" style="min-width:150px" onclick="openStatusMenu(event)"><span>Status</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+      <button class="sel viewpick" id="viewPick" onclick="openViewMenu(event)"><span class="material-symbols-outlined" style="font-size:18px">view_column</span><span id="viewPickLabel">Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
     </div>
 
     <div class="content">
@@ -99,53 +108,53 @@
               </tr>
             </thead>
             <tbody>
-              <tr id="somosIgRow">
+              <tr id="somosIgRow" data-network="Instagram" data-status="Needs reconnect" data-account="@somos" data-reconnect="1">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">photo_camera</span></span><a href="social-account-detail.html">@somos</a></div></td>
                 <td class="hs-small">Instagram</td>
                 <td class="hs-small">Priya Anand</td>
                 <td><span class="hs-badge hs-badge--warning" data-status-pill><span class="material-symbols-outlined">error</span>Reconnect</span></td>
-                <td><div class="cell-with-thumb"><button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="openReconnect()">Reconnect</button><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div></td>
+                <td><div class="cell-with-thumb"><button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="openReconnect()">Reconnect</button><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></div></td>
               </tr>
-              <tr>
+              <tr data-network="LinkedIn" data-status="Connected" data-account="Somos">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">tag</span></span><a href="social-account-detail.html">Somos</a></div></td>
                 <td class="hs-small">LinkedIn</td>
                 <td class="hs-small">Marisol Chen</td>
                 <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-network="X" data-status="Connected" data-account="@somos">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">forum</span></span><a href="social-account-detail.html">@somos</a></div></td>
                 <td class="hs-small">X</td>
                 <td class="hs-small">Marco Silva</td>
                 <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-network="YouTube" data-status="Connected" data-account="Somos Official">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">play_circle</span></span><a href="social-account-detail.html">Somos Official</a></div></td>
                 <td class="hs-small">YouTube</td>
                 <td class="hs-small">Jordan Lee</td>
                 <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-network="Facebook" data-status="Connected" data-account="Somos">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">thumb_up</span></span><a href="social-account-detail.html">Somos</a></div></td>
                 <td class="hs-small">Facebook</td>
                 <td class="hs-small">Bryn Morales</td>
                 <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-network="TikTok" data-status="Needs reconnect" data-account="@somos" data-reconnect="1">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">music_note</span></span><a href="social-account-detail.html">@somos</a></div></td>
                 <td class="hs-small">TikTok</td>
                 <td class="hs-small">Bryn Morales</td>
                 <td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">error</span>Reconnect</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
             </tbody>
           </table>
@@ -158,19 +167,22 @@
         </div>
 
         <div class="grid" id="gridView" hidden>
-          <div class="ecard">
-            <div class="top"><div class="av"><span class="material-symbols-outlined">photo_camera</span></div><div class="nm"><div class="n"><a href="social-account-detail.html">@somos</a></div><div class="e">Instagram &#183; Priya Anand</div></div><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div>
-            <div class="foot"><span class="pill warn"><span class="material-symbols-outlined">error</span>Reconnect</span></div>
+          <div class="ecard" data-network="Instagram" data-status="Needs reconnect" data-account="@somos" data-reconnect="1">
+            <div class="top"><div class="av"><span class="material-symbols-outlined">photo_camera</span></div><div class="nm"><div class="n"><a href="social-account-detail.html">@somos</a></div><div class="e">Instagram &#183; Priya Anand</div></div><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></div>
+            <div class="foot"><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">error</span>Reconnect</span></div>
           </div>
-          <div class="ecard">
-            <div class="top"><div class="av"><span class="material-symbols-outlined">tag</span></div><div class="nm"><div class="n"><a href="social-account-detail.html">Somos</a></div><div class="e">LinkedIn &#183; Marisol Chen</div></div><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div>
-            <div class="foot"><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Connected</span></div>
+          <div class="ecard" data-network="LinkedIn" data-status="Connected" data-account="Somos">
+            <div class="top"><div class="av"><span class="material-symbols-outlined">tag</span></div><div class="nm"><div class="n"><a href="social-account-detail.html">Somos</a></div><div class="e">LinkedIn &#183; Marisol Chen</div></div><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></div>
+            <div class="foot"><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></div>
           </div>
         </div>
 
       </div>
     </div>
   </main>
+
+  <!-- Floating menu (row actions + toolbar filters), mirrors people.html .menu -->
+  <div class="menu" id="floatMenu" hidden></div>
 
   <!-- Reconnect modal (T5): restore the expired @somos Instagram connection -->
   <div class="ovl" id="reconnectOvl">
@@ -193,11 +205,63 @@
   </div>
 
 <script>
-  function toggleView(){
-    var t=document.getElementById('tableView'), g=document.getElementById('gridView'), l=document.getElementById('viewPickLabel');
-    var toCard = !t.hidden;
-    if(t) t.hidden = toCard; if(g) g.hidden = !toCard;
-    if(l) l.textContent = toCard ? 'Card view' : 'Column view';
+  // ---------- floating menu (row actions + toolbar filters), mirrors people.html ----------
+  function closeMenus(){ var m=document.getElementById('floatMenu'); if(m) m.hidden=true; }
+  function showMenu(anchor, items){
+    var m=document.getElementById('floatMenu');
+    m.innerHTML = items.map(function(it){ return it.sep ? '<div class="sep"></div>'
+      : '<button'+(it.on?' class="on"':'')+' onclick="'+it.fn+'"><span class="material-symbols-outlined">'+it.icon+'</span>'+it.label+'<span class="material-symbols-outlined ck">check</span></button>'; }).join('');
+    var r=anchor.getBoundingClientRect();
+    m.style.left=Math.min(r.left, window.innerWidth-244)+'px'; m.style.top=(r.bottom+4)+'px'; m.hidden=false;
+  }
+  // toast (mirrors people.html)
+  function toast(msg){ var t=document.getElementById('acctToast'); if(!t){ t=document.createElement('div'); t.id='acctToast';
+    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s'; document.body.appendChild(t); }
+    t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800); }
+
+  // ---------- row action menu ----------
+  function openRowMenu(e, btn){ e.stopPropagation();
+    var host = btn.closest('tr') || btn.closest('.ecard');
+    var acct = host ? (host.getAttribute('data-account') || 'this account') : 'this account';
+    var needsReconnect = host && host.getAttribute('data-reconnect')==='1';
+    var items = [];
+    if(needsReconnect) items.push({label:'Reconnect', icon:'sync', fn:'rowReconnect(this)'});
+    items.push({label:'Reassign owner', icon:'person', fn:'rowReassign(\''+esc(acct)+'\')'});
+    items.push({label:'View details', icon:'open_in_new', fn:'rowViewDetails()'});
+    items.push({sep:true});
+    items.push({label:'Disconnect', icon:'link_off', fn:'rowDisconnect(\''+esc(acct)+'\')'});
+    showMenu(btn, items);
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function rowReconnect(){ closeMenus(); openReconnect(); }
+  function rowReassign(acct){ closeMenus(); toast('Reassign owner for '+acct); }
+  function rowViewDetails(){ closeMenus(); window.location.href='social-account-detail.html'; }
+  function rowDisconnect(acct){ closeMenus(); toast(acct+' disconnected'); }
+
+  // ---------- toolbar filters + view ----------
+  var networkF='All', statusF='All';
+  function openNetworkMenu(e){ e.stopPropagation();
+    showMenu(document.getElementById('networkFilter'), ['All','Instagram','LinkedIn','X','YouTube','Facebook','TikTok'].map(function(n){return {label:n,icon:'share',on:networkF===n,fn:'pickNetwork(\''+n+'\')'};})); }
+  function pickNetwork(n){ networkF=n; document.querySelector('#networkFilter span').textContent=(n==='All'?'Network':n); applyFilters(); closeMenus(); }
+  function openStatusMenu(e){ e.stopPropagation();
+    showMenu(document.getElementById('statusFilter'), ['All','Connected','Needs reconnect'].map(function(s){return {label:s,icon:'check_circle',on:statusF===s,fn:'pickStatus(\''+esc(s)+'\')'};})); }
+  function pickStatus(s){ statusF=s; document.querySelector('#statusFilter span').textContent=(s==='All'?'Status':s); applyFilters(); closeMenus(); }
+  function openViewMenu(e){ e.stopPropagation(); var col=!document.getElementById('tableView').hidden;
+    showMenu(document.getElementById('viewPick'), [
+      {label:'Column view', icon:'view_column', on:col, fn:'pickView(\'column\')'},
+      {label:'Card view', icon:'grid_view', on:!col, fn:'pickView(\'card\')'} ]); }
+  function pickView(v){ setView(v); document.getElementById('viewPickLabel').textContent=(v==='column'?'Column view':'Card view'); closeMenus(); }
+  function setView(v){ var t=document.getElementById('tableView'), g=document.getElementById('gridView');
+    if(t) t.hidden = v!=='column'; if(g) g.hidden = v!=='card'; }
+  function applyFilters(){
+    var q=(document.getElementById('acctSearch')||{value:''}).value.trim().toLowerCase();
+    function match(host, text){
+      var net=host.getAttribute('data-network')||''; var st=host.getAttribute('data-status')||'';
+      var ok=(networkF==='All'||net===networkF)&&(statusF==='All'||st===statusF)&&(!q||text.indexOf(q)>=0);
+      host.classList.toggle('filtered-out',!ok);
+    }
+    document.querySelectorAll('#tableView tbody tr').forEach(function(tr){ match(tr, tr.textContent.toLowerCase()); });
+    document.querySelectorAll('#gridView .ecard').forEach(function(c){ match(c, c.textContent.toLowerCase()); });
   }
 
   // Reconnect flow (T5)
@@ -222,7 +286,12 @@
     var meta = document.getElementById('countMeta');
     if(meta) meta.innerHTML = '13 connected &#183; 2 need to reconnect';
   }
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeReconnect(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReconnect(); closeMenus(); } });
+  // close floating menu on outside click (keep open when clicking the menu or its anchors)
+  document.addEventListener('click', function(e){
+    var t=e.target;
+    if(!(t.closest && (t.closest('#floatMenu')||t.closest('#networkFilter')||t.closest('#statusFilter')||t.closest('#viewPick')||t.closest('.icon-btn[aria-label="Actions"]')))) closeMenus();
+  });
 </script>
 <script src="app.js"></script>
 </body>
