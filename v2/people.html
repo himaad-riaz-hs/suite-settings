@@ -153,7 +153,7 @@
         <a href="#" class="on" data-tab="members" onclick="setTab(event,'members')">Members<span class="cnt">45</span></a>
         <a href="#" data-tab="teams" onclick="setTab(event,'teams')">Teams<span class="cnt">6</span></a>
         <a href="#" data-tab="pending" onclick="setTab(event,'pending')">Pending invites<span class="cnt">3</span></a>
-        <a href="#" data-tab="requested" onclick="setTab(event,'requested')">Requested<span class="cnt">2</span></a>
+        <a href="#" data-tab="requested" onclick="setTab(event,'requested')">Requested<span class="cnt">8</span></a>
       </nav>
     </div>
 
@@ -226,11 +226,19 @@
           <div class="listrow"><span class="av">KB</span><div class="kv"><div class="k">kenji.brooks@somos.co</div><div class="m">Viewer &#183; invited 4 days ago</div></div><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span><button class="hs-btn hs-btn--outlined hs-btn--sm">Resend</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Revoke</button></div>
         </section>
 
-        <!-- REQUESTED (seat requests to the billing owner) -->
+        <!-- REQUESTED (join requests to approve — Layla Task 3) -->
         <section data-panel="requested" hidden>
-          <p class="subhead">Seat requests wait here for the billing owner (Marisol Chen) to approve.</p>
-          <div class="listrow"><span class="av">SR</span><div class="kv"><div class="k">Sam Rivera requested 1 seat</div><div class="m">For a new contractor &#183; today</div></div><button class="hs-btn hs-btn--primary hs-btn--sm">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Deny</button></div>
-          <div class="listrow"><span class="av">DO</span><div class="kv"><div class="k">Devin Okafor requested 2 seats</div><div class="m">For the Paid Media team &#183; yesterday</div></div><button class="hs-btn hs-btn--primary hs-btn--sm">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Deny</button></div>
+          <p class="subhead">8 people have requested to join Somos. You have <strong id="reqFree">4</strong> free seats. Approving a request uses a seat; when they run out you can add more.</p>
+          <div id="reqList">
+            <div class="listrow" data-req="pending"><span class="av">NO</span><div class="kv"><div class="k">Nadia Osei</div><div class="m">nadia.osei@somos.co &#183; Growth</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">TR</span><div class="kv"><div class="k">Tomas Reyes</div><div class="m">tomas.reyes@somos.co &#183; Content</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">LP</span><div class="kv"><div class="k">Lena Park</div><div class="m">lena.park@somos.co &#183; Agency partner</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">OH</span><div class="kv"><div class="k">Omar Haddad</div><div class="m">omar.haddad@somos.co &#183; Paid Media</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">IC</span><div class="kv"><div class="k">Ivy Chen</div><div class="m">ivy.chen@somos.co &#183; Contractor</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">DS</span><div class="kv"><div class="k">Diego Santos</div><div class="m">diego.santos@somos.co &#183; Social</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">FM</span><div class="kv"><div class="k">Farah Malik</div><div class="m">farah.malik@somos.co &#183; Agency partner</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+            <div class="listrow" data-req="pending"><span class="av">KN</span><div class="kv"><div class="k">Kai Nguyen</div><div class="m">kai.nguyen@somos.co &#183; Content</div></div><span class="reqacts"><button class="hs-btn hs-btn--primary hs-btn--sm" onclick="approveReq(this)">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="denyReq(this)">Deny</button></span></div>
+          </div>
         </section>
       </div>
     </div>
@@ -242,6 +250,23 @@
       <div class="mh"><h2 id="invTitle">Invite members</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
       <div class="mb" id="invBody"></div>
       <div class="mf" id="invFoot"></div>
+    </div>
+  </div>
+
+  <!-- Approve-buy modal (Task 3: out of free seats while approving) -->
+  <div class="ovl" id="apBuyOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="apTitle">
+      <div class="mh"><h2 id="apTitle">Add seats to approve</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeApBuy()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb">
+        <p class="subhead">You are out of free seats. Add <span id="apNeed">4</span> seats to approve the remaining requests.</p>
+        <div class="price">
+          <div class="pr"><span>Advanced plan</span><span>US$1,245.00 / mo</span></div>
+          <div class="pr"><span><span id="apQty">4</span> additional seats</span><span id="apCost">US$996.00 / mo</span></div>
+          <div class="pr total"><span>Due now (prorated)</span><span id="apDue">US$996.00</span></div>
+        </div>
+        <div class="payln"><span>Visa ending 4242</span><button class="hs-btn hs-btn--ghost hs-btn--sm">Change</button></div>
+      </div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeApBuy()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="confirmApBuy()">Add seats and approve</button></div>
     </div>
   </div>
 
@@ -307,6 +332,23 @@
     // notifications
     function toggleNotif(e){ if(e) e.stopPropagation(); document.getElementById('notifPanel').classList.toggle('open'); }
     function goRequested(){ setTab({preventDefault:function(){}},'requested'); document.getElementById('notifPanel').classList.remove('open'); }
+    // Task 3: approve join requests, run out of free seats, buy more, continue
+    var reqFree=4, _apRow=null;
+    function reqRows(){ return [].slice.call(document.querySelectorAll('#reqList .listrow')); }
+    function reqPending(){ return reqRows().filter(function(r){return r.dataset.req==='pending';}).length; }
+    function reqSetFree(){ var el=document.getElementById('reqFree'); if(el) el.textContent=reqFree; }
+    function reqMark(row, kind){ row.dataset.req=kind; var a=row.querySelector('.reqacts');
+      if(a) a.innerHTML = kind==='approved' ? '<span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Approved</span>' : '<span class="hs-badge hs-badge--neutral">Denied</span>'; }
+    function approveReq(btn){ var row=btn.closest('.listrow');
+      if(reqFree<=0){ _apRow=row; var need=reqPending(); var cost=need*249;
+        document.getElementById('apNeed').textContent=need; document.getElementById('apQty').textContent=need;
+        document.getElementById('apCost').textContent='US$'+cost.toLocaleString()+'.00 / mo'; document.getElementById('apDue').textContent='US$'+cost.toLocaleString()+'.00';
+        document.getElementById('apBuyOvl').classList.add('open'); return; }
+      reqFree--; reqMark(row,'approved'); reqSetFree(); }
+    function denyReq(btn){ reqMark(btn.closest('.listrow'),'denied'); }
+    function closeApBuy(){ document.getElementById('apBuyOvl').classList.remove('open'); }
+    function confirmApBuy(){ var need=reqPending(); reqFree+=need; closeApBuy();
+      if(_apRow){ reqFree--; reqMark(_apRow,'approved'); _apRow=null; } reqSetFree(); toast('Seats added. You can approve the rest.'); }
     // toast
     function toast(msg){ var t=document.getElementById('pplToast'); if(!t){ t=document.createElement('div'); t.id='pplToast';
       t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:0 8px 24px rgba(1,43,58,.16);transition:opacity .16s'; document.body.appendChild(t); }
@@ -320,6 +362,13 @@
       if(!(t.closest && (t.closest('#floatMenu')||t.closest('#viewBtn')||t.closest('#roleFilter')||t.closest('#teamFilter')))) closeMenus();
       if(!(t.closest && (t.closest('#notifPanel')||t.closest('[aria-label="Notifications"]')))) document.getElementById('notifPanel').classList.remove('open');
     });
+    // sync the seat header + count meta to ?seats (Task 2 starts with no seats: ?seats=0)
+    (function(){ var q=new URLSearchParams(location.search); if(q.get('seats')===null) return;
+      var s=parseInt(q.get('seats'),10); if(isNaN(s)||s<0) return; var used=50-s;
+      var seatsEl=document.querySelector('.seatline .seats');
+      if(seatsEl) seatsEl.innerHTML='<span class="material-symbols-outlined">event_seat</span>'+used+' of 50 seats used';
+      var meta=document.querySelector('.count-h .meta');
+      if(meta) meta.innerHTML='Advanced plan · '+used+' of 50 seats used · '+s+' available.'; })();
   </script>
 
   <script>
@@ -338,9 +387,10 @@
     function invParams(){ var q=new URLSearchParams(location.search);
       var f=(q.get('flow')||'a').toLowerCase(); if(f!=='b') f='a';
       var r=(q.get('role')||'admin').toLowerCase(); if(r!=='member') r='admin';
-      return {flow:f, role:r}; }
-    function openInvite(){ var p=invParams(); inv.flow=p.flow; inv.role=p.role; inv.step='form'; inv.available=5; inv.buyQty=1;
-      var start = inv.role==='member' ? 2 : 3; inv.rows=[]; for(var i=0;i<start;i++) inv.rows.push({perm:'View only'});
+      var s=parseInt(q.get('seats'),10); if(isNaN(s)||s<0) s=5;
+      return {flow:f, role:r, seats:s}; }
+    function openInvite(){ var p=invParams(); inv.flow=p.flow; inv.role=p.role; inv.step='form'; inv.available=p.seats; inv.buyQty=1;
+      var start = inv.role==='member' ? 2 : (p.seats===0 ? 1 : 3); inv.rows=[]; for(var i=0;i<start;i++) inv.rows.push({perm:'View only'});
       renderInvite(); document.getElementById('inviteOvl').classList.add('open'); }
     function closeInvite(){ document.getElementById('inviteOvl').classList.remove('open'); }
     function addInvRow(){ inv.rows.push({perm:'View only'}); renderInvite(); }
@@ -394,12 +444,12 @@
       }
       h += colsHTML();
       if(inv.role==='admin' && inv.flow==='a'){
-        // included rows (fixed), then a section break + paid rows + neutral running total
-        var inc=Math.min(INCLUDED, n), i;
+        // free rows (up to available), then a section break + paid rows + neutral running total
+        var av=inv.available, inc=Math.min(av, n), i;
         for(i=0;i<inc;i++) h += rowHTML(i,false);
-        if(n>INCLUDED){
+        if(n>av){
           h += '<div class="secbreak"><span class="l">Additional seats will be added to your plan</span><span class="r">US$'+SEAT_PRICE.toLocaleString()+'/mo each</span></div>';
-          for(i=INCLUDED;i<n;i++) h += rowHTML(i,true);
+          for(i=av;i<n;i++) h += rowHTML(i,true);
           var over=invOverflow(), cost=(over*SEAT_PRICE).toLocaleString();
           h += '<div class="runtotal"><span class="material-symbols-outlined">info</span><span class="t">'+over+' additional seat'+(over>1?'s':'')+'</span><span class="amt">US$'+cost+'/mo</span></div>';
         }
