@@ -326,14 +326,16 @@ html, body { margin: 0; height: 100%; }
 .saved-note { margin: var(--bento-space-04) 0 0; }
 
 /* ============================================================
-   Restore the TESTED white-panel look (2026-07-22).
-   The Figma-reconciliation flattened every surface to a hairline
-   outline (box-shadow:none). The tested Organization build
-   read as white panels floating on the grey Bento canvas, so put
-   the subtle card elevation back. Later in the cascade → wins over
-   lines 205/206/209. Canvas stays the Bento bg-app token; CTA hue
-   left as-is (open question, flagged separately).
+   FLAT panels — match the Bento Figma (2026-07-22).
+   The Bento design language is flat: white surface, hairline border,
+   NO drop shadow ("no 3D"). Definition comes from the border + the
+   grey page canvas, not elevation. This enforces flat on every
+   page-level surface, overriding the base .card elevation (line 44)
+   and any stray shadow. Overlays (modals, menus, toasts) keep their
+   elevation on purpose — floating surfaces are meant to lift.
    ============================================================ */
 .card,
 .ecard,
-.table-card { box-shadow: var(--hs-elev-card); }
+.table-card,
+.ov-card,
+.listrow { box-shadow: none !important; }
