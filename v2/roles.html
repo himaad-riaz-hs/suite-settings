@@ -17,12 +17,13 @@
     <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
     <a class="suite-navbtn" data-product="perch" href="#"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
     <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">forum</span></span><span class="lbl">Nest</span></a>
-    <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
     <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">hearing</span></span><span class="lbl">Lumen</span></a>
+    <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
     <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
     <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">shield</span></span><span class="lbl">Vigil</span></a>
   </div>
   <div class="others">
+    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></button>
     <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
     <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
     <div class="avatar" title="Melanie Torres">MT</div>
@@ -33,30 +34,38 @@
       <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
     </div>
     <nav class="sd-body" aria-label="Settings">
-      <div class="sd-group">Account</div>
-      <a class="sd-item" href="profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
-      <a class="sd-item" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
-      <a class="sd-item" href="security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy</a>
-      <a class="sd-item" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
-      <a class="sd-item" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan &amp; billing</a>
-      <div class="sd-group">Organization</div>
-      <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
-      <a class="sd-item" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
-      <a class="sd-item on" href="roles.html" aria-current="page"><span class="material-symbols-outlined">manage_accounts</span>Roles</a>
-      <a class="sd-item" href="teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
-      <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
-      <div class="sd-group">Publishing</div>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">sell</span>Tags</a>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Vanity URLs</a>
+      <a class="sd-item" href="profile.html"><span class="material-symbols-outlined">person</span>Account</a>
+      <a class="sd-item on" href="org-general.html" aria-current="page"><span class="material-symbols-outlined">apartment</span>Organization</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">workspaces</span>Workspace</a>
     </nav>
   </aside>
   <main class="suite-main">
     <header class="suite-topbar">
-      <h1>Roles</h1>
+      <h1>Organization</h1>
       <div class="spacer"></div>
       <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
-      <button class="hs-btn hs-btn--primary" id="createRoleBtn"><span class="material-symbols-outlined">add</span>Create role</button>
+      <button class="icon-btn ne-tooltipbtn" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button>
+      <div class="splitbtn">
+        <button class="hs-btn hs-btn--primary">Create organization</button>
+        <button class="hs-btn hs-btn--primary split-caret" aria-label="More create options"><span class="material-symbols-outlined">expand_more</span></button>
+      </div>
     </header>
+
+    <div class="pagebar">
+      <nav class="tabs" aria-label="Organization">
+        <a href="org-general.html" data-tab="overview">Overview</a>
+        <a href="people.html" data-tab="users">Users</a>
+        <a class="on" href="roles.html" data-tab="roles" aria-current="page">Roles</a>
+        <a href="teams.html" data-tab="teams">Teams</a>
+        <a href="social-accounts.html" data-tab="social">Social accounts</a>
+      </nav>
+      <div class="grow"></div>
+      <div class="searchbox" style="min-width:200px">
+        <span class="material-symbols-outlined">search</span>
+        <input type="search" placeholder="Search roles" aria-label="Search roles">
+      </div>
+      <button class="hs-btn hs-btn--primary" id="createRoleBtn"><span class="material-symbols-outlined">add</span>Create role</button>
+    </div>
 
     <div class="content">
       <div class="inner wide">
@@ -72,7 +81,7 @@
                 <th>Role</th>
                 <th>What it can do</th>
                 <th style="width:120px">People</th>
-                <th style="width:56px"></th>
+                <th style="width:56px">Actions</th>
               </tr>
             </thead>
             <tbody id="rolesBody"><!-- rendered by app.js --></tbody>

@@ -438,11 +438,28 @@
     }
   }
 
+  /* ---- account section sub-tabs (highlight the current page) ----------- */
+  function initAccountTabs() {
+    var tabs = document.querySelectorAll('.tabs [data-acct]');
+    if (!tabs.length) return;
+    var file = location.pathname.split("/").pop() || "profile.html";
+    tabs.forEach(function (t) {
+      var h = t.getAttribute("data-acct");
+      var on = (h === file) ||
+        (file.indexOf("security") === 0 && h === "security.html") ||
+        (file.indexOf("plan-billing") === 0 && h === "plan-billing.html") ||
+        (file === "" && h === "profile.html");
+      t.classList.toggle("on", on);
+      if (on) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
+    });
+  }
+
   /* ---- boot ------------------------------------------------------------- */
   function boot() {
     initPersonDetail();
     initPeopleList();
     initRoles();
+    initAccountTabs();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

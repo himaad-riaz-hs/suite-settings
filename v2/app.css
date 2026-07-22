@@ -191,6 +191,66 @@ html, body { margin: 0; height: 100%; }
 .inner.wide { max-width: 1180px; }
 
 /* ============================================================
+   Figma reconciliation (social-os-reboot, node 1580-160232).
+   Primary CTA = Bento info-blue #1F60C9. Panels are FLAT (no
+   drop shadow). List tables sit flat and full-width on a white
+   base panel — no card wrapper, no 3D — per the User Table frame.
+   ============================================================ */
+:root {
+  --hs-action-primary:         var(--bento-system-sys-info-600);   /* #1F60C9 */
+  --hs-action-primary-hover:   var(--bento-system-sys-info-700);
+  --hs-action-primary-pressed: var(--bento-system-sys-info-800);
+}
+/* Overview summary cards: white, hairline border, rounded, NO shadow */
+.card  { border: 1px solid var(--hs-border); box-shadow: none; border-radius: var(--hs-radii-xl); }
+.ecard { border: 1px solid var(--hs-border); box-shadow: none; }
+/* list table sits in a FLAT white base panel (hairline, rounded, NO shadow)
+   on the grey page canvas — matches the Figma "white borderless base panel" */
+.table-card { border: 1px solid var(--hs-border); box-shadow: none; border-radius: var(--hs-radii-xl); background: var(--bento-theme-color-bg-surface); overflow: hidden; }
+/* sortable table header cell */
+.th-sort { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.th-sort .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+/* split primary button: blue action + teal dropdown affordance (Create organization) */
+.splitbtn { display: inline-flex; }
+.splitbtn .hs-btn--primary { border-radius: var(--hs-radii-md) 0 0 var(--hs-radii-md); }
+.splitbtn .split-caret {
+  border-radius: 0 var(--hs-radii-md) var(--hs-radii-md) 0; padding: 0 8px; min-width: 0;
+  background: var(--bento-theme-color-bg-primary); color: var(--bento-theme-color-text-inverse, #fdfdfd);
+  border-left: 1px solid rgba(253,253,253,0.24);
+}
+.splitbtn .split-caret:hover { background: var(--bento-theme-color-bg-primary-hovered); }
+.splitbtn .split-caret .material-symbols-outlined { font-size: 18px; margin: 0; }
+/* "Column view" toolbar dropdown reuses .sel; keep its label on one line */
+.sel.viewpick { min-width: 156px; white-space: nowrap; gap: 8px; }
+.sel.viewpick > :first-child { flex: 0 0 auto; }
+.sel.viewpick #viewPickLabel { flex: 1; }
+
+/* Organization Overview page — summary cards (frame 1580:160376) */
+.ov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: var(--bento-space-04); }
+.ov-card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-xl); padding: var(--bento-space-05); display: flex; flex-direction: column; gap: 14px; }
+.ov-card .ov-head { display: flex; align-items: center; gap: 10px; }
+.ov-card .ov-head .material-symbols-outlined { font-size: 22px; color: var(--bento-theme-color-icon-base); }
+.ov-card .ov-head h3 { font: var(--hs-type-title-base); margin: 0; flex: 1; }
+.ov-num { font: var(--hs-type-title-screen); font-size: 44px; line-height: 1; color: var(--hs-fg); }
+.ov-sub { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+.ov-stats { display: flex; gap: 8px; }
+.ov-stat { flex: 1; border-radius: var(--hs-radii-md); padding: 10px 8px; text-align: center; background: var(--bento-system-sys-neutral-alt-100); }
+.ov-stat .n { font: var(--hs-type-title-sub); display: block; }
+.ov-stat .l { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+.ov-stat.pos { background: var(--hs-bg-positive); } .ov-stat.pos .n { color: var(--hs-fg-positive); }
+.ov-stat.neg { background: var(--hs-bg-negative); } .ov-stat.neg .n { color: var(--hs-fg-negative); }
+.ov-mid { display: flex; align-items: center; gap: 16px; }
+.ov-donut { width: 92px; height: 92px; border-radius: 999px; display: grid; place-items: center; flex-shrink: 0; }
+.ov-donut span { width: 68px; height: 68px; border-radius: 999px; background: var(--bento-theme-color-bg-surface); display: grid; place-items: center; font: var(--hs-type-title-base); }
+.ov-legend { display: flex; flex-direction: column; gap: 6px; font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+.ov-legend .dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; margin-right: 6px; }
+.ov-bars { display: flex; flex-direction: column; gap: 10px; }
+.ov-bar { display: flex; align-items: center; gap: 10px; font: var(--hs-type-body-sm); }
+.ov-bar .track { flex: 1; height: 8px; border-radius: 999px; background: var(--bento-system-sys-neutral-alt-100); overflow: hidden; }
+.ov-bar .fill { height: 100%; border-radius: 999px; display: block; }
+.ov-card > .hs-btn { width: 100%; justify-content: center; margin-top: auto; }
+
+/* ============================================================
    Interactive layer — permissions scoping + custom roles
    (person-detail Permissions tab, Change role + Create role
    modals, save confirmation). Tokens only; modal + menu markup
