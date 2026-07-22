@@ -1,0 +1,53 @@
+/* boost.css — Automated Boost. Boost is NOT a nav item: this flow is launched
+   from Create ("Boost a post") and from Ads. First-class template so the flow
+   is discoverable. Reuses ads.css wizard (.aw-*, .obj-*, .ad-kpi*) — load both.
+   Adds the automations list + trigger cards. Bento-backed. */
+
+/* Automations list */
+.bo-note { display: flex; align-items: center; gap: 10px; background: var(--bento-system-sys-info-50); border: 1px solid var(--bento-system-sys-info-200); color: var(--bento-system-sys-info-800); border-radius: 10px; padding: 12px 16px; font-size: 14px; margin-bottom: 16px; }
+.bo-note .material-symbols-outlined { font-size: 20px; color: var(--bento-system-sys-info-700); }
+
+.bo-auto { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.bo-auto:last-child { border-bottom: 0; }
+.bo-auto .bo-ic { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; background: var(--bento-system-sys-primary-100); color: var(--bento-system-sys-primary-700); }
+.bo-auto .bo-ic .material-symbols-outlined { font-size: 22px; }
+.bo-auto .bo-body { flex: 1; min-width: 0; }
+.bo-auto .bo-name { font-weight: 700; font-size: 16px; }
+.bo-auto .bo-rule { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin-top: 2px; }
+.bo-auto .bo-metrics { display: flex; gap: 28px; flex-shrink: 0; }
+.bo-auto .bo-metric { text-align: right; }
+.bo-auto .bo-metric .v { font-weight: 700; font-size: 17px; font-variant-numeric: tabular-nums; }
+.bo-auto .bo-metric .k { font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+
+/* boost create-automated-boost flow — centered single-column (board flow-boost) */
+.bo-flowhead { height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); }
+.bo-flowhead h1 { font-weight: 700; font-size: 20px; margin: 0; }
+.bo-flowscroll { flex: 1; min-height: 0; overflow: auto; padding: 40px 24px; display: flex; justify-content: center; }
+.bo-flow { width: 637px; max-width: 100%; display: flex; flex-direction: column; gap: 24px; }
+.bo-fld { display: flex; flex-direction: column; gap: 8px; }
+.bo-fld > label { font-weight: 600; font-size: 14px; }
+.bo-opt { font-weight: 400; color: var(--bento-theme-color-text-subtle); }
+.bo-hint { margin: 0; font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.bo-trigcard { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1.5px solid var(--bento-theme-color-bg-primary); border-radius: 12px; box-shadow: inset 0 0 0 1px var(--bento-theme-color-bg-primary); }
+.bo-trigradio { width: 20px; height: 20px; border-radius: 999px; border: 1.5px solid var(--bento-theme-color-bg-primary); flex-shrink: 0; position: relative; margin-top: 2px; }
+.bo-trigradio::after { content: ""; position: absolute; inset: 3px; border-radius: 999px; background: var(--bento-theme-color-bg-primary); }
+.bo-trigtx { display: flex; flex-direction: column; gap: 2px; }
+.bo-trigtx .t { font-weight: 700; font-size: 15px; }
+.bo-trigtx .d { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.bo-addtrig { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-base); padding: 6px 0; }
+.bo-addtrig .material-symbols-outlined { font-size: 18px; }
+.bo-inline { display: flex; align-items: center; gap: 8px; }
+.bo-pct { font-weight: 700; font-size: 22px; }
+.bo-flowfoot { flex-shrink: 0; height: 64px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 24px; border-top: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); }
+.bw-triggers { display: flex; flex-direction: column; gap: 10px; }
+.bw-trigger { text-align: left; display: flex; gap: 14px; align-items: flex-start; background: var(--bento-theme-color-bg-surface); border: 1.5px solid var(--bento-theme-color-border-subtle); border-radius: 12px; padding: 16px; cursor: pointer; font-family: inherit; }
+.bw-trigger:hover { border-color: var(--bento-system-sys-neutral-400); }
+.bw-trigger.on { border-color: var(--bento-theme-color-bg-primary); box-shadow: inset 0 0 0 1px var(--bento-theme-color-bg-primary); }
+.bw-trigger .tw-ic { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base); }
+.bw-trigger.on .tw-ic { background: var(--bento-theme-color-bg-primary); color: var(--bento-theme-color-text-on-primary); }
+.bw-trigger .tw-ic .material-symbols-outlined { font-size: 22px; }
+.bw-trigger .tw-t { font-weight: 700; font-size: 15px; }
+.bw-trigger .tw-d { font-size: 13px; color: var(--bento-theme-color-text-subtle); line-height: 1.45; margin-top: 2px; }
+.bw-trigger .tw-radio { margin-left: auto; width: 20px; height: 20px; border-radius: 999px; border: 1.5px solid var(--bento-system-sys-neutral-400); flex-shrink: 0; position: relative; align-self: center; }
+.bw-trigger.on .tw-radio { border-color: var(--bento-theme-color-bg-primary); }
+.bw-trigger.on .tw-radio::after { content: ""; position: absolute; inset: 3px; border-radius: 999px; background: var(--bento-theme-color-bg-primary); }

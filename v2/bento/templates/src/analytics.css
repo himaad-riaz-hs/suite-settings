@@ -1,0 +1,192 @@
+/* Analytics template · Suite shell. Bento-backed.
+   Six surfaces: overview (main) · report detail · report builder (create/edit)
+   · empty · error · loading. Reports lives INSIDE Analytics (per direction).
+   Verified order vs social-os-reboot Analytics frames + HS-Bento-master tokens. */
+
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bento-theme-color-bg-app); color: var(--bento-theme-color-text-base);
+       font-family: var(--bento-theme-font-families-primary); -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+/* Snowflake (flagged): chart series colours use the tokenized categorical palette
+   (--hs-cat-*) led by primary navy. No dedicated Bento chart component exists. */
+:root {
+  --an-s1: var(--bento-system-sys-primary-500); /* navy lead series */
+  --an-s2: var(--hs-cat-2);                      /* turquoise compare */
+  --an-grid: var(--bento-theme-color-border-subtle);
+}
+
+.suite-app { display: flex; height: 100vh; overflow: hidden; }
+.an { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bento-system-sys-neutral-alt-100); }
+
+/* Analytics sub-nav matches the shared Perch/Suite drawer width (304) */
+.suite-app .suite-drawer { width: 304px; }
+
+/* ── Topbar ─────────────────────────────────────────────── */
+.an-top { height: 64px; background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle);
+          display: flex; align-items: center; gap: 16px; padding: 12px 24px; flex-shrink: 0; }
+.an-top h1 { font-weight: 700; font-size: 24px; line-height: 32px; margin: 0; color: var(--bento-theme-color-text-base); }
+.an-ws { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: transparent; border: 0; cursor: pointer;
+         font-weight: 600; font-size: 15px; color: var(--bento-theme-color-text-base); font-family: inherit; }
+.an-ws:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.an-ws .av { width: 26px; height: 26px; border-radius: 999px; background: var(--hs-cat-2-bg); color: var(--hs-cat-2-fg);
+             display: grid; place-items: center; font-weight: 800; font-size: 8px; letter-spacing: 0.04em; }
+.an-ws .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-text-subtle); }
+.an-spacer { flex: 1; }
+.an-back { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 0; cursor: pointer; padding: 6px 8px;
+           border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.an-back:hover { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base); }
+.an-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.an-crumb b { color: var(--bento-theme-color-text-base); font-weight: 700; }
+.an-crumb .material-symbols-outlined { font-size: 16px; }
+
+/* ── Subheader / filter toolbar ─────────────────────────── */
+.an-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 24px; flex-wrap: wrap;
+              border-bottom: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); }
+.an-toolbar .sub-title { font-weight: 700; font-size: 20px; line-height: 28px; color: var(--bento-theme-color-text-base); }
+.cf .dot { width: 8px; height: 8px; border-radius: 999px; }
+
+/* ── Body + grid ────────────────────────────────────────── */
+.an-body { flex: 1; min-height: 0; overflow: auto; padding: 24px; }
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle);
+        border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.s3 { grid-column: span 3; } .s4 { grid-column: span 4; } .s6 { grid-column: span 6; } .s8 { grid-column: span 8; } .s12 { grid-column: span 12; }
+.card .h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.card .h .t { font-weight: 600; font-size: 16px; }
+.card .h .s { font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.kpi-big { font-weight: 600; font-size: 48px; line-height: 52px; letter-spacing: -0.02em; }
+
+/* Deltas — colour NEVER alone (paired arrow), and NO red: down is neutral. */
+.dt { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; font-size: 13px; }
+.dt .material-symbols-outlined { font-size: 16px; }
+.dt.up   { color: var(--bento-theme-color-text-positive); }
+.dt.down { color: var(--bento-theme-color-text-subtle); }
+
+.legend { display: flex; gap: 14px; font-size: 13px; flex-wrap: wrap; color: var(--bento-theme-color-text-subtle); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 999px; }
+.ph-line, .ph-bar, .ph-donut, .ph-area { flex: 1; min-height: 150px; width: 100%; }
+
+/* ── Report detail header ───────────────────────────────── */
+.rd-head { display: flex; align-items: flex-start; gap: 20px; padding: 24px; background: var(--bento-theme-color-bg-surface);
+           border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px; margin-bottom: 16px; }
+.rd-head .rd-title { font-weight: 700; font-size: 26px; line-height: 32px; margin: 0 0 6px; }
+.rd-head .rd-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--bento-theme-color-text-subtle); font-size: 14px; }
+.rd-head .rd-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.rd-head .rd-meta .material-symbols-outlined { font-size: 16px; }
+.rd-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ── Data table (snowflake, flagged: no .hs-table in components.css) ── */
+.an-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.an-table th, .an-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); white-space: nowrap; }
+.an-table th { font-weight: 600; font-size: 13px; color: var(--bento-theme-color-text-subtle); text-transform: none; }
+.an-table td.num, .an-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.an-table tbody tr:hover { background: var(--bento-system-sys-neutral-alt-50); }
+.an-table .row-lead { display: flex; align-items: center; gap: 10px; }
+.an-table .row-lead .net { width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+.an-table .row-lead .nm { font-weight: 600; }
+.an-table .row-lead .su { font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+
+/* ── Report builder ─────────────────────────────────────── */
+.bd { flex: 1; min-height: 0; display: flex; overflow: hidden; }
+.bd-config { width: 360px; flex-shrink: 0; border-right: 1px solid var(--bento-theme-color-border-subtle);
+             background: var(--bento-theme-color-bg-surface); overflow: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+.bd-sec { display: flex; flex-direction: column; gap: 10px; }
+.bd-sec > label.lbl { font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-base); }
+.bd-hint { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin: -4px 0 0; }
+.bd-net { display: flex; flex-wrap: wrap; gap: 8px; }
+.bd-modules { display: flex; flex-direction: column; gap: 2px; }
+.bd-mod { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+.bd-mod:hover { background: var(--bento-system-sys-neutral-alt-50); }
+.bd-mod .mi { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--bento-system-sys-neutral-alt-100);
+              color: var(--bento-theme-color-text-base); flex-shrink: 0; }
+.bd-mod .mi .material-symbols-outlined { font-size: 18px; }
+.bd-mod .mt { flex: 1; min-width: 0; }
+.bd-mod .mt .mn { font-weight: 600; font-size: 14px; }
+.bd-mod .mt .md { font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+.bd-canvas { flex: 1; min-width: 0; overflow: auto; padding: 28px 32px; }
+.bd-paper { max-width: 760px; margin: 0 auto; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle);
+            border-radius: 12px; box-shadow: var(--bento-theme-elevation-shadow-raised); overflow: hidden; }
+.bd-paper-head { padding: 28px 32px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.bd-paper-head h2 { font-weight: 700; font-size: 24px; margin: 0 0 4px; }
+.bd-paper-head .sub { color: var(--bento-theme-color-text-subtle); font-size: 14px; }
+.bd-paper-body { padding: 24px 32px 32px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.bd-block { border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 10px; padding: 16px; min-height: 120px; display: flex; flex-direction: column; gap: 8px; }
+.bd-block.full { grid-column: span 2; }
+.bd-block .bb-t { font-weight: 600; font-size: 14px; }
+.bd-block.ghost { border-style: dashed; align-items: center; justify-content: center; color: var(--bento-theme-color-text-placeholder); font-size: 13px; min-height: 80px; }
+.bd-foot { height: 72px; flex-shrink: 0; border-top: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface);
+           display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 24px; }
+.bd-foot .meta { margin-right: auto; font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+
+/* form controls (scoped to builder) */
+.an-field { width: 100%; box-sizing: border-box; }
+.an-select { position: relative; }
+.an-select .material-symbols-outlined { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--bento-theme-color-text-subtle); font-size: 18px; }
+select.an-field { appearance: none; }
+
+/* checkbox (matches Bento check token feel) */
+.an-check { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; border: 1.5px solid var(--bento-system-sys-neutral-400);
+            display: grid; place-items: center; background: var(--bento-theme-color-bg-surface); }
+.an-check.on { background: var(--bento-theme-color-bg-primary); border-color: var(--bento-theme-color-bg-primary); }
+.an-check .material-symbols-outlined { font-size: 16px; color: #fff; opacity: 0; }
+.an-check.on .material-symbols-outlined { opacity: 1; }
+
+/* form controls (scoped to builder) */
+
+/* ── Folded onto canonical Bento table (Approvals/DM comp-table 1530:165745) ──
+   Grid-bordered cells, 56px header on surface-hovered (#F7F8F9), 16px text.
+   Compact 56px rows (these are single-line data tables). */
+.an-table { width: 100%; border-collapse: collapse; }
+.an-table thead th { text-align: left; font-weight: 600; font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); height: 56px; padding: 0 16px; background: var(--bento-theme-color-bg-surface-hovered); border: 1px solid var(--bento-theme-color-border-subtle); white-space: nowrap; box-sizing: border-box; }
+.an-table tbody td { height: 56px; padding: 0 16px; border: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); vertical-align: middle; box-sizing: border-box; }
+.an-table tbody tr:hover td { background: var(--bento-theme-color-bg-surface-hovered); }
+.an-table th.num, .an-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+
+/* ── Analytics overview — performance score + social impact (3781:272775) ── */
+.an-sech { font-weight: 700; font-size: 24px; line-height: 32px; color: var(--bento-theme-color-text-base); margin: 0 0 16px; }
+.an-secsub { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--bento-theme-color-text-subtle); }
+.an-score { position: relative; display: grid; grid-template-columns: 1fr 1.4fr; gap: 32px; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 16px; padding: 24px; margin-bottom: 32px; }
+.sc-left { display: flex; flex-direction: column; }
+.sc-t { font-weight: 700; font-size: 20px; color: var(--bento-theme-color-text-base); }
+.sc-d { font-size: 14px; line-height: 20px; color: var(--bento-theme-color-text-subtle); margin-top: 6px; max-width: 46ch; }
+.sc-num { display: flex; align-items: baseline; gap: 8px; margin-top: 24px; }
+.sc-num .big { font-weight: 700; font-size: 64px; line-height: 1; letter-spacing: -0.02em; color: var(--bento-system-sys-primary-700); }
+.sc-num .den { font-weight: 700; font-size: 20px; color: var(--bento-theme-color-text-subtle); }
+.sc-arrow { width: 28px; height: 28px; border-radius: 999px; background: var(--bento-system-sys-positive-50); color: var(--bento-system-sys-positive-600); display: grid; place-items: center; margin-left: 4px; }
+.sc-arrow .material-symbols-outlined { font-size: 18px; }
+.sc-great { font-weight: 700; font-size: 16px; margin-top: 16px; color: var(--bento-theme-color-text-base); }
+.sc-greatsub { font-size: 14px; color: var(--bento-theme-color-text-subtle); margin-top: 2px; }
+.sc-right { display: flex; flex-direction: column; }
+.sc-chart-t { font-weight: 700; font-size: 12px; letter-spacing: 0.06em; color: var(--bento-theme-color-text-subtle); margin-bottom: 8px; }
+.sc-right .ph-line { width: 100%; height: 200px; }
+.sc-months { display: flex; justify-content: space-between; font-size: 12px; color: var(--bento-theme-color-text-subtle); margin-top: 4px; }
+.sc-cta { position: absolute; top: 24px; right: 24px; }
+
+.an-impacthead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.an-impactgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.an-impact-card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
+.an-impact-card.wide { grid-column: span 2; }
+.ai-h { display: flex; align-items: center; gap: 8px; }
+.ai-ic { width: 24px; height: 24px; display: grid; place-items: center; color: var(--bento-system-sys-primary-700); }
+.ai-ic .material-symbols-outlined { font-size: 20px; }
+.ai-t { font-weight: 600; font-size: 15px; color: var(--bento-theme-color-text-base); }
+.ai-i { margin-left: auto; color: var(--bento-theme-color-icon-subtle); display: grid; place-items: center; }
+.ai-i .material-symbols-outlined { font-size: 16px; }
+.ai-v { font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.01em; color: var(--bento-theme-color-text-base); margin-top: 6px; }
+.ai-unit { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.ai-delta { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 14px; }
+.an-idt { display: inline-flex; align-items: center; gap: 2px; font-weight: 700; }
+.an-idt .material-symbols-outlined { font-size: 16px; }
+.ai-from { color: var(--bento-theme-color-text-subtle); }
+
+
+/* ── Borderless table (global fix — board 1530:165745): white header, no
+   vertical/cell dividers, only #EBEBEB horizontal separators, top padding,
+   left-aligned. Overrides the earlier grid-bordered fold. */
+.an-table thead th { background: transparent; border: 0; border-bottom: 1px solid var(--bento-theme-color-border-subtle); padding: 24px 16px 12px; font-weight: 700; height: auto; }
+.an-table tbody td { background: transparent; border: 0; border-bottom: 1px solid var(--bento-theme-color-border-subtle); padding: 18px 16px; height: auto; }
+.an-table th.num, .an-table td.num { text-align: left; }
+.an-table tbody tr:hover td { background: var(--bento-theme-color-bg-surface-hovered); }
+.an-table tbody tr:last-child td { border-bottom: 0; }

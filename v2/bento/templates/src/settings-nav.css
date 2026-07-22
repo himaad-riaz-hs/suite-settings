@@ -1,0 +1,344 @@
+/* settings-nav.css — Settings navigation panel, two layouts compared.
+   Reuses the canonical Suite shell (.suite-rail / .suite-drawer / .sd-*) and
+   REAL Bento components: .hs-input (search), .hs-select, .hs-table, .hs-badge,
+   .hs-alert, .hs-toggle, .hs-display-toggle, .hs-avatar, .hs-btn, .hs-check.
+   Section headers use the named type tokens (= bento-text-label-sm); Option B
+   sub-labels are the SAME recipe one weight lighter (= bento-text-body-sm).
+   FLAGGED SNOWFLAKES (tokenized, no Bento equivalent in components.css):
+   .snav-grouphead (collapsible NavDrawer — pending DS-lead approval), .snav-menu
+   (popover), .snav-bulkbar, .snav-mdrawer, .snav-flow, .snav-toc, .snav-toast,
+   .snav-previewbar, .snav-destruct, .snav-idcell. All isolated under .snav-* so
+   Option A's collapse lifts out cleanly without touching core .sd-group. */
+
+.snav-app { height: 100vh; display: flex; flex-direction: row; overflow: hidden; }
+
+/* ── The settings nav panel (reuses .suite-drawer chrome) ── */
+.snav-drawer { width: 304px; }
+.snav-drawer .sd-head { font-size: 22px; }
+.snav-drawer .sd-body { padding: 8px 12px 16px; gap: 0; }
+.snav-search { position: relative; margin: 4px 0 8px; }
+.snav-search .snav-search-ic { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--bento-theme-color-icon-subtle); pointer-events: none; }
+.snav-search .snav-search-input { width: 100%; box-sizing: border-box; padding-left: 38px; padding-right: 34px; }
+.snav-search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-subtle); }
+.snav-search-clear:hover { background: var(--bento-system-sys-neutral-alt-200); }
+.snav-search-clear:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); }
+.snav-search-clear .material-symbols-outlined { font-size: 18px; }
+
+/* Section headers (group labels) — the named Bento section-header type tokens
+   (= bento-text-label-sm: size-1 / line-1 / semibold / letter-spacing-0), matching
+   the product drawer's .sd-group exactly, same padding rhythm. */
+.snav-drawer .sd-group {
+  padding: 18px 12px 6px;
+  font-family: var(--bento-theme-font-families-primary);
+  font-size: var(--bento-theme-font-size-1);
+  line-height: var(--bento-theme-line-heights-1);
+  font-weight: var(--bento-theme-font-weights-semibold);
+  letter-spacing: var(--bento-theme-letter-spacing-0);
+  color: var(--bento-theme-color-text-subtle);
+}
+.snav-drawer .sd-group:first-of-type { padding-top: 6px; }
+
+/* Option B sub-label = SAME section-header recipe, ONE weight lighter
+   (= bento-text-body-sm: regular 400 — the next step on the 700/600/400 scale).
+   Same family/size/line-height/letter-spacing/colour; only the weight differs. */
+.snav-drawer .sd-group.snav-sub { padding: 8px 12px 4px; font-weight: var(--bento-theme-font-weights-regular); }
+
+/* ── Option A: collapsible group header (the isolated new behavior) ── */
+.snav-grouphead {
+  display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent;
+  cursor: pointer; text-align: left; padding: 18px 12px 6px; white-space: nowrap;
+  font-family: var(--bento-theme-font-families-primary);
+  font-size: var(--bento-theme-font-size-1); line-height: var(--bento-theme-line-heights-1);
+  font-weight: var(--bento-theme-font-weights-semibold); letter-spacing: var(--bento-theme-letter-spacing-0);
+  color: var(--bento-theme-color-text-subtle);
+}
+.snav-grouphead:first-of-type { padding-top: 6px; }
+.snav-grouphead:hover { color: var(--bento-theme-color-text-base); }
+.snav-grouphead .grow { flex: 1; }
+.snav-grouphead .chev { display: inline-flex; font-size: 20px; color: var(--bento-theme-color-icon-subtle); transition: transform .15s ease; }
+.snav-grouphead.collapsed .chev { transform: rotate(-90deg); }
+.snav-grouphead.locked-open { cursor: default; }
+.snav-grouphead:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; border-radius: 8px; }
+/* collapsed-group count uses the shared .hs-badge--neutral component */
+
+/* ── Option B: collapsible SUB-GROUP header — SECOND level of the same snowflake.
+   = .snav-sub typography (regular weight, one step lighter than the semibold
+   group header) rendered as a button, reusing .snav-grouphead's chevron-rotate,
+   hover and focus patterns. Isolated here; core .sd-group is untouched. */
+.snav-subhead {
+  display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent;
+  cursor: pointer; text-align: left; padding: 8px 12px 4px; white-space: nowrap;
+  font-family: var(--bento-theme-font-families-primary);
+  font-size: var(--bento-theme-font-size-1); line-height: var(--bento-theme-line-heights-1);
+  font-weight: var(--bento-theme-font-weights-regular); letter-spacing: var(--bento-theme-letter-spacing-0);
+  color: var(--bento-theme-color-text-subtle);
+}
+.snav-subhead:hover { color: var(--bento-theme-color-text-base); }
+.snav-subhead .grow { flex: 1; }
+.snav-subhead .chev { display: inline-flex; font-size: 18px; color: var(--bento-theme-color-icon-subtle); transition: transform .15s ease; }
+.snav-subhead.collapsed .chev { transform: rotate(-90deg); }
+.snav-subhead.locked-open { cursor: default; }
+.snav-subhead:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; border-radius: 8px; }
+
+/* WCAG: a clear keyboard focus ring on every nav row + active state already via .sd-item.on */
+.snav-drawer .sd-item:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; }
+
+/* empty-search state inside the panel */
+.snav-empty { padding: 28px 16px; text-align: center; color: var(--bento-theme-color-text-subtle); }
+.snav-empty .material-symbols-outlined { font-size: 30px; display: block; margin: 0 auto 8px; color: var(--bento-theme-color-icon-disabled); }
+.snav-empty .t { font-size: 14px; font-weight: 600; color: var(--bento-theme-color-text-base); }
+.snav-empty .d { font-size: 13px; margin-top: 2px; }
+
+/* search-result group label (flat list while filtering) */
+.snav-resultgroup { padding: 14px 12px 4px; font-family: var(--bento-theme-font-families-primary); font-weight: var(--bento-theme-font-weights-semibold); font-size: var(--bento-theme-font-size-1); line-height: var(--bento-theme-line-heights-1); color: var(--bento-theme-color-text-subtle); }
+
+/* ── Main column (reuses .set-main rhythm) ── */
+.snav-main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bento-system-sys-neutral-alt-100); overflow: hidden; }
+.snav-topbar {
+  flex-shrink: 0; background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle);
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--bento-space-02) var(--bento-space-04); padding: var(--bento-space-03) var(--bento-space-06); min-height: 72px; box-sizing: border-box;
+}
+.snav-topbar .ttl { flex: 1 1 220px; min-width: 0; }
+.snav-topbar .crumb { font-size: 13px; line-height: 18px; color: var(--bento-theme-color-text-subtle); display: flex; align-items: center; gap: 4px; }
+.snav-topbar .crumb .material-symbols-outlined { font-size: 14px; }
+.snav-topbar h1 { font-family: var(--bento-theme-font-families-primary); font-size: 24px; line-height: 32px; font-weight: 700; margin: 2px 0 0; color: var(--bento-theme-color-text-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* description joins the title in the white header band (tight under the title) */
+.snav-topbar .snav-topbar-desc { margin: var(--bento-space-01) 0 0; font-size: var(--bento-theme-font-size-1); line-height: 1.45; color: var(--bento-theme-color-text-subtle); max-width: 78ch; }
+
+/* DEV/DEMO preview bar — deliberately distinct from product chrome */
+.snav-previewbar {
+  flex-shrink: 0; display: flex; align-items: center; flex-wrap: wrap; gap: var(--bento-space-02) var(--bento-space-04);
+  padding: 8px var(--bento-space-06); background: var(--bento-system-sys-neutral-alt-200);
+  border-bottom: 1px dashed var(--bento-theme-color-border-base);
+}
+.snav-previewbar .pv-badge { height: 24px; }
+.snav-previewbar .pv-badge .material-symbols-outlined { font-size: 15px; }
+.snav-previewbar .pv-help { font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+.snav-previewbar .pv-grow { flex: 1; min-width: var(--bento-space-04); }
+.snav-previewbar .pv-ctrl { display: inline-flex; align-items: center; gap: var(--bento-space-02); }
+.snav-previewbar .pv-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bento-theme-color-text-subtle); }
+.snav-previewbar .hs-display-toggle { background: var(--bento-theme-color-bg-surface); }
+.snav-previewbar .pv-hide { width: 28px; height: 28px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-subtle); margin-left: var(--bento-space-01); }
+.snav-previewbar .pv-hide:hover { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-icon-base); }
+.snav-previewbar .pv-hide:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); }
+.snav-previewbar .pv-hide .material-symbols-outlined { font-size: 18px; }
+/* low-key reopen pill (shown when the demo controls are hidden) */
+.snav-preview-show { position: absolute; top: 10px; right: 14px; z-index: 40; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 8px; border-radius: 999px; border: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); color: var(--bento-theme-color-text-subtle); font-family: var(--bento-theme-font-families-primary); font-size: 12px; font-weight: 600; cursor: pointer; opacity: 0.62; }
+.snav-preview-show:hover { opacity: 1; box-shadow: var(--bento-theme-elevation-shadow-raised); }
+.snav-preview-show:focus-visible { opacity: 1; outline: 2px solid var(--bento-theme-color-border-focus); }
+.snav-preview-show .material-symbols-outlined { font-size: 15px; }
+@media (max-width: 860px) { .snav-preview-show { top: auto; bottom: 14px; } }
+/* role preview = the real .hs-select, sized down to the bar's 32px controls */
+.snav-previewbar .pv-roleselect { height: 32px; width: 156px; background: var(--bento-theme-color-bg-surface); }
+.snav-previewbar .pv-roleselect .chev { font-size: 18px; }
+
+/* hamburger (mobile only) — reuses .hs-btn--icon; this class only toggles visibility */
+.snav-menubtn { display: none; }
+
+/* page scroll container — the content area behind the cards sits on the canonical
+   Bento light-grey page surface (neutral-alt-100, the token every product content
+   column + the live Settings .set-main use; note --bento-theme-color-bg-app resolves
+   to white in this theme, so it is NOT the grey-page token). Cards stay on
+   --bento-theme-color-bg-surface (white) so they pop. Rail + drawer are untouched. */
+.snav-main { position: relative; }
+.snav-content { flex: 1; min-height: 0; overflow-y: auto; position: relative; background: var(--bento-system-sys-neutral-alt-100); }
+
+/* ── Rail avatar flyout (reuses .set-menu / .set-menu-item) ── */
+.snav-avatarwrap { position: relative; width: 100%; display: flex; justify-content: center; }
+.snav-flyout { position: absolute; left: calc(100% + 8px); bottom: 0; min-width: 248px; z-index: 90; }
+.snav-flyout .fly-id { display: flex; align-items: center; gap: var(--bento-space-03); padding: var(--bento-space-03); }
+.snav-flyout .fly-nm { font-size: 14px; font-weight: 700; color: var(--bento-theme-color-text-base); }
+.snav-flyout .fly-em { font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+.snav-flyout .fly-lab { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--bento-theme-color-text-subtle); padding: 6px var(--bento-space-03) 2px; }
+
+/* mobile backdrop */
+.snav-backdrop { display: none; position: fixed; inset: 0; background: rgba(28,28,28,0.4); z-index: 65; }
+
+/* ── Responsive: panel collapses behind a menu button ── */
+@media (max-width: 860px) {
+  .snav-app .suite-rail { display: none; }
+  .snav-menubtn { display: inline-flex; }
+  .snav-app .snav-drawer {
+    position: fixed; top: 0; left: 0; height: 100%; z-index: 70;
+    transform: translateX(-100%); transition: transform .22s ease; box-shadow: 4px 0 24px rgba(28,28,28,0.18);
+  }
+  .snav-app.nav-open .snav-drawer { transform: none; }
+  .snav-app.nav-open .snav-backdrop { display: block; }
+  /* avatar moves into the top bar on mobile */
+  .snav-mobile-av { display: inline-flex; }
+}
+.snav-mobile-av { display: none; position: relative; }
+.snav-mobile-av .snav-flyout { left: auto; right: 0; bottom: auto; top: calc(100% + 8px); }
+.snav-mobile-av .suite-rail-avatar-btn { border: 0; background: transparent; cursor: pointer; padding: 0; }
+
+/* ════════ Pages (shared across nav options) ════════ */
+.snav-pagewrap { max-width: 920px; margin: 0 auto; padding: var(--bento-space-06); display: flex; flex-direction: column; gap: var(--bento-space-05); }
+.snav-mtable, .snav-mtable + * { } /* members page uses a wider wrap */
+.snav-pagewrap:has(.snav-mtable), .snav-pagewrap:has(.snav-toc-layout) { max-width: 1100px; }
+
+.snav-phead { display: flex; align-items: center; justify-content: flex-end; gap: var(--bento-space-04); }
+.snav-phead .grow { flex: 1; min-width: 0; }
+.snav-ph-title { font-family: var(--bento-theme-font-families-primary); font-size: 24px; line-height: 32px; font-weight: 700; color: var(--bento-theme-color-text-base); margin: 0; }
+.snav-ph-sub { font-size: 14px; line-height: 1.5; color: var(--bento-theme-color-text-subtle); margin: var(--bento-space-01) 0 0; max-width: 70ch; }
+
+/* card (Bento .hs-card equivalent: flat white, 1px border, 8px radius) */
+.snav-card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; }
+.snav-card-h { display: flex; align-items: flex-start; gap: var(--bento-space-04); padding: var(--bento-space-04) var(--bento-space-05); border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.snav-card-h .grow { flex: 1; min-width: 0; }
+.snav-card-h h2 { font-family: var(--bento-theme-font-families-primary); font-size: 16px; font-weight: 700; color: var(--bento-theme-color-text-base); margin: 0; }
+.snav-card-h p { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin: 2px 0 0; }
+.snav-card-body { padding: var(--bento-space-02) var(--bento-space-05); }
+.snav-card-foot { padding: var(--bento-space-03) var(--bento-space-05); border-top: 1px solid var(--bento-theme-color-border-subtle); display: flex; gap: var(--bento-space-03); }
+
+.snav-setrow { display: flex; align-items: center; gap: var(--bento-space-04); padding: var(--bento-space-03) 0; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.snav-card-body > .snav-setrow:last-child { border-bottom: 0; }
+.snav-setrow .grow { flex: 1; min-width: 0; }
+.snav-setrow .t { font-size: 14px; font-weight: 600; color: var(--bento-theme-color-text-base); }
+.snav-setrow .d { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin-top: 1px; }
+.snav-setrow .ctrl { flex-shrink: 0; display: flex; align-items: center; gap: var(--bento-space-02); }
+.snav-val { font-size: 14px; color: var(--bento-theme-color-text-base); }
+.snav-formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bento-space-04); padding: var(--bento-space-03) 0; }
+/* inline select in settings rows = the real .hs-select shell, sized to content */
+.snav-inlineselect { width: auto; min-width: 220px; height: 36px; }
+
+/* table card */
+.snav-tablecard { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; overflow: hidden; }
+.snav-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.snav-checkcol { width: 44px; }
+.snav-mtable .snav-checkcol { padding-right: 0; }
+/* selected-row fill comes from the .hs-table component (.is-selected) */
+.snav-mrow:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; }
+/* members empty state */
+.snav-table-empty { padding: 48px 24px; text-align: center; color: var(--bento-theme-color-text-subtle); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.snav-table-empty .material-symbols-outlined { font-size: 34px; color: var(--bento-theme-color-icon-disabled); }
+.snav-table-empty .t { font-size: 16px; font-weight: 700; color: var(--bento-theme-color-text-base); }
+.snav-table-empty .d { font-size: 13px; max-width: 46ch; }
+.snav-table-empty .hs-btn { margin-top: var(--bento-space-03); }
+.snav-access { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+/* identity cell (avatar + name/email) — replaces the .set-cell/.set-av lookalike */
+.snav-idcell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.snav-idcell .tx { display: flex; flex-direction: column; min-width: 0; }
+.snav-idcell .nm { font-size: 14px; font-weight: 600; color: var(--bento-theme-color-text-base); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.snav-idcell .em { font-size: 12px; color: var(--bento-theme-color-text-subtle); line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* avatar category colours — Bento categorical tokens on the real .hs-avatar */
+.hs-avatar[data-c="1"] { background: var(--hs-cat-1-bg); color: var(--hs-cat-1-fg); }
+.hs-avatar[data-c="2"] { background: var(--hs-cat-2-bg); color: var(--hs-cat-2-fg); }
+.hs-avatar[data-c="3"] { background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg); }
+.hs-avatar[data-c="4"] { background: var(--hs-cat-4-bg); color: var(--hs-cat-4-fg); }
+.hs-avatar[data-c="5"] { background: var(--hs-cat-5-bg); color: var(--hs-cat-5-fg); }
+.hs-avatar[data-c="6"] { background: var(--hs-cat-6-bg); color: var(--hs-cat-6-fg); }
+
+/* floating bulk-action bar */
+.snav-bulkbar { position: sticky; bottom: 20px; z-index: 30; width: fit-content; max-width: 100%; margin: var(--bento-space-05) auto 4px; display: flex; align-items: center; gap: var(--bento-space-02); padding: 8px 10px; background: var(--bento-theme-color-text-base); color: var(--bento-theme-color-bg-surface); border-radius: 10px; box-shadow: var(--bento-theme-elevation-shadow-overlay, 0 8px 24px rgba(28,28,28,0.24)); }
+.snav-bulkbar .cnt { font-size: 13px; font-weight: 700; padding: 0 var(--bento-space-02); }
+.snav-bulkbar .sep { width: 1px; align-self: stretch; background: rgba(255,255,255,0.24); margin: 2px var(--bento-space-01); }
+.snav-bulkbar .hs-btn--ghost { color: var(--bento-theme-color-bg-surface); }
+.snav-bulkbar .hs-btn--ghost:hover { background: rgba(255,255,255,0.14); }
+.snav-bulk-act { position: relative; }
+.snav-bulkmenu { position: absolute; bottom: calc(100% + 8px); left: 0; top: auto; min-width: 200px; color: var(--bento-theme-color-text-base); }
+
+/* member drawer */
+.snav-drawer-scrim { position: fixed; inset: 0; background: rgba(28,28,28,0.4); z-index: 79; }
+.snav-mdrawer { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 92vw; z-index: 80; background: var(--bento-theme-color-bg-surface); box-shadow: -8px 0 28px rgba(28,28,28,0.18); display: flex; flex-direction: column; }
+.snav-mdrawer:focus { outline: none; }
+.snav-mdrawer-head { display: flex; align-items: center; gap: var(--bento-space-03); padding: var(--bento-space-04) var(--bento-space-05); border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.snav-mdrawer-head .set-cell { flex: 1; min-width: 0; }
+.snav-mdrawer-body { flex: 1; overflow-y: auto; padding: var(--bento-space-05); }
+.snav-eff-h { font-family: var(--bento-theme-font-families-primary); font-size: 16px; font-weight: 700; color: var(--bento-theme-color-text-base); }
+.snav-eff-sub { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin: 2px 0 var(--bento-space-05); }
+.snav-eff-sec { margin-bottom: var(--bento-space-05); }
+.snav-eff-sec .lbl { display: flex; align-items: center; gap: var(--bento-space-02); font-size: 12px; font-weight: 600; color: var(--bento-theme-color-text-subtle); margin-bottom: var(--bento-space-02); }
+.snav-eff-row { display: flex; align-items: center; gap: var(--bento-space-02); font-size: 14px; color: var(--bento-theme-color-text-base); padding: var(--bento-space-02) var(--bento-space-03); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; margin-bottom: 6px; }
+.snav-eff-row .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+.snav-eff-empty { font-size: 13px; color: var(--bento-theme-color-text-subtle); font-style: italic; }
+.snav-mdrawer-foot { padding: var(--bento-space-04) var(--bento-space-05); border-top: 1px solid var(--bento-theme-color-border-subtle); }
+.snav-mdrawer-foot .hs-btn { width: 100%; }
+
+/* full-page transfer & offboard flow */
+.snav-flow { position: fixed; inset: 0; z-index: 95; background: var(--bento-system-sys-neutral-alt-100); display: flex; flex-direction: column; }
+.snav-flow-head { display: flex; align-items: center; gap: var(--bento-space-04); padding: var(--bento-space-04) var(--bento-space-06); background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle); flex-wrap: wrap; }
+.snav-flow-head .ttl { min-width: 0; }
+.snav-flow-head .crumb { font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+.snav-flow-head h1 { font-family: var(--bento-theme-font-families-primary); font-size: 20px; font-weight: 700; margin: 2px 0 0; color: var(--bento-theme-color-text-base); }
+.snav-flow-steps { margin-left: auto; display: flex; align-items: center; gap: var(--bento-space-04); }
+.snav-flow-steps .st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--bento-theme-color-text-disabled); }
+.snav-flow-steps .st.on { color: var(--bento-theme-color-text-base); }
+.snav-flow-steps .st.done { color: var(--bento-system-sys-positive-700); }
+.snav-flow-steps .st .n { width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; background: var(--bento-system-sys-neutral-alt-200); color: var(--bento-theme-color-text-subtle); }
+.snav-flow-steps .st.on .n { background: var(--bento-theme-color-bg-primary); color: #fff; }
+.snav-flow-steps .st.done .n { background: var(--bento-system-sys-positive-100); color: var(--bento-system-sys-positive-700); }
+.snav-flow-steps .st .n .material-symbols-outlined { font-size: 15px; }
+.snav-flow-body { flex: 1; overflow-y: auto; padding: var(--bento-space-06); }
+.snav-flow-card { max-width: 640px; margin: 0 auto; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; padding: var(--bento-space-06); }
+.snav-flow-card h2 { font-family: var(--bento-theme-font-families-primary); font-size: 18px; font-weight: 700; margin: 0 0 var(--bento-space-02); color: var(--bento-theme-color-text-base); }
+.snav-flow-card > p { font-size: 14px; color: var(--bento-theme-color-text-subtle); margin: 0 0 var(--bento-space-04); }
+.snav-flow-foot { display: flex; align-items: center; gap: var(--bento-space-03); padding: var(--bento-space-04) var(--bento-space-06); background: var(--bento-theme-color-bg-surface); border-top: 1px solid var(--bento-theme-color-border-subtle); }
+.snav-flow-foot .grow { flex: 1; }
+.snav-radiolist { display: flex; flex-direction: column; gap: var(--bento-space-02); }
+.snav-radio-row { position: relative; display: flex; align-items: center; gap: var(--bento-space-03); padding: var(--bento-space-03); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; cursor: pointer; }
+.snav-radio-row:hover { background: var(--bento-system-sys-neutral-alt-50); }
+.snav-radio-row.on { border-color: var(--bento-theme-color-bg-primary); box-shadow: inset 0 0 0 1px var(--bento-theme-color-bg-primary); }
+.snav-radio-row .set-cell { flex: 1; }
+.snav-radio-row:focus-within { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: 2px; }
+
+/* spacing for Bento .hs-alert inside flow cards / setting-card bodies */
+.snav-flow-card .hs-alert, .snav-card-body .hs-alert { margin-bottom: var(--bento-space-04); }
+/* form field (label + control) — layout helper; the control is a real .hs-input/.hs-select */
+.snav-field { display: flex; flex-direction: column; gap: var(--bento-space-02); }
+.snav-field label { font-size: 14px; font-weight: 600; color: var(--bento-theme-color-text-base); }
+.snav-review { border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; overflow: hidden; }
+.snav-review .rrow { display: flex; gap: var(--bento-space-04); padding: var(--bento-space-03) var(--bento-space-04); font-size: 14px; }
+.snav-review .rrow + .rrow { border-top: 1px solid var(--bento-theme-color-border-subtle); }
+.snav-review .k { width: 150px; flex-shrink: 0; color: var(--bento-theme-color-text-subtle); }
+.snav-review .v { color: var(--bento-theme-color-text-base); font-weight: 600; }
+
+/* notifications TOC */
+.snav-toc-layout { display: grid; grid-template-columns: 200px 1fr; gap: var(--bento-space-06); align-items: start; }
+.snav-toc { position: sticky; top: 0; display: flex; flex-direction: column; gap: 2px; }
+.snav-toc-item { text-align: left; border: 0; background: transparent; cursor: pointer; padding: 8px 12px; border-radius: 8px; font-family: var(--bento-theme-font-families-primary); font-size: 14px; color: var(--bento-theme-color-text-subtle); border-left: 2px solid transparent; }
+.snav-toc-item:hover { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base); }
+.snav-toc-item.on { color: var(--bento-theme-color-text-base); font-weight: 600; border-left-color: var(--bento-theme-color-bg-primary); background: var(--bento-system-sys-neutral-alt-50); }
+.snav-toc-item:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; }
+.snav-toc-body { display: flex; flex-direction: column; gap: var(--bento-space-05); min-width: 0; }
+
+/* danger zone */
+.snav-danger { border-color: var(--bento-system-sys-warning-300, var(--bento-theme-color-border-base)); }
+.snav-danger .snav-card-h h2 { color: var(--bento-system-sys-warning-900); }
+.snav-destruct { color: var(--bento-system-sys-warning-900); border: 1px solid var(--bento-system-sys-warning-300, var(--bento-theme-color-border-base)); background: var(--bento-system-sys-warning-100); }
+.snav-destruct:hover:not(:disabled) { background: var(--bento-system-sys-warning-200, var(--bento-system-sys-warning-100)); }
+.snav-destruct:disabled { opacity: 0.5; cursor: not-allowed; }
+/* popover menu (avatar flyout + bulk-action menus) — SNOWFLAKE: tokenized, but
+   components.css ships no Bento Menu/popover component to reuse. */
+.snav-menu { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; box-shadow: var(--bento-theme-elevation-shadow-overlay, 0 8px 24px rgba(28,28,28,0.18)); padding: var(--bento-space-02); }
+.snav-menu-item { display: flex; align-items: center; gap: var(--bento-space-03); width: 100%; border: 0; background: transparent; cursor: pointer; text-align: left; padding: 8px 10px; border-radius: 6px; font-family: var(--bento-theme-font-families-primary); font-size: 14px; color: var(--bento-theme-color-text-base); }
+.snav-menu-item:hover { background: var(--bento-component-list-item-fill-hovered); }
+.snav-menu-item:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: -2px; }
+.snav-menu-item .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-base); }
+.snav-menu-lab { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--bento-theme-color-text-subtle); padding: 6px 10px 2px; }
+.snav-menu-sep { height: 1px; background: var(--bento-theme-color-border-subtle); margin: var(--bento-space-02) 0; }
+
+/* toasts */
+.snav-toasts { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 120; display: flex; flex-direction: column; gap: var(--bento-space-02); align-items: center; pointer-events: none; }
+.snav-toast { pointer-events: auto; display: flex; align-items: center; gap: var(--bento-space-03); background: var(--bento-theme-color-text-base); color: var(--bento-theme-color-bg-surface); border-radius: 10px; padding: 10px var(--bento-space-03) 10px var(--bento-space-04); box-shadow: 0 8px 24px rgba(28,28,28,0.28); font-size: 14px; max-width: 460px; }
+.snav-toast .material-symbols-outlined { font-size: 20px; }
+.snav-toast .msg { flex: 1; }
+.snav-toast .undo { border: 0; background: transparent; color: #fff; font-weight: 700; font-family: inherit; font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 6px; text-decoration: underline; }
+.snav-toast .undo:hover { background: rgba(255,255,255,0.14); }
+.snav-toast .x { border: 0; background: transparent; color: rgba(255,255,255,0.8); cursor: pointer; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; }
+.snav-toast .x:hover { background: rgba(255,255,255,0.14); }
+.snav-toast .x .material-symbols-outlined { font-size: 18px; }
+
+/* ── Responsive: tables reflow to stacked cards ── */
+@media (max-width: 860px) {
+  .snav-previewbar .pv-help { display: none; }
+  .snav-toc-layout { grid-template-columns: 1fr; }
+  .snav-toc { position: static; flex-direction: row; flex-wrap: wrap; }
+  .snav-mdrawer { width: 100%; }
+  .snav-formgrid { grid-template-columns: 1fr; }
+  .snav-flow-steps { width: 100%; margin-left: 0; }
+  .snav-mtable thead, .snav-tablecard .hs-table thead { display: none; }
+  .snav-mtable tbody tr, .snav-tablecard .hs-table tbody tr { display: block; border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 8px; margin: var(--bento-space-03); padding: var(--bento-space-02); }
+  .snav-mtable tbody td, .snav-tablecard .hs-table tbody td { display: flex; justify-content: space-between; gap: var(--bento-space-04); border: 0; height: auto; padding: 6px var(--bento-space-03); }
+  .snav-mtable tbody td[data-label]::before, .snav-tablecard .hs-table tbody td[data-label]::before { content: attr(data-label); font-weight: 600; color: var(--bento-theme-color-text-subtle); font-size: 13px; }
+  .snav-mtable tbody td.right, .snav-tablecard .hs-table tbody td.right { justify-content: flex-end; }
+}

@@ -1,0 +1,127 @@
+/* analytics-overview.css — Social analytics overview dashboard.
+   Canonical Suite shell (suite-rail + suite-drawer). Flat surfaces, Bento tokens
+   only, no red (amber for any negative). Chart series are blue-led. */
+
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base);
+       font-family: var(--bento-theme-font-families-primary); -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+/* Snowflake (flagged): no dedicated Bento chart component — series colours use the
+   tokenized visual-data palette, led by Bento blue (visual-data-01). */
+:root {
+  --ao-s1: var(--bento-theme-color-visual-data-01);  /* this period — Bento blue */
+  --ao-s2: var(--bento-system-sys-neutral-400);       /* last period — neutral */
+}
+
+.ao-app  { display: flex; height: 100vh; overflow: hidden; }
+.ao-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* ── Page header ─────────────────────────────────────────── */
+.ao-hdr { height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: var(--bento-space-03);
+          padding: 0 var(--bento-space-06); background: var(--bento-theme-color-bg-surface);
+          border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.ao-hdr h1 { font-size: 24px; font-weight: 700; margin: 0; }
+.ao-hdr .grow { flex: 1; }
+.ao-iconbtn { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 999px; cursor: pointer;
+              display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.ao-iconbtn:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.ao-iconbtn:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: 2px; }
+.ao-iconbtn .material-symbols-outlined { font-size: 22px; }
+
+/* date-range / compare ghost dropdowns */
+.ao-ghost { display: inline-flex; align-items: center; gap: var(--bento-space-02); height: 36px; padding: 0 var(--bento-space-03);
+            border: 0; background: transparent; border-radius: 8px; cursor: pointer;
+            font-family: var(--bento-theme-font-families-primary); font-size: 14px; font-weight: 600; color: var(--bento-theme-color-text-base); }
+.ao-ghost:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.ao-ghost:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus); outline-offset: 2px; }
+.ao-ghost .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+
+/* ── Content scroll ──────────────────────────────────────── */
+.ao-content { flex: 1; overflow-y: auto; padding: var(--bento-space-06); }
+.ao-content > * { flex-shrink: 0; box-sizing: border-box; }
+.ao-wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--bento-space-05); }
+
+/* ── Card ────────────────────────────────────────────────── */
+.ao-card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle);
+           border-radius: 12px; box-sizing: border-box; }
+.ao-card-pad { padding: var(--bento-space-06); }
+.ao-card-head { display: flex; align-items: center; gap: var(--bento-space-03); padding: var(--bento-space-05) var(--bento-space-06);
+                border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.ao-card-head h2 { font-size: 18px; font-weight: 700; margin: 0; flex: 1; min-width: 0; }
+.ao-card-sub { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin-top: 2px; font-weight: 400; }
+
+/* ── KPI summary cards ───────────────────────────────────── */
+.ao-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--bento-space-04); }
+.ao-kpi { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle);
+          border-radius: 12px; padding: var(--bento-space-05); display: flex; flex-direction: column; gap: var(--bento-space-02); box-sizing: border-box; }
+.ao-kpi-label { display: flex; align-items: center; gap: var(--bento-space-02); font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.ao-kpi-label .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+.ao-kpi-val { font-family: var(--bento-theme-font-families-secondary); font-weight: 700; font-size: 34px; line-height: 1.05;
+              letter-spacing: -0.01em; color: var(--bento-theme-color-text-base); font-variant-numeric: tabular-nums; }
+.ao-kpi-foot { display: flex; align-items: center; gap: var(--bento-space-02); font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+
+/* trend indicator — paired arrow (never colour alone); no red, amber for down */
+.ao-trend { display: inline-flex; align-items: center; gap: 2px; font-weight: 700; }
+.ao-trend.up   { color: var(--bento-theme-color-text-positive); }
+.ao-trend.down { color: var(--bento-system-sys-warning-900); }
+.ao-trend .material-symbols-outlined { font-size: 16px; font-variation-settings: "FILL" 1; }
+
+/* ── Performance chart ───────────────────────────────────── */
+.ao-chart-legend { display: flex; gap: var(--bento-space-04); margin-left: auto; flex-wrap: wrap; }
+.ao-leg { display: inline-flex; align-items: center; gap: var(--bento-space-02); font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.ao-leg .swatch { width: 12px; height: 3px; border-radius: 999px; }
+.ao-chart { width: 100%; height: 280px; display: block; }
+.ao-chart .gridline { stroke: var(--bento-theme-color-border-subtle); stroke-width: 1; }
+.ao-chart .axislabel { font-size: 11px; fill: var(--bento-theme-color-text-subtle); font-family: var(--bento-theme-font-families-primary); }
+
+/* ── Two-up row (table + network) ────────────────────────── */
+.ao-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--bento-space-05); align-items: start; }
+
+/* table */
+.ao-table { width: 100%; border-collapse: collapse; }
+.ao-table thead th { text-align: left; font-size: 13px; font-weight: 700; color: var(--bento-theme-color-text-subtle);
+  padding: var(--bento-space-03) var(--bento-space-05); border-bottom: 1px solid var(--bento-theme-color-border-subtle);
+  background: var(--bento-system-sys-neutral-alt-50); white-space: nowrap; }
+.ao-table tbody td { padding: var(--bento-space-04) var(--bento-space-05); border-bottom: 1px solid var(--bento-theme-color-border-subtle);
+  font-size: 14px; vertical-align: middle; }
+.ao-table tbody tr:last-child td { border-bottom: 0; }
+.ao-table tbody tr:hover td { background: var(--bento-system-sys-neutral-alt-50); }
+.ao-table th.num, .ao-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.ao-post { display: flex; align-items: center; gap: var(--bento-space-03); }
+.ao-thumb { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; background: var(--bento-system-sys-neutral-alt-200);
+            display: grid; place-items: center; color: var(--bento-theme-color-icon-subtle); position: relative; }
+.ao-thumb .material-symbols-outlined { font-size: 20px; }
+.ao-post-tx { min-width: 0; }
+.ao-post-tx .t { font-weight: 600; color: var(--bento-theme-color-text-base); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.ao-post-tx .d { font-size: 12px; color: var(--bento-theme-color-text-subtle); margin-top: 1px; }
+
+/* network glyph — categorical tokens, NEVER raw brand hex */
+.ao-glyph { width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center;
+            font-size: 11px; font-weight: 800; flex-shrink: 0; }
+.ao-glyph.sm { width: 18px; height: 18px; font-size: 9px; }
+
+/* per-network breakdown */
+.ao-net { display: flex; flex-direction: column; }
+.ao-net-row { display: flex; align-items: center; gap: var(--bento-space-03); padding: var(--bento-space-04) var(--bento-space-06); }
+.ao-net-row + .ao-net-row { border-top: 1px solid var(--bento-theme-color-border-subtle); }
+.ao-net-tx { flex: 1; min-width: 0; }
+.ao-net-name { font-weight: 600; font-size: 14px; }
+.ao-net-sub { font-size: 12px; color: var(--bento-theme-color-text-subtle); margin-top: 1px; }
+.ao-net-val { text-align: right; }
+.ao-net-val .v { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.ao-bar { height: 6px; border-radius: 999px; background: var(--bento-system-sys-neutral-alt-200); overflow: hidden; margin-top: 6px; }
+.ao-bar > span { display: block; height: 100%; border-radius: 999px; }
+
+/* ── States ──────────────────────────────────────────────── */
+.ao-state { flex: 1; display: grid; place-items: center; padding: var(--bento-space-08); }
+.ao-state-inner { text-align: center; max-width: 420px; }
+.ao-state-inner .ico { width: 64px; height: 64px; border-radius: 999px; display: grid; place-items: center;
+  margin: 0 auto var(--bento-space-04); background: var(--bento-system-sys-neutral-alt-100); }
+.ao-state-inner .ico .material-symbols-outlined { font-size: 32px; color: var(--bento-theme-color-icon-subtle); }
+.ao-state-inner h2 { font-size: 20px; font-weight: 700; margin: 0 0 var(--bento-space-02); }
+.ao-state-inner p { font-size: 14px; line-height: 1.55; color: var(--bento-theme-color-text-subtle); margin: 0 0 var(--bento-space-04); }
+.ao-state-inner .acts { display: flex; gap: var(--bento-space-03); justify-content: center; }
+
+/* skeleton */
+.ao-sk { background: var(--bento-system-sys-neutral-alt-200); border-radius: 6px; animation: aopulse 1.4s ease-in-out infinite; }
+@keyframes aopulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }

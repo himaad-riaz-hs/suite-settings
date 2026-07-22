@@ -1,0 +1,61 @@
+/* governance.css — Governance (Vigil): approvals + audit log + submission
+   review. Governance is NOT in the HS-Bento-master main nav → rail "More"
+   overflow (flagged, per direction: "add it to nav under More"). Reuses
+   perch-pages.css pp-table/pp-badge/pp-person. Bento-backed. */
+
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bento-theme-color-bg-app); color: var(--bento-theme-color-text-base); font-family: var(--bento-theme-font-families-primary); -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+.gv-main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bento-system-sys-neutral-alt-100); }
+.gv-top { height: 64px; flex-shrink: 0; background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle); display: flex; align-items: center; gap: 12px; padding: 0 24px; }
+.gv-top h1 { font-weight: 700; font-size: 24px; margin: 0; }
+.gv-back { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 0; cursor: pointer; padding: 6px 8px; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.gv-back:hover { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base); }
+.gv-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.gv-crumb b { color: var(--bento-theme-color-text-base); font-weight: 700; }
+.gv-crumb .material-symbols-outlined { font-size: 16px; }
+.gv-spacer { flex: 1; }
+.gv-ws { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: transparent; border: 0; cursor: pointer; font-weight: 600; font-size: 15px; font-family: inherit; }
+.gv-ws:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.gv-ws .av { width: 26px; height: 26px; border-radius: 999px; background: var(--hs-cat-2-bg); color: var(--hs-cat-2-fg); display: grid; place-items: center; font-weight: 800; font-size: 8px; }
+.gv-ws .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-text-subtle); }
+
+.gv-body { flex: 1; min-height: 0; overflow: auto; padding: 24px; }
+
+/* ── Audit log ──────────────────────────────────────────── */
+.gv-auditbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.gv-audit { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 14px; overflow: hidden; }
+.gv-aday { padding: 12px 20px; font-weight: 700; font-size: 13px; color: var(--bento-theme-color-text-subtle); background: var(--bento-system-sys-neutral-alt-50); border-bottom: 1px solid var(--bento-theme-color-border-subtle); text-transform: uppercase; letter-spacing: 0.04em; }
+.gv-arow { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.gv-arow:last-child { border-bottom: 0; }
+.gv-arow .ic { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: grid; place-items: center; }
+.gv-arow .ic.approve { background: var(--bento-system-sys-positive-50); color: var(--bento-system-sys-positive-700); }
+.gv-arow .ic.edit { background: var(--bento-system-sys-info-50); color: var(--bento-system-sys-info-700); }
+.gv-arow .ic.flag { background: var(--bento-system-sys-warning-100); color: var(--bento-system-sys-warning-700); }
+.gv-arow .ic.system { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-subtle); }
+.gv-arow .ic .material-symbols-outlined { font-size: 20px; }
+.gv-arow .atxt { flex: 1; min-width: 0; font-size: 15px; }
+.gv-arow .atxt strong { font-weight: 700; }
+.gv-arow .atxt .asub { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin-top: 2px; }
+.gv-arow .atime { flex-shrink: 0; font-size: 13px; color: var(--bento-theme-color-text-subtle); font-variant-numeric: tabular-nums; }
+
+/* ── Submission review (detail) ─────────────────────────── */
+.gv-review { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; max-width: 1080px; }
+.gv-rev-main { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 14px; overflow: hidden; }
+.gv-rev-media { height: 320px; }
+.gv-rev-cap { padding: 18px 20px; }
+.gv-rev-cap .net { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 8px; }
+.gv-rev-cap .ctext { font-size: 15px; line-height: 1.55; }
+.gv-side .gv-panel { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+.gv-panel h3 { font-weight: 700; font-size: 15px; margin: 0 0 12px; }
+.gv-meta-row { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 10px; }
+.gv-meta-row .k { color: var(--bento-theme-color-text-subtle); width: 96px; flex-shrink: 0; }
+.gv-check { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.gv-check:last-child { border-bottom: 0; }
+.gv-check .material-symbols-outlined { font-size: 20px; }
+.gv-check.pass .material-symbols-outlined { color: var(--bento-system-sys-positive-600); }
+.gv-check.warn .material-symbols-outlined { color: var(--bento-system-sys-warning-700); }
+.gv-check .ct { flex: 1; font-size: 14px; font-weight: 600; }
+.gv-check .cs { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.gv-rev-actions { display: flex; flex-direction: column; gap: 10px; }
+.gv-rev-actions .hs-btn { justify-content: center; }

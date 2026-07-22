@@ -1,0 +1,92 @@
+/* Perch › Content (library) — Suite shell. Bento-backed.
+   Source: social-os-reboot.fig "CL - Template (main page)". */
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bento-theme-color-bg-app); color: var(--bento-theme-color-text-base); font-family: var(--bento-theme-font-families-primary); overflow: hidden; }
+
+.ct-main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bento-system-sys-neutral-alt-100); }
+
+/* top bar */
+.ct-top { height: 64px; flex-shrink: 0; background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle); display: flex; align-items: center; gap: 8px; padding: 0 24px; }
+.ct-top h1 { font-weight: 700; font-size: 26px; line-height: 32px; margin: 0; }
+.ct-top .spacer { flex: 1; }
+.ct-icon { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.ct-icon:hover { background: rgba(28,28,28,0.06); }
+.ct-icon .material-symbols-outlined { font-size: 22px; }
+/* dark primary Create-a-post split */
+.ct-split { display: inline-flex; gap: 1px; text-decoration: none; }
+.ct-split .main { height: 40px; padding: 0 16px; border: 0; cursor: pointer; background: var(--bento-system-sys-primary-500); color: var(--bento-theme-color-text-on-primary); border-radius: 8px 0 0 8px; font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
+.ct-split .chev { width: 40px; height: 40px; border: 0; cursor: pointer; background: var(--bento-system-sys-primary-500); color: var(--bento-theme-color-text-on-primary); border-radius: 0 8px 8px 0; border-left: 1px solid rgba(255,255,255,0.24); display: grid; place-items: center; }
+.ct-split .main:hover, .ct-split .chev:hover { background: var(--bento-system-sys-primary-400); }
+.ct-split .material-symbols-outlined { font-size: 20px; }
+.ct-topdiv { width: 1px; height: 28px; background: var(--bento-theme-color-border-subtle); margin: 0 6px; flex-shrink: 0; }
+.ct-ws { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px 8px 12px; border-radius: 8px; background: transparent; border: 0; cursor: pointer; font-weight: 600; font-size: 16px; }
+.ct-ws:hover { background: rgba(28,28,28,0.04); }
+.ct-ws .av { width: 28px; height: 28px; border-radius: 999px; background: #B6F085; color: #1F4A1B; display: grid; place-items: center; font-weight: 800; font-size: 8.5px; }
+.ct-ws .chev { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+
+/* Library / Apps tabs */
+.ct-tabs { flex-shrink: 0; display: flex; align-items: center; gap: 24px; padding: 0 24px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); }
+.ct-tab { position: relative; height: 48px; display: inline-flex; align-items: center; font-weight: 700; font-size: 16px; color: var(--bento-theme-color-text-subtle); cursor: pointer; text-decoration: none; }
+.ct-tab:hover { color: var(--bento-theme-color-text-base); }
+.ct-tab.on { color: var(--bento-theme-color-text-base); }
+.ct-tab.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: 9px; height: 2px; border-radius: 2px; background: var(--bento-theme-color-text-base); }
+
+/* body — single unified panel: libs col (bordered) + card col share one rounded-16 surface */
+.ct-body { flex: 1; min-height: 0; display: flex; padding: 24px 32px; overflow: hidden; }
+.ct-shell { flex: 1; min-width: 0; max-width: 1280px; margin: 0 auto; display: flex; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 16px; overflow: hidden; }
+
+/* libraries column (left, internal divider) */
+.ct-libs { width: 289px; flex-shrink: 0; border-right: 1px solid var(--bento-theme-color-border-subtle); padding: 24px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.ct-addlib { height: 44px; padding: 0 12px; border: 0; background: transparent; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 16px; color: var(--bento-theme-color-text-base); }
+.ct-addlib:hover { background: var(--bento-component-list-item-fill-hovered); }
+.ct-addlib .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+.ct-libhead { padding: 16px 12px 6px; font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.ct-libitem { height: 44px; padding: 0 12px; border: 0; background: transparent; border-radius: 8px; cursor: pointer; text-align: left; font-family: var(--bento-theme-font-families-primary); font-weight: 400; font-size: 16px; color: var(--bento-theme-color-text-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ct-libitem:hover { background: var(--bento-component-list-item-fill-hovered); }
+.ct-libitem.on { background: var(--bento-component-list-item-fill-selected); font-weight: 600; }
+
+/* card column (right) */
+.ct-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.ct-toolbar { display: flex; align-items: center; gap: 12px; padding: 24px 24px 8px; flex-shrink: 0; }
+.ct-toolbar .spacer { flex: 1; }
+.ct-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 24px 24px; }
+/* Templates / Media toggle: selected = filled grey pill w/ check, other = plain text */
+.ct-toggle { display: inline-flex; align-items: center; gap: 8px; }
+.ct-tog { height: 36px; padding: 0 14px; border: 0; background: transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 16px; color: var(--bento-theme-color-text-subtle); }
+.ct-tog:hover { color: var(--bento-theme-color-text-base); background: rgba(28,28,28,0.04); }
+.ct-tog.on { background: var(--bento-system-sys-neutral-alt-300); color: var(--bento-theme-color-text-base); }
+.ct-tog .material-symbols-outlined { font-size: 18px; }
+.ct-sort { height: 40px; padding: 0 8px 0 4px; border: 0; background: transparent; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-family: var(--bento-theme-font-families-primary); font-weight: 600; font-size: 16px; color: var(--bento-theme-color-text-base); }
+.ct-sort:hover { background: rgba(28,28,28,0.04); }
+.ct-sort .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+/* Filter = grey filled dropdown pill */
+.ct-filter { height: 40px; padding: 0 12px 0 16px; border: 0; background: var(--bento-system-sys-neutral-alt-300); border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--bento-theme-font-families-primary); font-weight: 700; font-size: 16px; color: var(--bento-theme-color-text-base); }
+.ct-filter:hover { background: var(--bento-system-sys-neutral-alt-400); }
+.ct-filter .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+.ct-kebab { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.ct-kebab:hover { background: rgba(28,28,28,0.06); }
+
+/* template cards grid (467×154 landscape, thumb-left) */
+.ct-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.ct-card { display: flex; gap: 16px; align-items: stretch; height: 154px; padding: 16px; border-radius: 8px; box-sizing: border-box; }
+.ct-card:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.ct-thumb { position: relative; width: 122px; align-self: stretch; border-radius: 8px; flex-shrink: 0; background-size: cover; background-position: center; background-color: var(--bento-system-sys-neutral-alt-200); }
+.ct-cbody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 2px 0; }
+.ct-desc { font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ct-tags { font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+
+/* media-asset grid (board 1530:163735) */
+.ct-mgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 20px; }
+.ct-mcard { display: flex; flex-direction: column; gap: 8px; cursor: pointer; }
+.ct-mthumb { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; background-size: cover; background-position: center; background-color: var(--bento-system-sys-neutral-alt-200); box-shadow: inset 0 0 0 1px var(--bento-theme-color-border-subtle); }
+.ct-mcheck { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 6px; background: rgba(253,253,253,0.92); box-shadow: inset 0 0 0 1.5px var(--bento-system-sys-neutral-400); opacity: 0; transition: opacity 120ms; }
+.ct-mcard:hover .ct-mcheck { opacity: 1; }
+.ct-mdur { position: absolute; right: 8px; bottom: 8px; height: 22px; padding: 0 6px; border-radius: 6px; background: rgba(28,28,28,0.72); color: #fff; display: inline-flex; align-items: center; gap: 2px; font-weight: 700; font-size: 12px; }
+.ct-mdur .material-symbols-outlined { font-size: 14px; }
+.ct-mfoot { display: flex; flex-direction: column; gap: 2px; }
+.ct-mname { font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ct-mused { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.ct-cfoot { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+.ct-avail { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border-radius: 6px; background: var(--bento-system-sys-positive-50); color: var(--bento-system-sys-positive-600); font-weight: 700; font-size: 14px; }
+.ct-avail svg { width: 14px; height: 14px; fill: var(--bento-system-sys-positive-600); }
+.ct-used { font-size: 14px; color: var(--bento-theme-color-text-subtle); }

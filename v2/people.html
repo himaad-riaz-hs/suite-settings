@@ -3,234 +3,251 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Users: Suite Settings</title>
+  <title>People: Suite Settings</title>
   <link rel="stylesheet" href="bento/colors_and_type.css">
   <link rel="stylesheet" href="bento/components.css">
   <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
   <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
+  <style>
+    /* People hub, tested-IA specifics (tokens only) */
+    .seatline { display:flex; align-items:center; gap:14px; }
+    .seatline .seats { display:inline-flex; align-items:center; gap:6px; font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); white-space:nowrap; }
+    .seatline .seats .material-symbols-outlined { font-size:18px; }
+    .tabs a .cnt { margin-left:6px; font: var(--hs-type-meta-b); color: var(--bento-theme-color-text-subtle); }
+    .tabs a.on .cnt { color: var(--hs-fg-link); }
+    .filterbar { display:flex; align-items:center; gap:12px; margin: 4px 0 16px; flex-wrap:wrap; }
+    .ecard .access { margin:0 16px 14px; font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); display:flex; align-items:center; gap:6px; }
+    .ecard .access .material-symbols-outlined { font-size:16px; }
+    .rolechip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font: var(--hs-type-meta-b); background: var(--bento-system-sys-neutral-alt-100); color: var(--hs-fg); }
+    .rolechip.super { background: var(--hs-bg-info); color: var(--hs-fg-link); }
+    .listrow { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--hs-border); border-radius: var(--hs-radii-lg); background: var(--bento-theme-color-bg-surface); margin-bottom:10px; }
+    .listrow .av { width:36px; height:36px; border-radius:999px; background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg); display:grid; place-items:center; font: var(--hs-type-meta-b); flex:none; }
+    .listrow .kv { flex:1; min-width:0; } .listrow .k { font: var(--hs-type-body-md-b); } .listrow .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+    /* invite modal (Layla's seats-upsell flow) */
+    .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl.open { display:flex; }
+    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
+    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
+    .invrow { display:flex; gap:10px; align-items:center; margin-bottom:10px; }
+    .invrow input { flex:1; min-width:0; height:40px; padding:0 12px; border:1px solid var(--hs-border-input); border-radius: var(--bento-component-input-border-radius); font: var(--hs-type-body-md); }
+    .invrow .sel { min-width:150px; }
+    .addmore { display:inline-flex; align-items:center; gap:6px; background:none; border:0; color: var(--hs-fg-link); font: var(--hs-type-body-md-b); cursor:pointer; padding:4px 0; }
+    .upsell { display:flex; gap:10px; align-items:flex-start; background: var(--hs-bg-warning); border-radius: var(--hs-radii-md); padding:12px 14px; margin-top:8px; }
+    .upsell .material-symbols-outlined { color: var(--hs-fg-warning); font-size:20px; flex:none; }
+    .upsell .t { flex:1; font: var(--hs-type-body-sm); color: var(--hs-fg); } .upsell .amt { font: var(--hs-type-body-md-b); white-space:nowrap; }
+    .price { border:1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding:14px 16px; }
+    .price .pr { display:flex; justify-content:space-between; padding:6px 0; font: var(--hs-type-body-md); }
+    .price .pr.total { border-top:1px solid var(--hs-border); margin-top:6px; padding-top:12px; font: var(--hs-type-body-md-b); }
+    .payln { display:flex; align-items:center; justify-content:space-between; margin-top:14px; font: var(--hs-type-body-md); }
+    .sent { text-align:center; padding:12px 0; } .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 14px; } .sent .big .material-symbols-outlined { font-size:40px; }
+  </style>
 </head>
 <body class="suite-app">
-<aside class="suite-rail">
-  <div class="main">
-    <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
-    <a class="suite-navbtn" data-product="perch" href="#"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
-    <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">forum</span></span><span class="lbl">Nest</span></a>
-    <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">hearing</span></span><span class="lbl">Lumen</span></a>
-    <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
-    <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
-    <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">shield</span></span><span class="lbl">Vigil</span></a>
-  </div>
-  <div class="others">
-    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></button>
-    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
-    <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
-    <div class="avatar" title="Melanie Torres">MT</div>
-  </div>
-</aside>
+
+  <aside class="suite-rail">
+    <div class="main">
+      <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+      <a class="suite-navbtn" data-product="perch" href="#"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+      <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">forum</span></span><span class="lbl">Nest</span></a>
+      <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">campaign</span></span><span class="lbl">Parliament</span></a>
+      <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">hearing</span></span><span class="lbl">Lumen</span></a>
+      <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+      <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">shield</span></span><span class="lbl">Vigil</span></a>
+    </div>
+    <div class="others">
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members" onclick="openInvite()"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
+      <div class="avatar" title="Melanie Torres">MT</div>
+    </div>
+  </aside>
+
   <aside class="suite-drawer">
     <div class="sd-head">Settings
       <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
     </div>
     <nav class="sd-body" aria-label="Settings">
-      <a class="sd-item" href="profile.html"><span class="material-symbols-outlined">person</span>Account</a>
-      <a class="sd-item on" href="people.html" aria-current="page"><span class="material-symbols-outlined">apartment</span>Organization</a>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">workspaces</span>Workspace</a>
+      <div class="sd-group">Account</div>
+      <a class="sd-item" href="profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
+      <a class="sd-item" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
+      <a class="sd-item" href="security.html"><span class="material-symbols-outlined">lock</span>Security &amp; privacy</a>
+      <a class="sd-item" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+      <a class="sd-item" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan &amp; billing</a>
+      <div class="sd-group">Organization</div>
+      <a class="sd-item" href="org-general.html"><span class="material-symbols-outlined">settings</span>General</a>
+      <a class="sd-item on" href="people.html" aria-current="page"><span class="material-symbols-outlined">group</span>People</a>
+      <a class="sd-item" href="roles.html"><span class="material-symbols-outlined">admin_panel_settings</span>Roles &amp; permissions</a>
+      <a class="sd-item" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social &amp; ad accounts</a>
+      <div class="sd-group">Publishing</div>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Vanity URLs</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">sell</span>Tags</a>
     </nav>
   </aside>
+
   <main class="suite-main">
     <header class="suite-topbar">
-      <h1>Organization</h1>
+      <h1>People</h1>
       <div class="spacer"></div>
-      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
-      <button class="icon-btn ne-tooltipbtn" aria-label="More options"><span class="material-symbols-outlined">more_horiz</span></button>
-      <div class="splitbtn">
-        <button class="hs-btn hs-btn--primary">Create organization</button>
-        <button class="hs-btn hs-btn--primary split-caret" aria-label="More create options"><span class="material-symbols-outlined">expand_more</span></button>
+      <div class="seatline">
+        <span class="seats"><span class="material-symbols-outlined">event_seat</span>449 of 450 seats used</span>
+        <button class="hs-btn hs-btn--ghost hs-btn--sm">Get more seats</button>
+        <button class="hs-btn hs-btn--primary" onclick="openInvite()"><span class="material-symbols-outlined">person_add</span>Invite people</button>
       </div>
+      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
     </header>
 
     <div class="pagebar">
-      <nav class="tabs" aria-label="Organization">
-        <a href="org-general.html" data-tab="overview">Overview</a>
-        <a class="on" href="people.html" data-tab="users" aria-current="page">Users</a>
-        <a href="roles.html" data-tab="roles">Roles</a>
-        <a href="teams.html" data-tab="teams">Teams</a>
-        <a href="social-accounts.html" data-tab="social">Social accounts</a>
+      <nav class="tabs" aria-label="People">
+        <a href="#" class="on" data-tab="members" onclick="setTab(event,'members')">Members<span class="cnt">440</span></a>
+        <a href="#" data-tab="teams" onclick="setTab(event,'teams')">Teams<span class="cnt">52</span></a>
+        <a href="#" data-tab="pending" onclick="setTab(event,'pending')">Pending invites<span class="cnt">3</span></a>
+        <a href="#" data-tab="requested" onclick="setTab(event,'requested')">Requested<span class="cnt">2</span></a>
       </nav>
-      <div class="grow"></div>
-      <div class="searchbox" style="min-width:240px">
-        <span class="material-symbols-outlined">search</span>
-        <input type="search" placeholder="Search users, teams or accounts" aria-label="Search users, teams or accounts">
-      </div>
-      <button class="sel viewpick" id="viewPick" onclick="toggleView()"><span class="material-symbols-outlined" style="font-size:18px">view_column</span><span id="viewPickLabel">Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-      <button class="sel"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
     </div>
 
     <div class="content">
       <div class="inner wide">
-        <div class="count-h">
-          <h2>30 users in Somos</h2>
-          <div class="meta">25 active &#183; 5 pending</div>
-        </div>
+        <div class="count-h"><h2>440 people in Somos</h2><div class="meta">Everything about a person starts here. 25 active &#183; 3 pending.</div></div>
 
-        <!-- Column (table) view — default per Fabiana's 60-day plan -->
-        <div id="tableView" class="table-card">
-          <table class="hs-table">
-            <thead>
-              <tr>
-                <th style="width:48px"><span class="hs-check indeterminate"></span></th>
-                <th><span class="th-sort">User name<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th>
-                <th><span class="th-sort">Added on<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th>
-                <th>Email</th>
-                <th><span class="th-sort">Teams<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th>
-                <th><span class="th-sort">Social accounts<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th>
-                <th><span class="th-sort">Status<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th>
-                <th style="width:64px">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr data-pid="jordan">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">JL</span><a href="person-detail.html?p=jordan" data-pid="jordan">Jordan Lee</a></div></td>
-                <td class="hs-small">Mar 12, 2024</td>
-                <td class="hs-small">jordan@somos.co</td>
-                <td>8</td>
-                <td>6</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="marisol">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">MC</span><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div></td>
-                <td class="hs-small">Apr 5, 2024</td>
-                <td class="hs-small">marisol@somos.co</td>
-                <td>5</td>
-                <td>4</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="sam">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">SR</span><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div></td>
-                <td class="hs-small">May 20, 2024</td>
-                <td class="hs-small">sam@somos.co</td>
-                <td>3</td>
-                <td>2</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="aisha">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">AP</span><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div></td>
-                <td class="hs-small">Jun 1, 2024</td>
-                <td class="hs-small">aisha@somos.co</td>
-                <td>2</td>
-                <td>2</td>
-                <td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="devin">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">DO</span><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div></td>
-                <td class="hs-small">Jul 15, 2024</td>
-                <td class="hs-small">devin@somos.co</td>
-                <td>4</td>
-                <td>3</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="priya">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">PA</span><a href="person-detail.html?p=priya" data-pid="priya">Priya Anand</a></div></td>
-                <td class="hs-small">Aug 9, 2024</td>
-                <td class="hs-small">priya@somos.co</td>
-                <td>1</td>
-                <td>0</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="marco">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">MS</span><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div></td>
-                <td class="hs-small">Sep 3, 2024</td>
-                <td class="hs-small">marco@somos.co</td>
-                <td>6</td>
-                <td>5</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="yuki">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">YT</span><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div></td>
-                <td class="hs-small">Sep 23, 2024</td>
-                <td class="hs-small">yuki@somos.co</td>
-                <td>0</td>
-                <td>0</td>
-                <td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-              <tr data-pid="bryn">
-                <td><span class="hs-check"></span></td>
-                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">BM</span><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div></td>
-                <td class="hs-small">Oct 30, 2024</td>
-                <td class="hs-small">bryn@somos.co</td>
-                <td>3</td>
-                <td>3</td>
-                <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination">
-            <button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button>
-            <div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div>
-            <span class="hs-small">of 30</span>
-            <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
+        <!-- MEMBERS -->
+        <section data-panel="members">
+          <div class="filterbar">
+            <div class="searchbox" style="min-width:240px"><span class="material-symbols-outlined">search</span><input type="search" placeholder="Filter members" aria-label="Filter members"></div>
+            <button class="sel" style="min-width:120px"><span>Role</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+            <button class="sel" style="min-width:120px"><span>Team</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+            <div class="grow" style="flex:1"></div>
+            <div class="viewseg" role="group" aria-label="View">
+              <button id="cardBtn" class="on" aria-pressed="true" onclick="setView('card')"><span class="material-symbols-outlined">grid_view</span>Cards</button>
+              <button id="colBtn" aria-pressed="false" onclick="setView('column')"><span class="material-symbols-outlined">view_list</span>Columns</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Card view — secondary (90-day) -->
-        <div class="grid" id="gridView" hidden>
-          <div class="ecard">
-            <div class="top">
-              <div class="av">JL</div>
-              <div class="nm"><div class="n"><a href="person-detail.html?p=jordan" data-pid="jordan">Jordan Lee</a></div><div class="e">jordan@somos.co</div></div>
-              <button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button>
-            </div>
-            <div class="foot"><span>Super admin</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div>
+          <div id="gridView" class="grid">
+            <div class="ecard"><div class="top"><span class="av">AP</span><div class="nm"><div class="n"><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div><div class="e">aisha@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip super">Super Admin</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 1 account</div></div>
+            <div class="ecard"><div class="top"><span class="av">BM</span><div class="nm"><div class="n"><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div><div class="e">bryn@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Admin</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Growth Team &#183; 3 accounts</div></div>
+            <div class="ecard"><div class="top"><span class="av">SR</span><div class="nm"><div class="n"><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div><div class="e">sam@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 2 accounts</div></div>
+            <div class="ecard"><div class="top"><span class="av">DO</span><div class="nm"><div class="n"><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div><div class="e">devin@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Content Team &#183; 4 accounts</div></div>
+            <div class="ecard"><div class="top"><span class="av">MC</span><div class="nm"><div class="n"><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div><div class="e">marisol@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Admin</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; billing owner</div></div>
+            <div class="ecard"><div class="top"><span class="av">MS</span><div class="nm"><div class="n"><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div><div class="e">marco@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Paid Media &#183; 2 accounts</div></div>
+            <div class="ecard"><div class="top"><span class="av">YT</span><div class="nm"><div class="n"><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div><div class="e">yuki@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span></div><div class="access"><span class="material-symbols-outlined">link</span>Invited &#183; seat held</div></div>
+            <div class="ecard"><div class="top"><span class="av">PA</span><div class="nm"><div class="n"><a href="person-detail.html?p=priya" data-pid="priya">Priya Anand</a></div><div class="e">priya@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span></div><div class="access"><span class="material-symbols-outlined">link</span>Invited &#183; seat held</div></div>
           </div>
-          <div class="ecard">
-            <div class="top">
-              <div class="av">SR</div>
-              <div class="nm"><div class="n"><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div><div class="e">sam@somos.co</div></div>
-              <button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button>
-            </div>
-            <div class="foot"><span>Editor</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div>
-          </div>
-          <div class="ecard">
-            <div class="top">
-              <div class="av">DO</div>
-              <div class="nm"><div class="n"><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div><div class="e">devin@somos.co</div></div>
-              <button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button>
-            </div>
-            <div class="foot"><span>Editor</span><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></div>
-          </div>
-        </div>
 
+          <div id="tableView" hidden>
+            <div class="table-card"><table class="hs-table">
+              <thead><tr><th style="width:48px"><span class="hs-check indeterminate"></span></th><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Status</th><th style="width:56px"></th></tr></thead>
+              <tbody>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)">AP</span><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div></td><td class="hs-small">aisha@somos.co</td><td>Super Admin</td><td class="hs-small">Direct &#183; 1</td><td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-5-bg);color:var(--hs-cat-5-fg)">BM</span><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div></td><td class="hs-small">bryn@somos.co</td><td>Admin</td><td class="hs-small">via Growth Team &#183; 3</td><td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-8-bg);color:var(--hs-cat-8-fg)">SR</span><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div></td><td class="hs-small">sam@somos.co</td><td>Editor</td><td class="hs-small">Direct &#183; 2</td><td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-9-bg);color:var(--hs-cat-9-fg)">DO</span><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div></td><td class="hs-small">devin@somos.co</td><td>Editor</td><td class="hs-small">via Content Team &#183; 4</td><td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-1-bg);color:var(--hs-cat-1-fg)">MC</span><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div></td><td class="hs-small">marisol@somos.co</td><td>Admin</td><td class="hs-small">Direct &#183; owner</td><td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-6-bg);color:var(--hs-cat-6-fg)">MS</span><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div></td><td class="hs-small">marco@somos.co</td><td>Editor</td><td class="hs-small">via Paid Media &#183; 2</td><td><span class="pill ok"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-2-bg);color:var(--hs-cat-2-fg)">YT</span><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div></td><td class="hs-small">yuki@somos.co</td><td>Editor</td><td class="hs-small">Invited</td><td><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-4-bg);color:var(--hs-cat-4-fg)">PA</span><a href="person-detail.html?p=priya" data-pid="priya">Priya Anand</a></div></td><td class="hs-small">priya@somos.co</td><td>Editor</td><td class="hs-small">Invited</td><td><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+              </tbody>
+            </table>
+              <div class="pagination"><button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button><div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div><span class="hs-small">of 440</span><button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TEAMS -->
+        <section data-panel="teams" hidden>
+          <div class="grid">
+            <div class="ecard"><div class="top"><span class="av" style="background:var(--hs-cat-1-bg);color:var(--hs-cat-1-fg)"><span class="material-symbols-outlined">groups</span></span><div class="nm"><div class="n"><a href="team-detail.html">Growth Team</a></div><div class="e">12 members &#183; 8 accounts</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="av-stack"><span class="av">EN</span><span class="av">MK</span><span class="av">JL</span></span><span class="rolechip">Admin</span></div></div>
+            <div class="ecard"><div class="top"><span class="av" style="background:var(--hs-cat-4-bg);color:var(--hs-cat-4-fg)"><span class="material-symbols-outlined">groups</span></span><div class="nm"><div class="n"><a href="team-detail.html">Content Team</a></div><div class="e">9 members &#183; 6 accounts</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="av-stack"><span class="av">DO</span><span class="av">SR</span></span><span class="rolechip">Editor</span></div></div>
+            <div class="ecard"><div class="top"><span class="av" style="background:var(--hs-cat-6-bg);color:var(--hs-cat-6-fg)"><span class="material-symbols-outlined">groups</span></span><div class="nm"><div class="n"><a href="team-detail.html">Paid Media</a></div><div class="e">4 members &#183; 3 accounts</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="av-stack"><span class="av">MS</span></span><span class="rolechip">Editor</span></div></div>
+          </div>
+        </section>
+
+        <!-- PENDING INVITES -->
+        <section data-panel="pending" hidden>
+          <div class="listrow"><span class="av">YT</span><div class="kv"><div class="k">yuki@somos.co</div><div class="m">Editor &#183; invited 2 days ago</div></div><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span><button class="hs-btn hs-btn--outlined hs-btn--sm">Resend</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Revoke</button></div>
+          <div class="listrow"><span class="av">PA</span><div class="kv"><div class="k">priya@somos.co</div><div class="m">Editor &#183; invited today</div></div><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span><button class="hs-btn hs-btn--outlined hs-btn--sm">Resend</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Revoke</button></div>
+          <div class="listrow"><span class="av">KB</span><div class="kv"><div class="k">kenji.brooks@somos.co</div><div class="m">Viewer &#183; invited 4 days ago</div></div><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span><button class="hs-btn hs-btn--outlined hs-btn--sm">Resend</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Revoke</button></div>
+        </section>
+
+        <!-- REQUESTED (seat requests to the billing owner) -->
+        <section data-panel="requested" hidden>
+          <p class="subhead">Seat requests wait here for the billing owner (Marisol Chen) to approve.</p>
+          <div class="listrow"><span class="av">SR</span><div class="kv"><div class="k">Sam Rivera requested 1 seat</div><div class="m">For a new contractor &#183; today</div></div><button class="hs-btn hs-btn--primary hs-btn--sm">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Deny</button></div>
+          <div class="listrow"><span class="av">DO</span><div class="kv"><div class="k">Devin Okafor requested 2 seats</div><div class="m">For the Paid Media team &#183; yesterday</div></div><button class="hs-btn hs-btn--primary hs-btn--sm">Approve</button><button class="hs-btn hs-btn--ghost hs-btn--sm">Deny</button></div>
+        </section>
       </div>
     </div>
   </main>
-<script>
-  function toggleView(){
-    var t=document.getElementById('tableView'), g=document.getElementById('gridView'), l=document.getElementById('viewPickLabel');
-    var toCard = !t.hidden;
-    if(t) t.hidden = toCard;
-    if(g) g.hidden = !toCard;
-    if(l) l.textContent = toCard ? 'Card view' : 'Column view';
-  }
-</script>
-<script src="app.js"></script>
+
+  <!-- Invite modal — Layla's seats-upsell flow -->
+  <div class="ovl" id="inviteOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="invTitle">
+      <!-- step 1 -->
+      <div data-step="1">
+        <div class="mh"><h2 id="invTitle">Invite members</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb">
+          <p class="subhead">1 seat is available on your plan. Inviting more will add seats to your subscription.</p>
+          <div id="invRows"></div>
+          <button class="addmore" onclick="addInvRow()"><span class="material-symbols-outlined">add</span>Add more members</button>
+          <div class="upsell" id="invUpsell" hidden><span class="material-symbols-outlined">info</span><span class="t">Extra seats will be added to your plan. <strong><span id="upsellN">0</span> additional seat(s).</strong></span><span class="amt">US$29/mo each</span></div>
+        </div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="invNext()">Continue</button></div>
+      </div>
+      <!-- step 2 -->
+      <div data-step="2" hidden>
+        <div class="mh"><h2>Add more seats</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb">
+          <p class="subhead">You are inviting <span id="s2count">0</span> people. 1 seat is available and <span id="s2add">0</span> will be added to your plan.</p>
+          <div class="price">
+            <div class="pr"><span>Business plan</span><span>US$249.00 / mo</span></div>
+            <div class="pr"><span><span id="s2addb">0</span> additional seats</span><span id="s2addcost">US$0.00 / mo</span></div>
+            <div class="pr total"><span>Due now (prorated)</span><span id="s2due">US$0.00</span></div>
+          </div>
+          <div class="payln"><span>Visa ending 4242</span><button class="hs-btn hs-btn--ghost hs-btn--sm">Change</button></div>
+        </div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="invBack()">Back</button><button class="hs-btn hs-btn--primary" onclick="invConfirm()">Confirm and continue</button></div>
+      </div>
+      <!-- step 3 -->
+      <div data-step="3" hidden>
+        <div class="mh"><h2>Invitations sent</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb"><div class="sent"><div class="big"><span class="material-symbols-outlined">mark_email_read</span></div><p><strong id="sentN">0</strong> invitations are on their way. New members become active as soon as they accept, and their seats are held until then.</p></div></div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Done</button><button class="hs-btn hs-btn--primary" onclick="closeInvite()">View members</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // tabs
+    function setTab(e,t){ e.preventDefault();
+      document.querySelectorAll('.tabs a').forEach(a=>a.classList.toggle('on', a.dataset.tab===t));
+      document.querySelectorAll('[data-panel]').forEach(p=>p.hidden = p.dataset.panel!==t);
+    }
+    // card/column view
+    function setView(v){ var g=document.getElementById('gridView'),tv=document.getElementById('tableView'),c=document.getElementById('cardBtn'),k=document.getElementById('colBtn');
+      g.hidden=v!=='card'; tv.hidden=v!=='column'; c.classList.toggle('on',v==='card'); k.classList.toggle('on',v==='column'); c.setAttribute('aria-pressed',v==='card'); k.setAttribute('aria-pressed',v==='column'); }
+    // invite modal (Layla's seats-upsell flow)
+    var FREE_SEATS=1, SEAT_PRICE=29;
+    function invRowHTML(val){ return '<div class="invrow"><input type="email" placeholder="name@company.com" value="'+(val||'')+'" oninput="recalc()"><button class="sel"><span>Full access</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>'; }
+    function addInvRow(){ document.getElementById('invRows').insertAdjacentHTML('beforeend', invRowHTML('')); recalc(); }
+    function inviteeCount(){ return [...document.querySelectorAll('#invRows input')].filter(i=>i.value.trim().length>0).length; }
+    function recalc(){ var add=Math.max(0,inviteeCount()-FREE_SEATS); var up=document.getElementById('invUpsell');
+      up.hidden = add<=0; document.getElementById('upsellN').textContent=add; }
+    function openInvite(){ var r=document.getElementById('invRows'); r.innerHTML=invRowHTML('')+invRowHTML(''); showStep(1); recalc(); document.getElementById('inviteOvl').classList.add('open'); }
+    function closeInvite(){ document.getElementById('inviteOvl').classList.remove('open'); }
+    function showStep(s){ document.querySelectorAll('#inviteOvl [data-step]').forEach(d=>d.hidden = +d.dataset.step!==s); }
+    function invNext(){ var n=inviteeCount(), add=Math.max(0,n-FREE_SEATS);
+      if(add<=0){ finishInvite(n); return; }
+      document.getElementById('s2count').textContent=n; document.getElementById('s2add').textContent=add; document.getElementById('s2addb').textContent=add;
+      document.getElementById('s2addcost').textContent='US$'+(add*SEAT_PRICE).toFixed(2)+' / mo'; document.getElementById('s2due').textContent='US$'+(add*SEAT_PRICE).toFixed(2);
+      showStep(2); }
+    function invBack(){ showStep(1); }
+    function invConfirm(){ finishInvite(inviteeCount()); }
+    function finishInvite(n){ document.getElementById('sentN').textContent=n; showStep(3); }
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInvite(); });
+  </script>
+  <script src="app.js"></script>
 </body>
 </html>

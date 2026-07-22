@@ -1,0 +1,617 @@
+<!-- @template name="Lumen" description="Social listening — Overview landing with topic trends, quick search, and latest activity on the Suite shell." -->
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="../">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1440">
+  <title>Hootsuite · Lumen · Overview</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <link rel="stylesheet" href="../components.css">
+  <link rel="stylesheet" href="src/suite-shell.css">
+  <link rel="stylesheet" href="src/suite-drawer.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    html, body, #root { height: 100%; margin: 0; }
+    body { background: var(--bento-theme-color-bg-app); color: var(--bento-theme-color-text-base);
+           font-family: var(--bento-theme-font-families-primary); -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+    /* ── App shell: rail | drawer | main (canonical) ─────────── */
+    .ti-app  { display: flex; height: 100vh; overflow: hidden; }
+    .ti-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+    /* ── Page header ─────────────────────────────────────────── */
+    .lm-pagehdr { height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+                  padding: 0 24px; background: var(--bento-theme-color-bg-surface);
+                  border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+    .lm-pagehdr h1 { font-size: 24px; font-weight: 700; margin: 0; color: var(--bento-theme-color-text-base); }
+    .lm-pagehdr .sp { flex: 1; }
+    .lm-icon-btn { width: 36px; height: 36px; border: 0; background: transparent; border-radius: 999px;
+                   cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+    .lm-icon-btn:hover { background: var(--bento-system-sys-neutral-alt-100); }
+    .lm-icon-btn .material-symbols-outlined { font-size: 20px; }
+
+    /* ── Content scroll area ─────────────────────────────────── */
+    .ti-content { flex: 1; overflow: auto; padding: 24px;
+                  background: var(--bento-system-sys-neutral-alt-100); }
+    .ov { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+    /* ── Flat card (comp-card-surface) ───────────────────────── */
+    .ti-card, .ov-card { background: var(--bento-theme-color-bg-surface);
+                         border: 1px solid var(--bento-theme-color-border-subtle);
+                         border-radius: 12px; padding: 24px; }
+
+    /* ── Section head + topic selector ───────────────────────── */
+    .ov-head { display: flex; align-items: center; gap: 12px; }
+    .ov-head h2 { font-size: 18px; font-weight: 700; margin: 0; flex: 1; min-width: 0; }
+    .ov-head-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .lm-pop-wrap { position: relative; display: inline-flex; }
+    .ov-topicsel { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px;
+                   border-radius: 999px; border: 1px solid var(--bento-theme-color-border-subtle);
+                   background: var(--bento-theme-color-bg-surface); cursor: pointer; font: inherit;
+                   font-size: 14px; font-weight: 600; color: var(--bento-theme-color-text-base); }
+    .ov-topicsel .dot { width: 10px; height: 10px; border-radius: 999px; background: var(--bento-theme-color-bg-primary); }
+    .ov-topicsel .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+    .ov-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 60; min-width: 220px;
+              background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle);
+              border-radius: 12px; box-shadow: var(--bento-theme-elevation-shadow-overlay-bottom); padding: 6px; }
+    .ov-pop-item { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 8px;
+                   cursor: pointer; font-size: 14px; color: var(--bento-theme-color-text-base); }
+    .ov-pop-item:hover { background: var(--bento-component-list-item-fill-hovered); }
+    .ov-pop-item .material-symbols-outlined { margin-left: auto; font-size: 18px; color: var(--bento-theme-color-bg-primary); }
+
+    /* ── Insights blurb + stats ──────────────────────────────── */
+    .ov-blurb { font-size: 14px; line-height: 22px; color: var(--bento-theme-color-text-subtle); margin: 12px 0 16px; }
+    .ov-blurb b { color: var(--bento-theme-color-text-base); font-weight: 600; }
+    .ov-stats { display: flex; gap: 40px; flex-wrap: wrap; margin-bottom: 16px; }
+    .ov-stat { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+    .ov-stat .v { font-family: var(--bento-theme-font-families-secondary); font-weight: 700; font-size: 28px; line-height: 34px; }
+    .ov-stat .l { font-size: 13px; color: var(--bento-theme-color-text-subtle); white-space: nowrap; }
+    .ov-delta { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .ov-delta.up   { color: var(--bento-theme-color-text-positive); }
+    .ov-delta.down { color: var(--bento-system-sys-warning-700); }
+    .ov-delta .material-symbols-outlined { font-size: 16px; font-variation-settings: "FILL" 1; }
+
+    /* ── Overview chart (blue area + line) ───────────────────── */
+    .ov-chart { width: 100%; height: 220px; display: block; }
+
+    /* ── Quick search panel ──────────────────────────────────── */
+    .ov-searchrow { display: flex; gap: 12px; margin: 16px 0 20px; }
+    .ov-search { flex: 1; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 8px 0 14px;
+                 border-radius: 10px; box-shadow: inset 0 0 0 1px var(--bento-theme-color-border-btn-outlined); }
+    .ov-search:focus-within { box-shadow: inset 0 0 0 2px var(--bento-theme-color-border-focus); }
+    .ov-search > .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-subtle); }
+    .ov-search input { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; color: var(--bento-theme-color-text-base); }
+    .ov-aiqb { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px;
+               border: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface);
+               cursor: pointer; font: inherit; font-size: 13px; font-weight: 600; color: var(--bento-theme-color-text-base); white-space: nowrap; }
+    .ov-aiqb:hover { background: var(--bento-system-sys-neutral-alt-100); }
+    .ov-aiqb .material-symbols-outlined { font-size: 16px; color: var(--bento-theme-color-bg-primary); }
+    .ov-searchbtn { height: 44px; }
+    .ov-topsearches .lbl { font-size: 13px; font-weight: 600; color: var(--bento-theme-color-text-subtle); margin-bottom: 6px; }
+    .ov-search-list { display: flex; flex-direction: column; }
+    .ov-search-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 8px; border-radius: 8px; cursor: pointer; }
+    .ov-search-item:hover { background: var(--bento-component-list-item-fill-hovered); }
+    .ov-search-item > .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+    .ov-search-item .q { flex: 1; font-size: 14px; color: var(--bento-theme-color-text-base); }
+    .ov-search-item .n { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+
+    /* ── Your latest activity ────────────────────────────────── */
+    .ov-activity-head { font-size: 18px; font-weight: 700; margin: 0 0 12px; }
+    .ov-activity { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+    .ov-act-card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle);
+                   border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .ov-act-head { display: flex; align-items: center; gap: 10px; }
+    .ov-act-head .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-icon-base); }
+    .ov-act-head .t { font-size: 15px; font-weight: 700; }
+    .ov-act-head .c { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--bento-theme-color-text-subtle); }
+    .ov-act-list { display: flex; flex-direction: column; gap: 10px; }
+    .ov-act-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--bento-theme-color-text-base); }
+    .ov-act-row .meta { margin-left: auto; font-size: 12px; color: var(--bento-theme-color-text-subtle); }
+    .ov-act-foot { margin-top: auto; padding-top: 4px; }
+
+    /* loading skeleton grid */
+    .ti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .ti-col  { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Create-alert / schedule modals (create/edit surfaces) ─ */
+    .lm-modal-scrim { position: fixed; inset: 0; z-index: 220; background: rgba(28,28,28,0.45); display: grid; place-items: center; }
+    .lm-modal { width: 480px; max-width: calc(100vw - 48px); background: var(--bento-theme-color-bg-surface); border-radius: 14px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.28); overflow: hidden; display: flex; flex-direction: column; }
+    .lm-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 18px 24px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+    .lm-modal-head h2 { font-weight: 700; font-size: 20px; margin: 0; }
+    .lm-modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+    .lm-field { display: flex; flex-direction: column; gap: 6px; }
+    .lm-field > label { font-weight: 600; font-size: 14px; }
+    .lm-modal-foot { display: flex; align-items: center; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--bento-theme-color-border-subtle); }
+    .lm-modal--wizard { width: 600px; }
+    .lm-steps { display: flex; align-items: center; gap: 0; padding: 16px 24px 0; }
+    .lm-step { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+    .lm-stepline { flex: 1; height: 2px; min-width: 16px; margin: 0 10px; background: var(--bento-system-sys-neutral-alt-300); }
+    .lm-stepline.on { background: var(--bento-system-sys-positive-600); }
+    .lm-step .num { width: 24px; height: 24px; border-radius: 999px; flex-shrink: 0; display: grid; place-items: center; font-weight: 700; font-size: 12px; background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-subtle); }
+    .lm-step .num .material-symbols-outlined { font-size: 15px; }
+    .lm-step.on { color: var(--bento-theme-color-text-base); font-weight: 700; }
+    .lm-step.on .num { background: var(--bento-system-sys-positive-600); color: #fff; }
+    .lm-step.done .num { background: var(--bento-system-sys-positive-600); color: #fff; }
+    .lm-step .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lm-step-meta { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+    .lm-choices, .lm-controls { display: flex; flex-direction: column; gap: 10px; }
+    .lm-choice, .lm-control { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1.5px solid var(--bento-theme-color-border-subtle); border-radius: 12px; background: var(--bento-theme-color-bg-surface); cursor: pointer; text-align: left; font-family: inherit; position: relative; }
+    .lm-choice:hover, .lm-control:hover { border-color: var(--bento-system-sys-neutral-400); }
+    .lm-choice.on, .lm-control.on { border-color: var(--bento-theme-color-bg-primary); box-shadow: inset 0 0 0 1px var(--bento-theme-color-bg-primary); }
+    .lm-choice-ic { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base); }
+    .lm-choice.on .lm-choice-ic { background: var(--bento-theme-color-bg-primary); color: var(--bento-theme-color-text-on-primary); }
+    .lm-choice-ic .material-symbols-outlined { font-size: 22px; }
+    .lm-choice-tx, .lm-control-tx { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .lm-choice-tx .t, .lm-control-tx .t { font-weight: 700; font-size: 15px; }
+    .lm-choice-tx .d, .lm-control-tx .d { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+    .lm-radio { width: 20px; height: 20px; border-radius: 999px; border: 1.5px solid var(--bento-system-sys-neutral-400); flex-shrink: 0; position: relative; }
+    .lm-choice.on .lm-radio, .lm-radio.on { border-color: var(--bento-theme-color-bg-primary); }
+    .lm-choice.on .lm-radio::after, .lm-radio.on::after { content: ""; position: absolute; inset: 3px; border-radius: 999px; background: var(--bento-theme-color-bg-primary); }
+    .lm-togglerow { display: flex; align-items: center; gap: 16px; }
+    .lm-toggle-tx { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .lm-toggle-tx .t { font-weight: 600; font-size: 15px; }
+    .lm-toggle-tx .d { font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+    .lm-sched { display: flex; align-items: center; gap: 8px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="src/suite-rail.jsx"></script>
+<script type="text/babel" src="src/suite-states.jsx"></script>
+<script type="text/babel">
+
+/* ── Lumen / Overview (board social-os-reboot Lumen / Overview 345:135297).
+   Single "Lumen" sub-nav drawer + Overview landing on the canonical suite shell. ── */
+
+/* Single Lumen sub-nav drawer (canonical .suite-drawer / .sd-*). */
+function LumenDrawer() {
+  const items = [
+    { key: "overview",   icon: "home",                label: "Overview" },
+    { key: "search",     icon: "search",              label: "Quick search" },
+    { key: "topic",      icon: "sell",                label: "Topic Analytics" },
+    { key: "channel",    icon: "radar",               label: "Channel Analytics" },
+    { key: "dash",       icon: "dashboard_customize", label: "Dashboards" },
+    { key: "reports",    icon: "bar_chart",           label: "Reports & Alerts" },
+    { key: "iqapps",     icon: "apps",                label: "IQ Apps" },
+    { key: "iqinsights", icon: "auto_awesome",        label: "IQ Insights" },
+    { key: "trends",     icon: "bubble_chart",        label: "Trends Discovery" },
+    { key: "insights",   icon: "query_stats",         label: "Search Insights" },
+  ];
+  const active = "overview";
+  return (
+    <aside className="suite-drawer" aria-label="Lumen navigation">
+      <div className="sd-head">Lumen
+        <button className="sd-collapse" type="button" aria-label="Collapse" title="Collapse"><span className="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+      </div>
+      <nav className="sd-body">
+        {items.map(it => (
+          <a key={it.key} href="#" className={"sd-item" + (active === it.key ? " on" : "")} aria-current={active === it.key ? "page" : undefined}>
+            <span className="material-symbols-outlined">{it.icon}</span>{it.label}
+          </a>
+        ))}
+      </nav>
+    </aside>
+  );
+}
+
+function useClickAway(ref, close) {
+  React.useEffect(() => {
+    const h = e => { if (ref.current && !ref.current.contains(e.target)) close(); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+}
+
+/* Topic selector chip (Overview section 1). */
+function TopicSelector() {
+  const [open, setOpen] = React.useState(false);
+  const [sel, setSel] = React.useState("Tesla");
+  const ref = React.useRef(null); useClickAway(ref, () => setOpen(false));
+  const TOPICS = ["Tesla", "BMW", "Ford", "Rivian", "Volkswagen"];
+  return (
+    <span className="lm-pop-wrap" ref={ref}>
+      <button className="ov-topicsel" type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+        <span className="dot"></span>{sel}<span className="material-symbols-outlined">keyboard_arrow_down</span>
+      </button>
+      {open && (
+        <div className="ov-pop">
+          {TOPICS.map(t => (
+            <div key={t} className="ov-pop-item" role="option" aria-selected={t === sel} onClick={() => { setSel(t); setOpen(false); }}>
+              {t}{t === sel && <span className="material-symbols-outlined">check</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </span>
+  );
+}
+
+/* Monotone-cubic smoothing for the line/area chart. */
+function smoothPath(pts) {
+  const n = pts.length;
+  if (n < 2) return "";
+  const dx = [], sl = [];
+  for (let i = 0; i < n - 1; i++) { dx[i] = pts[i+1][0] - pts[i][0]; sl[i] = (pts[i+1][1] - pts[i][1]) / dx[i]; }
+  const t = [sl[0]];
+  for (let i = 1; i < n - 1; i++) t.push(sl[i-1] * sl[i] <= 0 ? 0 : (sl[i-1] + sl[i]) / 2);
+  t.push(sl[n-2]);
+  let d = "M" + pts[0][0] + "," + pts[0][1];
+  for (let i = 0; i < n - 1; i++) {
+    const a = dx[i] / 3;
+    d += " C" + (pts[i][0]+a) + "," + (pts[i][1]+a*t[i]) + " " + (pts[i+1][0]-a) + "," + (pts[i+1][1]-a*t[i+1]) + " " + pts[i+1][0] + "," + pts[i+1][1];
+  }
+  return d;
+}
+
+const OV_X0 = 10, OV_XN = 918, OV_Y0 = 12, OV_YN = 200, OV_MAX = 700;
+const OV_DATA = [320, 410, 365, 520, 470, 615, 560];
+const OV_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const ovx = i => OV_X0 + (i / (OV_DATA.length - 1)) * (OV_XN - OV_X0);
+const ovy = v => OV_Y0 + (1 - v / OV_MAX) * (OV_YN - OV_Y0);
+
+function OverviewChart() {
+  const pts = OV_DATA.map((v, i) => [ovx(i), ovy(v)]);
+  const line = smoothPath(pts);
+  const area = line + " L" + OV_XN + "," + OV_YN + " L" + OV_X0 + "," + OV_YN + " Z";
+  const grid = [0, 175, 350, 525, 700];
+  return (
+    <svg className="ov-chart" viewBox="0 0 928 230" role="img" aria-label="Daily mention volume, last 7 days">
+      {grid.map(v => (
+        <line key={v} x1={OV_X0} y1={ovy(v)} x2={OV_XN} y2={ovy(v)} stroke="var(--bento-theme-color-border-subtle)" strokeWidth="1"/>
+      ))}
+      <path d={area} fill="var(--bento-theme-color-bg-primary)" fillOpacity="0.10"/>
+      <path d={line} fill="none" stroke="var(--bento-theme-color-bg-primary)" strokeWidth="2.5" strokeLinecap="round"/>
+      {pts.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="3.5" fill="var(--bento-theme-color-bg-surface)" stroke="var(--bento-theme-color-bg-primary)" strokeWidth="2"/>
+      ))}
+      {OV_DAYS.map((d, i) => (
+        <text key={d} x={ovx(i)} y={OV_YN + 22} textAnchor="middle" fontSize="11"
+              fill="var(--bento-theme-color-text-subtle)" fontFamily="var(--bento-theme-font-families-primary)">{d}</text>
+      ))}
+    </svg>
+  );
+}
+
+/* Section 1 — Your topic in the last 7 days. */
+function TopicSection() {
+  return (
+    <section className="ov-card">
+      <div className="ov-head">
+        <h2>Your topic in the last 7 days</h2>
+        <div className="ov-head-actions">
+          <TopicSelector />
+          <button className="hs-btn hs-btn--secondary" type="button"><span className="material-symbols-outlined">add</span>Monitor your topics</button>
+        </div>
+      </div>
+      <p className="ov-blurb">
+        <b>Insights:</b> Mentions of <b>Tesla</b> climbed steadily through the week, peaking Saturday on coverage of the new range estimates. Sentiment stayed net-positive while potential reach softened slightly versus last week.
+      </p>
+      <div className="ov-stats">
+        <div className="ov-stat">
+          <span className="v">128.4K</span>
+          <span className="l">Mentions</span>
+          <span className="ov-delta up"><span className="material-symbols-outlined">trending_up</span>16.3%</span>
+        </div>
+        <div className="ov-stat">
+          <span className="v">54%</span>
+          <span className="l">Positive sentiment</span>
+          <span className="ov-delta up"><span className="material-symbols-outlined">trending_up</span>4.1%</span>
+        </div>
+        <div className="ov-stat">
+          <span className="v">8.2M</span>
+          <span className="l">Potential reach</span>
+          <span className="ov-delta down"><span className="material-symbols-outlined">trending_down</span>3.0%</span>
+        </div>
+      </div>
+      <OverviewChart />
+    </section>
+  );
+}
+
+/* Section 2 — Quick search. */
+const OV_TOP_SEARCHES = [
+  ["tesla model 3", "42.1K results"],
+  ["ev charging network", "31.8K results"],
+  ["battery range 2026", "27.4K results"],
+  ["autopilot safety", "19.2K results"],
+];
+function QuickSearchPanel() {
+  return (
+    <section className="ov-card">
+      <div className="ov-head"><h2>Quick search</h2></div>
+      <div className="ov-searchrow">
+        <div className="ov-search">
+          <span className="material-symbols-outlined">search</span>
+          <input placeholder="Search a brand, topic, or person" aria-label="Search query" />
+          <button className="ov-aiqb" type="button"><span className="material-symbols-outlined">auto_awesome</span>AI query builder</button>
+        </div>
+        <button className="hs-btn hs-btn--primary ov-searchbtn" type="button"><span className="material-symbols-outlined">search</span>Search</button>
+      </div>
+      <div className="ov-topsearches">
+        <div className="lbl">Top searches</div>
+        <div className="ov-search-list">
+          {OV_TOP_SEARCHES.map(([q, n]) => (
+            <div className="ov-search-item" key={q} role="button" tabIndex={0}>
+              <span className="material-symbols-outlined">trending_up</span>
+              <span className="q">{q}</span>
+              <span className="n">{n}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* Section 3 — Your latest activity. */
+function LatestActivity({ onSchedule, onAlert }) {
+  return (
+    <section>
+      <h2 className="ov-activity-head">Your latest activity</h2>
+      <div className="ov-activity">
+        <div className="ov-act-card">
+          <div className="ov-act-head"><span className="material-symbols-outlined">bar_chart</span><span className="t">Scheduled reports</span><span className="c">3</span></div>
+          <div className="ov-act-list">
+            <div className="ov-act-row">Weekly brand digest<span className="meta">Mon 9:00</span></div>
+            <div className="ov-act-row">Competitor recap<span className="meta">Fri 8:00</span></div>
+            <div className="ov-act-row">Monthly sentiment<span className="meta">1st 9:00</span></div>
+          </div>
+          <div className="ov-act-foot"><button className="hs-btn hs-btn--outlined hs-btn--sm" type="button" onClick={onSchedule}><span className="material-symbols-outlined">add</span>New report</button></div>
+        </div>
+        <div className="ov-act-card">
+          <div className="ov-act-head"><span className="material-symbols-outlined">notifications_active</span><span className="t">Active alerts</span><span className="c">5</span></div>
+          <div className="ov-act-list">
+            <div className="ov-act-row">Negative sentiment spike<span className="meta">Live</span></div>
+            <div className="ov-act-row">Volume &gt; 10K / day<span className="meta">Live</span></div>
+            <div className="ov-act-row">New competitor mention<span className="meta">Live</span></div>
+          </div>
+          <div className="ov-act-foot"><button className="hs-btn hs-btn--outlined hs-btn--sm" type="button" onClick={onAlert}><span className="material-symbols-outlined">add</span>New alert</button></div>
+        </div>
+        <div className="ov-act-card">
+          <div className="ov-act-head"><span className="material-symbols-outlined">apps</span><span className="t">Recent IQ Apps</span></div>
+          <div className="ov-act-list">
+            <div className="ov-act-row">Share of Voice<span className="meta">2d ago</span></div>
+            <div className="ov-act-row">Influencer Finder<span className="meta">4d ago</span></div>
+            <div className="ov-act-row">Trend Radar<span className="meta">1w ago</span></div>
+          </div>
+          <div className="ov-act-foot"><button className="hs-btn hs-btn--ghost hs-btn--sm" type="button">Browse IQ Apps<span className="material-symbols-outlined">chevron_right</span></button></div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Overview({ onSchedule, onAlert }) {
+  return (
+    <div className="ov">
+      <TopicSection />
+      <QuickSearchPanel />
+      <LatestActivity onSchedule={onSchedule} onAlert={onAlert} />
+    </div>
+  );
+}
+
+/* ── Create-alert wizard (board AlertCreationSimplified 3102:128511) ── */
+const LM_ALERT_TYPES = [
+  ["results", "notifications_active", "New results alert", "Send an alert when there are new results"],
+  ["volume", "trending_up", "Volume alert", "Send an alert when mention volume changes sharply"],
+  ["engagement", "favorite", "Engagement alert", "Send an alert when engagement spikes or drops"],
+  ["sentiment", "mood", "Sentiment alert", "Send an alert when sentiment shifts"],
+];
+const LM_ALERT_STEPS = ["Alert type", "Trigger", "Details", "Delivery methods"];
+function LumenAlertModal({ onClose }) {
+  const [step, setStep] = React.useState(0);
+  const [type, setType] = React.useState("results");
+  const [trigger, setTrigger] = React.useState("every");
+  const next = () => setStep(s => Math.min(3, s + 1));
+  const back = () => step === 0 ? onClose() : setStep(s => s - 1);
+  return (
+    <div className="lm-modal-scrim" onClick={onClose}>
+      <div className="lm-modal lm-modal--wizard" role="dialog" aria-modal="true" aria-label="Create new alert" onClick={e => e.stopPropagation()}>
+        <div className="lm-modal-head"><h2>Create new alert</h2><button className="lm-icon-btn" aria-label="Close" title="Close" onClick={onClose}><span className="material-symbols-outlined">close</span></button></div>
+        <div className="lm-steps" aria-hidden="true">
+          {LM_ALERT_STEPS.map((s, i) => (
+            <React.Fragment key={s}>
+              {i > 0 && <span className={"lm-stepline" + (i <= step ? " on" : "")}></span>}
+              <div className={"lm-step" + (i === step ? " on" : i < step ? " done" : "")}>
+                <span className="num">{i < step ? <span className="material-symbols-outlined">check</span> : i + 1}</span>
+                <span className="lbl">{s}</span>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="lm-modal-body">
+          {step === 0 && (
+            <div className="lm-field"><label>Alert type</label>
+              <div className="lm-choices">
+                {LM_ALERT_TYPES.map(([k, ic, t, d]) => (
+                  <button key={k} type="button" className={"lm-choice" + (type === k ? " on" : "")} aria-pressed={type === k} onClick={() => setType(k)}>
+                    <span className="lm-choice-ic"><span className="material-symbols-outlined">{ic}</span></span>
+                    <span className="lm-choice-tx"><span className="t">{t}</span><span className="d">{d}</span></span>
+                    <span className="lm-radio" aria-hidden="true"></span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {step === 1 && (
+            <div className="lm-field"><label>Trigger</label>
+              <div className="lm-controls">
+                {[["every", "Every new result", "Send an alert every time there is a new result"], ["threshold", "Define a number of results", "Send an alert when there is a specific number of new results"]].map(([k, t, d]) => (
+                  <label key={k} className={"lm-control" + (trigger === k ? " on" : "")}>
+                    <span className={"lm-radio" + (trigger === k ? " on" : "")} aria-hidden="true"></span>
+                    <input type="radio" name="lm-trigger" checked={trigger === k} onChange={() => setTrigger(k)} style={{ position: "absolute", opacity: 0 }} />
+                    <span className="lm-control-tx"><span className="t">{t}</span><span className="d">{d}</span></span>
+                  </label>
+                ))}
+              </div>
+              {trigger === "threshold" && (
+                <div className="lm-field" style={{ marginTop: 14, maxWidth: 220 }}><label>Number of results</label><input className="hs-input" defaultValue="100" /></div>
+              )}
+            </div>
+          )}
+          {step === 2 && (<React.Fragment>
+            <div className="lm-field"><label>Alert name</label><input className="hs-input" placeholder="Please enter alert name" defaultValue="Spike in negative sentiment" /></div>
+            <div className="lm-field"><label>Description <span style={{ fontWeight: 400, color: "var(--bento-theme-color-text-subtle)" }}>(optional)</span></label><textarea className="hs-input" style={{ height: 88, padding: 12, resize: "none" }} placeholder="Please enter alert description"></textarea></div>
+          </React.Fragment>)}
+          {step === 3 && (<React.Fragment>
+            <div className="lm-field"><label>Deliver to</label>
+              <div className="lm-controls">
+                <label className="lm-control on"><span className="hs-check is-on" aria-hidden="true"></span><span className="lm-control-tx"><span className="t">Email · Ryan Williams</span><span className="d">ryan@somos.com</span></span></label>
+                <label className="lm-control"><span className="hs-check" aria-hidden="true"></span><span className="lm-control-tx"><span className="t">In-app notification</span></span></label>
+              </div>
+            </div>
+            <div className="lm-field"><label>Add an email <span style={{ fontWeight: 400, color: "var(--bento-theme-color-text-subtle)" }}>(optional)</span></label><input className="hs-input" placeholder="name@company.com" /></div>
+          </React.Fragment>)}
+        </div>
+        <div className="lm-modal-foot">
+          <span className="lm-step-meta">Step {step + 1} of 4 · {LM_ALERT_STEPS[step]}</span>
+          <span style={{ flex: 1 }}></span>
+          <button className="hs-btn hs-btn--ghost" type="button" onClick={back}>{step === 0 ? "Cancel" : "Back"}</button>
+          {step < 3
+            ? <button className="hs-btn hs-btn--primary" type="button" onClick={next}>Next</button>
+            : <button className="hs-btn hs-btn--primary" type="button" onClick={onClose}>Create</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Schedule-report modal (board "Create a new report" 3102:125341) ── */
+function LumenScheduleModal({ onClose }) {
+  const [scheduling, setScheduling] = React.useState(true);
+  const [mailing, setMailing] = React.useState(true);
+  const [notify, setNotify] = React.useState(false);
+  const Toggle = ({ on, set }) => (
+    <button type="button" role="switch" aria-checked={on} className={"hs-toggle" + (on ? " is-on" : "")} onClick={() => set(v => !v)}></button>
+  );
+  return (
+    <div className="lm-modal-scrim" onClick={onClose}>
+      <div className="lm-modal" role="dialog" aria-modal="true" aria-label="Create a new report" onClick={e => e.stopPropagation()}>
+        <div className="lm-modal-head"><h2>Create a new report</h2><button className="lm-icon-btn" aria-label="Close" title="Close" onClick={onClose}><span className="material-symbols-outlined">close</span></button></div>
+        <div className="lm-modal-body">
+          <div className="lm-togglerow"><div className="lm-toggle-tx"><span className="t">Enable scheduling</span><span className="d">Send this report automatically on a recurring basis</span></div><Toggle on={scheduling} set={setScheduling} /></div>
+          {scheduling && (
+            <div className="lm-field"><label>Send report every</label>
+              <div className="lm-sched">
+                <input className="hs-input" defaultValue="1" style={{ width: 64 }} />
+                <button className="hs-select" type="button"><span>Day(s)</span><span className="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+                <button className="hs-select" type="button"><span>9:00 AM</span><span className="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+              </div>
+            </div>
+          )}
+          <div className="lm-togglerow"><div className="lm-toggle-tx"><span className="t">Include mailing list</span><span className="d">Send to a saved list of recipients</span></div><Toggle on={mailing} set={setMailing} /></div>
+          <div className="lm-togglerow"><div className="lm-toggle-tx"><span className="t">Send notifications</span><span className="d">Notify recipients when the report is ready</span></div><Toggle on={notify} set={setNotify} /></div>
+        </div>
+        <div className="lm-modal-foot">
+          <button className="hs-btn hs-btn--ghost" type="button" onClick={onClose}>Back</button>
+          <span style={{ flex: 1 }}></span>
+          <button className="hs-btn hs-btn--ghost" type="button" onClick={onClose}>Cancel</button>
+          <button className="hs-btn hs-btn--primary" type="button" onClick={onClose}>Create</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── State surfaces ────────────────────────────────────────────────── */
+function LumenEmpty() {
+  return (
+    <div className="suite-state empty">
+      <div className="suite-state-inner">
+        <div className="ico"><span className="material-symbols-outlined">travel_explore</span></div>
+        <h2>No topics tracked yet</h2>
+        <p>Set up a listening topic to track brand mentions, sentiment, and reach across the social web. Results stream in within minutes.</p>
+        <div className="acts"><button className="hs-btn hs-btn--secondary" type="button"><span className="material-symbols-outlined">school</span>How listening works</button><button className="hs-btn hs-btn--primary" type="button"><span className="material-symbols-outlined">add</span>Create a topic</button></div>
+      </div>
+    </div>
+  );
+}
+function LumenError({ onRetry }) {
+  return (
+    <div className="suite-state error">
+      <div className="suite-state-inner">
+        <div className="ico"><span className="material-symbols-outlined">cloud_off</span></div>
+        <h2>We couldn't load listening data</h2>
+        <p>The data stream didn't respond in time. Your topics and alerts are unaffected — try refreshing the results.</p>
+        <div className="acts"><button className="hs-btn hs-btn--secondary" type="button"><span className="material-symbols-outlined">help</span>View status</button><button className="hs-btn hs-btn--primary" type="button" onClick={onRetry}><span className="material-symbols-outlined">refresh</span>Try again</button></div>
+      </div>
+    </div>
+  );
+}
+function LumenLoading() {
+  return (
+    <div className="ti-content" aria-busy="true">
+      <div className="ov">
+        <div className="ti-card"><div className="suite-sk" style={{ width: "40%", height: 16, marginBottom: 16 }}></div><div className="suite-sk" style={{ width: "100%", height: 220, borderRadius: 8 }}></div></div>
+        <div className="ti-card"><div className="suite-sk" style={{ width: "30%", height: 16, marginBottom: 16 }}></div><div className="suite-sk" style={{ width: "100%", height: 44, borderRadius: 8 }}></div></div>
+        <div className="ti-grid" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+          {[0,1,2].map(i => <div className="ti-card" key={i}><div className="suite-sk" style={{ width: "60%", height: 14, marginBottom: 12 }}></div><div className="suite-sk" style={{ width: "100%", height: 80, borderRadius: 8 }}></div></div>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── App root ──────────────────────────────────────────────────────── */
+function App() {
+  const [surface, setSurface] = React.useState("main"); // main | empty | error | loading
+  const [scheduleOpen, setScheduleOpen] = React.useState(false);
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const onState = (k) => {
+    if (k === "detail") { setSurface("main"); setAlertOpen(false); setScheduleOpen(true); }
+    else if (k === "edit") { setSurface("main"); setScheduleOpen(false); setAlertOpen(true); }
+    else { setScheduleOpen(false); setAlertOpen(false); setSurface(k); }
+  };
+  const demoValue = alertOpen ? "edit" : scheduleOpen ? "detail" : surface;
+  React.useEffect(() => {
+    const others = document.querySelector('.suite-rail .others');
+    if (!others || others.querySelector('[data-lm-injected]')) return;
+    const btn = document.createElement('button');
+    btn.className = 'suite-navbtn util';
+    btn.setAttribute('data-lm-injected', 'help_outline');
+    btn.setAttribute('aria-label', 'Help');
+    btn.setAttribute('title', 'Help');
+    btn.style.cssText = 'border:0;background:transparent;cursor:pointer;padding:0;width:100%;';
+    btn.innerHTML = '<span class="circle"><span class="material-symbols-outlined">help_outline</span></span>';
+    others.insertBefore(btn, others.firstChild);
+  }, []);
+  return (
+    <div className="ti-app">
+      <SuiteRail active="lumen" />
+      <LumenDrawer />
+      <main className="ti-main">
+        <header className="lm-pagehdr">
+          <h1>Overview</h1>
+          <span className="sp"></span>
+          <button className="lm-icon-btn" type="button" aria-label="Settings" title="Settings"><span className="material-symbols-outlined">settings</span></button>
+          <button className="lm-icon-btn" type="button" aria-label="Help" title="Help"><span className="material-symbols-outlined">help</span></button>
+        </header>
+        {surface === "empty" ? <LumenEmpty />
+          : surface === "error" ? <LumenError onRetry={() => setSurface("loading")} />
+          : surface === "loading" ? <LumenLoading />
+          : (
+            <div className="ti-content">
+              <Overview onSchedule={() => setScheduleOpen(true)} onAlert={() => setAlertOpen(true)} />
+            </div>
+          )}
+      </main>
+      {scheduleOpen && <LumenScheduleModal onClose={() => setScheduleOpen(false)} />}
+      {alertOpen && <LumenAlertModal onClose={() => setAlertOpen(false)} />}
+      <SuiteStates
+        states={[["main", "Overview"], ["detail", "Schedule report"], ["edit", "Create alert"], ["empty", "Empty"], ["error", "Error"], ["loading", "Loading"]]}
+        value={demoValue} onChange={onState}
+      />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

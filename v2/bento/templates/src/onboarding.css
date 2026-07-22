@@ -1,0 +1,314 @@
+/* onboarding.css — Everything Welcome onboarding + paywall + payment flows.
+   Source: Everything Welcome (Copy).fig /Onboarding-paywalls + /Payment-Upgrade.
+   Modal tour over a dimmed Suite backdrop. Display font (Montserrat Alternates,
+   via --hs-font-display) is reserved for saffron moments (splash / new product).
+   No-red: status uses amber/positive + icon, never colour alone. */
+html, body, #root { height: 100%; margin: 0; }
+body { background: #0b1417; color: var(--bento-theme-color-text-base); font-family: var(--bento-theme-font-families-primary); overflow: hidden; }
+
+.ob-app { position: relative; height: 100%; overflow: hidden; }
+
+/* ── Dimmed Suite backdrop ─────────────────────────────────────────── */
+.ob-backdrop { position: absolute; inset: 0; display: flex; filter: blur(2px); transform: scale(1.02); }
+.ob-bd-rail { width: 80px; background: var(--bento-theme-color-bg-surface); border-right: 1px solid var(--bento-theme-color-border-subtle); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 20px; }
+.ob-bd-rail img { width: 34px; height: 34px; object-fit: contain; }
+.ob-bd-rail .d { width: 28px; height: 28px; border-radius: 8px; background: var(--bento-system-sys-neutral-alt-200); }
+.ob-bd-main { flex: 1; background: var(--bento-system-sys-neutral-alt-100); padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.ob-bd-top { height: 56px; background: var(--bento-theme-color-bg-surface); border-radius: 12px; }
+.ob-bd-grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 16px; }
+.ob-bd-card { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 14px; }
+.ob-scrim { position: absolute; inset: 0; background: rgba(1,43,58,0.55); }
+
+/* ── Centered stage (modal / splash) ───────────────────────────────── */
+.ob-stage { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
+
+/* ── Tour modal ────────────────────────────────────────────────────── */
+.ob-modal { width: min(920px, 94vw); max-height: 88vh; background: var(--bento-theme-color-bg-surface); border-radius: 20px; overflow: hidden; box-shadow: 0 24px 64px rgba(1,43,58,0.4); display: flex; flex-direction: column; }
+.ob-modal-head { display: flex; align-items: center; gap: 8px; padding: 16px 16px 0 24px; }
+.ob-badge { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 8px; border-radius: 999px; font-weight: 700; font-size: 15px; }
+.ob-badge .material-symbols-outlined { font-size: 20px; }
+.ob-badge .new { margin-left: 4px; height: 20px; padding: 0 8px; border-radius: 999px; background: var(--bento-system-sys-positive-600); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; display: inline-grid; place-items: center; }
+.ob-close { margin-left: auto; width: 40px; height: 40px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.ob-close:hover { background: var(--bento-system-sys-neutral-alt-100); }
+
+.ob-cols { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 0; flex: 1; min-height: 0; }
+.ob-text { padding: 12px 32px 24px; overflow: auto; display: flex; flex-direction: column; gap: 16px; }
+.ob-title { margin: 0; font-weight: 700; font-size: 28px; line-height: 36px; letter-spacing: -0.01em; color: var(--bento-theme-color-text-base); text-wrap: balance; }
+.ob-title.display { font-family: var(--hs-font-display); font-size: 32px; line-height: 40px; }
+.ob-intro { margin: 0; font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); }
+.ob-bullets { display: flex; flex-direction: column; gap: 10px; margin: 4px 0 0; }
+.ob-bullet { display: flex; gap: 10px; font-size: 15px; line-height: 22px; color: var(--bento-theme-color-text-base); }
+.ob-bullet .material-symbols-outlined { font-size: 20px; color: var(--bento-system-sys-positive-600); flex-shrink: 0; }
+.ob-bullet strong { font-weight: 700; }
+.ob-media { position: relative; margin: 12px 24px 24px 8px; border-radius: 14px; overflow: hidden; background:
+  repeating-linear-gradient(135deg, var(--bento-system-sys-neutral-alt-100) 0 12px, var(--bento-system-sys-neutral-alt-50) 12px 24px); border: 1px solid var(--bento-theme-color-border-subtle); display: grid; place-items: center; min-height: 280px; }
+.ob-media .lbl { font-family: ui-monospace, monospace; font-size: 13px; color: var(--bento-theme-color-text-subtle); background: var(--bento-theme-color-bg-surface); padding: 6px 12px; border-radius: 999px; box-shadow: 0 1px 3px rgba(28,28,28,0.12); }
+
+.ob-foot { display: flex; align-items: center; gap: 16px; padding: 16px 24px; border-top: 1px solid var(--bento-theme-color-border-subtle); }
+.ob-progress { display: flex; gap: 6px; flex: 1; }
+.ob-seg { width: 22px; height: 6px; border-radius: 999px; background: var(--bento-system-sys-neutral-alt-200); }
+.ob-seg.on { background: var(--bento-theme-color-text-base); }
+.ob-foot-btns { display: flex; align-items: center; gap: 10px; }
+
+/* ── Full-bleed splash / finish ────────────────────────────────────── */
+.ob-splash { width: min(960px, 94vw); border-radius: 24px; overflow: hidden; background: #012B3A; color: #fff; box-shadow: 0 24px 64px rgba(1,43,58,0.5); display: grid; grid-template-columns: 1.1fr 0.9fr; }
+.ob-splash-body { padding: 56px 48px; display: flex; flex-direction: column; gap: 20px; justify-content: center; }
+.ob-splash .eyebrow { font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+.ob-splash h1 { margin: 0; font-family: var(--hs-font-display); font-weight: 700; font-size: 48px; line-height: 1.08; letter-spacing: -0.01em; text-wrap: balance; }
+.ob-splash p { margin: 0; font-size: 17px; line-height: 26px; color: rgba(255,255,255,0.86); max-width: 46ch; }
+.ob-splash .acts { display: flex; gap: 12px; margin-top: 8px; }
+.ob-splash-art { position: relative; background: #0E7C6B; overflow: hidden; display: grid; place-items: center; }
+.ob-splash-art::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 16px, transparent 16px 32px); }
+.ob-splash-art img { position: relative; width: 52%; max-width: 280px; }
+.ob-splash .hs-btn--primary { background: #fff; color: #012B3A; }
+.ob-splash .hs-btn--primary:hover { background: rgba(255,255,255,0.88); }
+.ob-splash .hs-btn--ghost { color: #fff; }
+.ob-splash .hs-btn--ghost:hover { background: rgba(255,255,255,0.12); }
+
+/* finish card (light) */
+.ob-finish { width: min(620px, 94vw); background: var(--bento-theme-color-bg-surface); border-radius: 20px; overflow: hidden; box-shadow: 0 24px 64px rgba(1,43,58,0.4); }
+.ob-finish-art { height: 168px; background: #0E7C6B; position: relative; display: grid; place-items: center; overflow: hidden; }
+.ob-finish-art::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,0.07) 0 16px, transparent 16px 32px); }
+.ob-finish-art img { position: relative; width: 96px; }
+.ob-finish-body { padding: 28px 32px 24px; display: flex; flex-direction: column; gap: 14px; }
+.ob-finish-body h1 { margin: 0; font-weight: 700; font-size: 26px; line-height: 32px; }
+.ob-finish-body p { margin: 0; font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); }
+.ob-finish-note { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 20px; color: var(--bento-theme-color-text-subtle); background: var(--bento-system-sys-neutral-alt-50); border-radius: 12px; padding: 12px 14px; }
+.ob-finish-note .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
+.ob-finish-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+
+/* ── Flow switcher (demo) ──────────────────────────────────────────── */
+.ob-flowbar { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 999px; background: #1c1c1c; box-shadow: 0 8px 24px rgba(0,0,0,0.32); max-width: calc(100vw - 32px); flex-wrap: wrap; justify-content: center; }
+.ob-flowbar .lbl { font-weight: 700; font-size: 12px; color: rgba(255,255,255,0.5); padding: 0 8px; letter-spacing: 0.04em; }
+.ob-flowbar button { appearance: none; border: 0; cursor: pointer; background: transparent; color: rgba(255,255,255,0.82); font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 999px; white-space: nowrap; }
+.ob-flowbar button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.ob-flowbar button.on { background: #fff; color: #1c1c1c; }
+
+/* product tones */
+.tone-perch { background: #E5EDFF; color: #0F48D7; }
+.tone-lumen { background: #D6F0F5; color: #0B7C92; }
+.tone-parliament { background: #E3F3E8; color: #1F8A4C; }
+.tone-wisdom { background: #F0E9FF; color: #6B3FA0; }
+.tone-nest { background: #FDE8CF; color: #B4690E; }
+.tone-vigil { background: #D6F6FB; color: #0B95AA; }
+.tone-analytics { background: var(--bento-system-sys-neutral-alt-200); color: var(--bento-theme-color-text-base); }
+.tone-mcp { background: #E7ECEE; color: #385966; }
+
+/* ── Sheet (New user wizard / paywall / payment shared card) ───────── */
+.ob-sheet { width: min(820px, 94vw); max-height: 88vh; background: var(--bento-theme-color-bg-surface); border-radius: 20px; overflow: hidden; box-shadow: 0 24px 64px rgba(1,43,58,0.4); display: flex; flex-direction: column; }
+.ob-sheet.wide { width: min(960px, 95vw); }
+.ob-sheet-head { display: flex; align-items: center; gap: 8px; padding: 16px 16px 0 24px; min-height: 24px; }
+.ob-sheet-body { padding: 12px 32px 8px; overflow: auto; display: flex; flex-direction: column; gap: 16px; }
+.ob-sheet-title { margin: 0; font-weight: 700; font-size: 28px; line-height: 36px; letter-spacing: -0.01em; color: var(--bento-theme-color-text-base); text-wrap: balance; }
+.ob-sheet-title.display { font-family: var(--hs-font-display); }
+.ob-sheet-sub { margin: 0; font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-subtle); }
+.ob-sheet-foot { display: flex; align-items: center; gap: 16px; padding: 16px 24px; border-top: 1px solid var(--bento-theme-color-border-subtle); }
+
+/* business form selects */
+.ob-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.ob-field { display: flex; flex-direction: column; gap: 6px; }
+.ob-field label { font-weight: 700; font-size: 14px; color: var(--bento-theme-color-text-base); }
+.ob-select { height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--bento-theme-color-border-base, #767676); background: var(--bento-theme-color-bg-surface); font-family: var(--bento-theme-font-families-primary); font-size: 16px; color: var(--bento-theme-color-text-base); cursor: pointer; }
+.ob-select:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus, #0065FF); outline-offset: 1px; }
+
+/* product picker grid */
+.ob-pickgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ob-pick { display: flex; gap: 14px; align-items: flex-start; text-align: left; padding: 16px; border-radius: 14px; border: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); cursor: pointer; }
+.ob-pick:hover { border-color: var(--bento-theme-color-text-base); }
+.ob-pick.on { border-color: var(--bento-theme-color-bg-primary); box-shadow: inset 0 0 0 1px var(--bento-theme-color-bg-primary); }
+.ob-pick-ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+.ob-pick-ic .material-symbols-outlined { font-size: 22px; }
+.ob-pick .nm { font-weight: 700; font-size: 16px; color: var(--bento-theme-color-text-base); }
+.ob-pick .d { font-size: 14px; line-height: 20px; color: var(--bento-theme-color-text-subtle); margin-top: 2px; }
+.ob-pick .chk { margin-left: auto; color: var(--bento-theme-color-bg-primary); display: grid; place-items: center; }
+.ob-pick .chk .material-symbols-outlined { font-size: 22px; }
+
+/* connect-accounts grid */
+.ob-netgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ob-net { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--bento-theme-color-border-subtle); background: var(--bento-theme-color-bg-surface); }
+.ob-net-ic { width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+.ob-net-ic svg { width: 60%; height: 60%; }
+.ob-net .nm { font-weight: 700; font-size: 15px; flex: 1; }
+.ob-net .hs-btn { flex-shrink: 0; }
+.ob-net.done .hs-btn { pointer-events: none; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   PAYWALL + PAYMENT (Everything Welcome — Payment-Upgrade---Downgrade).
+   Full-bleed product surfaces (not the centered modal stage). PAYMENTS
+   ARE UI ONLY — fake card data, nothing processed. No-red → amber.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Shared product-app chrome (the dimmed app behind a paywall, and the
+      shell for full-page payment screens) ───────────────────────────── */
+.pwapp { position: absolute; inset: 0; display: flex; background: var(--bento-system-sys-neutral-alt-100); overflow: hidden; }
+.pwapp-rail { width: 80px; flex-shrink: 0; background: var(--bento-theme-color-bg-surface); border-right: 1px solid var(--bento-theme-color-border-subtle); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; }
+.pwapp-rail .owl { width: 36px; height: 36px; object-fit: contain; margin-bottom: 8px; }
+.pwapp-rail .spring { flex: 1; }
+.pwapp-navbtn { width: 64px; height: 56px; border: 0; background: transparent; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--bento-theme-color-icon-base); font-family: var(--bento-theme-font-families-primary); }
+.pwapp-navbtn .material-symbols-outlined { font-size: 24px; }
+.pwapp-navbtn .lbl { font-size: 11px; font-weight: 600; letter-spacing: 0.01em; }
+.pwapp-navbtn.on { background: var(--tone-fill, #E5EDFF); color: var(--tone-fg, #0F48D7); }
+.pwapp-navbtn.util .lbl { display: none; }
+.pwapp-navbtn.util { height: 44px; }
+
+.pwapp-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pwapp-top { height: 64px; flex-shrink: 0; background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle); display: flex; align-items: center; gap: 16px; padding: 0 24px; }
+.pwapp-top h1 { margin: 0; font-weight: 700; font-size: 24px; line-height: 32px; }
+.pwapp-top .spring { flex: 1; }
+.pwapp-ws { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px 0 8px; border-radius: 8px; background: transparent; border: 0; cursor: pointer; font-weight: 600; font-size: 15px; color: var(--bento-theme-color-text-base); }
+.pwapp-ws:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.pwapp-ws .av { width: 28px; height: 28px; border-radius: 999px; background: var(--bento-theme-color-bg-primary); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+.pwapp-ico { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.pwapp-ico:hover { background: var(--bento-system-sys-neutral-alt-100); }
+
+/* generic planner backdrop (only seen blurred behind the paywall) */
+.pwapp-body { flex: 1; min-height: 0; overflow: hidden; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.pwapp-toolbar { display: flex; align-items: center; gap: 12px; }
+.pwapp-toolbar .chip { height: 36px; padding: 0 14px; border-radius: 999px; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.pwapp-cal { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 10px; }
+.pwapp-cell { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.pwapp-cell .dn { font-size: 12px; font-weight: 700; color: var(--bento-theme-color-text-subtle); }
+.pwapp-evt { height: 22px; border-radius: 6px; }
+
+/* ── Paywall · centered upgrade card (Lumen-Advanced pattern) ──────── */
+.pw-root { position: absolute; inset: 0; }
+.pw-scrim { position: absolute; inset: 0; background: rgba(1,43,58,0.5); }
+.pw-center { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
+.pw-card { position: relative; width: min(920px, 95vw); max-height: 92vh; overflow: auto; box-sizing: border-box;
+  background: linear-gradient(135deg, var(--tone-fill) 0%, var(--bento-theme-color-bg-surface) 70%);
+  border: 1px solid var(--tone-fg); border-radius: 20px; padding: 48px; text-align: center;
+  box-shadow: 0 24px 64px rgba(1,43,58,0.45); }
+.pw-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; background: transparent; border-radius: 999px; cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-icon-base); }
+.pw-close:hover { background: var(--bento-system-sys-neutral-alt-100); }
+.pw-badge2 { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--tone-fg); background: var(--bento-theme-color-bg-surface); padding: 6px 14px; border-radius: 999px; margin-bottom: 20px; }
+.pw-badge2 .material-symbols-outlined { font-size: 16px; color: var(--tone-fg); }
+.pw-card h1 { margin: 0 0 12px; font-family: var(--hs-font-display); font-weight: 700; font-size: 34px; line-height: 1.1; letter-spacing: -0.01em; color: var(--bento-theme-color-text-base); text-wrap: balance; }
+.pw-lede { font-size: 17px; line-height: 1.55; color: var(--bento-theme-color-text-base); margin: 0 auto 28px; max-width: 60ch; }
+.pw-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0 auto 32px; max-width: 760px; text-align: left; }
+.pw-feat { background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px; padding: 18px; }
+.pw-feat .material-symbols-outlined { font-size: 24px; color: var(--tone-fg); }
+.pw-feat .ft { font-weight: 700; font-size: 15px; margin: 8px 0 4px; color: var(--bento-theme-color-text-base); }
+.pw-feat .fd { font-size: 13px; color: var(--bento-theme-color-text-subtle); line-height: 1.45; }
+.pw-cta { display: flex; gap: 12px; justify-content: center; align-items: center; }
+.pw-cta .hs-btn .material-symbols-outlined { font-size: 18px; }
+.pw-poweredby { display: inline-flex; align-items: center; gap: 6px; margin-top: 20px; font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.pw-poweredby .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-text-positive); }
+.pw-poweredby b { color: var(--bento-theme-color-text-positive); font-weight: 700; }
+.pw-switch { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--bento-theme-color-border-subtle); }
+.pw-foot-note { font-size: 13px; color: var(--bento-theme-color-text-subtle); margin-right: 4px; }
+
+/* ── Payment · full-page screens (within the product app) ──────────── */
+.pay-body { flex: 1; min-height: 0; overflow: auto; background: var(--bento-system-sys-neutral-alt-100); }
+/* secondary demo sub-state bar */
+.pay-sub { display: flex; align-items: center; gap: 4px; padding: 10px 24px; background: var(--bento-theme-color-bg-surface); border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.pay-sub .lbl { font-weight: 700; font-size: 12px; letter-spacing: 0.04em; color: var(--bento-theme-color-text-subtle); padding-right: 6px; }
+.pay-sub button { appearance: none; border: 0; background: transparent; cursor: pointer; font-family: var(--bento-theme-font-families-primary); font-weight: 600; font-size: 14px; color: var(--bento-theme-color-text-subtle); height: 32px; padding: 0 12px; border-radius: 999px; }
+.pay-sub button:hover { background: var(--bento-system-sys-neutral-alt-100); color: var(--bento-theme-color-text-base); }
+.pay-sub button.on { background: var(--bento-theme-color-bg-primary); color: #fff; }
+
+.pay-page { padding: 32px; max-width: 1280px; margin: 0 auto; box-sizing: border-box; }
+.pay-grid { display: grid; grid-template-columns: minmax(0,1fr) 380px; gap: 24px; align-items: start; }
+.pay-h2 { margin: 0 0 16px; font-weight: 700; font-size: 22px; line-height: 28px; }
+
+/* plan cards */
+.pay-plans-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.pay-pcard { border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px; background: var(--bento-theme-color-bg-surface); overflow: hidden; display: flex; flex-direction: column; }
+.pay-pcard-banner { background: var(--bento-theme-color-bg-primary); color: #fff; text-align: center; font-weight: 700; font-size: 16px; padding: 10px; }
+.pay-pcard-in { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+.pay-pcard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.pay-pname { font-weight: 700; font-size: 22px; line-height: 28px; color: var(--bento-theme-color-text-base); }
+.pay-pprice { display: flex; align-items: baseline; gap: 6px; margin-top: 6px; }
+.pay-pprice .amt { font-weight: 700; font-size: 30px; line-height: 1; color: var(--bento-theme-color-text-base); }
+.pay-pprice .per { font-size: 15px; color: var(--bento-theme-color-text-subtle); }
+.pay-pcard-tag { font-size: 15px; color: var(--bento-theme-color-text-base); }
+.pay-pcard-tag b { font-weight: 700; }
+.pay-feat { display: flex; flex-direction: column; gap: 12px; }
+.pay-feat .ln { display: flex; gap: 10px; font-size: 15px; line-height: 22px; color: var(--bento-theme-color-text-base); }
+.pay-feat .ln .material-symbols-outlined { font-size: 20px; color: var(--bento-theme-color-text-base); flex-shrink: 0; }
+.pay-learn { align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--bento-theme-color-text-link); font-weight: 600; font-size: 15px; text-decoration: none; }
+.pay-learn:hover { text-decoration: underline; }
+.pay-learn .material-symbols-outlined { font-size: 18px; }
+.pay-cur-btn { height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: var(--bento-system-sys-neutral-alt-200); color: var(--bento-theme-color-text-disabled, #8a8a8a); font-weight: 600; font-size: 14px; }
+
+/* additional seats */
+.pay-seats { margin-top: 24px; border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px; background: var(--bento-theme-color-bg-surface); padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.pay-seats .lead { font-size: 17px; line-height: 26px; color: var(--bento-theme-color-text-base); }
+.pay-seats-ctl { display: flex; align-items: center; gap: 18px; }
+.pay-seats-ctl .t { font-weight: 700; font-size: 18px; }
+.pay-step { width: 44px; height: 44px; border-radius: 999px; border: 0; background: var(--bento-system-sys-neutral-alt-200); cursor: pointer; display: grid; place-items: center; color: var(--bento-theme-color-text-base); }
+.pay-step:hover { background: var(--bento-system-sys-neutral-alt-300); }
+.pay-step:disabled { opacity: 0.45; cursor: not-allowed; }
+.pay-seats-ctl .n { min-width: 28px; text-align: center; font-weight: 700; font-size: 18px; }
+.pay-seats .foot { font-size: 17px; color: var(--bento-theme-color-text-base); }
+.pay-seats .foot b { font-weight: 700; }
+
+/* right column — billing cycle + order summary */
+.pay-side { display: flex; flex-direction: column; gap: 24px; position: sticky; top: 0; }
+.pay-side-h { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+.pay-side-h .material-symbols-outlined { font-size: 18px; color: var(--bento-theme-color-icon-subtle); }
+.pay-cyc { width: 100%; text-align: left; border: 1px solid var(--bento-theme-color-border-base); border-radius: 12px; background: var(--bento-theme-color-bg-surface); padding: 16px; cursor: pointer; display: grid; grid-template-columns: 24px 1fr auto; gap: 12px; align-items: start; margin-bottom: 12px; font-family: var(--bento-theme-font-families-primary); }
+.pay-cyc.on { border: 2px solid var(--bento-theme-color-bg-primary); padding: 15px; }
+.pay-radio { width: 20px; height: 20px; border-radius: 999px; border: 2px solid var(--bento-theme-color-border-base); margin-top: 2px; display: grid; place-items: center; }
+.pay-cyc.on .pay-radio { border-color: var(--bento-theme-color-bg-primary); }
+.pay-cyc.on .pay-radio::after { content: ""; width: 10px; height: 10px; border-radius: 999px; background: var(--bento-theme-color-bg-primary); }
+.pay-cyc .nm { font-weight: 700; font-size: 16px; color: var(--bento-theme-color-text-base); }
+.pay-cyc .amt { font-weight: 700; font-size: 26px; line-height: 1.1; color: var(--bento-theme-color-text-base); margin-top: 4px; }
+.pay-cyc .sub { font-size: 14px; color: var(--bento-theme-color-text-subtle); }
+.pay-save { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 6px; background: var(--bento-theme-color-bg-positive); color: var(--bento-theme-color-text-positive); font-weight: 700; font-size: 13px; white-space: nowrap; }
+.pay-save .material-symbols-outlined { font-size: 14px; }
+
+.pay-summary { border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px; background: var(--bento-theme-color-bg-surface); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.pay-sum-plan .k { font-weight: 700; font-size: 15px; }
+.pay-sum-plan .v { font-size: 15px; color: var(--bento-theme-color-text-subtle); }
+.pay-sum-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 15px; }
+.pay-sum-row .v { font-variant-numeric: tabular-nums; }
+.pay-sum-div { height: 1px; background: var(--bento-theme-color-border-subtle); }
+.pay-sum-total { display: flex; align-items: baseline; justify-content: space-between; font-weight: 700; font-size: 18px; }
+.pay-summary .hs-btn { width: 100%; }
+.pay-fineprint { font-size: 13px; line-height: 18px; color: var(--bento-theme-color-text-subtle); text-align: center; }
+
+/* ── Billing & plan (Profile) settings ─────────────────────────────── */
+.pay-settings { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.pay-sec { border: 1px solid var(--bento-theme-color-border-subtle); border-radius: 12px; background: var(--bento-theme-color-bg-surface); overflow: hidden; }
+.pay-sec-h { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.pay-sec-h h3 { margin: 0; font-weight: 700; font-size: 17px; }
+.pay-sec-h .spring { flex: 1; }
+.pay-sec-b { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.pay-kv { display: flex; align-items: flex-start; gap: 16px; }
+.pay-kv .k { width: 160px; flex-shrink: 0; font-weight: 600; font-size: 15px; color: var(--bento-theme-color-text-subtle); padding-top: 2px; }
+.pay-kv .v { font-size: 15px; line-height: 22px; color: var(--bento-theme-color-text-base); }
+.pay-kv .v .em { font-weight: 700; }
+.pay-card-chip { display: inline-flex; align-items: center; gap: 10px; }
+.pay-brand { width: 40px; height: 26px; border-radius: 4px; background: linear-gradient(135deg, #EB001B 0%, #EB001B 45%, #F79E1B 55%, #F79E1B 100%); position: relative; }
+.pay-brand.visa { background: #1A1F71; }
+.pay-trialbadge { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: var(--bento-theme-color-bg-positive); color: var(--bento-theme-color-text-positive); font-weight: 700; font-size: 13px; }
+.pay-trialbadge .material-symbols-outlined { font-size: 16px; }
+/* fake-card edit form */
+.pay-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pay-form .full { grid-column: 1 / -1; }
+.pay-fld { display: flex; flex-direction: column; gap: 6px; }
+.pay-fld label { font-weight: 700; font-size: 14px; color: var(--bento-theme-color-text-base); }
+.pay-fld input { height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--bento-theme-color-border-base, #767676); background: var(--bento-theme-color-bg-surface); font-family: var(--bento-theme-font-families-primary); font-size: 16px; color: var(--bento-theme-color-text-base); }
+.pay-fld input:focus-visible { outline: 2px solid var(--bento-theme-color-border-focus, #0065FF); outline-offset: 1px; }
+.pay-demo-note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--hs-fg-warning, #6B4B15); background: var(--hs-bg-warning, #FFE7C0); border-radius: 8px; padding: 10px 12px; }
+.pay-demo-note .material-symbols-outlined { font-size: 18px; }
+.pay-edit-acts { display: flex; gap: 10px; justify-content: flex-end; }
+/* billing history mini table */
+.pay-hist { width: 100%; border-collapse: collapse; font-size: 15px; }
+.pay-hist th, .pay-hist td { text-align: left; padding: 12px 0; border-bottom: 1px solid var(--bento-theme-color-border-subtle); }
+.pay-hist th { font-weight: 600; font-size: 13px; color: var(--bento-theme-color-text-subtle); }
+.pay-hist td.num, .pay-hist th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.pay-hist tr:last-child td { border-bottom: 0; }
+.pay-hist .dl { color: var(--bento-theme-color-text-link); font-weight: 600; cursor: pointer; }
+
+/* ── End of trial / confirm modals (centered, amber — no red) ──────── */
+.pay-tmodal { width: min(520px, 94vw); background: var(--bento-theme-color-bg-surface); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 64px rgba(1,43,58,0.45); }
+.pay-tmodal-art { height: 96px; background: var(--hs-bg-warning, #FFE7C0); display: grid; place-items: center; }
+.pay-tmodal-art .material-symbols-outlined { font-size: 44px; color: var(--hs-fg-warning, #6B4B15); }
+.pay-tmodal-b { padding: 28px 32px 24px; display: flex; flex-direction: column; gap: 12px; }
+.pay-tmodal-b h2 { margin: 0; font-weight: 700; font-size: 24px; line-height: 30px; }
+.pay-tmodal-b p { margin: 0; font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); }
+.pay-tmodal-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+.pay-confirm-b { padding: 28px 32px 24px; display: flex; flex-direction: column; gap: 12px; }
+.pay-confirm-b h2 { margin: 0; font-weight: 700; font-size: 22px; }
+.pay-confirm-b p { margin: 0; font-size: 16px; line-height: 24px; color: var(--bento-theme-color-text-base); }
