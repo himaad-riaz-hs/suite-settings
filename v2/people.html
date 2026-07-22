@@ -25,24 +25,49 @@
     .listrow { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--hs-border); border-radius: var(--hs-radii-lg); background: var(--bento-theme-color-bg-surface); margin-bottom:10px; }
     .listrow .av { width:36px; height:36px; border-radius:999px; background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg); display:grid; place-items:center; font: var(--hs-type-meta-b); flex:none; }
     .listrow .kv { flex:1; min-width:0; } .listrow .k { font: var(--hs-type-body-md-b); } .listrow .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
-    /* invite modal (Layla's seats-upsell flow) */
+    /* invite modal — Layla's seats flow. Two arms via ?flow=a|b, plus non-admin ?role=member. */
     .ovl { position:fixed; inset:0; background:rgba(1,43,58,.32); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
     .ovl.open { display:flex; }
-    .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
+    .invmodal { width:600px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: 0 12px 36px rgba(1,43,58,.20); overflow:hidden; }
     .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
     .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
-    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mb { padding:18px 20px; max-height:60vh; overflow:auto; }
     .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
+    /* blue intro banner */
+    .invbanner { display:flex; gap:12px; align-items:flex-start; background: var(--hs-bg-info); border-radius: var(--hs-radii-md); padding:14px 16px; margin-bottom:18px; }
+    .invbanner > .material-symbols-outlined { color: var(--hs-fg-link); font-size:20px; flex:none; }
+    .invbanner .bt { flex:1; font: var(--hs-type-body-md); color: var(--hs-fg); }
+    .invbanner .buyseats { margin-top:10px; }
+    /* column headers + invitee rows */
+    .invcols { display:flex; gap:10px; font: var(--hs-type-body-md-b); color: var(--hs-fg); margin-bottom:8px; }
+    .invcols .c1 { flex:1; } .invcols .c2 { min-width:160px; }
     .invrow { display:flex; gap:10px; align-items:center; margin-bottom:10px; }
     .invrow input { flex:1; min-width:0; height:40px; padding:0 12px; border:1px solid var(--hs-border-input); border-radius: var(--bento-component-input-border-radius); font: var(--hs-type-body-md); }
-    .invrow .sel { min-width:150px; }
-    .addmore { display:inline-flex; align-items:center; gap:6px; background:none; border:0; color: var(--hs-fg-link); font: var(--hs-type-body-md-b); cursor:pointer; padding:4px 0; }
-    .upsell { display:flex; gap:10px; align-items:flex-start; background: var(--hs-bg-warning); border-radius: var(--hs-radii-md); padding:12px 14px; margin-top:8px; }
-    .upsell .material-symbols-outlined { color: var(--hs-fg-warning); font-size:20px; flex:none; }
-    .upsell .t { flex:1; font: var(--hs-type-body-sm); color: var(--hs-fg); } .upsell .amt { font: var(--hs-type-body-md-b); white-space:nowrap; }
+    .invrow .sel { min-width:160px; }
+    .invrow .rm { border:0; background:none; cursor:pointer; color: var(--bento-theme-color-icon-subtle); display:grid; place-items:center; width:28px; height:28px; border-radius:999px; }
+    .invrow .rm:hover { background: var(--bento-system-sys-neutral-alt-100); }
+    .invrow .rmspace { width:28px; flex:none; }
+    /* Flow A section break: free rows above, paid rows below */
+    .secbreak { display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-top:1px solid var(--hs-border); margin:6px 0 14px; padding-top:14px; }
+    .secbreak .l { font: var(--hs-type-body-md-b); color: var(--hs-fg); } .secbreak .r { font: var(--hs-type-body-md); color: var(--bento-theme-color-text-subtle); white-space:nowrap; }
+    /* Flow A running total — NEUTRAL styling (a consequence, not an error) */
+    .runtotal { display:flex; gap:10px; align-items:center; background: var(--bento-system-sys-neutral-alt-100); border-radius: var(--hs-radii-md); padding:12px 14px; margin-top:6px; }
+    .runtotal > .material-symbols-outlined { color: var(--bento-theme-color-icon-subtle); font-size:20px; flex:none; }
+    .runtotal .t { flex:1; font: var(--hs-type-body-md-b); color: var(--hs-fg); } .runtotal .amt { font: var(--hs-type-body-md-b); white-space:nowrap; }
+    /* non-admin note (neutral info) */
+    .membernote { display:flex; gap:12px; align-items:flex-start; background: var(--hs-bg-info); border-radius: var(--hs-radii-md); padding:14px 16px; margin-bottom:18px; }
+    .membernote > .material-symbols-outlined { color: var(--hs-fg-link); font-size:20px; flex:none; }
+    .membernote .bt { flex:1; font: var(--hs-type-body-md); color: var(--hs-fg); }
+    .addmore { display:inline-flex; align-items:center; gap:6px; background:none; border:0; color: var(--hs-fg-link); font: var(--hs-type-body-md-b); cursor:pointer; padding:4px 0; margin-top:2px; }
+    /* Flow B buy-seats step */
     .price { border:1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding:14px 16px; }
     .price .pr { display:flex; justify-content:space-between; padding:6px 0; font: var(--hs-type-body-md); }
     .price .pr.total { border-top:1px solid var(--hs-border); margin-top:6px; padding-top:12px; font: var(--hs-type-body-md-b); }
+    .qtyrow { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font: var(--hs-type-body-md); }
+    .qty { display:inline-flex; align-items:center; border:1px solid var(--hs-border-input); border-radius: var(--hs-radii-md); overflow:hidden; }
+    .qty button { width:36px; height:36px; border:0; background:transparent; cursor:pointer; font-size:18px; color: var(--hs-fg); }
+    .qty button + span, .qty span + button { border-left:1px solid var(--hs-border-input); }
+    .qty span { min-width:44px; text-align:center; font: var(--hs-type-body-md-b); height:36px; display:inline-flex; align-items:center; justify-content:center; }
     .payln { display:flex; align-items:center; justify-content:space-between; margin-top:14px; font: var(--hs-type-body-md); }
     .sent { text-align:center; padding:12px 0; } .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 14px; } .sent .big .material-symbols-outlined { font-size:40px; }
   </style>
@@ -93,7 +118,7 @@
       <h1>People</h1>
       <div class="spacer"></div>
       <div class="seatline">
-        <span class="seats"><span class="material-symbols-outlined">event_seat</span>449 of 450 seats used</span>
+        <span class="seats"><span class="material-symbols-outlined">event_seat</span>45 of 50 seats used</span>
         <button class="hs-btn hs-btn--ghost hs-btn--sm">Get more seats</button>
         <button class="hs-btn hs-btn--primary" onclick="openInvite()"><span class="material-symbols-outlined">person_add</span>Invite people</button>
       </div>
@@ -102,8 +127,8 @@
 
     <div class="pagebar">
       <nav class="tabs" aria-label="People">
-        <a href="#" class="on" data-tab="members" onclick="setTab(event,'members')">Members<span class="cnt">440</span></a>
-        <a href="#" data-tab="teams" onclick="setTab(event,'teams')">Teams<span class="cnt">52</span></a>
+        <a href="#" class="on" data-tab="members" onclick="setTab(event,'members')">Members<span class="cnt">45</span></a>
+        <a href="#" data-tab="teams" onclick="setTab(event,'teams')">Teams<span class="cnt">6</span></a>
         <a href="#" data-tab="pending" onclick="setTab(event,'pending')">Pending invites<span class="cnt">3</span></a>
         <a href="#" data-tab="requested" onclick="setTab(event,'requested')">Requested<span class="cnt">2</span></a>
       </nav>
@@ -111,7 +136,7 @@
 
     <div class="content">
       <div class="inner wide">
-        <div class="count-h"><h2>440 people in Somos</h2><div class="meta">Everything about a person starts here. 25 active &#183; 3 pending.</div></div>
+        <div class="count-h"><h2>45 people in Somos</h2><div class="meta">Advanced plan &#183; 45 of 50 seats used &#183; 5 available.</div></div>
 
         <!-- MEMBERS -->
         <section data-panel="members">
@@ -151,7 +176,7 @@
                 <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-4-bg);color:var(--hs-cat-4-fg)">PA</span><a href="person-detail.html?p=priya" data-pid="priya">Priya Anand</a></div></td><td class="hs-small">priya@somos.co</td><td>Editor</td><td class="hs-small">Invited</td><td><span class="pill warn"><span class="material-symbols-outlined">schedule</span>Pending</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
               </tbody>
             </table>
-              <div class="pagination"><button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button><div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div><span class="hs-small">of 440</span><button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button></div>
+              <div class="pagination"><button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button><div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div><span class="hs-small">of 45</span><button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button></div>
             </div>
           </div>
         </section>
@@ -182,40 +207,12 @@
     </div>
   </main>
 
-  <!-- Invite modal — Layla's seats-upsell flow -->
+  <!-- Invite modal — Layla's seats flow. Arms: ?flow=a (default) | ?flow=b. Non-admin: ?role=member. Rendered by JS. -->
   <div class="ovl" id="inviteOvl">
     <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="invTitle">
-      <!-- step 1 -->
-      <div data-step="1">
-        <div class="mh"><h2 id="invTitle">Invite members</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
-        <div class="mb">
-          <p class="subhead">1 seat is available on your plan. Inviting more will add seats to your subscription.</p>
-          <div id="invRows"></div>
-          <button class="addmore" onclick="addInvRow()"><span class="material-symbols-outlined">add</span>Add more members</button>
-          <div class="upsell" id="invUpsell" hidden><span class="material-symbols-outlined">info</span><span class="t">Extra seats will be added to your plan. <strong><span id="upsellN">0</span> additional seat(s).</strong></span><span class="amt">US$29/mo each</span></div>
-        </div>
-        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="invNext()">Continue</button></div>
-      </div>
-      <!-- step 2 -->
-      <div data-step="2" hidden>
-        <div class="mh"><h2>Add more seats</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
-        <div class="mb">
-          <p class="subhead">You are inviting <span id="s2count">0</span> people. 1 seat is available and <span id="s2add">0</span> will be added to your plan.</p>
-          <div class="price">
-            <div class="pr"><span>Business plan</span><span>US$249.00 / mo</span></div>
-            <div class="pr"><span><span id="s2addb">0</span> additional seats</span><span id="s2addcost">US$0.00 / mo</span></div>
-            <div class="pr total"><span>Due now (prorated)</span><span id="s2due">US$0.00</span></div>
-          </div>
-          <div class="payln"><span>Visa ending 4242</span><button class="hs-btn hs-btn--ghost hs-btn--sm">Change</button></div>
-        </div>
-        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="invBack()">Back</button><button class="hs-btn hs-btn--primary" onclick="invConfirm()">Confirm and continue</button></div>
-      </div>
-      <!-- step 3 -->
-      <div data-step="3" hidden>
-        <div class="mh"><h2>Invitations sent</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
-        <div class="mb"><div class="sent"><div class="big"><span class="material-symbols-outlined">mark_email_read</span></div><p><strong id="sentN">0</strong> invitations are on their way. New members become active as soon as they accept, and their seats are held until then.</p></div></div>
-        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Done</button><button class="hs-btn hs-btn--primary" onclick="closeInvite()">View members</button></div>
-      </div>
+      <div class="mh"><h2 id="invTitle">Invite members</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeInvite()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb" id="invBody"></div>
+      <div class="mf" id="invFoot"></div>
     </div>
   </div>
 
@@ -228,24 +225,92 @@
     // card/column view
     function setView(v){ var g=document.getElementById('gridView'),tv=document.getElementById('tableView'),c=document.getElementById('cardBtn'),k=document.getElementById('colBtn');
       g.hidden=v!=='card'; tv.hidden=v!=='column'; c.classList.toggle('on',v==='card'); k.classList.toggle('on',v==='column'); c.setAttribute('aria-pressed',v==='card'); k.setAttribute('aria-pressed',v==='column'); }
-    // invite modal (Layla's seats-upsell flow)
-    var FREE_SEATS=1, SEAT_PRICE=29;
-    function invRowHTML(val){ return '<div class="invrow"><input type="email" placeholder="name@company.com" value="'+(val||'')+'" oninput="recalc()"><button class="sel"><span>Full access</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>'; }
-    function addInvRow(){ document.getElementById('invRows').insertAdjacentHTML('beforeend', invRowHTML('')); recalc(); }
-    function inviteeCount(){ return [...document.querySelectorAll('#invRows input')].filter(i=>i.value.trim().length>0).length; }
-    function recalc(){ var add=Math.max(0,inviteeCount()-FREE_SEATS); var up=document.getElementById('invUpsell');
-      up.hidden = add<=0; document.getElementById('upsellN').textContent=add; }
-    function openInvite(){ var r=document.getElementById('invRows'); r.innerHTML=invRowHTML('')+invRowHTML(''); showStep(1); recalc(); document.getElementById('inviteOvl').classList.add('open'); }
+    // invite modal — Layla's seats flow. ?flow=a (default) | b. ?role=member = non-admin request path.
+    var INCLUDED=5, SEAT_PRICE=249;
+    var inv={flow:'a', role:'admin', step:'form', rows:[], available:5, buyQty:1};
+    function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+    function invParams(){ var q=new URLSearchParams(location.search);
+      var f=(q.get('flow')||'a').toLowerCase(); if(f!=='b') f='a';
+      var r=(q.get('role')||'admin').toLowerCase(); if(r!=='member') r='admin';
+      return {flow:f, role:r}; }
+    function openInvite(){ var p=invParams(); inv.flow=p.flow; inv.role=p.role; inv.step='form'; inv.available=5; inv.buyQty=1;
+      var start = inv.role==='member' ? 2 : 3; inv.rows=[]; for(var i=0;i<start;i++) inv.rows.push({perm:'View only'});
+      renderInvite(); document.getElementById('inviteOvl').classList.add('open'); }
     function closeInvite(){ document.getElementById('inviteOvl').classList.remove('open'); }
-    function showStep(s){ document.querySelectorAll('#inviteOvl [data-step]').forEach(d=>d.hidden = +d.dataset.step!==s); }
-    function invNext(){ var n=inviteeCount(), add=Math.max(0,n-FREE_SEATS);
-      if(add<=0){ finishInvite(n); return; }
-      document.getElementById('s2count').textContent=n; document.getElementById('s2add').textContent=add; document.getElementById('s2addb').textContent=add;
-      document.getElementById('s2addcost').textContent='US$'+(add*SEAT_PRICE).toFixed(2)+' / mo'; document.getElementById('s2due').textContent='US$'+(add*SEAT_PRICE).toFixed(2);
-      showStep(2); }
-    function invBack(){ showStep(1); }
-    function invConfirm(){ finishInvite(inviteeCount()); }
-    function finishInvite(n){ document.getElementById('sentN').textContent=n; showStep(3); }
+    function addInvRow(){ inv.rows.push({perm:'View only'}); renderInvite(); }
+    function rmInvRow(i){ if(inv.rows.length>1){ inv.rows.splice(i,1); renderInvite(); } }
+    function invOverflow(){ return Math.max(0, inv.rows.length - inv.available); }
+    function rowHTML(i, removable){
+      var rm = removable ? '<button class="rm" aria-label="Remove" onclick="rmInvRow('+i+')"><span class="material-symbols-outlined">close</span></button>' : '<span class="rmspace"></span>';
+      return '<div class="invrow"><input type="email" placeholder="name@company.com">'
+        + '<button class="sel"><span>'+esc(inv.rows[i].perm)+'</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>'
+        + rm + '</div>'; }
+    function colsHTML(){ return '<div class="invcols"><span class="c1">Who are you inviting?</span><span class="c2">Permission</span><span class="rmspace"></span></div>'; }
+    function renderInvite(){
+      var title=document.getElementById('invTitle'), body=document.getElementById('invBody'), foot=document.getElementById('invFoot');
+      var n=inv.rows.length;
+      if(inv.step==='sent'){
+        title.textContent = inv.role==='member' ? 'Request sent' : 'Invitations sent';
+        var msg = inv.role==='member'
+          ? '<strong>'+n+'</strong> member request'+(n>1?'s were':' was')+' sent to Marisol Chen, the billing owner, to approve. You will be notified once it is reviewed.'
+          : '<strong>'+n+'</strong> invitation'+(n>1?'s are':' is')+' on the way.' + (inv.flow==='a' && invOverflow()>0 ? ' '+invOverflow()+' seat'+(invOverflow()>1?'s were':' was')+' added to your advanced plan.' : '') + ' New members become active as soon as they accept.';
+        body.innerHTML = '<div class="sent"><div class="big"><span class="material-symbols-outlined">'+(inv.role==='member'?'forward_to_inbox':'mark_email_read')+'</span></div><p>'+msg+'</p></div>';
+        foot.innerHTML = '<button class="hs-btn hs-btn--primary" onclick="closeInvite()">Done</button>';
+        return;
+      }
+      if(inv.step==='bought'){
+        title.textContent='Seats added';
+        body.innerHTML = '<div class="sent"><div class="big"><span class="material-symbols-outlined">check</span></div><p><strong>'+inv.buyQty+'</strong> seat'+(inv.buyQty>1?'s were':' was')+' added to your advanced plan. You now have <strong>'+inv.available+'</strong> seats available. Continue inviting your team.</p></div>';
+        foot.innerHTML = '<button class="hs-btn hs-btn--primary" onclick="inv.step=\'form\';renderInvite()">Continue inviting</button>';
+        return;
+      }
+      if(inv.step==='buy'){
+        title.textContent='Buy more seats';
+        body.innerHTML = '<div class="qtyrow"><span>Additional seats</span><span class="qty"><button aria-label="Fewer" onclick="inv.buyQty=Math.max(1,inv.buyQty-1);renderInvite()">&#8722;</button><span>'+inv.buyQty+'</span><button aria-label="More" onclick="inv.buyQty=inv.buyQty+1;renderInvite()">+</button></span></div>'
+          + '<div class="price"><div class="pr"><span>Advanced plan</span><span>US$1,245.00 / mo</span></div>'
+          + '<div class="pr"><span>'+inv.buyQty+' additional seat'+(inv.buyQty>1?'s':'')+'</span><span>US$'+(inv.buyQty*SEAT_PRICE).toLocaleString()+'.00 / mo</span></div>'
+          + '<div class="pr total"><span>Due now (prorated)</span><span>US$'+(inv.buyQty*SEAT_PRICE).toLocaleString()+'.00</span></div></div>'
+          + '<div class="payln"><span>Visa ending 4242</span><button class="hs-btn hs-btn--ghost hs-btn--sm">Change</button></div>';
+        foot.innerHTML = '<button class="hs-btn hs-btn--ghost" onclick="inv.step=\'form\';renderInvite()">Back</button><button class="hs-btn hs-btn--primary" onclick="invBuy()">Buy seats</button>';
+        return;
+      }
+      // form step
+      var h='';
+      if(inv.role==='member'){
+        title.textContent='Request to invite members';
+        h += '<div class="membernote"><span class="material-symbols-outlined">info</span><span class="bt">You do not have permission to add seats. Your request to invite members goes to the billing owner, Marisol Chen, to approve.</span></div>';
+      } else if(inv.flow==='b'){
+        title.textContent='Invite members';
+        h += '<div class="invbanner"><span class="material-symbols-outlined">info</span><span class="bt">'+inv.available+' of 50 seats available on your advanced plan, invite your team to get started.<span style="display:block"><button class="hs-btn hs-btn--secondary hs-btn--sm buyseats" onclick="inv.step=\'buy\';renderInvite()">Buy more seats</button></span></span></div>';
+      } else {
+        title.textContent='Invite members';
+        h += '<div class="invbanner"><span class="material-symbols-outlined">info</span><span class="bt">'+inv.available+' seats available on your advanced plan, invite your team to get started.</span></div>';
+      }
+      h += colsHTML();
+      if(inv.role==='admin' && inv.flow==='a'){
+        // included rows (fixed), then a section break + paid rows + neutral running total
+        var inc=Math.min(INCLUDED, n), i;
+        for(i=0;i<inc;i++) h += rowHTML(i,false);
+        if(n>INCLUDED){
+          h += '<div class="secbreak"><span class="l">Additional seats will be added to your plan</span><span class="r">US$'+SEAT_PRICE.toLocaleString()+'/mo each</span></div>';
+          for(i=INCLUDED;i<n;i++) h += rowHTML(i,true);
+          var over=invOverflow(), cost=(over*SEAT_PRICE).toLocaleString();
+          h += '<div class="runtotal"><span class="material-symbols-outlined">info</span><span class="t">'+over+' additional seat'+(over>1?'s':'')+'</span><span class="amt">US$'+cost+'/mo</span></div>';
+        }
+      } else {
+        for(var j=0;j<n;j++) h += rowHTML(j, j>=2);
+      }
+      h += '<button class="addmore" onclick="addInvRow()"><span class="material-symbols-outlined">add</span>Add more members</button>';
+      body.innerHTML = h;
+      // footer
+      var primary;
+      if(inv.role==='member') primary='Send request';
+      else if(inv.flow==='a' && invOverflow()>0){ var o=invOverflow(); primary='Add '+o+' seat'+(o>1?'s':'')+' and invite '+n; }
+      else primary='Invite members';
+      foot.innerHTML = '<button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="invSubmit()">'+esc(primary)+'</button>';
+    }
+    function invSubmit(){ inv.step='sent'; renderInvite(); }
+    function invBuy(){ inv.available = inv.available + inv.buyQty; inv.step='bought'; renderInvite(); }
     document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInvite(); });
   </script>
   <script src="app.js"></script>
