@@ -129,7 +129,7 @@
           <h2 class="modal-title" id="ssoConfigTitle">Configure SSO from metadata</h2>
           <p class="modal-sub">Import identity-provider settings instead of entering them by hand.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
         <div class="hs-field">
@@ -323,10 +323,14 @@
   .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
   .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
   .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
-  /* clear disabled state for the connection-detail fields when SSO is off */
-  .hs-input:disabled { background:var(--bento-system-sys-neutral-alt-100); color:var(--hs-fg-disabled);
-    border-color:var(--hs-border-input); cursor:not-allowed; }
-  .hs-input:disabled::placeholder { color:var(--hs-fg-disabled); }
+  /* Disabled state for the connection-detail fields when SSO is off (Bento input disabled tokens). */
+  .hs-input:disabled { background:var(--bento-theme-color-bg-disabled); color:var(--bento-theme-color-text-disabled);
+    border-color:var(--bento-theme-color-border-disabled); cursor:not-allowed; }
+  .hs-input:disabled::placeholder { color:var(--bento-theme-color-text-disabled); }
+  /* Disabled state for the identity-provider select lookalike (mirrors .hs-select[disabled]). */
+  .sel[aria-disabled="true"] { background:var(--bento-theme-color-bg-disabled);
+    border-color:var(--bento-theme-color-border-disabled); color:var(--bento-theme-color-text-disabled); cursor:not-allowed; }
+  .sel[aria-disabled="true"] .chev { color:var(--bento-theme-color-text-disabled); }
   .save-bar { padding-bottom:8px; }
 </style>
 </body>

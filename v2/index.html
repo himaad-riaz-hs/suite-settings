@@ -20,8 +20,7 @@
     .calbar .mo { font: var(--hs-type-title-base); }
     .calbar .navio { width:32px; height:32px; border:0; background:transparent; border-radius:8px; display:grid; place-items:center; cursor:pointer; color:var(--bento-theme-color-icon-base); }
     .calbar .navio:hover { background:var(--bento-system-sys-neutral-alt-100); }
-    .calbar .today { height:36px; padding:0 14px; border-radius:8px; background:transparent; box-shadow:inset 0 0 0 1px var(--hs-border); font:var(--hs-type-body-md-b); cursor:pointer; }
-    .calbar .today:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    /* "Today" uses the real outlined button (.hs-btn hs-btn--outlined hs-btn--sm); no page-local override needed. */
     .calwrap { flex:1; min-height:0; display:flex; flex-direction:column; background:var(--bento-theme-color-bg-surface); }
     .calhead { display:grid; grid-template-columns:repeat(7,1fr); border-bottom:1px solid var(--hs-border); }
     .calhead div { padding:10px 12px; font:var(--hs-type-meta-b); color:var(--bento-theme-color-text-subtle); text-transform:uppercase; letter-spacing:.04em; }
@@ -30,7 +29,7 @@
     .cell:nth-child(7n) { border-right:0; }
     .cell.dim { background:var(--bento-system-sys-neutral-alt-100); }
     .cell .num { font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); }
-    .cell.today .num { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:999px; background:var(--bento-theme-color-bg-primary); color:#fff; font-weight:700; }
+    .cell.today .num { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:999px; background:var(--bento-theme-color-bg-primary); color:var(--hs-fg-inverse); font-weight:700; }
     .chip { display:flex; align-items:center; gap:6px; margin-top:5px; padding:4px 7px; border-radius:6px; background:var(--bento-system-sys-neutral-alt-100); font:var(--hs-type-meta); color:var(--hs-fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .chip .dot { width:8px; height:8px; border-radius:999px; flex:0 0 auto; }
     .chip .t { color:var(--bento-theme-color-text-subtle); }
@@ -39,13 +38,13 @@
       border:1px solid var(--hs-border); border-radius:12px; box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); padding:6px; display:none; }
     .acctmenu.open { display:block; }
     .acctmenu .ah { display:flex; align-items:center; gap:10px; padding:10px 10px 12px; border-bottom:1px solid var(--hs-border); margin-bottom:6px; }
-    .acctmenu .ah .av { width:34px; height:34px; border-radius:999px; background:var(--hs-cat-6-bg,#dfeaff); color:var(--hs-cat-6-fg,#1f60c9); display:grid; place-items:center; font-weight:700; }
+    .acctmenu .ah .av { width:34px; height:34px; border-radius:999px; background:var(--hs-cat-6-bg); color:var(--hs-cat-6-fg); display:grid; place-items:center; font-weight:700; }
     .acctmenu .ah .n { font:var(--hs-type-body-md-b); } .acctmenu .ah .e { font:var(--hs-type-meta); color:var(--bento-theme-color-text-subtle); }
     .acctmenu a, .acctmenu button.mi { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 10px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); text-decoration:none; cursor:pointer; }
     .acctmenu a:hover, .acctmenu button.mi:hover { background:var(--bento-system-sys-neutral-alt-100); }
     .acctmenu .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
     .acctmenu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
-    .suite-navbtn.on .circle { background:var(--bento-theme-color-bg-primary); color:#fff; }
+    .suite-navbtn.on .circle { background:var(--bento-theme-color-bg-primary); color:var(--hs-fg-inverse); }
     .suite-rail .avatar { border:0; cursor:pointer; }
   </style>
 </head>
@@ -101,7 +100,7 @@
       <button class="navio" aria-label="Next month"><span class="material-symbols-outlined">chevron_right</span></button>
       <span class="mo">July 2026</span>
       <span style="flex:1"></span>
-      <button class="today">Today</button>
+      <button class="hs-btn hs-btn--outlined hs-btn--sm">Today</button>
     </div>
 
     <div class="calwrap">

@@ -108,12 +108,14 @@
           <h2 class="modal-title" id="nameModalTitle">Edit name</h2>
           <p class="modal-sub">The name teammates see across Hootsuite.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
-        <label for="nameInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Full name</label>
-        <input id="nameInput" class="hs-input" type="text" data-autofocus style="width:100%">
-        <p id="nameError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:6px 0 0" hidden>Enter a name.</p>
+        <div class="hs-field">
+          <label class="hs-field-label" for="nameInput">Full name</label>
+          <input id="nameInput" class="hs-input" type="text" data-autofocus style="width:100%">
+          <p id="nameError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative)" hidden>Enter a name.</p>
+        </div>
       </div>
       <div class="modal-foot">
         <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
@@ -131,12 +133,14 @@
           <h2 class="modal-title" id="emailModalTitle">Change email</h2>
           <p class="modal-sub">Used for sign-in and account notifications.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
-        <label for="emailInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">New email address</label>
-        <input id="emailInput" class="hs-input" type="email" data-autofocus placeholder="name@company.com" style="width:100%">
-        <p id="emailError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:6px 0 0" hidden>Enter a valid email.</p>
+        <div class="hs-field">
+          <label class="hs-field-label" for="emailInput">New email address</label>
+          <input id="emailInput" class="hs-input" type="email" data-autofocus placeholder="name@company.com" style="width:100%">
+          <p id="emailError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative)" hidden>Enter a valid email.</p>
+        </div>
       </div>
       <div class="modal-foot">
         <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
@@ -154,7 +158,7 @@
           <h2 class="modal-title" id="deleteModalTitle">Delete account?</h2>
           <p class="modal-sub">Your account is scheduled for deletion and can be restored while the request is pending.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
         <p style="margin:0">We schedule the deletion rather than removing everything at once, so you have time to change your mind.</p>

@@ -144,11 +144,13 @@
           <h2 class="modal-title" id="orgNameModalTitle">Edit organization name</h2>
           <p class="modal-sub">Shown across Hootsuite and on invitations to new members.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
-        <label for="orgNameInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Organization name</label>
-        <input id="orgNameInput" type="text" data-autofocus style="width:100%">
+        <div class="hs-field">
+          <label class="hs-field-label" for="orgNameInput">Organization name</label>
+          <input id="orgNameInput" class="hs-input" type="text" data-autofocus style="width:100%">
+        </div>
       </div>
       <div class="modal-foot">
         <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
@@ -166,7 +168,7 @@
           <h2 class="modal-title" id="deleteOrgModalTitle">Delete organization?</h2>
           <p class="modal-sub">This permanently removes Somos, all teams, and all connected accounts. This cannot be undone.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
         <p style="margin:0">Active seats are billed until the end of the current period.</p>

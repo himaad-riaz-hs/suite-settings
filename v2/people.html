@@ -42,7 +42,8 @@
     .invcols { display:flex; gap:10px; font: var(--hs-type-body-md-b); color: var(--hs-fg); margin-bottom:8px; }
     .invcols .c1 { flex:1; } .invcols .c2 { min-width:160px; }
     .invrow { display:flex; gap:10px; align-items:center; margin-bottom:10px; }
-    .invrow input { flex:1; min-width:0; height:40px; padding:0 12px; border:1px solid var(--hs-border-input); border-radius: var(--bento-component-input-border-radius); font: var(--hs-type-body-md); }
+    /* invite-row email field is the real .hs-input; only its flex sizing is page-local */
+    .invrow .hs-input { flex:1; min-width:0; }
     .invrow .sel { min-width:160px; }
     .invrow .rm { border:0; background:none; cursor:pointer; color: var(--bento-theme-color-icon-subtle); display:grid; place-items:center; width:28px; height:28px; border-radius:999px; }
     .invrow .rm:hover { background: var(--bento-system-sys-neutral-alt-100); }
@@ -91,7 +92,7 @@
     .notifitem .ic { width:32px;height:32px;border-radius:999px;background:var(--hs-bg-info);color:var(--hs-fg-link);display:grid;place-items:center;flex:none; }
     .notifitem .ic .material-symbols-outlined { font-size:18px; }
     .notifitem .nt { flex:1; font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); } .notifitem .nt b { font:var(--hs-type-body-md-b); color:var(--hs-fg); display:block; }
-    .notifitem .nt .act { color:var(--hs-fg-link); font-weight:var(--bento-theme-font-weights-semibold); background:none; border:0; padding:4px 0 0; cursor:pointer; font-size:13px; }
+    .notifitem .nt .act { color:var(--hs-fg-link); font-weight:var(--bento-theme-font-weights-semibold); background:none; border:0; padding:4px 0 0; cursor:pointer; font-size:var(--bento-theme-font-size-1); line-height:var(--bento-theme-line-heights-1); }
     .notifitem .dot { width:8px; height:8px; border-radius:999px; background:var(--hs-fg-link); flex:none; margin-top:6px; }
   </style>
 </head>
@@ -296,9 +297,9 @@
     <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="ctTitle" style="width:460px">
       <div class="mh"><h2 id="ctTitle">Create a team</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeCreateTeam()"><span class="material-symbols-outlined">close</span></button></div>
       <div class="mb">
-        <div class="hs-field"><label class="hs-label" for="ctName">Team name</label>
+        <div class="hs-field"><label class="hs-field-label" for="ctName">Team name</label>
           <input class="hs-input" id="ctName" type="text" placeholder="e.g. Paid Media" autocomplete="off" onkeydown="if(event.key==='Enter')submitCreateTeam()"></div>
-        <p class="hs-small" id="ctErr" hidden style="color:var(--bento-system-sys-negative-500,#b3261e);margin-top:6px">Give the team a name.</p>
+        <p class="hs-small" id="ctErr" hidden style="color:var(--bento-theme-color-text-negative);margin-top:6px">Give the team a name.</p>
         <p class="hs-small" style="margin-top:12px">You can add members and social accounts once the team exists.</p>
       </div>
       <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeCreateTeam()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="submitCreateTeam()" data-autofocus>Create team</button></div>
@@ -550,7 +551,7 @@
     function setInvPerm(i,perm){ inv.rows[i].perm=perm; closeMenus(); renderInvite(); }
     function rowHTML(i, removable){
       var rm = removable ? '<button class="rm" aria-label="Remove" onclick="rmInvRow('+i+')"><span class="material-symbols-outlined">close</span></button>' : '<span class="rmspace"></span>';
-      return '<div class="invrow"><input type="email" placeholder="name@company.com" value="'+esc(inv.rows[i].email||'')+'" oninput="inv.rows['+i+'].email=this.value;updateInviteValidity()">'
+      return '<div class="invrow"><input class="hs-input" type="email" placeholder="name@company.com" value="'+esc(inv.rows[i].email||'')+'" oninput="inv.rows['+i+'].email=this.value;updateInviteValidity()">'
         + '<button type="button" class="sel" aria-haspopup="menu" onclick="openInvPerm(event,'+i+',this)"><span>'+esc(inv.rows[i].perm)+'</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>'
         + rm + '</div>'; }
     function colsHTML(){ return '<div class="invcols"><span class="c1">Who are you inviting?</span><span class="c2">Permission</span><span class="rmspace"></span></div>'; }

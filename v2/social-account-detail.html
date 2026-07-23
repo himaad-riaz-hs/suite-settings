@@ -15,43 +15,44 @@
     .ovl { position:fixed; inset:0; background:var(--bento-theme-color-overlay-scrim, rgba(1,43,58,.32)); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
     .ovl.open { display:flex; }
     .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); overflow:hidden; }
-    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:var(--bento-space-04) 20px; border-bottom:1px solid var(--hs-border); }
     .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
-    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
-    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
-    .sent { text-align:center; padding:12px 0; }
-    .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 14px; }
+    .invmodal .mb { padding:var(--bento-space-04) 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:var(--bento-space-02); padding:var(--bento-space-04) 20px; border-top:1px solid var(--hs-border); }
+    .sent { text-align:center; padding:var(--bento-space-03) 0; }
+    .sent .big { width:72px;height:72px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:var(--bento-space-01) auto var(--bento-space-03); }
     .sent .big .material-symbols-outlined { font-size:40px; }
     /* inline saved confirmation next to the Owner value */
-    .savednote { display:inline-flex; align-items:center; gap:4px; margin-left:10px; font: var(--hs-type-body-sm); color: var(--hs-fg-positive); vertical-align:middle; }
+    .savednote { display:inline-flex; align-items:center; gap:var(--bento-space-01); margin-left:var(--bento-space-03); font: var(--hs-type-body-sm); color: var(--hs-fg-positive); vertical-align:middle; }
     .savednote .material-symbols-outlined { font-size:16px; }
     /* floating action menu (mirrors people.html .menu, tokens only) */
-    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
-    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:var(--bento-space-01); }
+    .menu button { display:flex; align-items:center; gap:var(--bento-space-03); width:100%; text-align:left; background:none; border:0; padding:var(--bento-space-02) var(--bento-space-03); border-radius:var(--hs-radii-md); font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
     .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button:focus-visible { outline:2px solid var(--bento-theme-color-border-focus); outline-offset:-2px; }
     .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
-    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+    .menu .sep { height:1px; background:var(--hs-border); margin:var(--bento-space-01) var(--bento-space-01); }
     /* Manage-access modal rows: member on the left, role select on the right */
-    .accrow { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--hs-border); }
+    .accrow { display:flex; align-items:center; gap:var(--bento-space-03); padding:var(--bento-space-03) 0; border-bottom:1px solid var(--hs-border); }
     .accrow:last-child { border-bottom:0; }
     .accrow .lead { width:32px; height:32px; border-radius:999px; background:var(--bento-system-sys-neutral-alt-100); display:grid; place-items:center; color:var(--bento-theme-color-icon-subtle); flex-shrink:0; }
     .accrow .lead .material-symbols-outlined { font-size:18px; }
     .accrow .who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; }
     .accrow .who .n { font: var(--hs-type-body-md-b); }
     .accrow .who .d { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
-    /* native select styled to match the Bento Select trigger, tokens only */
-    .rolesel { font: var(--hs-type-body-md); color: var(--hs-fg); background: var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border-input); border-radius: var(--hs-radii-md); padding:7px 30px 7px 12px; min-width:132px; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231c1c1c'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat:no-repeat; background-position:right 8px center; background-size:18px; }
+    /* native select styled to match the Bento Select trigger (40px control), tokens only */
+    .rolesel { height:40px; box-sizing:border-box; font: var(--hs-type-body-md); color: var(--hs-fg); background: var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border-input); border-radius: var(--hs-radii-md); padding:0 32px 0 var(--bento-space-03); min-width:132px; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231c1c1c'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat:no-repeat; background-position:right var(--bento-space-02) center; background-size:18px; }
     .rolesel:hover { border-color: var(--bento-theme-color-text-base); }
-    .rolesel:focus-visible { border-color: var(--hs-border-focus); box-shadow:0 0 0 2px var(--hs-focus-halo); outline:none; }
+    .rolesel:focus-visible { outline:2px solid var(--bento-theme-color-border-focus); outline-offset:2px; border-color:var(--hs-border-input); }
     /* on-page "People with access" list reflecting the chosen levels */
-    .acclist { list-style:none; margin:6px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
-    .acclist li { display:flex; align-items:center; gap:8px; font: var(--hs-type-body-md); }
+    .acclist { list-style:none; margin:var(--bento-space-02) 0 0; padding:0; display:flex; flex-direction:column; gap:var(--bento-space-02); }
+    .acclist li { display:flex; align-items:center; gap:var(--bento-space-02); font: var(--hs-type-body-md); }
     .acclist li .nm { flex:1; min-width:0; }
     .acclist li .lv { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
     /* inline hint under the manage-access rows when nobody has access */
-    .accesshint { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin: 12px 0 0; }
+    .accesshint { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin: var(--bento-space-03) 0 0; }
     /* per-account notification settings rows (toggles handled by app.js global handler) */
-    .setrow { display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px solid var(--hs-border); }
+    .setrow { display:flex; align-items:flex-start; gap:var(--bento-space-04); padding:var(--bento-space-04) 0; border-bottom:1px solid var(--hs-border); }
     .setrow:last-child { border-bottom:0; }
     .setrow .txt { flex:1; min-width:0; }
     .setrow .txt .k { font: var(--hs-type-body-md-b); color: var(--hs-fg); }

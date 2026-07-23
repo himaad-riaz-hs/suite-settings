@@ -15,28 +15,26 @@
     .ovl { position:fixed; inset:0; background:var(--bento-theme-color-overlay-scrim, rgba(1,43,58,.32)); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
     .ovl.open { display:flex; }
     .invmodal { width:560px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); overflow:hidden; }
-    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:var(--bento-space-04) 20px; border-bottom:1px solid var(--hs-border); }
     .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
-    .invmodal .mb { padding:18px 20px; max-height:56vh; overflow:auto; }
-    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
-    /* form fields inside the modal */
-    .ctfield { margin-bottom:16px; }
-    .ctfield label { display:block; font: var(--hs-type-body-md-b); color: var(--hs-fg); margin-bottom:6px; }
-    .ctfield input { width:100%; height:40px; padding:0 12px; border:1px solid var(--hs-border-input); border-radius: var(--bento-component-input-border-radius); background: var(--bento-component-input-fill); font: var(--hs-type-body-md); color: var(--bento-theme-color-text-base); box-sizing:border-box; }
-    .ctfield input:focus { border-color: var(--hs-border-focus); box-shadow: 0 0 0 2px var(--hs-focus-halo); outline:none; }
-    .ctsection { font: var(--hs-type-meta-b); color: var(--bento-theme-color-text-subtle); margin: 4px 0 8px; }
-    .ctlist { margin: 8px 0 4px; }
-    .ctopt { display:flex; align-items:center; gap:10px; min-height:44px; padding:0 8px; border-radius: var(--hs-radii-md); cursor:pointer; user-select:none; }
+    .invmodal .mb { padding:var(--bento-space-04) 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:var(--bento-space-02); padding:var(--bento-space-04) 20px; border-top:1px solid var(--hs-border); }
+    /* form fields inside the modal — labels/inputs use the Bento .hs-field / .hs-input components */
+    .ctfield { margin-bottom:var(--bento-space-04); }
+    .ctsection { font: var(--hs-type-meta-b); color: var(--bento-theme-color-text-subtle); margin: var(--bento-space-01) 0 var(--bento-space-02); }
+    .ctlist { margin: var(--bento-space-02) 0 var(--bento-space-01); }
+    .ctopt { display:flex; align-items:center; gap:var(--bento-space-03); min-height:44px; padding:0 var(--bento-space-02); border-radius: var(--hs-radii-md); cursor:pointer; user-select:none; }
     .ctopt:hover { background: var(--bento-system-sys-neutral-alt-100); }
     .ctopt .ctkv { flex:1; min-width:0; }
     .ctopt .ctkv .k { font: var(--hs-type-body-md); color: var(--hs-fg); }
     .ctopt .ctkv .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
     /* floating row-action menu (mirrors people.html) */
-    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
-    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:var(--bento-space-01); }
+    .menu button { display:flex; align-items:center; gap:var(--bento-space-03); width:100%; text-align:left; background:none; border:0; padding:var(--bento-space-02) var(--bento-space-03); border-radius:var(--hs-radii-md); font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
     .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button:focus-visible { outline:2px solid var(--bento-theme-color-border-focus); outline-offset:-2px; }
     .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
-    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+    .menu .sep { height:1px; background:var(--hs-border); margin:var(--bento-space-01) var(--bento-space-01); }
   </style>
 </head>
 <body class="suite-app">
@@ -195,14 +193,14 @@
         <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeCreateTeam()"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="mb">
-        <div class="ctfield">
-          <label for="teamNameInput">Team name</label>
-          <input type="text" id="teamNameInput" placeholder="e.g. Paid Media" autocomplete="off" aria-describedby="ctErr" oninput="ctValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitCreateTeam();}">
-          <p class="hs-small" id="ctErr" hidden style="color:var(--bento-system-sys-negative-500,#b3261e);margin-top:6px">Give the team a name.</p>
+        <div class="ctfield hs-field">
+          <label class="hs-field-label" for="teamNameInput">Team name</label>
+          <input class="hs-input" type="text" id="teamNameInput" placeholder="e.g. Paid Media" autocomplete="off" aria-describedby="ctErr" oninput="ctValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitCreateTeam();}">
+          <p class="hs-field-hint" id="ctErr" hidden style="color:var(--hs-fg-negative)">Give the team a name.</p>
         </div>
-        <div class="ctfield">
-          <label for="teamDescInput">Description (optional)</label>
-          <input type="text" id="teamDescInput" placeholder="What this team works on" autocomplete="off">
+        <div class="ctfield hs-field">
+          <label class="hs-field-label" for="teamDescInput">Description (optional)</label>
+          <input class="hs-input" type="text" id="teamDescInput" placeholder="What this team works on" autocomplete="off">
         </div>
 
         <div class="ctsection">Add members</div>
@@ -240,9 +238,9 @@
         <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeRenameTeam()"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="mb">
-        <div class="ctfield">
-          <label for="renameInput">Team name</label>
-          <input type="text" id="renameInput" placeholder="Team name" autocomplete="off" oninput="rtValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitRenameTeam();}">
+        <div class="ctfield hs-field">
+          <label class="hs-field-label" for="renameInput">Team name</label>
+          <input class="hs-input" type="text" id="renameInput" placeholder="Team name" autocomplete="off" oninput="rtValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitRenameTeam();}">
         </div>
       </div>
       <div class="mf">

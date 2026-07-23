@@ -104,17 +104,23 @@
           <h2 class="modal-title" id="pwModalTitle">Update password</h2>
           <p class="modal-sub">Choose a new password for signing in.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
-        <form id="pwForm" autocomplete="off">
-          <label for="pwCurrent" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Current password</label>
-          <input id="pwCurrent" class="hs-input" type="password" data-autofocus placeholder="Enter current password" style="width:100%; margin:0 0 14px">
-          <label for="pwNew" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">New password</label>
-          <input id="pwNew" class="hs-input" type="password" placeholder="Enter new password" style="width:100%; margin:0 0 14px">
-          <label for="pwConfirm" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Confirm new password</label>
-          <input id="pwConfirm" class="hs-input" type="password" placeholder="Re-enter new password" style="width:100%">
-          <p id="pwError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:8px 0 0" hidden>Passwords do not match.</p>
+        <form id="pwForm" autocomplete="off" style="display:flex; flex-direction:column; gap:var(--bento-space-04)">
+          <div class="hs-field">
+            <label class="hs-field-label" for="pwCurrent">Current password</label>
+            <input id="pwCurrent" class="hs-input" type="password" data-autofocus placeholder="Enter current password" style="width:100%">
+          </div>
+          <div class="hs-field">
+            <label class="hs-field-label" for="pwNew">New password</label>
+            <input id="pwNew" class="hs-input" type="password" placeholder="Enter new password" style="width:100%">
+          </div>
+          <div class="hs-field">
+            <label class="hs-field-label" for="pwConfirm">Confirm new password</label>
+            <input id="pwConfirm" class="hs-input" type="password" placeholder="Re-enter new password" style="width:100%">
+            <p id="pwError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative)" hidden>Passwords do not match.</p>
+          </div>
         </form>
       </div>
       <div class="modal-foot">
@@ -133,7 +139,7 @@
           <h2 class="modal-title" id="twofaModalTitle">Turn on two-factor authentication</h2>
           <p class="modal-sub">Add a second step at sign-in using an authenticator app.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
         <p style="margin:0 0 10px">Scan the code below in your authenticator app (for example Google Authenticator or 1Password), then confirm to finish setup.</p>

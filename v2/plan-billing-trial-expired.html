@@ -68,24 +68,24 @@
 
         <section class="card">
           <h2 class="card-title">Change plan</h2>
-          <div class="plan-grid" style="display: flex; gap: var(--bento-space-04); margin: var(--bento-space-04) 0">
-            <div class="plan-card" data-plan="Team" data-plan-price="$99/mo" role="button" tabindex="0" aria-pressed="false" style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
-              <div style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Team</div>
-              <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">$99/mo</div>
-              <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">3 seats included</div>
-              <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Core publishing</div>
+          <div class="plan-grid">
+            <div class="plan-card" data-plan="Team" data-plan-price="$99/mo" role="button" tabindex="0" aria-pressed="false">
+              <div class="pc-name">Team</div>
+              <div class="pc-price">$99/mo</div>
+              <div class="pc-line">3 seats included</div>
+              <div class="pc-line">Core publishing</div>
             </div>
-            <div class="plan-card is-current" data-plan="Business" data-plan-price="$249/mo" role="button" tabindex="0" aria-pressed="true" style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-text-base); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
-              <div style="display: flex; align-items: center; gap: 8px"><span style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Business</span><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">warning</span>Trial expired</span></div>
-              <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">$249/mo</div>
-              <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">455 seats (450 + 5 added)</div>
-              <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Approvals, teams, roles</div>
+            <div class="plan-card is-current" data-plan="Business" data-plan-price="$249/mo" role="button" tabindex="0" aria-pressed="true">
+              <div class="pc-head"><span class="pc-name">Business</span><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">warning</span>Trial expired</span></div>
+              <div class="pc-price">$249/mo</div>
+              <div class="pc-line">455 seats (450 + 5 added)</div>
+              <div class="pc-line">Approvals, teams, roles</div>
             </div>
-            <div class="plan-card" data-plan="Enterprise" data-plan-price="Talk to us" role="button" tabindex="0" aria-pressed="false" style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
-              <div style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Enterprise</div>
-              <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">Talk to us</div>
-              <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">Custom roles, SSO</div>
-              <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Data export, audit log</div>
+            <div class="plan-card" data-plan="Enterprise" data-plan-price="Talk to us" role="button" tabindex="0" aria-pressed="false">
+              <div class="pc-name">Enterprise</div>
+              <div class="pc-price">Talk to us</div>
+              <div class="pc-line">Custom roles, SSO</div>
+              <div class="pc-line">Data export, audit log</div>
             </div>
           </div>
           <div class="row first">
@@ -151,7 +151,7 @@
           <h2 class="modal-title" id="planModalTitle">Choose a plan</h2>
           <p class="modal-sub">Reactivate Somos on the plan that fits your team. Nothing is charged until you confirm.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
         <div id="planOptions"></div>
@@ -171,7 +171,7 @@
           <h2 class="modal-title" id="transferModalTitle">Transfer billing owner</h2>
           <p class="modal-sub">The new billing owner receives invoices and receipts.</p>
         </div>
-        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px; height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
       <div class="modal-body">
         <div id="transferOptions"></div>
@@ -336,11 +336,21 @@
   .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
   .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
   .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
-  .plan-card { cursor:pointer; transition:border-color .12s ease, box-shadow .12s ease; }
-  .plan-card:hover { border-color:var(--bento-theme-color-text-base); }
-  .plan-card:focus-visible { outline:2px solid var(--hs-fg-link); outline-offset:2px; }
-  .plan-card.is-selected { border-color:var(--bento-theme-color-text-base) !important;
-    box-shadow:0 0 0 1px var(--bento-theme-color-text-base) inset; }
+  .plan-grid { display:flex; gap:var(--bento-space-04); margin:var(--bento-space-04) 0; }
+  .plan-card { flex:1; background:var(--bento-theme-color-bg-surface);
+    border:1px solid var(--bento-theme-color-border-subtle);
+    border-radius:var(--hs-radii-lg); padding:var(--bento-space-04);
+    cursor:pointer; transition:border-color .12s ease, box-shadow .12s ease; }
+  .plan-card .pc-head { display:flex; align-items:center; gap:var(--bento-space-02); }
+  .plan-card .pc-name { font:var(--hs-type-body-md-b); color:var(--hs-fg); }
+  .plan-card .pc-price { font:var(--hs-type-title-sub); color:var(--hs-fg); margin-top:var(--bento-space-01); }
+  .plan-card .pc-line { font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); margin-top:2px; }
+  .plan-card .pc-line:first-of-type { margin-top:var(--bento-space-02); }
+  .plan-card:hover { background:var(--bento-component-card-fill-hovered); }
+  .plan-card:focus-visible { outline:2px solid var(--bento-theme-color-border-focus); outline-offset:2px; }
+  /* Selected / current plan — Bento card selected token: 2px border, no inset hack. */
+  .plan-card.is-current, .plan-card.is-selected {
+    border:var(--bento-component-card-border-width-selected) solid var(--bento-theme-color-border-selected); }
 </style>
 </body>
 </html>
