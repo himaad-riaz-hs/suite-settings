@@ -56,21 +56,31 @@
     .wk-col { border-left:1px solid var(--hs-border); padding:8px; display:flex; flex-direction:column; gap:8px; }
     /* comp-card-calendar-portrait (Figma node 13250-128882): 104px image + 104px content,
        network badge straddling the divide, author 16/24 + time, body 14/20, footer status + comment. */
-    .pcard { border:1px solid var(--hs-global-color-border-subtle,#ebebeb); border-radius:8px; background:#fdfdfd; overflow:hidden; }
-    .pcard .pc-img { height:104px; background-size:cover; background-position:center; }
+    .pcard { position:relative; border:1px solid var(--hs-global-color-border-subtle,#ebebeb); border-radius:8px; background:#fdfdfd; }
+    .pcard.stacked { margin-bottom:5px; }
+    .pcard.stacked::after { content:''; position:absolute; z-index:-1; left:4px; right:4px; top:10px; bottom:-4px; background:#f4f5f6; border:1px solid var(--hs-global-color-border-subtle,#ebebeb); border-radius:8px; }
+    .pcard .pc-img { height:104px; background-size:cover; background-position:center; border-radius:8px 8px 0 0; }
+    .pc-ad { position:absolute; top:4px; left:4px; width:24px; height:22px; border-radius:6px; background:#fff; box-shadow:0 1px 3px rgba(1,43,58,.28); display:grid; place-items:center; color:#012b3a; z-index:2; }
+    .pc-ad .material-symbols-outlined { font-size:15px; }
     .pcard .pc-body { padding:8px; }
-    .pc-net { width:20px; height:20px; border-radius:5px; display:inline-grid; place-items:center; color:#fff; font:700 11px/1 var(--hs-font-body); flex:0 0 auto; }
-    .pc-net.fb { background:#1877f2; } .pc-net.li { background:#0a66c2; } .pc-net.x { background:#000; } .pc-net.ig { background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
-    .pc-net svg { width:12px; height:12px; display:block; }
-    .pcard.has-img .pc-net { margin-top:-22px; margin-bottom:4px; box-shadow:0 0 0 2px #fdfdfd; }
+    .pc-net { width:20px; height:20px; border-radius:5px; display:inline-grid; place-items:center; color:#fff; flex:0 0 auto; overflow:hidden; }
+    .pc-net.li { background:#0a66c2; } .pc-net.x { background:#000; }
+    .pc-net.brand { background:none; border-radius:0; overflow:visible; }
+    .pc-net.brand svg { width:20px; height:20px; display:block; }
+    .pc-net:not(.brand) svg { width:12px; height:12px; display:block; }
+    .pcard.has-img .pc-net { margin-top:-20px; margin-bottom:4px; }
+    .pcard.has-img .pc-net.brand { filter:drop-shadow(0 0 1.5px #fdfdfd) drop-shadow(0 0 1.5px #fdfdfd); }
+    .pcard.has-img .pc-net:not(.brand) { box-shadow:0 0 0 2px #fdfdfd; }
     .pc-titlerow { display:flex; align-items:center; gap:8px; }
     .pc-author { font:600 16px/24px var(--hs-font-body); color:#1c1c1c; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .pc-time { margin-left:auto; font:400 14px/24px var(--hs-font-body); color:#5c5c5c; white-space:nowrap; flex:0 0 auto; }
     .pc-text { font:400 14px/20px var(--hs-font-body); color:#1c1c1c; margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .pc-foot { display:flex; align-items:center; margin-top:8px; min-height:28px; }
     .pc-status { display:inline-flex; align-items:center; gap:5px; font:600 12px/16px var(--hs-font-body); border-radius:4px; padding:4px 8px; }
-    .pc-status.pub { background:#e6f3e9; color:#01781b; }
+    .pc-status.pub { background:var(--hs-bg-positive,#e6f3e9); color:var(--hs-fg-positive,#01781b); }
     .pc-status.draft { background:#eef1f2; color:#5c5c5c; }
+    .pc-status.pending { background:var(--hs-bg-warning,#ffe7c0); color:var(--hs-fg-warning,#6b4b15); }
+    .pc-status.failed { background:var(--hs-bg-negative,#fbe6e6); color:var(--hs-fg-negative,#c00803); }
     .pc-status .material-symbols-outlined { font-size:14px; }
     .pc-foot .cmt { margin-left:auto; color:#5c5c5c; font-size:20px; }
     /* account menu (avatar -> Settings) */
@@ -200,26 +210,26 @@
     // week data (Jul 19-25, 2026), matched to the real Perch calendar
     var DAYS=[
       {dow:'Sun',n:19,badge:8,red:true,nat:'National Ice Cream Day',posts:[
-        {net:'li',auth:'Alex T',time:'7:15AM',text:'main caption',thumb:'linear-gradient(135deg,#f2d9a8,#d9b98a)',status:'draft'},
+        {net:'li',auth:'Alex T',time:'7:15AM',text:'main caption',thumb:'#e9edf0 url(img/post-food.jpg) center/cover',status:'draft'},
         {net:'li',auth:'Test hoot company',time:'7:45AM',text:'test mentions for all networks. Boost your post to reach a wider audience instantly on top of your followers.',status:'pub'},
         {net:'li',auth:'Alex T',time:'8:25AM',text:'main caption',status:''}]},
       {dow:'Mon',n:20,badge:16,red:false,nat:null,posts:[
-        {net:'fb',auth:'JP Web Design',time:'3:51AM',text:'Facebook Link Send Now Test 1 784544674094',status:'pubv'},
+        {net:'fb',auth:'JP Web Design',time:'3:51AM',text:'Facebook Link Send Now Test 1 784544674094',status:'pubv',stacked:true},
         {net:'li',auth:'DevtestCo 1236',time:'4:52AM',text:'LI targeting duplicate send now - 3399',status:'pubv'},
         {net:'li',auth:'Alex T',time:'6:19AM',text:'test',status:'pub'},
-        {net:'li',auth:'DevtestCo 1236',time:'7:09AM',text:'Test API n8n - LAAD Architecture',status:''}]},
+        {net:'li',auth:'DevtestCo 1236',time:'7:09AM',text:'Test API n8n - LAAD Architecture',status:'failed'}]},
       {dow:'Tue',n:21,badge:44,red:false,nat:null,posts:[
         {net:'fb',auth:'JP Web Design',time:'3:52AM',text:'Facebook Link Send Now Test 1 784631073928',status:'pubv'},
         {net:'li',auth:'DevtestCo 1236',time:'4:49AM',text:'LI targeting duplicate send now - 7904',status:'pubv'},
-        {net:'fb',auth:'AlexT Hoot Shop',time:'8:10AM',text:'[July 21] E2E Test - FB Reels Asset',thumb:'linear-gradient(135deg,#bfe0e6,#8fc7cf)',status:'pubv'}]},
+        {net:'fb',auth:'AlexT Hoot Shop',time:'8:10AM',text:'[July 21] E2E Test - FB Reels Asset',thumb:'#dfeff2 url(img/post-teal.jpg) center/cover',status:'pubv',ad:true}]},
       {dow:'Wed',n:22,badge:15,red:true,nat:'National Be a Good Teammate Day',posts:[
         {net:'fb',auth:'JP Web Design',time:'3:50AM',text:'Facebook Link Send Now Test 1 784717390249',status:'pubv'},
         {net:'li',auth:'DevtestCo 1236',time:'4:50AM',text:'LI targeting duplicate send now - 4053',status:'pubv'},
-        {net:'fb',auth:'AlexT Hoot Shop',time:'8:50AM',text:'[July 22] E2E Test - FB Video Asset',thumb:'linear-gradient(135deg,#bfe0e6,#8fc7cf)',status:'pubv'}]},
+        {net:'fb',auth:'AlexT Hoot Shop',time:'8:50AM',text:'[July 22] E2E Test - FB Video Asset',thumb:'#e9edf0 url(img/post-food.jpg) center/cover',status:'pubv'}]},
       {dow:'Thu',n:23,badge:5,red:false,today:true,nat:null,posts:[
         {net:'fb',auth:'JP Web Design',time:'3:50AM',text:'Facebook Link Send Now Test 1 784803788908',status:'pubv'},
         {net:'li',auth:'DevtestCo 1236',time:'5:34AM',text:'asdasdas',status:'pubv'},
-        {net:'fb',auth:'Another Owl Mail',time:'2:35PM',text:'Test post',status:''},
+        {net:'fb',auth:'Another Owl Mail',time:'2:35PM',text:'Test post',status:'pending'},
         {net:'li',auth:'Alex T',time:'6:40PM',text:'REST vs. GraphQL: Pros and Cons https://example.com/posts/rest-vs-graphql-pros-and-cons',status:''}]},
       {dow:'Fri',n:24,badge:4,red:false,nat:'International Self Care Day',posts:[
         {net:'li',auth:'Alex T',time:'7:55AM',text:'Deploying a Full-Stack App with Docker and Kubernetes https://example.com/posts/deploying-a-full-stack-app-with-docker-and-kubernetes',status:''},
@@ -230,31 +240,47 @@
         {net:'li',auth:'Alex T',time:'1:25PM',text:'11 https://example.com/posts/getting-started-with-graphql-in-nodejs',status:''}]}
     ];
     function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
-    var NET_PATHS={
-      fb:'M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.1 24 12.07Z',
-      li:'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.27V1.73C24 .77 23.2 0 22.22 0Z',
-      x:'M18.24 2.25h3.31l-7.23 8.26L22.83 21.75h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23ZM17.08 19.77h1.83L7.08 4.13H5.12l11.96 15.64Z',
-      ig:'M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85C2.38 3.93 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z'
+    // Facebook + Instagram: exact 2-colour marks from the Figma card component (self-contained, no container fill).
+    var NET_SVG={
+      fb:'<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20Z" fill="#fff"/><path d="M20 10C19.9997 8.08902 19.4518 6.21832 18.4213 4.60902C17.3908 2.99972 15.9207 1.71941 14.1851 0.919639C12.4495 0.119873 10.5211 -0.165849 8.62821 0.0962983C6.73529 0.358446 4.95712 1.15748 3.50421 2.39882C2.0513 3.64015 0.984495 5.2718 0.430087 7.1006C-0.124321 8.92939 -0.143113 10.8788 0.375935 12.7179C0.894983 14.557 1.93014 16.2089 3.35884 17.4781C4.78755 18.7472 6.54999 19.5803 8.4375 19.8789V12.8908H5.89875V10.0002H8.4375V7.79706C8.4375 5.29081 9.93062 3.90644 12.2144 3.90644C12.9644 3.91684 13.7126 3.98201 14.4531 4.10144V6.56269H13.1919C12.977 6.53414 12.7584 6.55433 12.5523 6.62175C12.3462 6.68917 12.158 6.8021 12.0015 6.95216C11.845 7.10223 11.7243 7.28558 11.6483 7.48864C11.5723 7.6917 11.543 7.90925 11.5625 8.12519V10.0002H14.3363L13.8925 12.8908H11.5625V19.8789C13.9149 19.5068 16.0572 18.3073 17.604 16.4964C19.1507 14.6854 20.0004 12.3816 20 10Z" fill="#1877F2"/></svg>',
+      ig:'<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M20 10C20 15.523 15.523 20 10 20C4.477 20 0 15.523 0 10C0 4.477 4.477 0 10 0C15.523 0 20 4.477 20 10Z" fill="#D93175"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.9613 12.4753C15.9884 12.0174 16 11.1926 16 9.99806C16 8.80736 15.9884 7.98257 15.9613 7.52469C15.909 6.4395 15.5837 5.60019 14.9894 5.00678C14.3959 4.41336 13.5595 4.091 12.4753 4.03872C12.0174 4.01162 11.1926 4 9.99806 4C8.80736 4 7.98257 4.01162 7.52469 4.03872C6.4395 4.091 5.60019 4.41336 5.00678 5.00678C4.41336 5.60019 4.091 6.44046 4.03872 7.52469C4.01162 7.98257 4 8.80736 4 9.99806C4 11.1926 4.01162 12.0174 4.03872 12.4753C4.091 13.5605 4.41336 14.3959 5.00678 14.9894C5.60019 15.5837 6.44046 15.909 7.52469 15.9613C7.98257 15.9884 8.80736 16 9.99806 16C11.1926 16 12.0174 15.9884 12.4753 15.9613C13.5605 15.909 14.3959 15.5837 14.9894 14.9894C15.5837 14.3959 15.909 13.5595 15.9613 12.4753ZM9.99869 5.07844C9.96481 5.07844 9.76442 5.07844 9.4014 5.07457C9.12649 5.07069 8.85154 5.07069 8.57662 5.07457C8.32584 5.08044 8.07511 5.08819 7.82444 5.0978C7.5545 5.10625 7.28542 5.13277 7.01902 5.17718C6.79927 5.21494 6.61438 5.26431 6.46336 5.32046C5.94288 5.52972 5.53032 5.94228 5.32106 6.46276C5.26394 6.61378 5.21457 6.79867 5.17778 7.01842C5.13616 7.24108 5.11292 7.51019 5.0984 7.82384C5.08879 8.07451 5.08104 8.32524 5.07517 8.57602C5.0713 8.76576 5.0713 9.04069 5.07517 9.4008C5.07904 9.76382 5.07904 9.96421 5.07904 9.99809C5.07904 10.0368 5.07904 10.2362 5.07517 10.5954C5.0713 10.9584 5.0713 11.2343 5.07517 11.4202C5.07904 11.6089 5.08679 11.8587 5.0984 12.1762C5.11292 12.4899 5.13616 12.759 5.17778 12.9816C5.21554 13.2014 5.26491 13.3863 5.32106 13.5373C5.53032 14.0578 5.94288 14.4703 6.46336 14.6796C6.61438 14.7367 6.79927 14.7861 7.01902 14.8229C7.24168 14.8616 7.51079 14.8877 7.82444 14.9023C8.13809 14.9139 8.39172 14.9216 8.57662 14.9255C8.76636 14.9294 9.04129 14.9294 9.4014 14.9255C9.76442 14.9216 9.96481 14.9216 9.99869 14.9216C10.0374 14.9216 10.2368 14.9216 10.596 14.9255C10.959 14.9294 11.2349 14.9294 11.4208 14.9255C11.6095 14.9216 11.8593 14.9139 12.1768 14.9023C12.4905 14.8877 12.7596 14.8606 12.9822 14.8229C13.202 14.7851 13.3869 14.7358 13.5379 14.6796C14.0584 14.4703 14.4709 14.0578 14.6802 13.5373C14.7373 13.3863 14.7867 13.2014 14.8235 12.9816C14.8622 12.759 14.8883 12.4899 14.9029 12.1762C14.9145 11.8587 14.9222 11.6089 14.9261 11.4202C14.93 11.2343 14.93 10.9584 14.9261 10.5954C14.9222 10.2372 14.9222 10.0358 14.9222 9.99809C14.9222 9.96421 14.9222 9.76382 14.9261 9.4008C14.9301 9.12589 14.9301 8.85094 14.9261 8.57602C14.9202 8.32524 14.9125 8.07451 14.9029 7.82384C14.8922 7.55405 14.8657 7.28511 14.8235 7.01842C14.793 6.82917 14.7451 6.64315 14.6802 6.46276C14.4709 5.94228 14.0584 5.52972 13.5379 5.32046C13.3575 5.2556 13.1715 5.20764 12.9822 5.17718C12.7158 5.1331 12.4467 5.10658 12.1768 5.0978C11.8593 5.08619 11.6095 5.07844 11.4208 5.07457C11.1459 5.07068 10.8709 5.07068 10.596 5.07457C10.2378 5.07844 10.0364 5.07844 9.99869 5.07844ZM13.7119 7.30591C13.8483 7.17126 13.9232 6.98639 13.9191 6.79478C13.9191 6.59826 13.8523 6.42885 13.7119 6.28849C13.5783 6.15056 13.3937 6.07386 13.2018 6.07648C13.011 6.07458 12.8279 6.15126 12.6955 6.28849C12.5551 6.42885 12.4825 6.59826 12.4825 6.79478C12.4799 6.98677 12.5566 7.17135 12.6945 7.30494C12.827 7.44277 13.0105 7.51983 13.2018 7.51791C13.3937 7.52053 13.5783 7.44383 13.7119 7.30591ZM13.0772 9.99807C13.0772 10.8529 12.7781 11.5789 12.1808 12.1801C11.6078 12.7663 10.8185 13.0906 9.99881 13.0765C9.18029 13.0904 8.39228 12.7661 7.82069 12.1801C7.23444 11.607 6.91018 10.8177 6.92427 9.99807C6.92427 9.14715 7.2234 8.41723 7.82069 7.81995C8.39228 7.2339 9.18029 6.90959 9.99881 6.92353C10.8536 6.92353 11.5796 7.22266 12.1808 7.81995C12.7668 8.39154 13.0912 9.17955 13.0772 9.99807ZM11.9984 9.99808C12.0082 9.46687 11.7959 8.95567 11.4127 8.58763C11.0434 8.2046 10.5314 7.99243 9.99937 8.00196C9.44661 8.00196 8.97711 8.1946 8.58795 8.58763C8.20478 8.95567 7.9925 9.46687 8.00228 9.99808C8.00228 10.5499 8.19492 11.0233 8.58795 11.4124C8.95599 11.7956 9.4672 12.0079 9.9984 11.9981C10.5307 12.0078 11.0431 11.7956 11.4127 11.4124C11.8058 11.0233 11.9984 10.5499 11.9984 9.99808Z" fill="#fff"/></svg>'
     };
-    function netLabel(n){ return NET_PATHS[n] ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="'+NET_PATHS[n]+'"/></svg>' : ''; }
+    // LinkedIn + X: monochrome brand glyphs, rendered white on the brand-colour container.
+    var NET_PATHS={
+      li:'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.27V1.73C24 .77 23.2 0 22.22 0Z',
+      x:'M18.24 2.25h3.31l-7.23 8.26L22.83 21.75h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23ZM17.08 19.77h1.83L7.08 4.13H5.12l11.96 15.64Z'
+    };
+    function netLabel(n){
+      if(NET_SVG[n]) return NET_SVG[n];
+      return NET_PATHS[n] ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="'+NET_PATHS[n]+'"/></svg>' : '';
+    }
+    // delivery/status pill — states from the Figma comp-badge (Published / Pending / Failed / Draft).
+    function statPill(s){
+      var m={ pubv:['pub','check_circle','Published vi...'], pub:['pub','check_circle','Published'],
+              pending:['pending','warning','Pending'], failed:['failed','error','Failed'], draft:['draft','','Draft'] };
+      if(!m[s]) return '';
+      var c=m[s];
+      return '<span class="pc-status '+c[0]+'">'+(c[1]?'<span class="material-symbols-outlined">'+c[1]+'</span>':'')+c[2]+'</span>';
+    }
     (function(){
       var head='<div class="wk-gmt">GMT<br>-07:00</div>', body='<div class="wk-gutter"></div>';
       DAYS.forEach(function(d){
         head+='<div class="wk-dh"><div class="row1"><span class="dow">'+d.dow+'</span><span class="dnum'+(d.today?' today':'')+'">'+d.n+'</span><span class="dbadge'+(d.red?' red':'')+'">'+d.badge+'</span></div>'+(d.nat?'<div class="nat" title="'+esc(d.nat)+'">'+esc(d.nat)+'</div>':'')+'</div>';
         var cards=d.posts.map(function(p){
-          var st = p.status==='pubv' ? '<span class="pc-status pub"><span class="material-symbols-outlined">check_circle</span>Published vi...</span>'
-                 : p.status==='pub' ? '<span class="pc-status pub"><span class="material-symbols-outlined">check_circle</span>Published</span>'
-                 : p.status==='draft' ? '<span class="pc-status draft">Draft</span>' : '';
-          var net='<span class="pc-net '+p.net+'">'+netLabel(p.net)+'</span>';
+          var st = statPill(p.status);
+          var brandCls = NET_SVG[p.net] ? ' brand' : '';
+          var net='<span class="pc-net '+p.net+brandCls+'">'+netLabel(p.net)+'</span>';
           var foot='<div class="pc-foot">'+st+'<span class="material-symbols-outlined cmt">chat_bubble_outline</span></div>';
           var text='<div class="pc-text">'+esc(p.text)+'</div>';
+          var cls='pcard'+(p.thumb?' has-img':'')+(p.stacked?' stacked':'');
+          var ad = p.ad ? '<div class="pc-ad" title="Boosted post"><span class="material-symbols-outlined">rocket_launch</span></div>' : '';
           if(p.thumb){
-            return '<div class="pcard has-img"><div class="pc-img" style="background:'+p.thumb+'"></div>'+
+            return '<div class="'+cls+'"><div class="pc-img" style="background:'+p.thumb+'"></div>'+ad+
               '<div class="pc-body">'+net+
               '<div class="pc-titlerow"><span class="pc-author">'+esc(p.auth)+'</span><span class="pc-time">'+esc(p.time)+'</span></div>'+
               text+foot+'</div></div>';
           }
-          return '<div class="pcard"><div class="pc-body">'+
+          return '<div class="'+cls+'">'+ad+'<div class="pc-body">'+
             '<div class="pc-titlerow">'+net+'<span class="pc-author">'+esc(p.auth)+'</span><span class="pc-time">'+esc(p.time)+'</span></div>'+
             text+foot+'</div></div>';
         }).join('');
