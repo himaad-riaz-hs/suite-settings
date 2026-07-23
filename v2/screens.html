@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suite Settings prototype (Bento)</title>
+  <link rel="stylesheet" href="bento/colors_and_type.css">
+  <link rel="stylesheet" href="bento/components.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    /* Index-only layout. Tokens only (Bento rule 1). */
+    body.index {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bento-theme-color-bg-app);
+      color: var(--bento-theme-color-text-base);
+      font: var(--hs-type-body-md);
+    }
+    .index-col {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: var(--bento-space-10) var(--bento-space-06);
+    }
+    .index-title {
+      font: var(--hs-type-title-screen);
+      margin: 0 0 var(--bento-space-02);
+    }
+    .index-sub {
+      font: var(--hs-type-body-md);
+      color: var(--bento-theme-color-text-subtle);
+      margin: 0 0 var(--bento-space-08);
+    }
+    .index-group {
+      background: var(--bento-theme-color-bg-surface);
+      border: 1px solid var(--bento-theme-color-border-subtle);
+      border-radius: var(--bento-theme-border-radii-02);
+      padding: var(--bento-space-05);
+      margin-bottom: var(--bento-space-06);
+    }
+    .index-group h2 {
+      font: var(--hs-type-body-md-b);
+      margin: 0 0 var(--bento-space-04);
+    }
+    .index-links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--bento-space-01);
+    }
+    .index-link {
+      display: flex;
+      align-items: center;
+      gap: var(--bento-space-03);
+      padding: var(--bento-space-03) var(--bento-space-04);
+      border-radius: var(--bento-theme-border-radii-01);
+      color: var(--bento-theme-color-text-link);
+      text-decoration: none;
+      font: var(--hs-type-body-md);
+    }
+    .index-link:hover {
+      background: var(--bento-theme-color-bg-surface-hovered);
+      text-decoration: underline;
+    }
+    .index-link:focus-visible {
+      outline: 2px solid var(--bento-theme-color-border-focus);
+      outline-offset: 2px;
+    }
+    .index-link .material-symbols-outlined {
+      font-size: 20px;
+      color: var(--bento-theme-color-icon-base);
+    }
+  </style>
+</head>
+<body class="index">
+  <main class="index-col">
+    <h1 class="index-title">Suite Settings prototype (Bento)</h1>
+    <p class="index-sub">Click through every screen in the prototype.</p>
+
+    <section class="index-group" aria-labelledby="grp-account">
+      <h2 id="grp-account">Account</h2>
+      <nav class="index-links">
+        <a class="index-link" href="profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
+        <a class="index-link" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
+        <a class="index-link" href="security.html"><span class="material-symbols-outlined">lock</span>Security</a>
+        <a class="index-link" href="security-sso.html"><span class="material-symbols-outlined">key</span>Security SSO</a>
+        <a class="index-link" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+        <a class="index-link" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan and billing</a>
+        <a class="index-link" href="plan-billing-trial-expired.html"><span class="material-symbols-outlined">schedule</span>Plan and billing trial expired</a>
+      </nav>
+    </section>
+
+    <section class="index-group" aria-labelledby="grp-org">
+      <h2 id="grp-org">Organization</h2>
+      <nav class="index-links">
+        <a class="index-link" href="org-general.html"><span class="material-symbols-outlined">apartment</span>Org general</a>
+        <a class="index-link" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
+        <a class="index-link" href="roles.html"><span class="material-symbols-outlined">manage_accounts</span>Roles</a>
+        <a class="index-link" href="person-detail.html"><span class="material-symbols-outlined">badge</span>Person detail</a>
+        <a class="index-link" href="teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
+        <a class="index-link" href="team-detail.html"><span class="material-symbols-outlined">diversity_3</span>Team detail</a>
+        <a class="index-link" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social accounts</a>
+        <a class="index-link" href="social-account-detail.html"><span class="material-symbols-outlined">account_circle</span>Social account detail</a>
+      </nav>
+    </section>
+  </main>
+</body>
+</html>

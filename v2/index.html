@@ -3,105 +3,146 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Suite Settings prototype (Bento)</title>
+  <title>Plan · Hootsuite</title>
   <link rel="stylesheet" href="bento/colors_and_type.css">
   <link rel="stylesheet" href="bento/components.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
+  <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
   <style>
-    /* Index-only layout. Tokens only (Bento rule 1). */
-    body.index {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bento-theme-color-bg-app);
-      color: var(--bento-theme-color-text-base);
-      font: var(--hs-type-body-md);
-    }
-    .index-col {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: var(--bento-space-10) var(--bento-space-06);
-    }
-    .index-title {
-      font: var(--hs-type-title-screen);
-      margin: 0 0 var(--bento-space-02);
-    }
-    .index-sub {
-      font: var(--hs-type-body-md);
-      color: var(--bento-theme-color-text-subtle);
-      margin: 0 0 var(--bento-space-08);
-    }
-    .index-group {
-      background: var(--bento-theme-color-bg-surface);
-      border: 1px solid var(--bento-theme-color-border-subtle);
-      border-radius: var(--bento-theme-border-radii-02);
-      padding: var(--bento-space-05);
-      margin-bottom: var(--bento-space-06);
-    }
-    .index-group h2 {
-      font: var(--hs-type-body-md-b);
-      margin: 0 0 var(--bento-space-04);
-    }
-    .index-links {
-      display: flex;
-      flex-direction: column;
-      gap: var(--bento-space-01);
-    }
-    .index-link {
-      display: flex;
-      align-items: center;
-      gap: var(--bento-space-03);
-      padding: var(--bento-space-03) var(--bento-space-04);
-      border-radius: var(--bento-theme-border-radii-01);
-      color: var(--bento-theme-color-text-link);
-      text-decoration: none;
-      font: var(--hs-type-body-md);
-    }
-    .index-link:hover {
-      background: var(--bento-theme-color-bg-surface-hovered);
-      text-decoration: underline;
-    }
-    .index-link:focus-visible {
-      outline: 2px solid var(--bento-theme-color-border-focus);
-      outline-offset: 2px;
-    }
-    .index-link .material-symbols-outlined {
-      font-size: 20px;
-      color: var(--bento-theme-color-icon-base);
-    }
+    /* Perch / Planner landing (tokens only). Cold-start home; Settings is reached
+       from the account avatar menu, matching the real product path. */
+    .plan-main { display:flex; flex-direction:column; min-width:0; flex:1; background:var(--bento-system-sys-neutral-alt-200); }
+    .plan-create { display:inline-flex; align-items:center; gap:8px; }
+    .calbar { height:52px; flex-shrink:0; display:flex; align-items:center; gap:12px; padding:0 24px;
+      background:var(--bento-theme-color-bg-surface); border-bottom:1px solid var(--hs-border); }
+    .calbar .mo { font: var(--hs-type-title-base); }
+    .calbar .navio { width:32px; height:32px; border:0; background:transparent; border-radius:8px; display:grid; place-items:center; cursor:pointer; color:var(--bento-theme-color-icon-base); }
+    .calbar .navio:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .calbar .today { height:36px; padding:0 14px; border-radius:8px; background:transparent; box-shadow:inset 0 0 0 1px var(--hs-border); font:var(--hs-type-body-md-b); cursor:pointer; }
+    .calbar .today:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .calwrap { flex:1; min-height:0; display:flex; flex-direction:column; background:var(--bento-theme-color-bg-surface); }
+    .calhead { display:grid; grid-template-columns:repeat(7,1fr); border-bottom:1px solid var(--hs-border); }
+    .calhead div { padding:10px 12px; font:var(--hs-type-meta-b); color:var(--bento-theme-color-text-subtle); text-transform:uppercase; letter-spacing:.04em; }
+    .cal { flex:1; display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:1fr; }
+    .cell { border-right:1px solid var(--hs-border); border-bottom:1px solid var(--hs-border); padding:6px 8px; min-height:96px; overflow:hidden; }
+    .cell:nth-child(7n) { border-right:0; }
+    .cell.dim { background:var(--bento-system-sys-neutral-alt-100); }
+    .cell .num { font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); }
+    .cell.today .num { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:999px; background:var(--bento-theme-color-bg-primary); color:#fff; font-weight:700; }
+    .chip { display:flex; align-items:center; gap:6px; margin-top:5px; padding:4px 7px; border-radius:6px; background:var(--bento-system-sys-neutral-alt-100); font:var(--hs-type-meta); color:var(--hs-fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .chip .dot { width:8px; height:8px; border-radius:999px; flex:0 0 auto; }
+    .chip .t { color:var(--bento-theme-color-text-subtle); }
+    /* account menu (avatar -> settings path) */
+    .acctmenu { position:fixed; left:74px; bottom:14px; width:264px; z-index:80; background:var(--bento-theme-color-bg-surface);
+      border:1px solid var(--hs-border); border-radius:12px; box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); padding:6px; display:none; }
+    .acctmenu.open { display:block; }
+    .acctmenu .ah { display:flex; align-items:center; gap:10px; padding:10px 10px 12px; border-bottom:1px solid var(--hs-border); margin-bottom:6px; }
+    .acctmenu .ah .av { width:34px; height:34px; border-radius:999px; background:var(--hs-cat-6-bg,#dfeaff); color:var(--hs-cat-6-fg,#1f60c9); display:grid; place-items:center; font-weight:700; }
+    .acctmenu .ah .n { font:var(--hs-type-body-md-b); } .acctmenu .ah .e { font:var(--hs-type-meta); color:var(--bento-theme-color-text-subtle); }
+    .acctmenu a, .acctmenu button.mi { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 10px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); text-decoration:none; cursor:pointer; }
+    .acctmenu a:hover, .acctmenu button.mi:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .acctmenu .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .acctmenu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+    .suite-navbtn.on .circle { background:var(--bento-theme-color-bg-primary); color:#fff; }
+    .suite-rail .avatar { border:0; cursor:pointer; }
   </style>
 </head>
-<body class="index">
-  <main class="index-col">
-    <h1 class="index-title">Suite Settings prototype (Bento)</h1>
-    <p class="index-sub">Click through every screen in the prototype.</p>
+<body class="suite-app">
 
-    <section class="index-group" aria-labelledby="grp-account">
-      <h2 id="grp-account">Account</h2>
-      <nav class="index-links">
-        <a class="index-link" href="profile.html"><span class="material-symbols-outlined">person</span>Profile</a>
-        <a class="index-link" href="preferences.html"><span class="material-symbols-outlined">tune</span>Preferences</a>
-        <a class="index-link" href="security.html"><span class="material-symbols-outlined">lock</span>Security</a>
-        <a class="index-link" href="security-sso.html"><span class="material-symbols-outlined">key</span>Security SSO</a>
-        <a class="index-link" href="notifications.html"><span class="material-symbols-outlined">notifications</span>Notifications</a>
-        <a class="index-link" href="plan-billing.html"><span class="material-symbols-outlined">credit_card</span>Plan and billing</a>
-        <a class="index-link" href="plan-billing-trial-expired.html"><span class="material-symbols-outlined">schedule</span>Plan and billing trial expired</a>
-      </nav>
-    </section>
+  <aside class="suite-rail">
+    <div class="main">
+      <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
+      <a class="suite-navbtn on" data-product="perch" href="index.html" aria-current="page"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+      <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
+      <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
+      <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
+      <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+    </div>
+    <div class="others">
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></button>
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications" onclick="toggleNotif(event)"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members" onclick="openInvite()"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
+      <button class="avatar" id="acctBtn" title="Account" aria-haspopup="menu" onclick="toggleAcct(event)">MT</button>
+    </div>
+  </aside>
 
-    <section class="index-group" aria-labelledby="grp-org">
-      <h2 id="grp-org">Organization</h2>
-      <nav class="index-links">
-        <a class="index-link" href="org-general.html"><span class="material-symbols-outlined">apartment</span>Org general</a>
-        <a class="index-link" href="people.html"><span class="material-symbols-outlined">group</span>People</a>
-        <a class="index-link" href="roles.html"><span class="material-symbols-outlined">manage_accounts</span>Roles</a>
-        <a class="index-link" href="person-detail.html"><span class="material-symbols-outlined">badge</span>Person detail</a>
-        <a class="index-link" href="teams.html"><span class="material-symbols-outlined">groups</span>Teams</a>
-        <a class="index-link" href="team-detail.html"><span class="material-symbols-outlined">diversity_3</span>Team detail</a>
-        <a class="index-link" href="social-accounts.html"><span class="material-symbols-outlined">share</span>Social accounts</a>
-        <a class="index-link" href="social-account-detail.html"><span class="material-symbols-outlined">account_circle</span>Social account detail</a>
+  <aside class="suite-drawer">
+    <div class="sd-head">Publish
+      <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+    </div>
+    <nav class="sd-body" aria-label="Publish">
+      <a class="sd-item on" href="index.html" aria-current="page"><span class="material-symbols-outlined">calendar_month</span>Planner</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">grid_view</span>Content</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">edit_note</span>Drafts</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">task_alt</span>Approvals</a>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">dynamic_feed</span>Streams</a>
+      <div class="sd-group">Insights</div>
+      <a class="sd-item" href="#"><span class="material-symbols-outlined">bar_chart</span>Analytics</a>
+    </nav>
+  </aside>
+
+  <main class="plan-main">
+    <header class="suite-topbar plan-top">
+      <h1>Plan</h1>
+      <nav class="tabs" aria-label="Calendar view" style="margin-left:8px">
+        <a href="#" class="on" onclick="return calView(event,this)">Month</a>
+        <a href="#" onclick="return calView(event,this)">Week</a>
+        <a href="#" onclick="return calView(event,this)">List</a>
       </nav>
-    </section>
+      <span class="spacer"></span>
+      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
+      <button class="hs-btn hs-btn--primary plan-create"><span class="material-symbols-outlined">add</span>Create a post</button>
+    </header>
+
+    <div class="calbar">
+      <button class="navio" aria-label="Previous month"><span class="material-symbols-outlined">chevron_left</span></button>
+      <button class="navio" aria-label="Next month"><span class="material-symbols-outlined">chevron_right</span></button>
+      <span class="mo">July 2026</span>
+      <span style="flex:1"></span>
+      <button class="today">Today</button>
+    </div>
+
+    <div class="calwrap">
+      <div class="calhead"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+      <div class="cal" id="cal"></div>
+    </div>
   </main>
+
+  <!-- account menu: the real path from a product into Settings -->
+  <div class="acctmenu" id="acctMenu" role="menu" aria-label="Account">
+    <div class="ah"><span class="av">MT</span><div><div class="n">Melanie Torres</div><div class="e">melanie@somos.co</div></div></div>
+    <a href="profile.html" role="menuitem"><span class="material-symbols-outlined">settings</span>Account and settings</a>
+    <a href="plan-billing.html" role="menuitem"><span class="material-symbols-outlined">credit_card</span>Plan and billing</a>
+    <a href="people.html" role="menuitem"><span class="material-symbols-outlined">group</span>Manage organization</a>
+    <div class="sep"></div>
+    <button class="mi" role="menuitem" onclick="signOut()"><span class="material-symbols-outlined">logout</span>Sign out</button>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function toggleNotif(e){ if(e){e.preventDefault();e.stopPropagation();} }
+    function openInvite(){ location.href='people.html'; }
+    function signOut(){ if(window.SSV2&&SSV2.toast) SSV2.toast('Signed out (demo)'); }
+    function calView(e, a){ e.preventDefault(); a.parentNode.querySelectorAll('a').forEach(function(x){ x.classList.toggle('on', x===a); x.setAttribute('aria-selected', x===a?'true':'false'); }); return false; }
+    function toggleAcct(e){ e.stopPropagation(); document.getElementById('acctMenu').classList.toggle('open'); }
+    document.addEventListener('click', function(e){ var m=document.getElementById('acctMenu'); if(m.classList.contains('open') && !e.target.closest('#acctMenu') && !e.target.closest('#acctBtn')) m.classList.remove('open'); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') document.getElementById('acctMenu').classList.remove('open'); });
+    (function(){
+      var cal=document.getElementById('cal');
+      var posts={8:[['#1f60c9','9:00','Product teaser']],15:[['#0a7a55','2:00','Blog share']],22:[['#c1274a','11:00','Reel']],
+        23:[['#c1274a','9:00','Launch post'],['#1c1c1c','1:30','Thread']],24:[['#1877f2','10:00','FB update']],28:[['#0a66c2','8:30','LinkedIn']]};
+      var cells=[];
+      [28,29,30].forEach(function(d){ cells.push({d:d,dim:true}); });
+      for(var d=1;d<=31;d++) cells.push({d:d,dim:false});
+      cells.push({d:1,dim:true});
+      cal.innerHTML=cells.map(function(c){
+        var today=(!c.dim && c.d===23);
+        var chips=(!c.dim && posts[c.d]) ? posts[c.d].map(function(p){ return '<div class="chip"><span class="dot" style="background:'+p[0]+'"></span><span class="t">'+p[1]+'</span> '+p[2]+'</div>'; }).join('') : '';
+        return '<div class="cell'+(c.dim?' dim':'')+(today?' today':'')+'"><div class="num">'+c.d+'</div>'+chips+'</div>';
+      }).join('');
+    })();
+  </script>
 </body>
 </html>
