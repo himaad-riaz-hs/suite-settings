@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Plan · Hootsuite</title>
+  <title>Calendar · Perch · Hootsuite</title>
   <link rel="stylesheet" href="bento/colors_and_type.css">
   <link rel="stylesheet" href="bento/components.css">
   <link rel="stylesheet" href="bento/templates/src/suite-shell.css">
@@ -11,29 +11,65 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
   <style>
-    /* Perch / Planner landing (tokens only). Cold-start home; Settings is reached
-       from the account avatar menu, matching the real product path. */
+    /* Perch Calendar (week view), matched to the real product. Tokens only. */
+    body.perch { margin:0; height:100vh; display:flex; flex-direction:column; }
+    .perch .suite-app { height:auto !important; flex:1; min-height:0; }
+    /* reconnection banner (full width, top) */
+    .reconnect { flex-shrink:0; display:flex; align-items:center; gap:12px; padding:12px 20px;
+      background:var(--bento-system-sys-warning-100,#fdf3d7); border-bottom:1px solid var(--bento-system-sys-warning-300,#f2d98a); }
+    .reconnect .wi { color:var(--bento-system-sys-warning-700,#8a6d00); }
+    .reconnect b { font:var(--hs-type-body-md-b); }
+    .reconnect .rc-txt { font:var(--hs-type-body-md); color:var(--hs-fg); }
+    .reconnect a { color:var(--hs-fg-link); font:var(--hs-type-body-md-b); text-decoration:none; }
+    .reconnect .rc-x { margin-left:auto; width:32px; height:32px; border:0; background:transparent; border-radius:999px; display:grid; place-items:center; cursor:pointer; color:var(--bento-theme-color-icon-base); }
+    .reconnect .rc-x:hover { background:rgba(0,0,0,.05); }
+    /* main plan column */
     .plan-main { display:flex; flex-direction:column; min-width:0; flex:1; background:var(--bento-system-sys-neutral-alt-200); }
-    .plan-create { display:inline-flex; align-items:center; gap:8px; }
-    .calbar { height:52px; flex-shrink:0; display:flex; align-items:center; gap:12px; padding:0 24px;
+    .p-icobtn { width:36px; height:36px; border:0; background:transparent; border-radius:8px; display:grid; place-items:center; cursor:pointer; color:var(--bento-theme-color-icon-base); }
+    .p-icobtn:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .p-divider { width:1px; height:28px; background:var(--hs-border); }
+    /* second toolbar */
+    .caltoolbar { height:56px; flex-shrink:0; display:flex; align-items:center; gap:8px; padding:0 20px;
       background:var(--bento-theme-color-bg-surface); border-bottom:1px solid var(--hs-border); }
-    .calbar .mo { font: var(--hs-type-title-base); }
-    .calbar .navio { width:32px; height:32px; border:0; background:transparent; border-radius:8px; display:grid; place-items:center; cursor:pointer; color:var(--bento-theme-color-icon-base); }
-    .calbar .navio:hover { background:var(--bento-system-sys-neutral-alt-100); }
-    /* "Today" uses the real outlined button (.hs-btn hs-btn--outlined hs-btn--sm); no page-local override needed. */
-    .calwrap { flex:1; min-height:0; display:flex; flex-direction:column; background:var(--bento-theme-color-bg-surface); }
-    .calhead { display:grid; grid-template-columns:repeat(7,1fr); border-bottom:1px solid var(--hs-border); }
-    .calhead div { padding:10px 12px; font:var(--hs-type-meta-b); color:var(--bento-theme-color-text-subtle); text-transform:uppercase; letter-spacing:.04em; }
-    .cal { flex:1; display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:1fr; }
-    .cell { border-right:1px solid var(--hs-border); border-bottom:1px solid var(--hs-border); padding:6px 8px; min-height:96px; overflow:hidden; }
-    .cell:nth-child(7n) { border-right:0; }
-    .cell.dim { background:var(--bento-system-sys-neutral-alt-100); }
-    .cell .num { font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); }
-    .cell.today .num { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:999px; background:var(--bento-theme-color-bg-primary); color:var(--hs-fg-inverse); font-weight:700; }
-    .chip { display:flex; align-items:center; gap:6px; margin-top:5px; padding:4px 7px; border-radius:6px; background:var(--bento-system-sys-neutral-alt-100); font:var(--hs-type-meta); color:var(--hs-fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .chip .dot { width:8px; height:8px; border-radius:999px; flex:0 0 auto; }
-    .chip .t { color:var(--bento-theme-color-text-subtle); }
-    /* account menu (avatar -> settings path) */
+    .tb-today { height:36px; padding:0 14px; border-radius:8px; background:transparent; box-shadow:inset 0 0 0 1px var(--hs-border); font:var(--hs-type-body-md-b); cursor:pointer; }
+    .tb-today:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .tb-range { height:36px; padding:0 10px; border-radius:8px; border:0; background:transparent; display:inline-flex; align-items:center; gap:8px; font:var(--hs-type-body-md-b); cursor:pointer; }
+    .tb-range:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .tb-views { display:inline-flex; border:1px solid var(--hs-border); border-radius:8px; overflow:hidden; }
+    .tb-views button { width:38px; height:34px; border:0; background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--bento-theme-color-icon-subtle); }
+    .tb-views button.on { background:var(--bento-system-sys-neutral-alt-100); color:var(--hs-fg); }
+    .tb-filters { height:36px; padding:0 12px; border-radius:8px; border:0; background:transparent; display:inline-flex; align-items:center; gap:6px; font:var(--hs-type-body-md-b); cursor:pointer; }
+    .tb-filters:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    /* week grid */
+    .wk-head { display:grid; grid-template-columns:56px repeat(7,1fr); background:var(--bento-theme-color-bg-surface); border-bottom:1px solid var(--hs-border); flex-shrink:0; }
+    .wk-gmt { font:var(--hs-type-meta); color:var(--bento-theme-color-text-subtle); padding:8px 6px; display:flex; align-items:flex-end; }
+    .wk-dh { border-left:1px solid var(--hs-border); padding:8px 10px 10px; }
+    .wk-dh .row1 { display:flex; align-items:center; gap:8px; }
+    .wk-dh .dow { font:var(--hs-type-meta-b); color:var(--bento-theme-color-text-subtle); text-transform:uppercase; }
+    .wk-dh .dnum { font:var(--hs-type-title-sub); }
+    .wk-dh .dnum.today { display:inline-grid; place-items:center; width:34px; height:34px; border-radius:999px; background:var(--bento-theme-color-bg-primary); color:var(--hs-fg-inverse); }
+    .wk-dh .dbadge { margin-left:auto; min-width:22px; height:22px; padding:0 6px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font:var(--hs-type-meta-b); background:var(--bento-system-sys-neutral-800,#1c1c1c); color:#fff; }
+    .wk-dh .dbadge.red { background:var(--bento-system-sys-negative-500,#c1274a); }
+    .wk-dh .nat { margin-top:8px; font:var(--hs-type-meta-b); color:var(--hs-fg-inverse); background:var(--bento-theme-color-bg-primary); border-radius:6px; padding:5px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .wk-body { flex:1; min-height:0; overflow:auto; display:grid; grid-template-columns:56px repeat(7,1fr); }
+    .wk-gutter { border-right:1px solid var(--hs-border); }
+    .wk-col { border-left:1px solid var(--hs-border); padding:8px; display:flex; flex-direction:column; gap:8px; }
+    .pcard { border:1px solid var(--hs-border); border-radius:8px; background:var(--bento-theme-color-bg-surface); overflow:hidden; }
+    .pcard .thumb { height:78px; background:var(--bento-system-sys-neutral-alt-200); background-size:cover; background-position:center; }
+    .pcard .body { padding:8px; }
+    .pc-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+    .pc-net { width:20px; height:20px; border-radius:999px; display:grid; place-items:center; color:#fff; font:700 10px var(--hs-font-body); flex:0 0 auto; }
+    .pc-net.fb { background:#1877f2; } .pc-net.li { background:#0a66c2; } .pc-net.x { background:#1c1c1c; } .pc-net.ig { background:#c1274a; }
+    .pc-auth { font:var(--hs-type-body-sm-b); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pc-time { margin-left:auto; font:var(--hs-type-meta); color:var(--bento-theme-color-text-subtle); }
+    .pc-text { font:var(--hs-type-body-sm); color:var(--hs-fg); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .pc-foot { display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-top:1px solid var(--hs-border); }
+    .pc-status { display:inline-flex; align-items:center; gap:5px; font:var(--hs-type-meta-b); border-radius:6px; padding:3px 8px; }
+    .pc-status.pub { background:var(--bento-theme-color-bg-mint,#dfffde); color:#0a5f2c; }
+    .pc-status.draft { background:var(--bento-system-sys-neutral-alt-100); color:var(--bento-theme-color-text-subtle); }
+    .pc-status .material-symbols-outlined { font-size:14px; }
+    .pc-foot .cmt { color:var(--bento-theme-color-icon-subtle); font-size:18px; }
+    /* account menu (avatar -> Settings) */
     .acctmenu { position:fixed; left:74px; bottom:14px; width:264px; z-index:80; background:var(--bento-theme-color-bg-surface);
       border:1px solid var(--hs-border); border-radius:12px; box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); padding:6px; display:none; }
     .acctmenu.open { display:block; }
@@ -45,71 +81,93 @@
     .acctmenu .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
     .acctmenu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
     .suite-navbtn.on .circle { background:var(--bento-theme-color-bg-primary); color:var(--hs-fg-inverse); }
-    .suite-rail .avatar { border:0; cursor:pointer; }
+    .suite-rail .avatar { border:0; cursor:pointer; position:relative; }
+    .suite-rail .avatar .dot { position:absolute; top:0; right:0; width:8px; height:8px; border-radius:999px; background:var(--bento-system-sys-negative-500,#c1274a); box-shadow:0 0 0 2px var(--bento-theme-color-bg-surface); }
   </style>
 </head>
-<body class="suite-app">
+<body class="perch">
 
-  <aside class="suite-rail">
-    <div class="main">
-      <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""><span class="lbl">Home</span></a>
-      <a class="suite-navbtn on" data-product="perch" href="index.html" aria-current="page"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
-      <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
-      <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
-      <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
-      <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
-    </div>
-    <div class="others">
-      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></button>
-      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications" onclick="toggleNotif(event)"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
-      <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members" onclick="openInvite()"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
-      <button class="avatar" id="acctBtn" title="Account" aria-haspopup="menu" onclick="toggleAcct(event)">MT</button>
-    </div>
-  </aside>
+  <div class="reconnect" id="reconnectBanner">
+    <span class="material-symbols-outlined wi" style="font-variation-settings:'FILL' 1">error</span>
+    <b>Reconnection Required</b>
+    <span class="rc-txt">Some of your accounts are no longer publishing or collecting data, or may stop in the near future.</span>
+    <a href="social-accounts.html">Click to reconnect your social accounts</a>
+    <button class="rc-x" aria-label="Dismiss" onclick="document.getElementById('reconnectBanner').remove()"><span class="material-symbols-outlined">close</span></button>
+  </div>
 
-  <aside class="suite-drawer">
-    <div class="sd-head">Publish
-      <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
-    </div>
-    <nav class="sd-body" aria-label="Publish">
-      <a class="sd-item on" href="index.html" aria-current="page"><span class="material-symbols-outlined">calendar_month</span>Planner</a>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">grid_view</span>Content</a>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">edit_note</span>Drafts</a>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">task_alt</span>Approvals</a>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">dynamic_feed</span>Streams</a>
-      <div class="sd-group">Insights</div>
-      <a class="sd-item" href="#"><span class="material-symbols-outlined">bar_chart</span>Analytics</a>
-    </nav>
-  </aside>
+  <div class="suite-app">
+    <aside class="suite-rail">
+      <div class="main">
+        <a class="suite-brand" href="#" aria-label="Home"><img src="bento/assets/hootsuite-owly-small.png" alt=""></a>
+        <a class="suite-navbtn on" data-product="perch" href="index.html" aria-current="page"><span class="circle"><span class="material-symbols-outlined">calendar_month</span></span><span class="lbl">Perch</span></a>
+        <a class="suite-navbtn" data-product="nest" href="#"><span class="circle"><span class="material-symbols-outlined">inbox</span></span><span class="lbl">Nest</span></a>
+        <a class="suite-navbtn" data-product="lumen" href="#"><span class="circle"><span class="material-symbols-outlined">graphic_eq</span></span><span class="lbl">Lumen</span></a>
+        <a class="suite-navbtn" data-product="parliament" href="#"><span class="circle"><span class="material-symbols-outlined">groups</span></span><span class="lbl">Parliament</span></a>
+        <a class="suite-navbtn" data-product="wisdom" href="#"><span class="circle"><span class="material-symbols-outlined">auto_awesome</span></span><span class="lbl">Wisdom</span></a>
+        <a class="suite-navbtn" data-product="vigil" href="#"><span class="circle"><span class="material-symbols-outlined">verified_user</span></span><span class="lbl">Vigil</span></a>
+      </div>
+      <div class="others">
+        <button class="suite-navbtn util ne-tooltipbtn" aria-label="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></button>
+        <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+        <button class="avatar" id="acctBtn" title="Account" aria-haspopup="menu" onclick="toggleAcct(event)">MT<span class="dot"></span></button>
+      </div>
+    </aside>
 
-  <main class="plan-main">
-    <header class="suite-topbar plan-top">
-      <h1>Plan</h1>
-      <nav class="tabs" aria-label="Calendar view" style="margin-left:8px">
-        <a href="#" class="on" onclick="return calView(event,this)">Month</a>
-        <a href="#" onclick="return calView(event,this)">Week</a>
-        <a href="#" onclick="return calView(event,this)">List</a>
+    <aside class="suite-drawer">
+      <div class="sd-head">Perch
+        <button class="sd-collapse ne-tooltipbtn" aria-label="Collapse menu"><span class="material-symbols-outlined">keyboard_double_arrow_left</span></button>
+      </div>
+      <nav class="sd-body" aria-label="Perch">
+        <div class="sd-group">Plan</div>
+        <a class="sd-item on" href="index.html" aria-current="page"><span class="material-symbols-outlined">calendar_month</span>Calendar</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">edit_note</span>Drafts</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">grid_view</span>Content</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">task_alt</span>Approvals</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">dashboard</span>Whiteboard</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">forum</span>DM automations</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">link</span>Hootbio</a>
+        <div class="sd-group">Ads</div>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">campaign</span>Ads</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">rocket_launch</span>Boost</a>
+        <div class="sd-group">Analytics</div>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">explore</span>Explore</a>
+        <a class="sd-item" href="#"><span class="material-symbols-outlined">bar_chart</span>My reports</a>
       </nav>
-      <span class="spacer"></span>
-      <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
-      <button class="hs-btn hs-btn--primary plan-create"><span class="material-symbols-outlined">add</span>Create a post</button>
-    </header>
+    </aside>
 
-    <div class="calbar">
-      <button class="navio" aria-label="Previous month"><span class="material-symbols-outlined">chevron_left</span></button>
-      <button class="navio" aria-label="Next month"><span class="material-symbols-outlined">chevron_right</span></button>
-      <span class="mo">July 2026</span>
-      <span style="flex:1"></span>
-      <button class="hs-btn hs-btn--outlined hs-btn--sm">Today</button>
-    </div>
+    <main class="plan-main">
+      <header class="suite-topbar">
+        <h1>Calendar</h1>
+        <span class="spacer"></span>
+        <button class="p-icobtn" aria-label="Calendar settings"><span class="material-symbols-outlined">settings</span></button>
+        <button class="p-icobtn" aria-label="Share"><span class="material-symbols-outlined">share</span></button>
+        <span class="p-divider"></span>
+        <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
+        <button class="hs-btn hs-btn--secondary"><span class="material-symbols-outlined">add</span>Add social account</button>
+        <button class="hs-btn hs-btn--primary"><span class="material-symbols-outlined">add</span>Create a post</button>
+      </header>
 
-    <div class="calwrap">
-      <div class="calhead"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
-      <div class="cal" id="cal"></div>
-    </div>
-  </main>
+      <div class="caltoolbar">
+        <button class="p-icobtn" aria-label="Previous week"><span class="material-symbols-outlined">chevron_left</span></button>
+        <button class="tb-today">Today</button>
+        <button class="p-icobtn" aria-label="Next week"><span class="material-symbols-outlined">chevron_right</span></button>
+        <button class="tb-range">Jul 19 - 25, 2026 <span class="material-symbols-outlined">expand_more</span></button>
+        <span class="spacer" style="flex:1"></span>
+        <div class="tb-views" role="group" aria-label="View">
+          <button aria-label="List view" onclick="setView(this)"><span class="material-symbols-outlined">view_list</span></button>
+          <button class="on" aria-label="Week view" onclick="setView(this)"><span class="material-symbols-outlined">calendar_view_week</span></button>
+          <button aria-label="Month view" onclick="setView(this)"><span class="material-symbols-outlined">calendar_view_month</span></button>
+        </div>
+        <button class="tb-filters"><span class="material-symbols-outlined">tune</span>Filters <span class="material-symbols-outlined">expand_more</span></button>
+        <button class="p-icobtn" aria-label="Apps"><span class="material-symbols-outlined">apps</span></button>
+        <button class="p-icobtn" aria-label="Widgets"><span class="material-symbols-outlined">dashboard_customize</span></button>
+      </div>
 
-  <!-- account menu: the real path from a product into Settings -->
+      <div class="wk-head" id="wkHead"></div>
+      <div class="wk-body" id="wkBody"><div class="wk-gutter"></div></div>
+    </main>
+  </div>
+
   <div class="acctmenu" id="acctMenu" role="menu" aria-label="Account">
     <div class="ah"><span class="av">MT</span><div><div class="n">Melanie Torres</div><div class="e">melanie@somos.co</div></div></div>
     <a href="profile.html" role="menuitem"><span class="material-symbols-outlined">settings</span>Account and settings</a>
@@ -121,26 +179,63 @@
 
   <script src="app.js"></script>
   <script>
-    function toggleNotif(e){ if(e){e.preventDefault();e.stopPropagation();} }
-    function openInvite(){ location.href='people.html'; }
     function signOut(){ if(window.SSV2&&SSV2.toast) SSV2.toast('Signed out (demo)'); }
-    function calView(e, a){ e.preventDefault(); a.parentNode.querySelectorAll('a').forEach(function(x){ x.classList.toggle('on', x===a); x.setAttribute('aria-selected', x===a?'true':'false'); }); return false; }
+    function setView(b){ b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);}); }
     function toggleAcct(e){ e.stopPropagation(); document.getElementById('acctMenu').classList.toggle('open'); }
     document.addEventListener('click', function(e){ var m=document.getElementById('acctMenu'); if(m.classList.contains('open') && !e.target.closest('#acctMenu') && !e.target.closest('#acctBtn')) m.classList.remove('open'); });
     document.addEventListener('keydown', function(e){ if(e.key==='Escape') document.getElementById('acctMenu').classList.remove('open'); });
+
+    // week data (Jul 19-25, 2026), matched to the real Perch calendar
+    var DAYS=[
+      {dow:'Sun',n:19,badge:8,red:true,nat:'National Ice Cream Day',posts:[
+        {net:'li',auth:'Alex T',time:'7:15AM',text:'main caption',thumb:'linear-gradient(135deg,#f2d9a8,#d9b98a)',status:'draft'},
+        {net:'li',auth:'Test hoot company',time:'7:45AM',text:'test mentions for all networks. Boost your post to reach a wider audience instantly on top of your followers.',status:'pub'},
+        {net:'li',auth:'Alex T',time:'8:25AM',text:'main caption',status:''}]},
+      {dow:'Mon',n:20,badge:16,red:false,nat:null,posts:[
+        {net:'fb',auth:'JP Web Design',time:'3:51AM',text:'Facebook Link Send Now Test 1 784544674094',status:'pubv'},
+        {net:'li',auth:'DevtestCo 1236',time:'4:52AM',text:'LI targeting duplicate send now - 3399',status:'pubv'},
+        {net:'li',auth:'Alex T',time:'6:19AM',text:'test',status:'pub'},
+        {net:'li',auth:'DevtestCo 1236',time:'7:09AM',text:'Test API n8n - LAAD Architecture',status:''}]},
+      {dow:'Tue',n:21,badge:44,red:false,nat:null,posts:[
+        {net:'fb',auth:'JP Web Design',time:'3:52AM',text:'Facebook Link Send Now Test 1 784631073928',status:'pubv'},
+        {net:'li',auth:'DevtestCo 1236',time:'4:49AM',text:'LI targeting duplicate send now - 7904',status:'pubv'},
+        {net:'fb',auth:'AlexT Hoot Shop',time:'8:10AM',text:'[July 21] E2E Test - FB Reels Asset',thumb:'linear-gradient(135deg,#bfe0e6,#8fc7cf)',status:'pubv'}]},
+      {dow:'Wed',n:22,badge:15,red:true,nat:'National Be a Good Teammate Day',posts:[
+        {net:'fb',auth:'JP Web Design',time:'3:50AM',text:'Facebook Link Send Now Test 1 784717390249',status:'pubv'},
+        {net:'li',auth:'DevtestCo 1236',time:'4:50AM',text:'LI targeting duplicate send now - 4053',status:'pubv'},
+        {net:'fb',auth:'AlexT Hoot Shop',time:'8:50AM',text:'[July 22] E2E Test - FB Video Asset',thumb:'linear-gradient(135deg,#bfe0e6,#8fc7cf)',status:'pubv'}]},
+      {dow:'Thu',n:23,badge:5,red:false,today:true,nat:null,posts:[
+        {net:'fb',auth:'JP Web Design',time:'3:50AM',text:'Facebook Link Send Now Test 1 784803788908',status:'pubv'},
+        {net:'li',auth:'DevtestCo 1236',time:'5:34AM',text:'asdasdas',status:'pubv'},
+        {net:'fb',auth:'Another Owl Mail',time:'2:35PM',text:'Test post',status:''},
+        {net:'li',auth:'Alex T',time:'6:40PM',text:'REST vs. GraphQL: Pros and Cons https://example.com/posts/rest-vs-graphql-pros-and-cons',status:''}]},
+      {dow:'Fri',n:24,badge:4,red:false,nat:'International Self Care Day',posts:[
+        {net:'li',auth:'Alex T',time:'7:55AM',text:'Deploying a Full-Stack App with Docker and Kubernetes https://example.com/posts/deploying-a-full-stack-app-with-docker-and-kubernetes',status:''},
+        {net:'li',auth:'Alex T',time:'7:55AM',text:'5 https://example.com/posts/deploying-a-full-stack-app-with-docker-and-kubernetes',status:''},
+        {net:'li',auth:'Alex T',time:'8:50AM',text:'Unit Testing React Apps with Vitest https://example.com/posts/unit-testing-react-apps-with-vitest',status:''}]},
+      {dow:'Sat',n:25,badge:2,red:false,nat:'National Wine and Cheese Day',posts:[
+        {net:'li',auth:'Alex T',time:'1:25PM',text:'Getting Started with GraphQL in Node.js https://example.com/posts/getting-started-with-graphql-in-nodejs',status:''},
+        {net:'li',auth:'Alex T',time:'1:25PM',text:'11 https://example.com/posts/getting-started-with-graphql-in-nodejs',status:''}]}
+    ];
+    function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+    function netLabel(n){ return n==='fb'?'f':n==='li'?'in':n==='x'?'X':n==='ig'?'IG':''; }
     (function(){
-      var cal=document.getElementById('cal');
-      var posts={8:[['#1f60c9','9:00','Product teaser']],15:[['#0a7a55','2:00','Blog share']],22:[['#c1274a','11:00','Reel']],
-        23:[['#c1274a','9:00','Launch post'],['#1c1c1c','1:30','Thread']],24:[['#1877f2','10:00','FB update']],28:[['#0a66c2','8:30','LinkedIn']]};
-      var cells=[];
-      [28,29,30].forEach(function(d){ cells.push({d:d,dim:true}); });
-      for(var d=1;d<=31;d++) cells.push({d:d,dim:false});
-      cells.push({d:1,dim:true});
-      cal.innerHTML=cells.map(function(c){
-        var today=(!c.dim && c.d===23);
-        var chips=(!c.dim && posts[c.d]) ? posts[c.d].map(function(p){ return '<div class="chip"><span class="dot" style="background:'+p[0]+'"></span><span class="t">'+p[1]+'</span> '+p[2]+'</div>'; }).join('') : '';
-        return '<div class="cell'+(c.dim?' dim':'')+(today?' today':'')+'"><div class="num">'+c.d+'</div>'+chips+'</div>';
-      }).join('');
+      var head='<div class="wk-gmt">GMT<br>-07:00</div>', body='<div class="wk-gutter"></div>';
+      DAYS.forEach(function(d){
+        head+='<div class="wk-dh"><div class="row1"><span class="dow">'+d.dow+'</span><span class="dnum'+(d.today?' today':'')+'">'+d.n+'</span><span class="dbadge'+(d.red?' red':'')+'">'+d.badge+'</span></div>'+(d.nat?'<div class="nat" title="'+esc(d.nat)+'">'+esc(d.nat)+'</div>':'')+'</div>';
+        var cards=d.posts.map(function(p){
+          var st = p.status==='pubv' ? '<span class="pc-status pub"><span class="material-symbols-outlined">check_circle</span>Published vi...</span>'
+                 : p.status==='pub' ? '<span class="pc-status pub"><span class="material-symbols-outlined">check_circle</span>Published</span>'
+                 : p.status==='draft' ? '<span class="pc-status draft">Draft</span>' : '<span></span>';
+          return '<div class="pcard">'+(p.thumb?'<div class="thumb" style="background:'+p.thumb+'"></div>':'')+
+            '<div class="body"><div class="pc-top"><span class="pc-net '+p.net+'">'+netLabel(p.net)+'</span><span class="pc-auth">'+esc(p.auth)+'</span><span class="pc-time">'+esc(p.time)+'</span></div>'+
+            '<div class="pc-text">'+esc(p.text)+'</div></div>'+
+            '<div class="pc-foot">'+st+'<span class="material-symbols-outlined cmt">chat_bubble_outline</span></div></div>';
+        }).join('');
+        body+='<div class="wk-col">'+cards+'</div>';
+      });
+      document.getElementById('wkHead').innerHTML=head;
+      document.getElementById('wkBody').innerHTML=body;
     })();
   </script>
 </body>
