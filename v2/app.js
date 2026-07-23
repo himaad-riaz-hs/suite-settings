@@ -554,3 +554,156 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", decorate);
   else decorate();
 })();
+
+/* ---- organizations: switcher + create + manage (global top-bar chrome).
+   The ".orgsw" chip on every page was a dead control; this makes it a real
+   workspace switcher. Self-contained (injects its own styles + modals) so it
+   works on every page that loads app.js, without editing each file. ---- */
+(function(){
+  var K="ssv2";
+  function load(){ try{return JSON.parse(localStorage.getItem(K))||{};}catch(e){return {};} }
+  function persist(s){ try{localStorage.setItem(K,JSON.stringify(s));}catch(e){} }
+  function ost(){ var s=load();
+    if(!s.orgs) s.orgs=[{name:"Somos",role:"Super admin",plan:"Advanced",members:45,payer:true,def:true}];
+    if(!s.currentOrg) s.currentOrg=(s.orgs[0]&&s.orgs[0].name)||"Somos";
+    return s; }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":"&quot;"; }); }
+  function toast(m){ if(window.SSV2&&window.SSV2.toast) window.SSV2.toast(m); }
+  function ini(n){ return (String(n||"").trim()[0]||"O").toUpperCase(); }
+  function findOrg(s,name){ for(var i=0;i<s.orgs.length;i++) if(s.orgs[i].name===name) return s.orgs[i]; return null; }
+
+  var css=
+    ".ssv2-omenu{position:absolute;z-index:85;background:var(--bento-theme-color-bg-surface,#fff);border:1px solid var(--hs-border,#e3e6e8);border-radius:10px;box-shadow:0 10px 30px rgba(1,43,58,.18);min-width:264px;padding:6px;font:var(--hs-type-body-md,400 14px/1.4 Arial,sans-serif);color:var(--hs-fg,#1c1c1c)}"+
+    ".ssv2-omenu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;padding:9px 10px;border-radius:8px;cursor:pointer;font:inherit;color:inherit}"+
+    ".ssv2-omenu button:hover{background:var(--bento-system-sys-neutral-alt-100,#f2f4f5)}"+
+    ".ssv2-omenu .oi{width:26px;height:26px;border-radius:6px;background:var(--bento-theme-color-bg-primary,#012b3a);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto}"+
+    ".ssv2-omenu .ck{margin-left:auto;color:var(--hs-action-primary,#1f60c9);font-size:18px}"+
+    ".ssv2-omenu .sep{height:1px;background:var(--hs-border,#e3e6e8);margin:6px 4px}"+
+    ".ssv2-omenu .mi .material-symbols-outlined{font-size:20px;color:var(--bento-theme-color-icon-subtle,#5a6a72)}"+
+    ".ssv2-oovl{position:fixed;inset:0;background:var(--bento-theme-color-overlay-scrim,rgba(1,43,58,.32));display:none;align-items:flex-start;justify-content:center;padding:64px 16px;z-index:95}"+
+    ".ssv2-oovl.open{display:flex}"+
+    ".ssv2-om{width:560px;max-width:100%;background:var(--bento-theme-color-bg-surface,#fff);border-radius:14px;box-shadow:0 16px 44px rgba(1,43,58,.24);overflow:hidden;font:var(--hs-type-body-md,400 14px/1.45 Arial,sans-serif);color:var(--hs-fg,#1c1c1c)}"+
+    ".ssv2-om.sm{width:440px}"+
+    ".ssv2-om .mh{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--hs-border,#e3e6e8)}"+
+    ".ssv2-om .mh h2{margin:0;font-size:18px;font-weight:700}"+
+    ".ssv2-om .mb{padding:18px 20px;max-height:64vh;overflow:auto}"+
+    ".ssv2-om .mf{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--hs-border,#e3e6e8)}"+
+    ".ssv2-om label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}"+
+    ".ssv2-in{width:100%;padding:10px 12px;border:1px solid var(--hs-border,#c9ced1);border-radius:8px;font:inherit;box-sizing:border-box}"+
+    ".ssv2-om .err{color:#b3261e;font-size:12px;margin-top:6px}"+
+    ".ssv2-orow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--hs-border,#eef0f1)}"+
+    ".ssv2-orow:last-of-type{border-bottom:0}"+
+    ".ssv2-orow .oi{width:36px;height:36px;border-radius:8px;background:var(--bento-theme-color-bg-primary,#012b3a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 auto}"+
+    ".ssv2-orow .meta{flex:1;min-width:0}.ssv2-orow .meta .n{font-weight:600}.ssv2-orow .meta .s{font-size:12px;color:var(--bento-theme-color-text-subtle,#5a6a72)}"+
+    ".ssv2-orow .oact{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}"+
+    ".ssv2-chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bento-system-sys-neutral-alt-100,#eef0f1);color:#3a4a52;margin-left:6px}"+
+    ".ssv2-chip.cur{background:var(--bento-theme-color-bg-mint,#dfffde);color:#0a5f2c}";
+  var styleEl=document.createElement("style"); styleEl.textContent=css; document.head.appendChild(styleEl);
+
+  function paint(){ var name=ost().currentOrg;
+    document.querySelectorAll(".orgsw").forEach(function(b){
+      b.innerHTML='<span class="badge">'+esc(ini(name))+'</span>'+esc(name)+'<span class="material-symbols-outlined">expand_more</span>';
+      b.setAttribute("aria-haspopup","menu"); }); }
+
+  var menu=null;
+  function closeMenu(){ if(menu&&menu.parentNode) menu.parentNode.removeChild(menu); menu=null; }
+  function openMenu(anchor){ closeMenu(); var s=ost();
+    menu=document.createElement("div"); menu.className="ssv2-omenu"; menu.setAttribute("role","menu");
+    var h="";
+    s.orgs.forEach(function(o){ h+='<button role="menuitem" data-sw="'+esc(o.name)+'"><span class="oi">'+esc(ini(o.name))+'</span>'+esc(o.name)+(o.name===s.currentOrg?'<span class="material-symbols-outlined ck">check</span>':'')+'</button>'; });
+    h+='<div class="sep"></div>';
+    h+='<button role="menuitem" class="mi" data-create="1"><span class="material-symbols-outlined">add</span>Create organization</button>';
+    h+='<button role="menuitem" class="mi" data-manage="1"><span class="material-symbols-outlined">settings</span>Manage organizations</button>';
+    menu.innerHTML=h; document.body.appendChild(menu);
+    var r=anchor.getBoundingClientRect();
+    menu.style.top=(r.bottom+6)+"px";
+    menu.style.left=Math.max(8,Math.min(r.left,(window.innerWidth-menu.offsetWidth-8)))+"px"; }
+
+  var nameOvl,nameIn,nameErr,nameGo,nameTitle,nameHint,nameMode="create",nameTarget=null;
+  function buildNameModal(){
+    nameOvl=document.createElement("div"); nameOvl.className="ssv2-oovl";
+    nameOvl.innerHTML='<div class="ssv2-om sm" role="dialog" aria-modal="true" aria-label="Organization"><div class="mh"><h2 data-t>Create an organization</h2><button class="hs-btn hs-btn--ghost" data-x aria-label="Close" style="min-width:0;padding:6px"><span class="material-symbols-outlined">close</span></button></div><div class="mb"><label for="ssv2OrgName">Organization name</label><input id="ssv2OrgName" class="ssv2-in" type="text" placeholder="e.g. Somos EMEA" autocomplete="off"><p class="err" data-err hidden>Give the organization a name.</p><p data-hint style="font-size:13px;color:#5a6a72;margin-top:12px">You will be the Super admin of the new organization. It appears in your organization switcher once created.</p></div><div class="mf"><button class="hs-btn hs-btn--ghost" data-x>Cancel</button><button class="hs-btn hs-btn--primary" data-go disabled>Create organization</button></div></div>';
+    document.body.appendChild(nameOvl);
+    nameIn=nameOvl.querySelector("#ssv2OrgName"); nameErr=nameOvl.querySelector("[data-err]"); nameGo=nameOvl.querySelector("[data-go]"); nameTitle=nameOvl.querySelector("[data-t]"); nameHint=nameOvl.querySelector("[data-hint]");
+    nameIn.addEventListener("input",function(){ nameGo.disabled=!nameIn.value.trim(); nameErr.hidden=true; });
+    nameIn.addEventListener("keydown",function(e){ if(e.key==="Enter"&&!nameGo.disabled){e.preventDefault();nameSubmit();} else if(e.key==="Escape") closeName(); });
+    nameOvl.addEventListener("mousedown",function(e){ if(e.target===nameOvl) closeName(); });
+    nameOvl.querySelectorAll("[data-x]").forEach(function(b){ b.addEventListener("click",closeName); });
+    nameGo.addEventListener("click",nameSubmit);
+  }
+  function openCreate(){ nameMode="create"; nameTarget=null; nameTitle.textContent="Create an organization"; nameGo.textContent="Create organization"; nameHint.style.display=""; nameIn.value=""; nameErr.hidden=true; nameGo.disabled=true; nameOvl.classList.add("open"); setTimeout(function(){nameIn.focus();},30); }
+  function openRename(orgName){ nameMode="rename"; nameTarget=orgName; nameTitle.textContent="Rename organization"; nameGo.textContent="Save name"; nameHint.style.display="none"; nameIn.value=orgName; nameErr.hidden=true; nameGo.disabled=false; nameOvl.classList.add("open"); setTimeout(function(){nameIn.focus();nameIn.select();},30); }
+  function closeName(){ nameOvl.classList.remove("open"); }
+  function nameSubmit(){ var v=nameIn.value.trim(); if(!v){nameErr.hidden=false;return;} var s=ost();
+    if(nameMode==="create"){ if(!findOrg(s,v)) s.orgs.push({name:v,role:"Super admin",plan:"Advanced",members:1,payer:true,def:false}); persist(s); closeName(); toast('Organization "'+v+'" created. Switch to it any time from the organization menu.'); }
+    else { var o=findOrg(s,nameTarget); if(o){ var old=o.name; o.name=v; if(s.currentOrg===old) s.currentOrg=v; } persist(s); closeName(); paint(); toast('Organization renamed to "'+v+'".'); }
+    renderManage(); }
+
+  var mgOvl,mgBody;
+  function buildManageModal(){
+    mgOvl=document.createElement("div"); mgOvl.className="ssv2-oovl";
+    mgOvl.innerHTML='<div class="ssv2-om" role="dialog" aria-modal="true" aria-label="Manage organizations"><div class="mh"><h2>Your organizations</h2><button class="hs-btn hs-btn--ghost" data-x aria-label="Close" style="min-width:0;padding:6px"><span class="material-symbols-outlined">close</span></button></div><div class="mb" data-body></div><div class="mf"><button class="hs-btn hs-btn--secondary" data-create><span class="material-symbols-outlined">add</span>Create organization</button><button class="hs-btn hs-btn--primary" data-x>Done</button></div></div>';
+    document.body.appendChild(mgOvl);
+    mgBody=mgOvl.querySelector("[data-body]");
+    mgOvl.addEventListener("mousedown",function(e){ if(e.target===mgOvl) mgOvl.classList.remove("open"); });
+    mgOvl.querySelectorAll("[data-x]").forEach(function(b){ b.addEventListener("click",function(){ mgOvl.classList.remove("open"); }); });
+    mgOvl.querySelector("[data-create]").addEventListener("click",function(){ openCreate(); });
+    mgBody.addEventListener("click",function(e){ var b=e.target.closest("button[data-act]"); if(!b) return; orgAction(b.getAttribute("data-act"),b.getAttribute("data-org")); });
+  }
+  function openManage(){ renderManage(); mgOvl.classList.add("open"); }
+  function renderManage(){ if(!mgBody) return; var s=ost(); var h="";
+    s.orgs.forEach(function(o){ var cur=o.name===s.currentOrg;
+      h+='<div class="ssv2-orow"><span class="oi">'+esc(ini(o.name))+'</span><div class="meta"><div class="n">'+esc(o.name)+(o.def?'<span class="ssv2-chip">Default</span>':'')+(cur?'<span class="ssv2-chip cur">Current</span>':'')+'</div><div class="s">'+esc(o.role)+' &middot; '+esc(o.plan)+' plan &middot; '+o.members+' member'+(o.members===1?'':'s')+(o.payer?' &middot; billing owner':'')+'</div></div><div class="oact">';
+      if(!cur) h+='<button class="hs-btn hs-btn--ghost hs-btn--sm" data-act="switch" data-org="'+esc(o.name)+'">Switch</button>';
+      if(!o.def) h+='<button class="hs-btn hs-btn--ghost hs-btn--sm" data-act="default" data-org="'+esc(o.name)+'">Set default</button>';
+      h+='<button class="hs-btn hs-btn--ghost hs-btn--sm" data-act="rename" data-org="'+esc(o.name)+'">Rename</button>';
+      if(o.payer) h+='<button class="hs-btn hs-btn--outlined hs-btn--sm" data-act="delete" data-org="'+esc(o.name)+'">Delete</button>';
+      else h+='<button class="hs-btn hs-btn--outlined hs-btn--sm" data-act="leave" data-org="'+esc(o.name)+'">Leave</button>';
+      h+='</div></div>'; });
+    h+='<p style="font-size:12px;color:#5a6a72;margin-top:14px">As the billing owner you cannot leave an organization; transfer billing or delete it instead. Only the billing owner can delete an organization, and you must belong to at least one.</p>';
+    mgBody.innerHTML=h; }
+  function orgAction(act,name){ var s=ost(),o=findOrg(s,name); if(!o) return;
+    if(act==="switch"){ s.currentOrg=name; persist(s); paint(); renderManage(); toast("Switched to "+name+"."); }
+    else if(act==="default"){ s.orgs.forEach(function(x){x.def=(x.name===name);}); persist(s); renderManage(); toast(name+" is now your default organization."); }
+    else if(act==="rename"){ openRename(name); }
+    else if(act==="delete"){ orgConfirm("delete",name); }
+    else if(act==="leave"){ orgConfirm("leave",name); } }
+
+  var cfOvl,cfMsg,cfGo,cfTitle,cfAct,cfOrg;
+  function buildConfirm(){
+    cfOvl=document.createElement("div"); cfOvl.className="ssv2-oovl";
+    cfOvl.innerHTML='<div class="ssv2-om sm" role="dialog" aria-modal="true"><div class="mh"><h2 data-t>Confirm</h2><button class="hs-btn hs-btn--ghost" data-x aria-label="Close" style="min-width:0;padding:6px"><span class="material-symbols-outlined">close</span></button></div><div class="mb"><p data-msg></p></div><div class="mf"><button class="hs-btn hs-btn--ghost" data-x>Cancel</button><button class="hs-btn hs-btn--outlined" data-go>Confirm</button></div></div>';
+    document.body.appendChild(cfOvl);
+    cfMsg=cfOvl.querySelector("[data-msg]"); cfGo=cfOvl.querySelector("[data-go]"); cfTitle=cfOvl.querySelector("[data-t]");
+    cfOvl.addEventListener("mousedown",function(e){ if(e.target===cfOvl) cfOvl.classList.remove("open"); });
+    cfOvl.querySelectorAll("[data-x]").forEach(function(b){ b.addEventListener("click",function(){cfOvl.classList.remove("open");}); });
+    cfGo.addEventListener("click",doConfirm); }
+  function orgConfirm(act,name){ cfAct=act; cfOrg=name;
+    if(act==="delete"){ cfTitle.textContent="Delete "+name+"?"; cfMsg.textContent="This permanently removes "+name+", all its teams, and its connected accounts. This cannot be undone."; cfGo.textContent="Delete organization"; }
+    else { cfTitle.textContent="Leave "+name+"?"; cfMsg.textContent="You will lose access to "+name+" and its content."; cfGo.textContent="Leave organization"; }
+    cfOvl.classList.add("open"); }
+  function doConfirm(){ var s=ost();
+    if(s.orgs.length<=1){ cfOvl.classList.remove("open"); toast("You must belong to at least one organization."); return; }
+    var idx=-1; for(var i=0;i<s.orgs.length;i++) if(s.orgs[i].name===cfOrg) idx=i;
+    if(idx<0){ cfOvl.classList.remove("open"); return; }
+    var wasCurrent=s.currentOrg===cfOrg, wasDefault=s.orgs[idx].def;
+    s.orgs.splice(idx,1);
+    if(wasCurrent) s.currentOrg=s.orgs[0].name;
+    if(wasDefault && s.orgs.length) s.orgs[0].def=true;
+    persist(s); paint(); renderManage(); cfOvl.classList.remove("open");
+    toast(cfAct==="delete"?('"'+cfOrg+'" deleted.'):('You left "'+cfOrg+'".')); }
+
+  document.addEventListener("click",function(e){
+    var sw=e.target.closest && e.target.closest(".orgsw");
+    if(sw){ e.preventDefault(); e.stopPropagation(); if(menu) closeMenu(); else openMenu(sw); return; }
+    if(menu){ var it=e.target.closest && e.target.closest(".ssv2-omenu button");
+      if(it){ if(it.getAttribute("data-create")){ closeMenu(); openCreate(); }
+        else if(it.getAttribute("data-manage")){ closeMenu(); openManage(); }
+        else if(it.getAttribute("data-sw")){ var nm=it.getAttribute("data-sw"),s=ost(); s.currentOrg=nm; persist(s); paint(); closeMenu(); toast("Switched to "+nm+"."); }
+        return; }
+      closeMenu(); } });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeMenu(); });
+
+  function boot(){ buildNameModal(); buildManageModal(); buildConfirm(); paint(); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot); else boot();
+})();
