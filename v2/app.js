@@ -12,9 +12,9 @@
     jordan:  { name: "Jordan Lee",   email: "jordan@somos.co",  initials: "JL", role: "Super admin", status: "Active"  },
     marisol: { name: "Marisol Chen", email: "marisol@somos.co", initials: "MC", role: "Admin",       status: "Active"  },
     sam:     { name: "Sam Rivera",   email: "sam@somos.co",     initials: "SR", role: "Editor",      status: "Active"  },
-    aisha:   { name: "Aisha Patel",  email: "aisha@somos.co",   initials: "AP", role: "Admin",       status: "Pending" },
+    aisha:   { name: "Aisha Patel",  email: "aisha@somos.co",   initials: "AP", role: "Super admin", status: "Active"  },
     devin:   { name: "Devin Okafor", email: "devin@somos.co",   initials: "DO", role: "Editor",      status: "Active"  },
-    marco:   { name: "Marco Silva",  email: "marco@somos.co",   initials: "MS", role: "Admin",       status: "Active"  },
+    marco:   { name: "Marco Silva",  email: "marco@somos.co",   initials: "MS", role: "Editor",      status: "Active"  },
     yuki:    { name: "Yuki Tanaka",  email: "yuki@somos.co",    initials: "YT", role: "Editor",      status: "Pending" },
     bryn:    { name: "Bryn Morales", email: "bryn@somos.co",    initials: "BM", role: "Editor",      status: "Active"  }
   };
