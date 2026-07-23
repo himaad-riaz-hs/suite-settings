@@ -212,6 +212,9 @@
 
         <!-- TEAMS -->
         <section data-panel="teams" hidden>
+          <div class="toolbar" style="display:flex;justify-content:flex-end;margin-bottom:14px">
+            <button class="hs-btn hs-btn--primary" onclick="openCreateTeam()"><span class="material-symbols-outlined">group_add</span>Create team</button>
+          </div>
           <div class="grid">
             <div class="ecard"><div class="top"><span class="av" style="background:var(--hs-cat-1-bg);color:var(--hs-cat-1-fg)"><span class="material-symbols-outlined">groups</span></span><div class="nm"><div class="n"><a href="team-detail.html">Growth Team</a></div><div class="e">14 members &#183; 6 accounts</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="av-stack"><span class="av">EN</span><span class="av">MK</span><span class="av">JL</span></span><span class="rolechip">Admin</span></div></div>
             <div class="ecard"><div class="top"><span class="av" style="background:var(--hs-cat-4-bg);color:var(--hs-cat-4-fg)"><span class="material-symbols-outlined">groups</span></span><div class="nm"><div class="n"><a href="team-detail.html">Content Team</a></div><div class="e">9 members &#183; 3 accounts</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="av-stack"><span class="av">DO</span><span class="av">SR</span></span><span class="rolechip">Editor</span></div></div>
@@ -288,9 +291,40 @@
     </div>
   </div>
 
+  <!-- CREATE TEAM (T4) -->
+  <div class="ovl" id="createTeamOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="ctTitle" style="width:460px">
+      <div class="mh"><h2 id="ctTitle">Create a team</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeCreateTeam()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb">
+        <div class="hs-field"><label class="hs-label" for="ctName">Team name</label>
+          <input class="hs-input" id="ctName" type="text" placeholder="e.g. Paid Media" autocomplete="off" onkeydown="if(event.key==='Enter')submitCreateTeam()"></div>
+        <p class="hs-small" id="ctErr" hidden style="color:var(--bento-system-sys-negative-500,#b3261e);margin-top:6px">Give the team a name.</p>
+        <p class="hs-small" style="margin-top:12px">You can add members and social accounts once the team exists.</p>
+      </div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeCreateTeam()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="submitCreateTeam()" data-autofocus>Create team</button></div>
+    </div>
+  </div>
+
   <script>
     // ---------- interactivity: menus, filters, bulk select, notifications ----------
     function closeMenus(){ var m=document.getElementById('floatMenu'); if(m) m.hidden=true; }
+    // ---------- create team (T4): in-context create from the Teams tab ----------
+    function openCreateTeam(){ var n=document.getElementById('ctName'); n.value=''; document.getElementById('ctErr').hidden=true; document.getElementById('createTeamOvl').classList.add('open'); setTimeout(function(){ n.focus(); },30); }
+    function closeCreateTeam(){ document.getElementById('createTeamOvl').classList.remove('open'); }
+    function ttoast(msg){ if(window.SSV2&&window.SSV2.toast){window.SSV2.toast(msg);} else if(typeof toast==='function'){toast(msg);} }
+    function submitCreateTeam(){
+      var name=document.getElementById('ctName').value.trim();
+      if(!name){ document.getElementById('ctErr').hidden=false; return; }
+      var safe=name.replace(/[&<>"]/g,'');
+      try{ var k='ssv2_teams'; var t=JSON.parse(localStorage.getItem(k)||'[]'); t.unshift({id:'t'+Date.now().toString(36),name:name,members:[],accounts:[]}); localStorage.setItem(k,JSON.stringify(t)); }catch(e){}
+      var grid=document.querySelector('[data-panel="teams"] .grid');
+      if(grid){ var card=document.createElement('div'); card.className='ecard';
+        card.innerHTML='<div class="top"><span class="av" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)"><span class="material-symbols-outlined">groups</span></span><div class="nm"><div class="n"><a href="team-detail.html">'+safe+'</a></div><div class="e">0 members &#183; 0 accounts</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="hs-small">Just created</span></div>';
+        grid.insertBefore(card, grid.firstChild); }
+      var tc=document.querySelector('.tabs a[data-tab="teams"] .cnt'); if(tc){ tc.textContent=(parseInt(tc.textContent,10)||0)+1; }
+      closeCreateTeam();
+      ttoast('Team "'+name+'" created');
+    }
     function showMenu(anchor, items){
       var m=document.getElementById('floatMenu');
       m.innerHTML = items.map(function(it){ return it.sep ? '<div class="sep"></div>'
