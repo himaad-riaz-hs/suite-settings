@@ -66,6 +66,14 @@
     var s = load();
     if (!s.overrides) s.overrides = {};
     if (!s.customRoles) s.customRoles = [];
+    if (!s.seeded) {
+      // one starter custom role so an "edit an existing role" task has stable
+      // ground (does not depend on the participant having created one first)
+      s.customRoles.push({ id: "cr_campaign", name: "Campaign Manager",
+        caps: caps("manage", "view", "manage", "none", "none", "none") });
+      s.seeded = true;
+      save(s);
+    }
     return s;
   }
 
