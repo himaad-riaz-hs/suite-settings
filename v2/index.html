@@ -109,6 +109,7 @@
       <div class="others">
         <button class="suite-navbtn util ne-tooltipbtn" aria-label="Analytics"><span class="circle"><span class="material-symbols-outlined">bar_chart</span></span></button>
         <button class="suite-navbtn util ne-tooltipbtn" aria-label="Notifications"><span class="circle"><span class="material-symbols-outlined">notifications</span></span></button>
+        <button class="suite-navbtn util ne-tooltipbtn" aria-label="Invite members" onclick="openInvite()"><span class="circle"><span class="material-symbols-outlined">person_add</span></span></button>
         <button class="avatar" id="acctBtn" title="Account" aria-haspopup="menu" onclick="toggleAcct(event)">MT<span class="dot"></span></button>
       </div>
     </aside>
@@ -180,6 +181,7 @@
   <script src="app.js"></script>
   <script>
     function signOut(){ if(window.SSV2&&SSV2.toast) SSV2.toast('Signed out (demo)'); }
+    function openInvite(){ location.href='people.html'; }
     function setView(b){ b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);}); }
     function toggleAcct(e){ e.stopPropagation(); document.getElementById('acctMenu').classList.toggle('open'); }
     document.addEventListener('click', function(e){ var m=document.getElementById('acctMenu'); if(m.classList.contains('open') && !e.target.closest('#acctMenu') && !e.target.closest('#acctBtn')) m.classList.remove('open'); });
