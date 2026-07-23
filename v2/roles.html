@@ -178,7 +178,7 @@
       <div class="modal-head">
         <div style="flex:1">
           <h2 class="modal-title" id="viewRoleTitle">View permissions</h2>
-          <p class="modal-sub" id="viewRoleSub">Built-in roles can't be changed. Duplicate it to customize.</p>
+          <p class="modal-sub" id="viewRoleSub">Built-in roles can't be changed. Duplicate it to customise.</p>
         </div>
         <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
       </div>
@@ -293,6 +293,63 @@
     var CREATE_SUB = createSub ? createSub.textContent : "";
     var CREATE_CTA = createBtn ? createBtn.textContent : "Create role";
 
+    // Live validity for the Create/Edit modal: a name AND at least one permission
+    // above "No access". Drives the disabled state of the CTA and the inline hint.
+    function grantsAny() {
+      if (!createPerms) return false;
+      // A cap is granted when its segmented control has an "on" button whose
+      // level is not "none". app.js marks the chosen level button with .on.
+      return (API.CAPS || []).some(function (c) {
+        var on = createPerms.querySelector('[data-cap="' + c.key + '"] button.on');
+        return on && on.getAttribute("data-lvl") !== "none";
+      });
+    }
+    function syncCreateValid() {
+      if (!createBtn) return;
+      var name = createName ? createName.value.trim() : "";
+      var any = grantsAny();
+      var ok = !!name && any;
+      createBtn.disabled = !ok;
+      // Only surface a hint once the person has started (a name typed or a
+      // permission granted); an untouched form should not shout at them.
+      if (createErr) {
+        if (ok || (!name && !any)) {
+          createErr.hidden = true;
+        } else {
+          createErr.hidden = false;
+          createErr.textContent = !name ? "Give the role a name." : "Grant at least one permission.";
+        }
+      }
+      // Flag the name field only when a permission is set but the name is blank.
+      if (createName) createName.classList.toggle("hs-input--error", !name && any);
+    }
+    if (createName) createName.addEventListener("input", syncCreateValid);
+    // Permission changes bubble up from the segmented controls app.js builds.
+    if (createPerms) createPerms.addEventListener("click", function () { setTimeout(syncCreateValid, 0); });
+    // Enter anywhere in the modal submits (when valid). Esc closes: app.js's
+    // wireModal handles Esc for a fresh create, but Edit mode opens the modal by
+    // toggling .hidden directly (to reuse the container), so wire Esc here too so
+    // the Edit dialog is never a trap.
+    if (createWrap) {
+      createWrap.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          if (e.target && e.target.tagName === "TEXTAREA") return;
+          e.preventDefault();
+          if (createBtn && !createBtn.disabled) createBtn.click();
+          return;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          createWrap.hidden = true;
+          resetCreateChrome();
+        }
+      });
+    }
+    // app.js owns opening the modal for a fresh create (it clears name + perms).
+    // Re-sync just after so the CTA starts disabled on a blank form.
+    var openCreateBtnEl = document.getElementById("createRoleBtn");
+    if (openCreateBtnEl) openCreateBtnEl.addEventListener("click", function () { setTimeout(syncCreateValid, 0); });
+
     // Own the create modal here so we can flip it into edit mode without touching
     // app.js. app.js still opens/validates for a fresh create; we only intercept
     // the CTA when editMode is on, and reset chrome whenever the modal opens.
@@ -327,7 +384,7 @@
     function openEdit(name) {
       if (!createWrap || !API.buildPermEditor) { toast("Built-in roles can't be changed."); return; }
       var cr = API.customRoleByName ? API.customRoleByName(API.getState(), name) : null;
-      if (!cr) { toast("Built-in roles can't be changed. Duplicate it to customize."); return; }
+      if (!cr) { toast("Built-in roles can't be changed. Duplicate it to customise."); return; }
       editState.mode = "edit";
       editState.roleName = name;
       // Retitle + prefill, then reuse the same editor container as Create.
@@ -338,6 +395,7 @@
       if (createName) { createName.value = name; createName.classList.remove("hs-input--error"); }
       editEditor = API.buildPermEditor(createPerms, Object.assign({}, cr.caps));
       createWrap.hidden = false;
+      syncCreateValid();
       if (createName) createName.focus();
     }
 
@@ -513,7 +571,7 @@
         closeMenu();
         // Presets can only be viewed or duplicated; guard the rest with a note.
         if (isPreset(name) && (act === "edit" || act === "rename" || act === "delete")) {
-          toast("Built-in roles can't be changed. Duplicate it to customize.");
+          toast("Built-in roles can't be changed. Duplicate it to customise.");
           return;
         }
         if (act === "edit") openEdit(name);
@@ -530,17 +588,57 @@
 
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
 
-    // Search: filter role rows by name or by what the role can do.
+    // Search: filter role rows live by name / what the role can do, with a
+    // "No roles match" empty-state row when nothing survives the filter.
     var search = document.getElementById("rolesSearch");
-    if (search) {
-      search.addEventListener("input", function () {
-        var q = search.value.trim().toLowerCase();
-        var rows = document.querySelectorAll("#rolesBody tr");
+    var rolesBody = document.getElementById("rolesBody");
+
+    var _filtering = false; // reentrancy guard for the MutationObserver below
+
+    function applyRoleFilter() {
+      if (!rolesBody) return;
+      _filtering = true;
+      try {
+        var q = search ? search.value.trim().toLowerCase() : "";
+        // Never filter the empty-state row itself; rebuild it each pass.
+        var emptyRow = document.getElementById("rolesNoMatch");
+        if (emptyRow) emptyRow.remove();
+        var rows = rolesBody.querySelectorAll("tr");
+        var shown = 0, total = 0;
         rows.forEach(function (tr) {
+          total++;
           var text = (tr.textContent || "").toLowerCase();
-          tr.style.display = (!q || text.indexOf(q) >= 0) ? "" : "none";
+          var match = !q || text.indexOf(q) >= 0;
+          tr.style.display = match ? "" : "none";
+          if (match) shown++;
         });
+        if (q && total > 0 && shown === 0) {
+          var raw = search ? search.value.trim() : "";
+          var tr = document.createElement("tr");
+          tr.id = "rolesNoMatch";
+          tr.innerHTML = '<td colspan="4" class="hs-small" style="text-align:center; padding:28px 12px; color:var(--bento-theme-color-text-subtle)">No roles match "' +
+            (API.esc ? API.esc(raw) : raw) + '"</td>';
+          rolesBody.appendChild(tr);
+        }
+      } finally {
+        _filtering = false;
+      }
+    }
+
+    if (search) search.addEventListener("input", applyRoleFilter);
+
+    // app.js rebuilds #rolesBody on every create/edit/rename/duplicate/delete
+    // (via its own render() and via our repaint()), which drops both the hidden
+    // rows and the empty-state row. Rather than wrap the shared rerenderRoles
+    // (whose install timing races with app.js boot), watch the tbody directly:
+    // any structural change that isn't our own filtering reapplies the filter.
+    if (rolesBody && window.MutationObserver) {
+      var mo = new MutationObserver(function () {
+        if (_filtering) return;
+        if (!search || !search.value.trim()) return; // no active query, nothing to do
+        applyRoleFilter();
       });
+      mo.observe(rolesBody, { childList: true });
     }
   })();
 </script>

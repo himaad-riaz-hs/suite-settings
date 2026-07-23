@@ -63,25 +63,25 @@
         <div class="banner banner--warning">
           <span class="material-symbols-outlined">warning</span>
           <p>Your trial has ended and publishing is paused. Nothing was deleted, your members, teams, and connected accounts are intact. Reactivate to pick up where you left off.</p>
-          <div class="trail" style="flex-shrink: 0; align-self: center"><button class="hs-btn hs-btn--primary">Reactivate</button></div>
+          <div class="trail" style="flex-shrink: 0; align-self: center"><button class="hs-btn hs-btn--primary" id="reactivateBtn">Reactivate</button></div>
         </div>
 
         <section class="card">
           <h2 class="card-title">Change plan</h2>
-          <div style="display: flex; gap: var(--bento-space-04); margin: var(--bento-space-04) 0">
-            <div style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
+          <div class="plan-grid" style="display: flex; gap: var(--bento-space-04); margin: var(--bento-space-04) 0">
+            <div class="plan-card" data-plan="Team" data-plan-price="$99/mo" role="button" tabindex="0" aria-pressed="false" style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
               <div style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Team</div>
               <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">$99/mo</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">3 seats included</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Core publishing</div>
             </div>
-            <div style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-text-base); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
+            <div class="plan-card is-current" data-plan="Business" data-plan-price="$249/mo" role="button" tabindex="0" aria-pressed="true" style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--bento-theme-color-text-base); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
               <div style="display: flex; align-items: center; gap: 8px"><span style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Business</span><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">warning</span>Trial expired</span></div>
               <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">$249/mo</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">455 seats (450 + 5 added)</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 2px">Approvals, teams, roles</div>
             </div>
-            <div style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
+            <div class="plan-card" data-plan="Enterprise" data-plan-price="Talk to us" role="button" tabindex="0" aria-pressed="false" style="flex: 1; background: var(--bento-theme-color-bg-surface); border: 1px solid var(--hs-border); border-radius: var(--hs-radii-lg); padding: var(--bento-space-04)">
               <div style="font: var(--hs-type-body-md-b); color: var(--hs-fg)">Enterprise</div>
               <div style="font: var(--hs-type-title-sub); color: var(--hs-fg); margin-top: 4px">Talk to us</div>
               <div style="font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top: 8px">Custom roles, SSO</div>
@@ -89,8 +89,8 @@
             </div>
           </div>
           <div class="row first">
-            <div class="kv"><div class="v">Changing plans keeps every member, team, and connected account.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--ghost">Review change</button></div>
+            <div class="kv"><div class="v">Changing plans keeps every member, team, and connected account. <span id="planPickedNote" hidden>Selected plan: <strong id="planPickedName"></strong>.</span></div></div>
+            <div class="trail"><button class="hs-btn hs-btn--ghost" id="reviewChangeBtn">Review change</button></div>
           </div>
         </section>
 
@@ -98,15 +98,15 @@
           <h2 class="card-title">Billing details</h2>
           <div class="row first">
             <div class="kv"><div class="k">Billing cycle</div><div class="v">Renews on the first of each month.</div></div>
-            <div class="trail"><button class="sel"><span>Monthly</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" id="cycleSel" data-options="Monthly|Annual"><span>Monthly</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Payment method</div><div class="v">Visa ending 4242, expires 08/27.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Update card</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="updateCardBtn">Update card</button></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Billing owner</div><div class="v">Marisol Chen receives invoices and receipts.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Transfer</button></div>
+            <div class="kv"><div class="k">Billing owner</div><div class="v"><span id="teOwnerName">Marisol Chen</span> receives invoices and receipts.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="transferOwnerBtn">Transfer</button></div>
           </div>
         </section>
 
@@ -141,6 +141,206 @@
       </div>
     </div>
   </main>
+
+  <!-- Choose a plan modal -->
+  <div id="planModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="planModalTitle">Choose a plan</h2>
+          <p class="modal-sub">Reactivate Somos on the plan that fits your team. Nothing is charged until you confirm.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div id="planOptions"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transfer billing owner modal -->
+  <div id="transferModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="transferModalTitle">Transfer billing owner</h2>
+          <p class="modal-sub">The new billing owner receives invoices and receipts.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div id="transferOptions"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+    var currentPlan = "Business"; // the expired-trial plan is pre-selected
+
+    /* Bento .sel trigger -> click-to-open option list (inert, matches other pages). */
+    function wireSelect(sel, onPick) {
+      if (!sel) return;
+      var opts = (sel.getAttribute("data-options") || "").split("|").filter(Boolean);
+      var menu = null;
+      function labelEl() { return sel.querySelector("span:first-child"); }
+      function close() {
+        if (menu) { menu.remove(); menu = null; }
+        sel.setAttribute("aria-expanded", "false");
+        document.removeEventListener("mousedown", onDoc, true);
+      }
+      function onDoc(e) { if (!sel.contains(e.target) && (!menu || !menu.contains(e.target))) close(); }
+      sel.setAttribute("aria-haspopup", "listbox");
+      sel.setAttribute("aria-expanded", "false");
+      sel.addEventListener("click", function () {
+        if (menu) { close(); return; }
+        menu = S.el("div", "sel-menu");
+        menu.setAttribute("role", "listbox");
+        var current = labelEl().innerHTML;
+        opts.forEach(function (o) {
+          var item = S.el("div", "sel-menu-item" + (o === current ? " on" : ""), o);
+          item.setAttribute("role", "option");
+          item.addEventListener("click", function () {
+            var changed = o !== labelEl().innerHTML;
+            labelEl().innerHTML = o;
+            close();
+            if (changed && onPick) onPick(o);
+          });
+          menu.appendChild(item);
+        });
+        sel.parentNode.style.position = "relative";
+        sel.parentNode.appendChild(menu);
+        sel.setAttribute("aria-expanded", "true");
+        document.addEventListener("mousedown", onDoc, true);
+      });
+    }
+
+    // Billing cycle select
+    wireSelect(document.getElementById("cycleSel"), function () { S.toast("Billing cycle saved"); });
+
+    // ---- Plan selection (cards + modal share one applyPlan) ----
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".plan-card"));
+    var pickedNote = document.getElementById("planPickedNote");
+    var pickedName = document.getElementById("planPickedName");
+    function applyPlan(name) {
+      currentPlan = name;
+      cards.forEach(function (c) {
+        var on = c.getAttribute("data-plan") === name;
+        c.classList.toggle("is-selected", on);
+        c.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      if (pickedNote && pickedName) { pickedName.textContent = name; pickedNote.hidden = false; }
+      S.toast("Plan changed to " + name);
+    }
+    cards.forEach(function (c) {
+      function pick() { applyPlan(c.getAttribute("data-plan")); }
+      c.addEventListener("click", pick);
+      c.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
+      });
+    });
+
+    // Choose-a-plan modal (Reactivate CTA)
+    var PLANS = [
+      { name: "Team",       desc: "3 seats included. Core publishing." },
+      { name: "Business",   desc: "455 seats. Approvals, teams, roles." },
+      { name: "Enterprise", desc: "Custom roles, SSO, data export, audit log." }
+    ];
+    var planModal = document.getElementById("planModal");
+    var planM = S.wireModal(planModal);
+    var planOptions = document.getElementById("planOptions");
+    var planRows = [];
+    function markSelected() {
+      planRows.forEach(function (r) { r.el.classList.toggle("selected", r.name === currentPlan); });
+    }
+    PLANS.forEach(function (p, i) {
+      var o = S.el("div", "opt");
+      o.setAttribute("role", "button");
+      o.setAttribute("tabindex", "0");
+      if (i === 0) o.setAttribute("data-autofocus", "");
+      o.innerHTML =
+        '<span class="lead"><span class="material-symbols-outlined">workspace_premium</span></span>' +
+        '<div class="txt"><div class="n">' + S.esc(p.name) + '</div><div class="d">' + S.esc(p.desc) + '</div></div>' +
+        '<span class="material-symbols-outlined check">check</span>';
+      function pick() { planM.close(); applyPlan(p.name); }
+      o.addEventListener("click", pick);
+      o.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      planOptions.appendChild(o);
+      planRows.push({ name: p.name, el: o });
+    });
+    function openPlanModal() { markSelected(); planM.open(); }
+
+    document.getElementById("reactivateBtn").addEventListener("click", openPlanModal);
+    document.getElementById("reviewChangeBtn").addEventListener("click", function () {
+      S.toast("Reviewing plan change to " + currentPlan);
+    });
+
+    // Update payment method: inert, toast ONLY (no card capture)
+    document.getElementById("updateCardBtn").addEventListener("click", function () {
+      S.toast("Opening payment method update");
+    });
+
+    // Invoice downloads
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.hs-table [aria-label^="Download invoice"]'),
+      function (btn) { btn.addEventListener("click", function () { S.toast("Downloading invoice"); }); }
+    );
+
+    // Transfer billing owner
+    var MEMBERS = [
+      { name: "Jordan Lee",   email: "jordan@somos.co", initials: "JL" },
+      { name: "Sam Rivera",   email: "sam@somos.co",    initials: "SR" },
+      { name: "Devin Okafor", email: "devin@somos.co",  initials: "DO" },
+      { name: "Aisha Patel",  email: "aisha@somos.co",  initials: "AP" }
+    ];
+    var transferModal = document.getElementById("transferModal");
+    var transferM = S.wireModal(transferModal);
+    var transferOptions = document.getElementById("transferOptions");
+    var ownerName = document.getElementById("teOwnerName");
+    MEMBERS.forEach(function (mbr, i) {
+      var o = S.el("div", "opt");
+      o.setAttribute("role", "button");
+      o.setAttribute("tabindex", "0");
+      if (i === 0) o.setAttribute("data-autofocus", "");
+      o.innerHTML =
+        '<span class="lead">' + S.esc(mbr.initials) + '</span>' +
+        '<div class="txt"><div class="n">' + S.esc(mbr.name) + '</div><div class="d">' + S.esc(mbr.email) + '</div></div>' +
+        '<span class="material-symbols-outlined check">check</span>';
+      function pick() {
+        if (ownerName) ownerName.textContent = mbr.name;
+        transferM.close();
+        S.toast("Billing owner transferred to " + mbr.name);
+      }
+      o.addEventListener("click", pick);
+      o.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      transferOptions.appendChild(o);
+    });
+    document.getElementById("transferOwnerBtn").addEventListener("click", function () { transferM.open(); });
+  })();
+</script>
+<style>
+  .sel-menu { position:absolute; top:calc(100% + 4px); right:0; min-width:200px; max-width:320px;
+    background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border);
+    border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20));
+    padding:6px; z-index:50; }
+  .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
+  .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
+  .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
+  .plan-card { cursor:pointer; transition:border-color .12s ease, box-shadow .12s ease; }
+  .plan-card:hover { border-color:var(--bento-theme-color-text-base); }
+  .plan-card:focus-visible { outline:2px solid var(--hs-fg-link); outline-offset:2px; }
+  .plan-card.is-selected { border-color:var(--bento-theme-color-text-base) !important;
+    box-shadow:0 0 0 1px var(--bento-theme-color-text-base) inset; }
+</style>
 </body>
 </html>

@@ -31,6 +31,26 @@
     .menu button.on .ck { visibility:visible; }
     .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
     .filtered-out { display:none !important; }
+    /* bulk action bar (mirrors people.html .bulkbar, tokens only) */
+    .bulkbar { display:none; align-items:center; gap:14px; background:var(--hs-bg-info); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); padding:10px 14px; margin-bottom:12px; }
+    .bulkbar.show { display:flex; }
+    .bulkbar .n { font:var(--hs-type-body-md-b); color:var(--hs-fg); }
+    .bulkbar .grow { flex:1; }
+    /* empty state shown when filters/search match nothing */
+    .emptystate { display:none; text-align:center; padding:48px 20px; color:var(--bento-theme-color-text-subtle); }
+    .emptystate.show { display:block; }
+    .emptystate .ic { width:56px; height:56px; border-radius:999px; background:var(--bento-system-sys-neutral-alt-100); display:grid; place-items:center; margin:0 auto 12px; }
+    .emptystate .ic .material-symbols-outlined { font-size:28px; color:var(--bento-theme-color-icon-subtle); }
+    .emptystate h3 { font:var(--hs-type-title-sub); margin:0 0 4px; color:var(--hs-fg); }
+    .emptystate p { font:var(--hs-type-body-md); margin:0; }
+    /* connect flow: network picker grid */
+    .netgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px; }
+    .netopt { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); background:var(--bento-theme-color-bg-surface); cursor:pointer; text-align:left; font:var(--hs-type-body-md); color:var(--hs-fg); }
+    .netopt:hover { border-color:var(--bento-theme-color-text-base); }
+    .netopt.selected { border-color:var(--hs-border-focus); box-shadow:0 0 0 2px var(--hs-focus-halo); }
+    .netopt .lead { width:36px; height:36px; border-radius:999px; background:var(--bento-system-sys-neutral-alt-100); display:grid; place-items:center; color:var(--bento-theme-color-icon-subtle); flex-shrink:0; }
+    .netopt .ck { margin-left:auto; color:var(--hs-fg-link); visibility:hidden; }
+    .netopt.selected .ck { visibility:visible; }
   </style>
 </head>
 <body class="suite-app">
@@ -76,6 +96,7 @@
       <h1>Social &amp; ad accounts</h1>
       <div class="spacer"></div>
       <button class="orgsw"><span class="badge">S</span>Somos<span class="material-symbols-outlined">expand_more</span></button>
+      <button class="hs-btn hs-btn--primary" id="connectBtn" onclick="openConnect()"><span class="material-symbols-outlined">add</span>Connect account</button>
     </header>
 
     <div class="pagebar">
@@ -93,6 +114,13 @@
         <div class="count-h">
           <h2>15 social accounts in Somos</h2>
           <div class="meta" id="countMeta">12 connected &#183; 3 need to reconnect</div>
+        </div>
+
+        <div class="bulkbar" id="bulkbar">
+          <span class="n" id="bulkCount">0 selected</span>
+          <span class="grow"></span>
+          <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkDisconnect()">Disconnect selected</button>
+          <button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="clearSel()">Clear</button>
         </div>
 
         <div id="tableView" class="table-card">
@@ -177,6 +205,12 @@
           </div>
         </div>
 
+        <div class="emptystate" id="emptyState">
+          <div class="ic"><span class="material-symbols-outlined">search_off</span></div>
+          <h3>No accounts match</h3>
+          <p>Try a different search, network, or status filter.</p>
+        </div>
+
       </div>
     </div>
   </main>
@@ -202,6 +236,27 @@
       <div class="mh"><h2 id="disconnectTitle">Disconnect account</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeDisconnect()"><span class="material-symbols-outlined">close</span></button></div>
       <div class="mb"><p class="subhead" id="disconnectSub">Disconnecting removes this account from Somos and stops all scheduling. You can reconnect it later.</p></div>
       <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeDisconnect()">Cancel</button><button class="hs-btn hs-btn--outlined" onclick="confirmDisconnect()">Disconnect account</button></div>
+    </div>
+  </div>
+
+  <!-- Connect account modal: pick a network, then add a connected row + update count -->
+  <div class="ovl" id="connectOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="connectTitle">
+      <!-- step 1: pick network -->
+      <div data-cstep="1">
+        <div class="mh"><h2 id="connectTitle">Connect a new account</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeConnect()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb">
+          <p class="subhead">Choose a network to connect to Somos. You will sign in with that network to authorize publishing and analytics.</p>
+          <div class="netgrid" id="connectNetworks" role="radiogroup" aria-label="Select a network"></div>
+        </div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeConnect()">Cancel</button><button class="hs-btn hs-btn--primary" id="connectContinue" onclick="doConnect()" disabled>Continue</button></div>
+      </div>
+      <!-- step 2: success -->
+      <div data-cstep="2" hidden>
+        <div class="mh"><h2 id="connectDoneTitle">Account connected</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeConnect()"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="mb"><div class="sent"><div class="big"><span class="material-symbols-outlined">check</span></div><p id="connectDoneMsg"><strong>Account connected.</strong> Publishing and analytics are active for this account.</p></div></div>
+        <div class="mf"><button class="hs-btn hs-btn--primary" onclick="closeConnect()">Done</button></div>
+      </div>
     </div>
   </div>
 
@@ -330,7 +385,10 @@
     if(sub) sub.textContent = 'Disconnecting removes ' + hostAccount(_disconnectHost) + ' from Somos and stops all scheduling. You can reconnect it later.';
     document.getElementById('disconnectOvl').classList.add('open');
   }
-  function closeDisconnect(){ document.getElementById('disconnectOvl').classList.remove('open'); }
+  function closeDisconnect(){ document.getElementById('disconnectOvl').classList.remove('open');
+    // Reset the bulk state + title so a later single-row disconnect reads correctly.
+    _bulkPending = false;
+    var title=document.getElementById('disconnectTitle'); if(title) title.textContent='Disconnect account'; }
   // Displayed baseline counts (the table renders a page of the full 15-account set,
   // so we adjust these numbers by deltas rather than recounting only visible rows).
   var _connected = 12, _needReconnect = 3;
@@ -339,6 +397,7 @@
     if(meta) meta.innerHTML = _connected + ' connected &#183; ' + _needReconnect + ' need to reconnect';
   }
   function confirmDisconnect(){
+    if(_bulkPending){ performBulkDisconnect(); closeDisconnect(); return; }
     var host = _disconnectHost;
     var wasNeed = host && (host.getAttribute('data-status')||'')==='Needs reconnect';
     var twin = twinHost(host);
@@ -348,6 +407,7 @@
     else _connected = Math.max(0, _connected - 1);
     renderCounts();
     closeDisconnect();
+    applyFilters();
     toast('Account disconnected');
   }
   // A reconnect moves one account from "need reconnect" to "connected".
@@ -370,16 +430,146 @@
       {label:'Card view', icon:'grid_view', on:!col, fn:'pickView(\'card\')'} ]); }
   function pickView(v){ setView(v); document.getElementById('viewPickLabel').textContent=(v==='column'?'Column view':'Card view'); closeMenus(); }
   function setView(v){ var t=document.getElementById('tableView'), g=document.getElementById('gridView');
-    if(t) t.hidden = v!=='column'; if(g) g.hidden = v!=='card'; }
+    if(t){ t.hidden = v!=='column'; t.style.display=''; } if(g){ g.hidden = v!=='card'; g.style.display=''; }
+    applyFilters(); }
   function applyFilters(){
     var q=(document.getElementById('acctSearch')||{value:''}).value.trim().toLowerCase();
     function match(host, text){
       var net=host.getAttribute('data-network')||''; var st=host.getAttribute('data-status')||'';
       var ok=(networkF==='All'||net===networkF)&&(statusF==='All'||st===statusF)&&(!q||text.indexOf(q)>=0);
       host.classList.toggle('filtered-out',!ok);
+      return ok;
     }
-    document.querySelectorAll('#tableView tbody tr').forEach(function(tr){ match(tr, tr.textContent.toLowerCase()); });
+    var shown=0;
+    document.querySelectorAll('#tableView tbody tr').forEach(function(tr){ if(match(tr, tr.textContent.toLowerCase())) shown++; });
     document.querySelectorAll('#gridView .ecard').forEach(function(c){ match(c, c.textContent.toLowerCase()); });
+    // Hide any selection that was filtered away, then refresh the bulk bar.
+    document.querySelectorAll('#tableView tbody tr.filtered-out .hs-check.is-on').forEach(function(c){ c.classList.remove('is-on'); c.setAttribute('aria-checked','false'); });
+    updateBulk();
+    // Empty state: no visible table rows means the current filters match nothing.
+    var empty = shown===0;
+    var es=document.getElementById('emptyState'); if(es) es.classList.toggle('show', empty);
+    var tv=document.getElementById('tableView'); var gv=document.getElementById('gridView');
+    // Hide whichever view is active while the empty state is showing.
+    if(tv && !tv.hidden) tv.style.display = empty ? 'none' : '';
+    if(gv && !gv.hidden) gv.style.display = empty ? 'none' : '';
+  }
+
+  // ---------- bulk select + bulk disconnect ----------
+  // Only column-view rows carry checkboxes; the header check is select-all.
+  function rowChecks(){ return [].slice.call(document.querySelectorAll('#tableView tbody tr:not(.filtered-out) .hs-check')); }
+  function selChecks(){ return rowChecks().filter(function(c){ return c.classList.contains('is-on'); }); }
+  function setCheck(c, on){ c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on?'true':'false'); }
+  function updateBulk(){
+    var all=rowChecks(); var sel=selChecks(); var n=sel.length;
+    var bar=document.getElementById('bulkbar'); if(bar) bar.classList.toggle('show', n>0);
+    var cnt=document.getElementById('bulkCount'); if(cnt) cnt.textContent=n+' selected';
+    var head=document.querySelector('#tableView thead .hs-check');
+    if(head){ head.classList.remove('is-on','indeterminate');
+      if(n>0 && n===all.length){ head.classList.add('is-on'); head.setAttribute('aria-checked','true'); }
+      else if(n>0){ head.classList.add('indeterminate'); head.setAttribute('aria-checked','mixed'); }
+      else { head.setAttribute('aria-checked','false'); } }
+  }
+  function toggleSelectAll(){ var all=rowChecks(); var target=!all.every(function(c){ return c.classList.contains('is-on'); });
+    all.forEach(function(c){ setCheck(c, target); }); updateBulk(); }
+  function clearSel(){ document.querySelectorAll('#tableView tbody .hs-check.is-on').forEach(function(c){ setCheck(c, false); }); updateBulk(); }
+  // Disconnect selected: reuse the outlined confirm dialog with a bulk message.
+  var _bulkPending = false;
+  function bulkDisconnect(){
+    var sel=selChecks(); if(!sel.length) return;
+    _bulkPending = true;
+    var sub=document.getElementById('disconnectSub');
+    if(sub) sub.textContent = 'Disconnecting removes ' + sel.length + (sel.length===1?' account':' accounts') + ' from Somos and stops all scheduling. You can reconnect them later.';
+    var title=document.getElementById('disconnectTitle'); if(title) title.textContent = sel.length===1 ? 'Disconnect account' : 'Disconnect ' + sel.length + ' accounts';
+    document.getElementById('disconnectOvl').classList.add('open');
+  }
+  function performBulkDisconnect(){
+    var sel=selChecks();
+    sel.forEach(function(chk){
+      var host=chk.closest('tr'); if(!host) return;
+      var wasNeed=(host.getAttribute('data-status')||'')==='Needs reconnect';
+      var twin=twinHost(host);
+      if(host.parentNode) host.parentNode.removeChild(host);
+      if(twin && twin.parentNode) twin.parentNode.removeChild(twin);
+      if(wasNeed) _needReconnect=Math.max(0,_needReconnect-1); else _connected=Math.max(0,_connected-1);
+    });
+    renderCounts();
+    updateBulk();
+    applyFilters();
+    toast(sel.length===1 ? 'Account disconnected' : sel.length + ' accounts disconnected');
+  }
+
+  // ---------- Connect a new account (header button) ----------
+  // Networks that can be connected, with the icon used in the account rows.
+  var CONNECT_NETWORKS = [
+    { name:'Instagram', icon:'photo_camera', account:'@somos', owner:'Priya Anand' },
+    { name:'LinkedIn',  icon:'tag',          account:'Somos',  owner:'Marisol Chen' },
+    { name:'X',         icon:'forum',        account:'@somos', owner:'Marco Silva' },
+    { name:'YouTube',   icon:'play_circle',  account:'Somos',  owner:'Jordan Lee' },
+    { name:'Facebook',  icon:'thumb_up',     account:'Somos',  owner:'Bryn Morales' },
+    { name:'TikTok',    icon:'music_note',   account:'@somos', owner:'Aisha Patel' },
+    { name:'Pinterest', icon:'push_pin',     account:'Somos',  owner:'Sam Rivera' },
+    { name:'Threads',   icon:'alternate_email', account:'@somos', owner:'Devin Okafor' }
+  ];
+  var _connectPick = null;
+  function connectStep(s){ document.querySelectorAll('#connectOvl [data-cstep]').forEach(function(d){ d.hidden = (+d.dataset.cstep)!==s; }); }
+  function openConnect(){
+    _connectPick = null;
+    var box=document.getElementById('connectNetworks');
+    box.innerHTML = CONNECT_NETWORKS.map(function(nw,i){
+      return '<button type="button" class="netopt" role="radio" aria-checked="false" data-i="'+i+'" onclick="pickConnect(this)">'
+        + '<span class="lead"><span class="material-symbols-outlined">'+nw.icon+'</span></span>'
+        + '<span>'+esc(nw.name)+'</span>'
+        + '<span class="material-symbols-outlined ck">check</span></button>';
+    }).join('');
+    var cont=document.getElementById('connectContinue'); if(cont) cont.disabled=true;
+    connectStep(1);
+    document.getElementById('connectOvl').classList.add('open');
+  }
+  function closeConnect(){ document.getElementById('connectOvl').classList.remove('open'); }
+  function pickConnect(el){
+    document.querySelectorAll('#connectNetworks .netopt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-checked','false'); });
+    el.classList.add('selected'); el.setAttribute('aria-checked','true');
+    _connectPick = CONNECT_NETWORKS[+el.getAttribute('data-i')];
+    var cont=document.getElementById('connectContinue'); if(cont) cont.disabled=false;
+  }
+  function doConnect(){
+    if(!_connectPick) return;
+    var nw=_connectPick;
+    // Append a connected row to the table.
+    var tbody=document.querySelector('#tableView tbody');
+    if(tbody){
+      var tr=document.createElement('tr');
+      tr.setAttribute('data-network', nw.name);
+      tr.setAttribute('data-status','Connected');
+      tr.setAttribute('data-account', nw.account);
+      tr.innerHTML = '<td><span class="hs-check"></span></td>'
+        + '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">'+nw.icon+'</span></span><a href="social-account-detail.html">'+esc(nw.account)+'</a></div></td>'
+        + '<td class="hs-small">'+esc(nw.name)+'</td>'
+        + '<td class="hs-small">'+esc(nw.owner)+'</td>'
+        + '<td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></td>'
+        + '<td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+      tbody.appendChild(tr);
+    }
+    // Mirror into the card view so both stay consistent.
+    var grid=document.getElementById('gridView');
+    if(grid){
+      var card=document.createElement('div');
+      card.className='ecard';
+      card.setAttribute('data-network', nw.name);
+      card.setAttribute('data-status','Connected');
+      card.setAttribute('data-account', nw.account);
+      card.innerHTML = '<div class="top"><div class="av"><span class="material-symbols-outlined">'+nw.icon+'</span></div><div class="nm"><div class="n"><a href="social-account-detail.html">'+esc(nw.account)+'</a></div><div class="e">'+esc(nw.name)+' &#183; '+esc(nw.owner)+'</div></div><button class="icon-btn ne-tooltipbtn" aria-label="Actions" onclick="openRowMenu(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></div>'
+        + '<div class="foot"><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Connected</span></div>';
+      grid.appendChild(card);
+    }
+    _connected++;
+    renderCounts();
+    applyFilters();
+    var msg=document.getElementById('connectDoneMsg');
+    if(msg) msg.innerHTML = '<strong>'+esc(nw.account)+' is connected on '+esc(nw.name)+'.</strong> Publishing and analytics are active for this account.';
+    connectStep(2);
+    toast(nw.name + ' account connected');
   }
 
   // Reconnect flow (T5)
@@ -414,10 +604,16 @@
     // Recompute the count line from the current rows
     updateCounts();
   }
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReconnect(); closeReassign(); closeDisconnect(); closeMenus(); } });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReconnect(); closeReassign(); closeDisconnect(); closeConnect(); closeMenus(); } });
   // close floating menu on outside click (keep open when clicking the menu or its anchors)
   document.addEventListener('click', function(e){
     var t=e.target;
+    // Checkbox selection (column view only). app.js decorates checks for a11y and
+    // syncs aria-checked from is-on, but the page owns the is-on toggle + bulk bar.
+    var head=t.closest && t.closest('#tableView thead .hs-check');
+    if(head){ toggleSelectAll(); return; }
+    var rc=t.closest && t.closest('#tableView tbody .hs-check');
+    if(rc){ setCheck(rc, !rc.classList.contains('is-on')); updateBulk(); return; }
     if(!(t.closest && (t.closest('#floatMenu')||t.closest('#networkFilter')||t.closest('#statusFilter')||t.closest('#viewPick')||t.closest('.icon-btn[aria-label="Actions"]')))) closeMenus();
   });
 </script>

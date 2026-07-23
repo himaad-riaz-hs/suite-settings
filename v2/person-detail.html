@@ -33,6 +33,19 @@
     .ofopt .nm { flex:1; display:flex; flex-direction:column; line-height:1.25; } .ofopt .nm .n { font:var(--hs-type-body-md-b); } .ofopt .nm .e { font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); }
     .ofopt .chk { color:var(--hs-fg-link); font-size:20px; visibility:hidden; } .ofopt.sel .chk { visibility:visible; }
     .ofsent { text-align:center; padding:8px 0; } .ofsent .big { width:64px;height:64px;border-radius:999px;background:var(--hs-bg-positive);color:var(--hs-fg-positive);display:grid;place-items:center;margin:4px auto 12px; } .ofsent .big .material-symbols-outlined{font-size:34px;}
+    /* row action menus: reuse .pdmenu; add the selected-state check used by role/access pickers */
+    #rowMenu button { justify-content:flex-start; }
+    #rowMenu button .ck { margin-left:auto; color:var(--hs-fg-link); font-size:18px; visibility:hidden; }
+    #rowMenu button.on .ck { visibility:visible; }
+    #rowMenu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+    /* bulk action bar for selected team rows (tokens only; matches count-h spacing) */
+    .bulkbar { display:flex; align-items:center; gap:12px; padding:10px 14px; margin-bottom:var(--bento-space-03); background:var(--hs-bg-info); border:1px solid var(--hs-fg-link); border-radius:var(--hs-radii-md); }
+    .bulkbar .grow { flex:1; }
+    .bulkbar-count { font:var(--hs-type-body-md-b); color:var(--hs-fg); }
+    .bulkbar .material-symbols-outlined { font-size:20px; }
+    /* table empty state (search with no matches) */
+    .pd-empty { display:flex; align-items:center; justify-content:center; gap:8px; padding:28px 12px; color:var(--bento-theme-color-text-subtle); font:var(--hs-type-body-md); }
+    .pd-empty .material-symbols-outlined { font-size:22px; }
   </style>
 </head>
 <body class="suite-app">
@@ -106,10 +119,8 @@
       <div class="grow"></div>
       <div class="searchbox">
         <span class="material-symbols-outlined">search</span>
-        <input type="search" placeholder="Search teams and accounts" aria-label="Search teams and accounts">
+        <input type="search" id="pdSearch" placeholder="Search teams and accounts" aria-label="Search teams and accounts" oninput="pdSearchInput(this.value)">
       </div>
-      <button class="sel"><span>Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-      <button class="sel"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
     </div>
 
     <div class="content">
@@ -118,14 +129,19 @@
         <!-- Teams panel -->
         <div data-panel="teams">
           <div class="count-h">
-            <h2>12 teams including <span id="pdCountName">Jordan Lee</span></h2>
-            <div class="meta">1 with no account yet &#183; 8 with connected accounts</div>
+            <h2><span id="teamsCount">6</span> teams including <span id="pdCountName">Jordan Lee</span></h2>
+            <div class="meta">Teams this person belongs to across Somos</div>
+          </div>
+          <div class="bulkbar" id="teamBulkBar" hidden>
+            <span class="bulkbar-count"><span id="teamSelCount">0</span> selected</span>
+            <div class="grow"></div>
+            <button class="hs-btn hs-btn--outlined" onclick="removeSelectedTeams()"><span class="material-symbols-outlined">group_remove</span>Remove from selected teams</button>
           </div>
           <div class="table-card">
           <table class="hs-table">
             <thead>
               <tr>
-                <th style="width:48px"><span class="hs-check"></span></th>
+                <th style="width:48px"><span class="hs-check" id="teamSelectAll"></span></th>
                 <th>Team name</th>
                 <th>Created on</th>
                 <th>Admins</th>
@@ -135,82 +151,79 @@
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
+            <tbody id="teamRows">
+              <tr data-team="Growth marketing">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Growth marketing</span></div></td>
                 <td>Mar 4, 2024</td>
                 <td><span class="av-stack"><span class="av">MT</span><span class="av">RK</span></span></td>
                 <td>14</td>
                 <td>6</td>
-                <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Team admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-team="Customer support">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Customer support</span></div></td>
                 <td>Jan 18, 2024</td>
                 <td><span class="av-stack"><span class="av">JL</span></span></td>
                 <td>9</td>
                 <td>3</td>
-                <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-team="Brand and PR">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Brand and PR</span></div></td>
                 <td>Nov 2, 2023</td>
                 <td><span class="av-stack"><span class="av">MT</span><span class="av">DL</span><span class="av">FA</span></span></td>
                 <td>7</td>
                 <td>4</td>
-                <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Team admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-team="Regional Europe">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Regional Europe</span></div></td>
                 <td>Aug 21, 2023</td>
                 <td><span class="av-stack"><span class="av">RK</span><span class="av">JL</span></span></td>
                 <td>11</td>
                 <td>0</td>
-                <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-team="Product launches">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Product launches</span></div></td>
                 <td>May 9, 2023</td>
                 <td><span class="av-stack"><span class="av">DL</span><span class="av">MT</span></span></td>
                 <td>8</td>
                 <td>5</td>
-                <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Team admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
-              <tr>
+              <tr data-team="Social listening">
                 <td><span class="hs-check"></span></td>
                 <td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>Social listening</span></div></td>
                 <td>Feb 27, 2023</td>
                 <td><span class="av-stack"><span class="av">FA</span><span class="av">RK</span><span class="av">JL</span></span></td>
                 <td>6</td>
                 <td>2</td>
-                <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
-                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                <td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
               </tr>
             </tbody>
+            <tbody id="teamEmpty" hidden>
+              <tr><td colspan="8"><div class="pd-empty"><span class="material-symbols-outlined">search_off</span>No teams match your search.</div></td></tr>
+            </tbody>
           </table>
-          <div class="pagination">
-            <button class="pg-btn" disabled><span class="material-symbols-outlined">chevron_left</span>Prev</button>
-            <div class="pg-jump"><span>1</span><span class="material-symbols-outlined">expand_more</span></div>
-            <span class="hs-small">of 12</span>
-            <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
-          </div>
           </div>
         </div>
 
         <!-- Social accounts panel -->
         <div data-panel="social" hidden>
           <div class="count-h">
-            <h2>3 social accounts</h2>
+            <h2><span id="acctCount">3</span> social accounts</h2>
             <div class="meta">Accounts this person can publish to</div>
           </div>
           <div class="table-card">
@@ -218,22 +231,25 @@
               <thead>
                 <tr><th style="width:48px"></th><th>Account</th><th>Network</th><th>Access</th><th style="width:56px"></th></tr>
               </thead>
-              <tbody>
-                <tr>
+              <tbody id="acctRows">
+                <tr data-account="@somos" data-network="Instagram">
                   <td><span class="thumb"><span class="material-symbols-outlined">photo_camera</span></span></td>
-                  <td>@somos</td><td>Instagram</td><td>Can publish</td>
-                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                  <td>@somos</td><td>Instagram</td><td data-access>Can publish</td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions" onclick="openAcctActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
                 </tr>
-                <tr>
+                <tr data-account="Somos" data-network="LinkedIn">
                   <td><span class="thumb"><span class="material-symbols-outlined">tag</span></span></td>
-                  <td>Somos</td><td>LinkedIn</td><td>Can publish</td>
-                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                  <td>Somos</td><td>LinkedIn</td><td data-access>Can publish</td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions" onclick="openAcctActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
                 </tr>
-                <tr>
+                <tr data-account="@somos" data-network="X">
                   <td><span class="thumb"><span class="material-symbols-outlined">forum</span></span></td>
-                  <td>@somos</td><td>X</td><td>View only</td>
-                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                  <td>@somos</td><td>X</td><td data-access>View only</td>
+                  <td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions" onclick="openAcctActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>
                 </tr>
+              </tbody>
+              <tbody id="acctEmpty" hidden>
+                <tr><td colspan="5"><div class="pd-empty"><span class="material-symbols-outlined">search_off</span>No accounts match your search.</div></td></tr>
               </tbody>
             </table>
           </div>
@@ -304,6 +320,18 @@
       </div>
     </div>
   </div>
+  <!-- Row action menus (Team actions / Account actions / role + access pickers) -->
+  <div class="pdmenu" id="rowMenu" role="menu" hidden></div>
+
+  <!-- Shared confirm dialog (remove from team / remove account). Destructive action is outlined, never red. -->
+  <div class="ovl" id="confirmOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" style="width:460px">
+      <div class="mh"><h2 id="confirmTitle">Remove</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeConfirm()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb"><p id="confirmBody" style="margin:0">Are you sure?</p></div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeConfirm()">Cancel</button><button class="hs-btn hs-btn--outlined" id="confirmOkBtn" onclick="runConfirm()">Remove</button></div>
+    </div>
+  </div>
+
   <script>
     /* current person id: mirror app.js (?p= param, default jordan) so removePerson targets the right record */
     function currentPersonId(){
@@ -356,33 +384,39 @@
     /* ---- Add to teams: insert an in-DOM row into the Teams panel table ---- */
     function addToTeam(name){
       closeAllPdMenus();
-      var tbody=document.querySelector('[data-panel="teams"] .hs-table tbody');
+      var plain=(name||'').replace(/&amp;/g,'&');
+      var tbody=document.getElementById('teamRows');
       if(tbody){
         var tr=document.createElement('tr');
+        tr.setAttribute('data-team', plain);
         tr.innerHTML=
           '<td><span class="hs-check"></span></td>'+
-          '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>'+esc(name)+'</span></div></td>'+
+          '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>'+esc(plain)+'</span></div></td>'+
           '<td>'+esc(todayLabel())+'</td>'+
           '<td><span class="av-stack"><span class="av">'+esc(currentInitials())+'</span></span></td>'+
           '<td>1</td><td>0</td>'+
-          '<td><button class="sel"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>'+
-          '<td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+          '<td><button class="sel" onclick="openTeamRoleMenu(event, this)"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>'+
+          '<td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions" onclick="openTeamActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>';
         tbody.insertBefore(tr, tbody.firstChild);
+        refreshTeamCount();
       }
-      ssvToast('Added to '+name);
+      ssvToast('Added to '+plain);
     }
 
     /* ---- Assign social account: insert an in-DOM row into the Social accounts panel ---- */
     function assignAccount(handle, network, icon){
       closeAllPdMenus();
-      var tbody=document.querySelector('[data-panel="social"] .hs-table tbody');
+      var tbody=document.getElementById('acctRows');
       if(tbody){
         var tr=document.createElement('tr');
+        tr.setAttribute('data-account', handle);
+        tr.setAttribute('data-network', network);
         tr.innerHTML=
           '<td><span class="thumb"><span class="material-symbols-outlined">'+esc(icon)+'</span></span></td>'+
-          '<td>'+esc(handle)+'</td><td>'+esc(network)+'</td><td>Can publish</td>'+
-          '<td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+          '<td>'+esc(handle)+'</td><td>'+esc(network)+'</td><td data-access>Can publish</td>'+
+          '<td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions" onclick="openAcctActions(event, this)"><span class="material-symbols-outlined">more_horiz</span></button></td>';
         tbody.appendChild(tr);
+        refreshAcctCount();
       }
       ssvToast('Assigned '+handle+' on '+network);
     }
@@ -413,7 +447,225 @@
       ofStep(2);
       ssvToast(nm+' was removed. Their seat is now free.');
     }
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeOffboard(); closeAllPdMenus(); } });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeOffboard(); closeAllPdMenus(); closeRowMenu(); closeConfirm(); } });
+
+    /* ==================================================================
+       Row menus (Team actions / Account actions / role + access pickers)
+       Uses the shared #rowMenu floating menu, positioned under its anchor.
+       ================================================================== */
+    var _rowAnchor=null;               // button the menu was opened from
+    var _rowHost=null;                 // the <tr> the action operates on
+    function closeRowMenu(){ var m=document.getElementById('rowMenu'); if(m){ m.hidden=true; } if(_rowAnchor){ _rowAnchor.setAttribute('aria-expanded','false'); } }
+    function renderRowMenu(anchor, items){
+      var m=document.getElementById('rowMenu');
+      m.innerHTML=items.map(function(it){
+        if(it.sep) return '<div class="sep"></div>';
+        return '<button role="menuitem"'+(it.on?' class="on"':'')+' onclick="'+it.fn+'"><span class="material-symbols-outlined">'+it.icon+'</span>'+esc(it.label)+'<span class="material-symbols-outlined ck">check</span></button>';
+      }).join('');
+      m.hidden=false;
+      /* position: fixed menu, viewport coordinates, kept on-screen */
+      var r=anchor.getBoundingClientRect();
+      m.style.position='fixed';
+      m.style.right='auto';
+      m.style.top=(r.bottom+6)+'px';
+      var w=m.offsetWidth||230;
+      m.style.left=Math.max(8, Math.min(r.left, window.innerWidth-w-8))+'px';
+      if(anchor.setAttribute) anchor.setAttribute('aria-expanded','true');
+      _rowAnchor=anchor;
+    }
+
+    /* ---- Teams: per-row role control (.sel) ---- */
+    var _teamRoleSel=null;             // the .sel button whose value we set
+    function teamName(tr){ return tr ? (tr.getAttribute('data-team')||'this team') : 'this team'; }
+    function openTeamRoleMenu(e, btn){
+      if(e){ e.stopPropagation(); }
+      closeAllPdMenus();
+      _teamRoleSel=btn;
+      _rowHost=btn.closest('tr');
+      var cur=(btn.querySelector('span:first-child')||{}).textContent||'';
+      renderRowMenu(btn, ['Team admin','Member','View only'].map(function(r){
+        return {label:r, icon:'shield_person', on:r===cur, fn:"pickTeamRole('"+r+"')"};
+      }));
+    }
+    function pickTeamRole(role){
+      closeRowMenu();
+      if(_teamRoleSel){ var lbl=_teamRoleSel.querySelector('span:first-child'); if(lbl) lbl.textContent=role; }
+      ssvToast('Role in '+teamName(_rowHost)+' set to '+role);
+      _teamRoleSel=null;
+    }
+
+    /* ---- Teams: per-row "Team actions" menu ---- */
+    function openTeamActions(e, btn){
+      if(e){ e.stopPropagation(); }
+      closeAllPdMenus();
+      _rowHost=btn.closest('tr');
+      renderRowMenu(btn, [
+        {label:'View team', icon:'open_in_new', fn:'teamAction(\'view\')'},
+        {sep:true},
+        {label:'Remove from team', icon:'group_remove', fn:'teamAction(\'remove\')'}
+      ]);
+    }
+    function teamAction(k){
+      var tr=_rowHost; closeRowMenu();
+      if(!tr) return;
+      if(k==='view'){ window.location.href='team-detail.html'; return; }
+      if(k==='remove'){
+        var nm=teamName(tr);
+        askConfirm('Remove from team', 'Remove this person from <strong>'+esc(nm)+'</strong>? They will lose access to that team\'s content and social accounts.', 'Remove', function(){
+          tr.remove(); refreshTeamCount(); syncTeamSelection(); ssvToast('Removed from '+nm);
+        });
+      }
+    }
+
+    /* ---- Teams: bulk remove from selected rows (checkboxes toggle .is-on via app.js) ---- */
+    function selectedTeamRows(){ return [].slice.call(document.querySelectorAll('#teamRows tr')).filter(function(tr){ var c=tr.querySelector('.hs-check'); return c && c.classList.contains('is-on'); }); }
+    function syncTeamSelection(){
+      var rows=selectedTeamRows();
+      var bar=document.getElementById('teamBulkBar'), n=document.getElementById('teamSelCount');
+      if(n) n.textContent=rows.length;
+      if(bar) bar.hidden=rows.length===0;
+    }
+    function removeSelectedTeams(){
+      var rows=selectedTeamRows();
+      if(!rows.length) return;
+      var msg=rows.length===1
+        ? 'Remove this person from <strong>'+esc(teamName(rows[0]))+'</strong>?'
+        : 'Remove this person from <strong>'+rows.length+' teams</strong>?';
+      askConfirm('Remove from selected teams', msg, 'Remove', function(){
+        rows.forEach(function(tr){ tr.remove(); });
+        refreshTeamCount(); syncTeamSelection();
+        ssvToast(rows.length===1 ? ('Removed from '+teamName(rows[0])) : ('Removed from '+rows.length+' teams'));
+      });
+    }
+    /* Keep the bulk bar in sync. app.js's global click listener flips .hs-check
+       (.is-on) for us; ours runs first, so we defer to read the post-toggle state. */
+    document.addEventListener('click', function(e){
+      var c=e.target.closest && e.target.closest('#teamRows .hs-check, #teamSelectAll');
+      if(!c) return;
+      var isAll=(c.id==='teamSelectAll');
+      setTimeout(function(){
+        /* header "select all" mirrors its (now toggled) state to every visible row */
+        if(isAll){
+          var on=c.classList.contains('is-on');
+          [].slice.call(document.querySelectorAll('#teamRows tr')).forEach(function(tr){
+            if(tr.style.display==='none') return;
+            var rc=tr.querySelector('.hs-check'); if(!rc) return;
+            rc.classList.toggle('is-on', on); rc.setAttribute('aria-checked', on?'true':'false');
+          });
+        }
+        syncTeamSelection();
+      }, 0);
+    });
+
+    /* ---- Social accounts: per-row "Account actions" menu ---- */
+    function acctLabel(tr){ if(!tr) return 'this account'; var a=tr.getAttribute('data-account')||'', n=tr.getAttribute('data-network')||''; return a + (n?(' on '+n):''); }
+    function openAcctActions(e, btn){
+      if(e){ e.stopPropagation(); }
+      closeAllPdMenus();
+      _rowHost=btn.closest('tr');
+      renderRowMenu(btn, [
+        {label:'View account', icon:'open_in_new', fn:'acctAction(\'view\')'},
+        {label:'Change access', icon:'tune', fn:'acctAction(\'access\')'},
+        {sep:true},
+        {label:'Remove', icon:'link_off', fn:'acctAction(\'remove\')'}
+      ]);
+    }
+    function acctAction(k){
+      var tr=_rowHost;
+      if(!tr) { closeRowMenu(); return; }
+      if(k==='view'){ closeRowMenu(); window.location.href='social-account-detail.html'; return; }
+      if(k==='access'){ openAcctAccessMenu(tr); return; }   // re-opens a submenu on the same anchor
+      if(k==='remove'){
+        closeRowMenu();
+        var nm=acctLabel(tr);
+        askConfirm('Remove account access', 'Remove access to <strong>'+esc(nm)+'</strong> for this person? They will no longer be able to publish to or view it.', 'Remove', function(){
+          tr.remove(); refreshAcctCount(); ssvToast('Removed access to '+nm);
+        });
+      }
+    }
+    function openAcctAccessMenu(tr){
+      var anchor=_rowAnchor || tr.querySelector('.icon-btn');
+      _rowHost=tr;
+      var cell=tr.querySelector('[data-access]');
+      var cur=cell ? cell.textContent.trim() : '';
+      renderRowMenu(anchor, ['Can publish','Can draft','View only'].map(function(a){
+        return {label:a, icon:'lock_open', on:a===cur, fn:"pickAcctAccess('"+a+"')"};
+      }));
+    }
+    function pickAcctAccess(access){
+      var tr=_rowHost; closeRowMenu();
+      if(!tr) return;
+      var cell=tr.querySelector('[data-access]'); if(cell) cell.textContent=access;
+      ssvToast('Access set to '+access+' for '+acctLabel(tr));
+    }
+
+    /* ---- shared confirm dialog ---- */
+    var _confirmFn=null;
+    function askConfirm(title, bodyHtml, okLabel, fn){
+      document.getElementById('confirmTitle').textContent=title;
+      document.getElementById('confirmBody').innerHTML=bodyHtml;
+      document.getElementById('confirmOkBtn').textContent=okLabel||'Confirm';
+      _confirmFn=fn;
+      document.getElementById('confirmOvl').classList.add('open');
+    }
+    function closeConfirm(){ document.getElementById('confirmOvl').classList.remove('open'); _confirmFn=null; }
+    function runConfirm(){ var fn=_confirmFn; closeConfirm(); if(typeof fn==='function') fn(); }
+    document.getElementById('confirmOvl').addEventListener('mousedown', function(e){ if(e.target===this) closeConfirm(); });
+
+    /* ---- counts ---- */
+    function refreshTeamCount(){ var n=document.querySelectorAll('#teamRows tr').length; var el=document.getElementById('teamsCount'); if(el) el.textContent=n; }
+    function refreshAcctCount(){ var n=document.querySelectorAll('#acctRows tr').length; var el=document.getElementById('acctCount'); if(el) el.textContent=n; }
+
+    /* ==================================================================
+       Pagebar search: filter the ACTIVE panel's rows by text.
+       Shows a "No results" empty state when nothing matches.
+       ================================================================== */
+    function activePanelKey(){
+      var t=document.querySelector('.tabs [data-tab].on');
+      return t ? t.getAttribute('data-tab') : 'teams';
+    }
+    function filterRows(bodyId, emptyId, q){
+      var body=document.getElementById(bodyId), empty=document.getElementById(emptyId);
+      if(!body) return;
+      var any=false;
+      [].slice.call(body.querySelectorAll('tr')).forEach(function(tr){
+        var hit=!q || tr.textContent.toLowerCase().indexOf(q)>=0;
+        tr.classList.toggle('filtered-out', !hit);
+        tr.style.display=hit?'':'none';
+        if(hit) any=true;
+      });
+      if(empty) empty.hidden=any;
+    }
+    function pdSearchInput(v){
+      var q=(v||'').trim().toLowerCase();
+      var key=activePanelKey();
+      if(key==='perms'){ return; } // permissions tab has no rows to filter
+      if(key==='social'){ filterRows('acctRows','acctEmpty', q); }
+      else { filterRows('teamRows','teamEmpty', q); syncTeamSelection(); }
+    }
+    /* re-apply the current query when tabs switch, and hide search on the perms tab */
+    (function(){
+      var input=document.getElementById('pdSearch');
+      var box=input ? input.closest('.searchbox') : null;
+      document.querySelectorAll('.tabs [data-tab]').forEach(function(t){
+        t.addEventListener('click', function(){
+          setTimeout(function(){
+            var perms=activePanelKey()==='perms';
+            if(box) box.style.display=perms?'none':'';
+            if(!perms) pdSearchInput(input?input.value:'');
+          },0);
+        });
+      });
+    })();
+
+    /* also close the row menu when clicking anywhere outside it or its trigger */
+    document.addEventListener('click', function(e){
+      var m=document.getElementById('rowMenu');
+      if(!m || m.hidden) return;
+      var t=e.target.closest && e.target.closest('#rowMenu, [aria-label="Team actions"], [aria-label^="Actions for"], [aria-label="Account actions"], #teamRows .sel');
+      if(!t) closeRowMenu();
+    });
+    window.addEventListener('resize', closeRowMenu);
   </script>
 <script src="app.js"></script>
 </body>

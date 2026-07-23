@@ -177,6 +177,12 @@
           </div>
         </div>
 
+        <div id="teamsEmpty" class="table-card" hidden style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:48px 24px; text-align:center">
+          <span class="material-symbols-outlined" style="font-size:40px; color:var(--bento-theme-color-icon-subtle)">search_off</span>
+          <div style="font:var(--hs-type-title-sub); color:var(--hs-fg)">No teams match</div>
+          <div class="hs-small" id="teamsEmptyMsg">No teams match your search. Try a different name.</div>
+        </div>
+
       </div>
     </div>
   </main>
@@ -191,7 +197,8 @@
       <div class="mb">
         <div class="ctfield">
           <label for="teamNameInput">Team name</label>
-          <input type="text" id="teamNameInput" placeholder="e.g. Paid Media" autocomplete="off">
+          <input type="text" id="teamNameInput" placeholder="e.g. Paid Media" autocomplete="off" aria-describedby="ctErr" oninput="ctValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitCreateTeam();}">
+          <p class="hs-small" id="ctErr" hidden style="color:var(--bento-system-sys-negative-500,#b3261e);margin-top:6px">Give the team a name.</p>
         </div>
         <div class="ctfield">
           <label for="teamDescInput">Description (optional)</label>
@@ -220,7 +227,7 @@
       </div>
       <div class="mf">
         <button class="hs-btn hs-btn--ghost" onclick="closeCreateTeam()">Cancel</button>
-        <button class="hs-btn hs-btn--primary" onclick="submitCreateTeam()">Create team</button>
+        <button class="hs-btn hs-btn--primary" id="ctCreate" onclick="submitCreateTeam()" disabled aria-disabled="true">Create team</button>
       </div>
     </div>
   </div>
@@ -235,12 +242,12 @@
       <div class="mb">
         <div class="ctfield">
           <label for="renameInput">Team name</label>
-          <input type="text" id="renameInput" placeholder="Team name" autocomplete="off">
+          <input type="text" id="renameInput" placeholder="Team name" autocomplete="off" oninput="rtValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitRenameTeam();}">
         </div>
       </div>
       <div class="mf">
         <button class="hs-btn hs-btn--ghost" onclick="closeRenameTeam()">Cancel</button>
-        <button class="hs-btn hs-btn--primary" onclick="submitRenameTeam()">Save</button>
+        <button class="hs-btn hs-btn--primary" id="rtSave" onclick="submitRenameTeam()">Save</button>
       </div>
     </div>
   </div>
@@ -320,6 +327,11 @@
     return list;
   }
 
+  /* members/accounts may be stored as a count (this page) or as an array of
+     identities (people.html create-team writes arrays). Render either as a
+     number so both shapes stay in sync across pages. */
+  function countOf(v){ return Array.isArray(v) ? v.length : (parseInt(v, 10) || 0); }
+
   /* ---- rendering ------------------------------------------------------- */
   function teamRowHTML(t){
     var admins = (t.admins && t.admins.length) ? t.admins : ['You'];
@@ -329,13 +341,13 @@
         '<a href="team-detail.html?t=' + tEsc(t.id) + '">' + tEsc(t.name) + '</a></div></td>' +
       '<td class="hs-small">' + tEsc(t.created || 'Just now') + '</td>' +
       '<td><span class="av-stack">' + av + '</span></td>' +
-      '<td>' + (t.members || 0) + '</td><td>' + (t.accounts || 0) + '</td>' +
+      '<td>' + countOf(t.members) + '</td><td>' + countOf(t.accounts) + '</td>' +
       '<td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" data-tid="' + tEsc(t.id) + '"><span class="material-symbols-outlined">more_horiz</span></button></td>';
   }
   function teamCardHTML(t){
     return '<div class="top"><div class="av"><span class="material-symbols-outlined">groups</span></div>' +
       '<div class="nm"><div class="n"><a href="team-detail.html?t=' + tEsc(t.id) + '">' + tEsc(t.name) + '</a></div>' +
-      '<div class="e">' + (t.members || 0) + ' members · ' + (t.accounts || 0) + ' accounts</div></div>' +
+      '<div class="e">' + countOf(t.members) + ' members · ' + countOf(t.accounts) + ' accounts</div></div>' +
       '<button class="icon-btn ne-tooltipbtn" aria-label="Actions" data-tid="' + tEsc(t.id) + '"><span class="material-symbols-outlined">more_horiz</span></button></div>' +
       '<div class="foot"><span>Created ' + tEsc(t.created || 'Just now') + '</span></div>';
   }
@@ -363,8 +375,10 @@
   function toggleView(){
     var t=document.getElementById('tableView'), g=document.getElementById('gridView'), l=document.getElementById('viewPickLabel');
     var toCard = !t.hidden;
-    if(t) t.hidden = toCard; if(g) g.hidden = !toCard;
+    if(t){ t.hidden = toCard; t.style.display = ''; }
+    if(g){ g.hidden = !toCard; g.style.display = ''; }
     if(l) l.textContent = toCard ? 'Card view' : 'Column view';
+    applyFilter(); // keep the empty state + per-container display correct
   }
 
   /* ---- Create team flow ------------------------------------------------ */
@@ -372,10 +386,23 @@
     var chk = row.querySelector('.hs-check');
     if(chk) chk.classList.toggle('is-on');
   }
+  /* keep Create disabled until a name is entered; show inline error only after
+     an empty submit attempt (not while the field is simply still blank). */
+  function ctValidate(){
+    var nameEl = document.getElementById('teamNameInput');
+    var btn = document.getElementById('ctCreate');
+    var err = document.getElementById('ctErr');
+    var ok = !!(nameEl && nameEl.value.trim());
+    if(btn){ btn.disabled = !ok; btn.setAttribute('aria-disabled', ok ? 'false' : 'true'); }
+    if(ok && err) err.hidden = true;
+    return ok;
+  }
   function openCreateTeam(){
     var name = document.getElementById('teamNameInput'); if(name) name.value = '';
     var desc = document.getElementById('teamDescInput'); if(desc) desc.value = '';
+    var err = document.getElementById('ctErr'); if(err) err.hidden = true;
     document.querySelectorAll('#createTeamOvl .hs-check.is-on').forEach(function(c){ c.classList.remove('is-on'); });
+    ctValidate();
     var ovl = document.getElementById('createTeamOvl');
     if(ovl) ovl.classList.add('open');
     if(name) name.focus();
@@ -387,10 +414,26 @@
   function submitCreateTeam(){
     var nameEl = document.getElementById('teamNameInput');
     var name = nameEl ? nameEl.value.trim() : '';
-    if(!name){ if(nameEl) nameEl.focus(); return; }
+    if(!name){
+      var err = document.getElementById('ctErr'); if(err) err.hidden = false;
+      if(nameEl) nameEl.focus();
+      return;
+    }
 
-    var memberCount = document.querySelectorAll('#ctMembers .hs-check.is-on').length;
-    var accountCount = document.querySelectorAll('#ctAccounts .hs-check.is-on').length;
+    /* capture selected identities as arrays so the shape matches people.html
+       ({id,name,members:[],accounts:[]}); rendering counts them via countOf. */
+    var members = [];
+    document.querySelectorAll('#ctMembers .ctopt').forEach(function(r){
+      if(r.querySelector('.hs-check.is-on')){
+        var k = r.querySelector('.ctkv .k'); if(k) members.push(k.textContent.trim());
+      }
+    });
+    var accounts = [];
+    document.querySelectorAll('#ctAccounts .ctopt').forEach(function(r){
+      if(r.querySelector('.hs-check.is-on')){
+        var k = r.querySelector('.ctkv .k'); if(k) accounts.push(k.textContent.trim());
+      }
+    });
 
     var list = getTeams();
     list.unshift({
@@ -398,8 +441,8 @@
       name: name,
       created: 'Just now',
       admins: ['You'],
-      members: memberCount,
-      accounts: accountCount
+      members: members,
+      accounts: accounts
     });
     saveTeams(list);
     renderTeams();
@@ -438,10 +481,18 @@
 
   /* ---- rename ---------------------------------------------------------- */
   var _renameTid = null;
+  function rtValidate(){
+    var input = document.getElementById('renameInput');
+    var btn = document.getElementById('rtSave');
+    var ok = !!(input && input.value.trim());
+    if(btn){ btn.disabled = !ok; btn.setAttribute('aria-disabled', ok ? 'false' : 'true'); }
+    return ok;
+  }
   function openRenameTeam(tid){
     var t = teamById(tid); if(!t) return;
     _renameTid = tid;
     var input = document.getElementById('renameInput'); if(input) input.value = t.name;
+    rtValidate();
     document.getElementById('renameTeamOvl').classList.add('open');
     if(input){ input.focus(); input.select(); }
   }
@@ -483,16 +534,42 @@
   var _query = '';
   function applyFilter(){
     var q = _query.trim().toLowerCase();
+    var shown = 0, total = 0;
     document.querySelectorAll('#tableView tbody tr').forEach(function(tr){
+      total++;
       var a = tr.querySelector('.cell-with-thumb a');
       var name = a ? a.textContent.toLowerCase() : '';
-      tr.style.display = (!q || name.indexOf(q) >= 0) ? '' : 'none';
+      var vis = (!q || name.indexOf(q) >= 0);
+      tr.style.display = vis ? '' : 'none';
+      if(vis) shown++;
     });
     document.querySelectorAll('#gridView .ecard').forEach(function(c){
       var a = c.querySelector('.nm .n a');
       var name = a ? a.textContent.toLowerCase() : '';
       c.style.display = (!q || name.indexOf(q) >= 0) ? '' : 'none';
     });
+
+    /* "No teams match" empty state: shown when the current search matches
+       nothing. The active view's container is hidden (via .style.display) so we
+       don't leave an empty header block; restored to visible when matches
+       return. The Column/Card toggle drives .hidden, so we only ever set inline
+       display on the container that the toggle has left visible. */
+    var empty = document.getElementById('teamsEmpty');
+    var table = document.getElementById('tableView');
+    var grid = document.getElementById('gridView');
+    var none = (total > 0 && shown === 0);
+    if(empty){
+      empty.hidden = !none;
+      var msg = document.getElementById('teamsEmptyMsg');
+      if(msg) msg.textContent = q ? ('No teams match “' + q + '”. Try a different name.') : 'No teams match your search. Try a different name.';
+    }
+    /* clear any prior inline display, then hide the active container if empty */
+    if(table) table.style.display = '';
+    if(grid) grid.style.display = '';
+    if(none){
+      var active = (table && !table.hidden) ? table : (grid && !grid.hidden ? grid : null);
+      if(active) active.style.display = 'none';
+    }
   }
 
   /* ---- boot ------------------------------------------------------------ */
@@ -510,8 +587,24 @@
     });
     if(filterBtn){ filterBtn.addEventListener('click', function(){ if(searchInput) _query = searchInput.value; applyFilter(); }); }
 
-    /* delegated clicks: open row-action menu; close menu on outside click. */
+    /* delegated clicks: row checkboxes (select all / select row), row-action
+       menu, and close-on-outside-click. app.js syncs aria-checked after. */
     document.addEventListener('click', function(e){
+      var chk = e.target.closest && e.target.closest('.hs-table .hs-check');
+      if(chk){
+        var head = chk.closest('thead');
+        if(head){
+          var on = !chk.classList.contains('is-on');
+          chk.classList.toggle('is-on', on);
+          document.querySelectorAll('#tableView tbody tr').forEach(function(tr){
+            if(tr.style.display === 'none') return;
+            var c = tr.querySelector('.hs-check'); if(c) c.classList.toggle('is-on', on);
+          });
+        } else {
+          chk.classList.toggle('is-on');
+        }
+        return;
+      }
       var act = e.target.closest && e.target.closest('.icon-btn[data-tid]');
       if(act){ e.stopPropagation(); openTeamMenu(act, act.getAttribute('data-tid')); return; }
       if(!(e.target.closest && e.target.closest('#teamMenu'))) closeTeamMenu();

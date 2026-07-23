@@ -89,8 +89,8 @@
         <span class="material-symbols-outlined">search</span>
         <input type="text" placeholder="Search members" aria-label="Search members">
       </div>
-      <button class="sel"><span>Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
-      <button class="sel"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+      <button class="sel viewpick" id="tdViewPick" onclick="tdToggleView()"><span class="material-symbols-outlined" style="font-size:18px">view_column</span><span id="tdViewPickLabel">Column view</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+      <button class="sel" id="tdFilterBtn"><span>Filter</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
     </div>
 
     <div class="content">
@@ -98,7 +98,7 @@
        <div data-panel="members">
         <div class="count-h">
           <h2 id="memberCount">12 members in Growth Team</h2>
-          <div class="meta">3 admins &#183; 9 editors</div>
+          <div class="meta">3 team admins &#183; 9 members</div>
         </div>
 
         <div class="table-card">
@@ -118,7 +118,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">MT</span><span>Melanie Torres</span></div></td>
-              <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>Team admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Jan 12, 2026</td>
               <td>8</td>
               <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
@@ -127,7 +127,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">DR</span><span>Diego Ramos</span></div></td>
-              <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>Team admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Jan 18, 2026</td>
               <td>6</td>
               <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
@@ -136,7 +136,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">PK</span><span>Priya Khanna</span></div></td>
-              <td><button class="sel"><span>Admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>Team admin</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Feb 03, 2026</td>
               <td>5</td>
               <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
@@ -145,7 +145,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">SN</span><span>Samuel Njoroge</span></div></td>
-              <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Feb 22, 2026</td>
               <td>3</td>
               <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
@@ -154,7 +154,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">LC</span><span>Lucia Costa</span></div></td>
-              <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Mar 09, 2026</td>
               <td>4</td>
               <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
@@ -163,7 +163,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">TW</span><span>Thomas Wren</span></div></td>
-              <td><button class="sel"><span>Viewer</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>View only</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Mar 27, 2026</td>
               <td>0</td>
               <td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check</span>Active</span></td>
@@ -172,7 +172,7 @@
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">AO</span><span>Amara Okafor</span></div></td>
-              <td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
+              <td><button class="sel"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>
               <td class="hs-small">Jul 14, 2026</td>
               <td>0</td>
               <td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td>
@@ -186,6 +186,15 @@
             <span class="hs-small">of 12</span>
             <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
           </div>
+        </div>
+
+        <div class="grid" id="membersGrid" hidden></div>
+
+        <div id="membersEmpty" class="table-card" hidden style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:48px 24px; text-align:center">
+          <span class="material-symbols-outlined" style="font-size:40px; color:var(--bento-theme-color-icon-subtle)">group_off</span>
+          <div style="font:var(--hs-type-title-sub); color:var(--hs-fg)">No members yet</div>
+          <div class="hs-small">Add people from your organization to this team.</div>
+          <button class="hs-btn hs-btn--primary" style="margin-top:8px" onclick="openAddMembers()"><span class="material-symbols-outlined">person_add</span>Add members</button>
         </div>
        </div>
 
@@ -251,7 +260,42 @@
       </div>
       <div class="mf">
         <button class="hs-btn hs-btn--ghost" onclick="closeAddMembers()">Cancel</button>
-        <button class="hs-btn hs-btn--primary" onclick="submitAddMembers()">Add selected</button>
+        <button class="hs-btn hs-btn--primary" id="amAdd" onclick="submitAddMembers()" disabled aria-disabled="true">Add selected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename team modal (in-DOM; also writes back to the ssv2_teams store) -->
+  <div class="ovl" id="renameTeamOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="rtTitle" style="width:460px">
+      <div class="mh">
+        <h2 id="rtTitle">Rename team</h2>
+        <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeRenameTeam()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="mb">
+        <div class="hs-field"><label class="hs-label" for="rtName">Team name</label>
+          <input class="hs-input" id="rtName" type="text" placeholder="Team name" autocomplete="off" style="width:100%;height:40px;padding:0 12px;border:1px solid var(--hs-border-input);border-radius:var(--bento-component-input-border-radius);background:var(--bento-component-input-fill);font:var(--hs-type-body-md);color:var(--bento-theme-color-text-base);box-sizing:border-box" oninput="rtValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitRenameTeam();}"></div>
+      </div>
+      <div class="mf">
+        <button class="hs-btn hs-btn--ghost" onclick="closeRenameTeam()">Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="rtSave" onclick="submitRenameTeam()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete team confirm (destructive action uses an outlined button, never red) -->
+  <div class="ovl" id="deleteTeamOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="dtTitle" style="width:460px">
+      <div class="mh">
+        <h2 id="dtTitle">Delete team</h2>
+        <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeDeleteTeam()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="mb">
+        <p style="margin:0; font:var(--hs-type-body-md); color:var(--hs-fg)">Delete <strong id="dtName"></strong>? Members stay in Somos, but this team and its account assignments are removed. This cannot be undone.</p>
+      </div>
+      <div class="mf">
+        <button class="hs-btn hs-btn--ghost" onclick="closeDeleteTeam()">Cancel</button>
+        <button class="hs-btn hs-btn--outlined" onclick="submitDeleteTeam()">Delete team</button>
       </div>
     </div>
   </div>
@@ -277,6 +321,37 @@
     function tdEsc(s){ if(window.SSV2 && window.SSV2.esc) return window.SSV2.esc(s);
       return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 
+    /* ---- team store (shared ssv2_teams key, same shape teams.html uses) --
+       We read ?t={id} to know which team this is. If the store has it, the
+       header name/title/count reflect that team, and rename/delete write back
+       so the Teams list stays in sync. Missing store or id degrades to the
+       pre-seeded "Growth Team" DOM content. -------------------------------- */
+    var TEAMS_KEY = 'ssv2_teams';
+    var _teamId = new URLSearchParams(location.search).get('t');
+    function loadTeamsStore(){ try{ var a=JSON.parse(localStorage.getItem(TEAMS_KEY)); return Array.isArray(a)?a:null; }catch(e){ return null; } }
+    function saveTeamsStore(list){ try{ localStorage.setItem(TEAMS_KEY, JSON.stringify(list)); }catch(e){} }
+    function currentTeam(){
+      if(!_teamId) return null;
+      var list = loadTeamsStore(); if(!list) return null;
+      for(var i=0;i<list.length;i++){ if(list[i].id===_teamId) return list[i]; }
+      return null;
+    }
+    function updateTeamInStore(mut){
+      var list = loadTeamsStore(); if(!list) return null;
+      for(var i=0;i<list.length;i++){ if(list[i].id===_teamId){ mut(list[i]); saveTeamsStore(list); return list[i]; } }
+      return null;
+    }
+    function teamNameNow(){ return (document.querySelector('.suite-topbar h1')||{}).textContent || 'this team'; }
+    function setTeamName(name){
+      var h=document.querySelector('.suite-topbar h1'); if(h) h.textContent=name;
+      document.title = name + ': Suite Settings';
+    }
+    /* hydrate the header from the store when we were opened with a real ?t */
+    (function hydrateTeam(){
+      var t = currentTeam();
+      if(t && t.name) setTeamName(t.name);
+    })();
+
     /* ---- tab switching (toggle .on + panel hidden) ------------------- */
     function showTab(key){
       document.querySelectorAll('nav.tabs a[data-tab]').forEach(function(a){
@@ -291,12 +366,46 @@
       a.addEventListener('click', function(e){ e.preventDefault(); showTab(a.getAttribute('data-tab')); });
     });
 
-    /* ---- member count sync ------------------------------------------- */
+    /* ---- member count sync + empty state ----------------------------- */
+    var _tdCardView = false;
     function refreshMemberCount(){
       var n = document.querySelectorAll('#memberRows tr').length;
       var h = document.getElementById('memberCount');
-      if(h){ var name = (document.querySelector('.suite-topbar h1')||{}).textContent || 'this team';
-        h.textContent = n + ' member' + (n===1?'':'s') + ' in ' + name; }
+      if(h){ h.textContent = n + ' member' + (n===1?'':'s') + ' in ' + teamNameNow(); }
+      /* swap in the empty state when the team has no members */
+      var empty = document.getElementById('membersEmpty');
+      var tbody = document.getElementById('memberRows');
+      var tableCard = tbody ? tbody.closest('.table-card') : null;
+      var grid = document.getElementById('membersGrid');
+      var none = (n === 0);
+      if(empty) empty.hidden = !none;
+      if(tableCard) tableCard.style.display = (none || _tdCardView) ? 'none' : '';
+      if(grid) grid.hidden = (none || !_tdCardView);
+      if(_tdCardView && !none) renderMemberCards();
+    }
+    /* Column/Card toggle for the members list (mirrors the teams.html idiom) */
+    function tdToggleView(){
+      _tdCardView = !_tdCardView;
+      var lbl = document.getElementById('tdViewPickLabel');
+      if(lbl) lbl.textContent = _tdCardView ? 'Card view' : 'Column view';
+      refreshMemberCount();
+    }
+    function renderMemberCards(){
+      var grid = document.getElementById('membersGrid'); if(!grid) return;
+      grid.innerHTML = '';
+      document.querySelectorAll('#memberRows tr').forEach(function(tr){
+        if(tr.style.display === 'none') return; // respect the active search filter
+        var initials = (tr.querySelector('.hs-avatar')||{}).textContent || '';
+        var name = (tr.querySelector('.cell-with-thumb span:last-child')||{}).textContent || '';
+        var role = (tr.querySelector('.sel span:first-child')||{}).textContent || '';
+        var badge = tr.querySelector('.hs-badge');
+        var card = document.createElement('div'); card.className = 'ecard';
+        card.innerHTML =
+          '<div class="top"><span class="av" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)">'+tdEsc(initials)+'</span>'+
+          '<div class="nm"><div class="n">'+tdEsc(name)+'</div><div class="e">'+tdEsc(role)+'</div></div></div>'+
+          '<div class="foot"><span>'+ (badge ? badge.outerHTML : '') +'</span></div>';
+        grid.appendChild(card);
+      });
     }
 
     /* ---- floating menu ------------------------------------------------ */
@@ -329,6 +438,13 @@
       var set={}; document.querySelectorAll('#memberRows .cell-with-thumb span:last-child').forEach(function(s){ set[s.textContent.trim().toLowerCase()]=true; });
       return set;
     }
+    /* keep "Add selected" disabled until at least one person is ticked */
+    function amValidate(){
+      var btn=document.getElementById('amAdd');
+      var any=!!document.querySelector('#amList .hs-check.is-on');
+      if(btn){ btn.disabled=!any; btn.setAttribute('aria-disabled', any?'false':'true'); }
+      return any;
+    }
     function renderAmList(){
       var wrap=document.getElementById('amList'); if(!wrap) return;
       var have=currentMemberNames();
@@ -342,10 +458,15 @@
         row.innerHTML='<span class="hs-check"></span>'+
           '<span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)">'+tdEsc(p.initials||'')+'</span>'+
           '<span class="ctkv"><div class="k">'+tdEsc(p.name)+'</div><div class="m">'+tdEsc(p.email||'')+'</div></span>';
-        row.addEventListener('click', function(){ var c=row.querySelector('.hs-check'); if(c) c.classList.toggle('is-on'); });
+        row.addEventListener('click', function(){ var c=row.querySelector('.hs-check'); if(c) c.classList.toggle('is-on'); amValidate(); });
         wrap.appendChild(row);
       });
-      if(!wrap.children.length){ wrap.innerHTML='<div class="hs-small" style="padding:10px 8px;color:var(--bento-theme-color-text-subtle)">Everyone is already on this team.</div>'; }
+      if(!wrap.children.length){
+        /* distinguish "no search match" from "everyone already a member" */
+        wrap.innerHTML='<div class="hs-small" style="padding:10px 8px;color:var(--bento-theme-color-text-subtle)">'+
+          (q ? 'No people match “'+tdEsc(q)+'”.' : 'Everyone is already on this team.')+'</div>';
+      }
+      amValidate();
     }
     function openAddMembers(){
       var s=document.getElementById('amSearch'); if(s) s.value='';
@@ -357,7 +478,7 @@
     function memberRowHTML(name, initials){
       return '<td><span class="hs-check"></span></td>'+
         '<td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">'+tdEsc(initials)+'</span><span>'+tdEsc(name)+'</span></div></td>'+
-        '<td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>'+
+        '<td><button class="sel"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>'+
         '<td class="hs-small">Just now</td>'+
         '<td>0</td>'+
         '<td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td>'+
@@ -365,7 +486,7 @@
     }
     function submitAddMembers(){
       var picked=[].slice.call(document.querySelectorAll('#amList .ctopt')).filter(function(r){ return r.querySelector('.hs-check.is-on'); });
-      if(!picked.length){ closeAddMembers(); return; }
+      if(!picked.length){ return; } // button is disabled in this state anyway
       var tbody=document.getElementById('memberRows');
       picked.forEach(function(r){
         var tr=document.createElement('tr');
@@ -373,6 +494,11 @@
         tbody.appendChild(tr);
       });
       refreshMemberCount();
+      /* keep the Teams-list member count in sync when opened from a real team */
+      updateTeamInStore(function(t){
+        if(Array.isArray(t.members)){ picked.forEach(function(r){ t.members.push(r.getAttribute('data-name')); }); }
+        else { t.members = (parseInt(t.members,10)||0) + picked.length; }
+      });
       closeAddMembers();
       tdToast(picked.length===1 ? ('Added '+picked[0].getAttribute('data-name')) : ('Added '+picked.length+' members'));
     }
@@ -400,14 +526,19 @@
     }
     function openRoleMenu(btn){
       _roleBtn=btn;
-      showTdMenu(btn, ['Admin','Editor','Viewer'].map(function(r){
+      showTdMenu(btn, ['Team admin','Member','View only'].map(function(r){
         return {label:r, icon:'shield_person', fn:'pickRole(\''+r+'\')'};
       }));
     }
     function pickRole(r){
       closeTdMenu();
-      if(_roleBtn){ var lbl=_roleBtn.querySelector('span:first-child'); if(lbl) lbl.textContent=r; _roleBtn=null; }
-      tdToast('Role updated');
+      if(_roleBtn){
+        var lbl=_roleBtn.querySelector('span:first-child');
+        var member = memberName(_roleBtn.closest('tr'));
+        if(lbl) lbl.textContent=r;
+        _roleBtn=null;
+        tdToast(member+' is now '+r);
+      } else { tdToast('Role updated'); }
     }
 
     /* ---- header: More actions + Assign social account ---------------- */
@@ -421,16 +552,114 @@
       ]); }); }
     function headerDo(k){
       closeTdMenu();
-      if(k==='rename'){ tdToast('Rename this team from the Teams list'); return; }
+      if(k==='rename'){ openRenameTeam(); return; }
       if(k==='social'){ showTab('social'); return; }
-      if(k==='delete'){ tdToast('Delete this team from the Teams list'); return; }
+      if(k==='delete'){ openDeleteTeam(); return; }
+    }
+
+    /* rename: updates the header + count + document title, and writes back to
+       the shared store so the Teams list reflects it too */
+    function rtValidate(){
+      var input=document.getElementById('rtName');
+      var btn=document.getElementById('rtSave');
+      var ok=!!(input && input.value.trim());
+      if(btn){ btn.disabled=!ok; btn.setAttribute('aria-disabled', ok?'false':'true'); }
+      return ok;
+    }
+    function openRenameTeam(){
+      var input=document.getElementById('rtName'); if(input) input.value=teamNameNow();
+      rtValidate();
+      document.getElementById('renameTeamOvl').classList.add('open');
+      if(input){ input.focus(); input.select(); }
+    }
+    function closeRenameTeam(){ document.getElementById('renameTeamOvl').classList.remove('open'); }
+    function submitRenameTeam(){
+      var input=document.getElementById('rtName');
+      var name=input?input.value.trim():'';
+      if(!name){ if(input) input.focus(); return; }
+      setTeamName(name);
+      refreshMemberCount(); // count line embeds the team name
+      updateTeamInStore(function(t){ t.name=name; });
+      closeRenameTeam();
+      tdToast('Team renamed to "'+name+'"');
+    }
+
+    /* delete: removes from the store (if present) then returns to the Teams
+       list; in-DOM feedback via toast */
+    function openDeleteTeam(){
+      var nm=document.getElementById('dtName'); if(nm) nm.textContent=teamNameNow();
+      document.getElementById('deleteTeamOvl').classList.add('open');
+    }
+    function closeDeleteTeam(){ document.getElementById('deleteTeamOvl').classList.remove('open'); }
+    function submitDeleteTeam(){
+      var name=teamNameNow();
+      if(_teamId){
+        var list=loadTeamsStore();
+        if(list){ saveTeamsStore(list.filter(function(t){ return t.id!==_teamId; })); }
+      }
+      closeDeleteTeam();
+      tdToast('Team "'+name+'" deleted');
+      /* let the toast show, then return to the Teams list */
+      setTimeout(function(){ location.href='teams.html'; }, 700);
+    }
+
+    /* Assign social account: adds a real row to the Social accounts table and
+       bumps its count, then surfaces the tab so the change is visible */
+    var SOCIALS=[
+      {initials:'FB', name:'Somos', network:'Facebook', cat:'1'},
+      {initials:'X',  name:'@somos', network:'X', cat:'8'},
+      {initials:'YT', name:'Somos', network:'YouTube', cat:'6'},
+      {initials:'PIN',name:'@somos', network:'Pinterest', cat:'9'}
+    ];
+    function refreshSocialCount(){
+      var n=document.querySelectorAll('[data-panel="social"] tbody tr').length;
+      var h=document.getElementById('socialCount');
+      if(h) h.textContent = n + ' social account' + (n===1?'':'s') + ' in ' + teamNameNow();
+    }
+    function assignSocial(){
+      var tbody=document.querySelector('[data-panel="social"] tbody');
+      if(!tbody){ tdToast('Social account assigned'); return; }
+      /* pick the first network not already in the table, else cycle the list */
+      var have={}; tbody.querySelectorAll('.hs-small').forEach(function(td){ if(td.cellIndex===2) have[td.textContent.trim()]=true; });
+      var pick=null;
+      for(var i=0;i<SOCIALS.length;i++){ if(!have[SOCIALS[i].network]){ pick=SOCIALS[i]; break; } }
+      if(!pick) pick=SOCIALS[document.querySelectorAll('[data-panel="social"] tbody tr').length % SOCIALS.length];
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><span class="hs-check"></span></td>'+
+        '<td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-'+pick.cat+'-bg);color:var(--hs-cat-'+pick.cat+'-fg)">'+tdEsc(pick.initials)+'</span><span>'+tdEsc(pick.name)+'</span></div></td>'+
+        '<td class="hs-small">'+tdEsc(pick.network)+'</td>'+
+        '<td class="hs-small">Just now</td>'+
+        '<td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+      tbody.appendChild(tr);
+      refreshSocialCount();
+      updateTeamInStore(function(t){
+        if(Array.isArray(t.accounts)) t.accounts.push(pick.name+' ('+pick.network+')');
+        else t.accounts=(parseInt(t.accounts,10)||0)+1;
+      });
+      showTab('social');
+      tdToast(pick.name+' ('+pick.network+') assigned to '+teamNameNow());
     }
     var assignBtn=document.getElementById('tdAssignBtn');
-    if(assignBtn){ assignBtn.addEventListener('click', function(){ tdToast('Social account assigned to '+((document.querySelector('.suite-topbar h1')||{}).textContent||'this team')); }); }
+    if(assignBtn){ assignBtn.addEventListener('click', assignSocial); }
 
     /* ---- delegated clicks -------------------------------------------- */
     document.addEventListener('click', function(e){
       var t=e.target;
+      /* row/header checkboxes (select all / select row); app.js syncs aria */
+      var chk=t.closest && t.closest('.hs-table .hs-check');
+      if(chk){
+        var head=chk.closest('thead');
+        if(head){
+          var on=!chk.classList.contains('is-on');
+          chk.classList.toggle('is-on', on);
+          var scope=chk.closest('table');
+          scope.querySelectorAll('tbody tr').forEach(function(tr){
+            if(tr.style.display==='none') return;
+            var c=tr.querySelector('.hs-check'); if(c) c.classList.toggle('is-on', on);
+          });
+        } else { chk.classList.toggle('is-on'); }
+        return;
+      }
       /* member role dropdown buttons open the role menu */
       var sel=t.closest && t.closest('#memberRows .sel');
       if(sel){ e.stopPropagation(); openRoleMenu(sel); return; }
@@ -440,7 +669,30 @@
       /* clicking outside the menu closes it */
       if(!(t.closest && (t.closest('#tdMenu')||t.closest('#tdMoreBtn')))) closeTdMenu();
     });
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeAddMembers(); closeTdMenu(); } });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeAddMembers(); closeRenameTeam(); closeDeleteTeam(); closeTdMenu(); } });
+
+    /* ---- boot -------------------------------------------------------- */
+    (function initTeamDetail(){
+      /* live-filter the picker as you type */
+      var amSearch=document.getElementById('amSearch');
+      if(amSearch){ amSearch.addEventListener('input', renderAmList); }
+      /* filter members in the page by name (search box in the pagebar) */
+      var pageSearch=document.querySelector('.pagebar .searchbox input');
+      function filterMembers(){
+        var q=(pageSearch?pageSearch.value:'').trim().toLowerCase();
+        document.querySelectorAll('#memberRows tr').forEach(function(tr){
+          var nm=(tr.querySelector('.cell-with-thumb span:last-child')||{}).textContent||'';
+          tr.style.display=(!q || nm.toLowerCase().indexOf(q)>=0)?'':'none';
+        });
+        if(_tdCardView) renderMemberCards();
+      }
+      if(pageSearch){ pageSearch.addEventListener('input', filterMembers); }
+      /* Filter button applies the current search (mirrors teams.html) */
+      var filterBtn=document.getElementById('tdFilterBtn');
+      if(filterBtn){ filterBtn.addEventListener('click', filterMembers); }
+      refreshMemberCount();
+      refreshSocialCount();
+    })();
   </script>
   <script src="app.js"></script>
 </body>

@@ -58,39 +58,276 @@
 
     <div class="content">
       <div class="inner">
-        <p class="subhead">How you sign in, and the org controls that apply to you.</p>
+        <p class="subhead">Configure single sign-on for Somos. Changes are saved when you select Save.</p>
 
         <section class="card">
-          <h2 class="card-title">Authentication methods</h2>
+          <h2 class="card-title">Single sign-on (SSO)</h2>
+          <p class="card-sub">Let people at Somos sign in through your identity provider.</p>
           <div class="row first">
-            <div class="kv"><div class="k">Set a password</div><div class="v">You signed up via SSO, so there is no password yet. Set one to enable email sign-in.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Set password</button></div>
+            <div class="kv"><div class="k">Enable SSO</div><div class="v"><span id="ssoStateText">SSO is off. Turn it on to configure your identity provider.</span></div></div>
+            <div class="trail">
+              <span class="status" id="ssoStatus">Off</span>
+              <span class="hs-toggle" id="ssoToggle" aria-label="Enable single sign-on"></span>
+            </div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Two-factor authentication (2FA)</div><div class="v">Turned on for everyone at Somos. You can't turn this off.</div></div>
-            <div class="trail"><span class="status">Required by Somos</span></div>
+            <div class="kv"><div class="k">Identity provider</div><div class="v">The service that verifies your team, for example Okta or Azure AD.</div></div>
+            <div class="trail"><button class="sel" id="ssoProviderSel" data-options="Okta|Azure AD|Google Workspace|OneLogin|Ping Identity"><span>Okta</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+          </div>
+        </section>
+
+        <section class="card" id="ssoConfigCard">
+          <h2 class="card-title">Connection details</h2>
+          <p class="card-sub">Paste the values from your identity provider, then test and save.</p>
+          <div class="hs-field" style="margin:0 0 16px">
+            <label class="hs-field-label" for="ssoEntityId">Entity ID / Issuer URL</label>
+            <input class="hs-input" id="ssoEntityId" type="text" placeholder="https://idp.example.com/somos" style="width:100%">
+          </div>
+          <div class="hs-field" style="margin:0 0 16px">
+            <label class="hs-field-label" for="ssoSignInUrl">Sign-in URL</label>
+            <input class="hs-input" id="ssoSignInUrl" type="text" placeholder="https://idp.example.com/sso/saml" style="width:100%">
+          </div>
+          <div class="hs-field" style="margin:0">
+            <label class="hs-field-label" for="ssoCert">x.509 signing certificate</label>
+            <textarea class="hs-input hs-textarea" id="ssoCert" placeholder="-----BEGIN CERTIFICATE-----" style="width:100%"></textarea>
+          </div>
+          <div class="row" style="border:0; padding-top:16px">
+            <div class="kv"><div class="k">Test connection</div><div class="v">Send a test request to your identity provider before saving.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="ssoTestBtn"><span class="material-symbols-outlined">bolt</span>Test connection</button></div>
           </div>
         </section>
 
         <section class="card">
-          <h2 class="card-title">Organization security</h2>
-          <p class="card-sub">Set by Somos admins &#183; <a href="org-general.html">Managed on General</a></p>
+          <h2 class="card-title">Advanced</h2>
           <div class="row first">
-            <div class="kv"><div class="k">Single sign-on (SSO)</div><div class="v">You sign in through your organization's identity provider.</div></div>
-            <div class="trail"><span class="status">Required</span></div>
+            <div class="kv"><div class="k">Configure with metadata file</div><div class="v">Import your identity provider settings from a SAML metadata URL or XML.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="ssoConfigureBtn">Configure SSO</button></div>
+          </div>
+          <div class="row">
+            <div class="kv"><div class="k">Require SSO for everyone</div><div class="v"><span id="ssoRequireText">When on, people at Somos must sign in through SSO.</span></div></div>
+            <div class="trail">
+              <span class="status" id="ssoRequireStatus">Off</span>
+              <span class="hs-toggle" id="ssoRequireToggle" aria-label="Require SSO for everyone"></span>
+            </div>
           </div>
         </section>
 
-        <section class="card">
-          <h2 class="card-title">Privacy</h2>
-          <div class="row first">
-            <div class="kv"><div class="k">Your data and privacy</div><div class="v">What we store and why. Read-only, applies to everyone.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">open_in_new</span>View policy</button></div>
-          </div>
-        </section>
+        <div class="save-bar" style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px">
+          <button class="hs-btn hs-btn--ghost" id="ssoCancelBtn">Cancel</button>
+          <button class="hs-btn hs-btn--primary" id="ssoSaveBtn">Save changes</button>
+        </div>
       </div>
     </div>
   </main>
+
+  <!-- Configure SSO modal (inert: nothing is submitted or stored) -->
+  <div id="ssoConfigModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ssoConfigTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="ssoConfigTitle">Configure SSO from metadata</h2>
+          <p class="modal-sub">Import identity-provider settings instead of entering them by hand.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="hs-field">
+          <label class="hs-field-label" for="ssoMetaUrl">Metadata URL</label>
+          <input class="hs-input" id="ssoMetaUrl" type="text" data-autofocus placeholder="https://idp.example.com/app/metadata" style="width:100%">
+          <p id="ssoMetaError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:6px 0 0" hidden>Enter a metadata URL.</p>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="ssoMetaImport" disabled>Import</button>
+      </div>
+    </div>
+  </div>
+
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    /* Bento .sel trigger -> click-to-open option list (inert; local only). */
+    function wireSelect(sel, onPick) {
+      if (!sel) return;
+      var opts = (sel.getAttribute("data-options") || "").split("|").filter(Boolean);
+      var menu = null;
+      function labelEl() { return sel.querySelector("span:first-child"); }
+      function close() {
+        if (menu) { menu.remove(); menu = null; }
+        sel.setAttribute("aria-expanded", "false");
+        document.removeEventListener("mousedown", onDoc, true);
+      }
+      function onDoc(e) { if (!sel.contains(e.target) && (!menu || !menu.contains(e.target))) close(); }
+      sel.setAttribute("aria-haspopup", "listbox");
+      sel.setAttribute("aria-expanded", "false");
+      sel.addEventListener("click", function () {
+        if (sel.hasAttribute("disabled") || sel.getAttribute("aria-disabled") === "true") return;
+        if (menu) { close(); return; }
+        menu = S.el("div", "sel-menu");
+        menu.setAttribute("role", "listbox");
+        var current = labelEl().innerHTML;
+        opts.forEach(function (o) {
+          var item = S.el("div", "sel-menu-item" + (o === current ? " on" : ""), o);
+          item.setAttribute("role", "option");
+          item.addEventListener("click", function () {
+            var changed = o !== labelEl().innerHTML;
+            labelEl().innerHTML = o;
+            close();
+            if (changed && onPick) onPick(o);
+          });
+          menu.appendChild(item);
+        });
+        sel.parentNode.style.position = "relative";
+        sel.parentNode.appendChild(menu);
+        sel.setAttribute("aria-expanded", "true");
+        document.addEventListener("mousedown", onDoc, true);
+      });
+    }
+
+    var providerSel = document.getElementById("ssoProviderSel");
+    var toggle = document.getElementById("ssoToggle");
+    var statusEl = document.getElementById("ssoStatus");
+    var stateText = document.getElementById("ssoStateText");
+    var configCard = document.getElementById("ssoConfigCard");
+    var configureBtn = document.getElementById("ssoConfigureBtn");
+    var testBtn = document.getElementById("ssoTestBtn");
+    var requireToggle = document.getElementById("ssoRequireToggle");
+    var requireStatus = document.getElementById("ssoRequireStatus");
+    var requireText = document.getElementById("ssoRequireText");
+    var saveBtn = document.getElementById("ssoSaveBtn");
+    var cancelBtn = document.getElementById("ssoCancelBtn");
+    var depInputs = [
+      document.getElementById("ssoEntityId"),
+      document.getElementById("ssoSignInUrl"),
+      document.getElementById("ssoCert")
+    ];
+
+    /* Reflect the SSO on/off state into every dependent control. The global
+       .hs-toggle handler in app.js flips the .is-on class for us; this only
+       reads that state (on the next tick) and enables/disables the rest. */
+    function applyState() {
+      var on = toggle.classList.contains("is-on");
+      statusEl.textContent = on ? "On" : "Off";
+      stateText.textContent = on
+        ? "SSO is on. Configure your identity provider below."
+        : "SSO is off. Turn it on to configure your identity provider.";
+
+      // provider select
+      if (on) { providerSel.removeAttribute("aria-disabled"); providerSel.style.opacity = ""; providerSel.style.pointerEvents = ""; }
+      else    { providerSel.setAttribute("aria-disabled", "true"); providerSel.style.opacity = ".5"; providerSel.style.pointerEvents = "none"; }
+
+      // connection-detail fields + buttons
+      depInputs.forEach(function (i) { if (i) i.disabled = !on; });
+      testBtn.disabled = !on;
+      configureBtn.disabled = !on;
+      requireToggle.style.pointerEvents = on ? "" : "none";
+      requireToggle.style.opacity = on ? "" : ".5";
+      requireToggle.setAttribute("aria-disabled", on ? "false" : "true");
+      requireToggle.setAttribute("tabindex", on ? "0" : "-1");
+      configCard.style.opacity = on ? "" : ".55";
+
+      // if SSO is turned off, force-clear the dependent "require" toggle
+      if (!on && requireToggle.classList.contains("is-on")) {
+        requireToggle.classList.remove("is-on");
+        requireToggle.setAttribute("aria-checked", "false");
+      }
+      applyRequireState();
+    }
+    function applyRequireState() {
+      var on = requireToggle.classList.contains("is-on");
+      requireStatus.textContent = on ? "On" : "Off";
+      requireText.textContent = on
+        ? "People at Somos must sign in through SSO. Password sign-in is disabled."
+        : "When on, people at Somos must sign in through SSO.";
+    }
+
+    // The global handler flips .is-on on click; read the result next tick.
+    toggle.addEventListener("click", function () {
+      setTimeout(function () {
+        applyState();
+        S.toast(toggle.classList.contains("is-on") ? "Single sign-on turned on" : "Single sign-on turned off");
+      }, 0);
+    });
+    requireToggle.addEventListener("click", function () {
+      // While SSO is off this control is disabled. The global handler may still
+      // have flipped the class (e.g. a keyboard activation), so revert it and stop.
+      if (requireToggle.getAttribute("aria-disabled") === "true") {
+        setTimeout(function () {
+          requireToggle.classList.remove("is-on");
+          requireToggle.setAttribute("aria-checked", "false");
+          applyRequireState();
+        }, 0);
+        return;
+      }
+      setTimeout(function () {
+        applyRequireState();
+        S.toast(requireToggle.classList.contains("is-on") ? "SSO now required for everyone" : "SSO no longer required");
+      }, 0);
+    });
+
+    wireSelect(providerSel, function (v) { S.toast(v + " selected as identity provider"); });
+
+    testBtn.addEventListener("click", function () {
+      if (testBtn.disabled) return;
+      S.toast("Testing connection to identity provider…");
+    });
+
+    // Configure SSO modal (inert import)
+    var configModal = document.getElementById("ssoConfigModal");
+    var metaUrl = document.getElementById("ssoMetaUrl");
+    var metaError = document.getElementById("ssoMetaError");
+    var metaImport = document.getElementById("ssoMetaImport");
+    function metaSync() {
+      var ok = metaUrl.value.trim().length > 0;
+      metaImport.disabled = !ok;
+      if (ok) { metaError.hidden = true; metaUrl.classList.remove("hs-input--error"); }
+    }
+    var configM = S.wireModal(configModal, { onClose: function () {
+      metaUrl.value = ""; metaError.hidden = true; metaUrl.classList.remove("hs-input--error"); metaImport.disabled = true;
+    } });
+    metaUrl.addEventListener("input", metaSync);
+    configureBtn.addEventListener("click", function () {
+      if (configureBtn.disabled) return;
+      metaUrl.value = ""; metaError.hidden = true; metaUrl.classList.remove("hs-input--error"); metaImport.disabled = true;
+      configM.open();
+    });
+    metaImport.addEventListener("click", function () {
+      if (!metaUrl.value.trim()) {
+        metaError.hidden = false; metaUrl.classList.add("hs-input--error"); metaUrl.focus();
+        return;
+      }
+      configM.close();
+      S.toast("Metadata imported. Review and save.");
+    });
+
+    saveBtn.addEventListener("click", function () {
+      S.toast("SSO settings saved");
+    });
+    cancelBtn.addEventListener("click", function () {
+      S.toast("Changes discarded");
+    });
+
+    // initial paint: SSO starts off, so everything dependent is disabled
+    applyState();
+  })();
+</script>
+<style>
+  .sel-menu { position:absolute; top:calc(100% + 4px); right:0; min-width:220px; max-width:320px;
+    background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border);
+    border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20));
+    padding:6px; z-index:50; }
+  .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
+  .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
+  .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
+  /* clear disabled state for the connection-detail fields when SSO is off */
+  .hs-input:disabled { background:var(--bento-system-sys-neutral-alt-100); color:var(--hs-fg-disabled);
+    border-color:var(--hs-border-input); cursor:not-allowed; }
+  .hs-input:disabled::placeholder { color:var(--hs-fg-disabled); }
+  .save-bar { padding-bottom:8px; }
+</style>
 </body>
 </html>

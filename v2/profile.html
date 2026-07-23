@@ -112,11 +112,12 @@
       </div>
       <div class="modal-body">
         <label for="nameInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Full name</label>
-        <input id="nameInput" type="text" data-autofocus style="width:100%">
+        <input id="nameInput" class="hs-input" type="text" data-autofocus style="width:100%">
+        <p id="nameError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:6px 0 0" hidden>Enter a name.</p>
       </div>
       <div class="modal-foot">
         <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
-        <button class="hs-btn hs-btn--primary" id="nameSave">Save</button>
+        <button class="hs-btn hs-btn--primary" id="nameSave" disabled>Save</button>
       </div>
     </div>
   </div>
@@ -134,11 +135,12 @@
       </div>
       <div class="modal-body">
         <label for="emailInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">New email address</label>
-        <input id="emailInput" type="email" data-autofocus placeholder="name@company.com" style="width:100%">
+        <input id="emailInput" class="hs-input" type="email" data-autofocus placeholder="name@company.com" style="width:100%">
+        <p id="emailError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:6px 0 0" hidden>Enter a valid email.</p>
       </div>
       <div class="modal-foot">
         <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
-        <button class="hs-btn hs-btn--primary" id="emailSave">Save</button>
+        <button class="hs-btn hs-btn--primary" id="emailSave" disabled>Save</button>
       </div>
     </div>
   </div>
@@ -169,39 +171,74 @@
   (function () {
     var S = window.SSV2;
 
-    // Edit name
+    // ---- Edit name (Save disabled until the name is non-empty) ----
     var nameModal = document.getElementById("nameModal");
-    var nameM = S.wireModal(nameModal);
     var nameDisplay = document.getElementById("profileName");
     var nameInput = document.getElementById("nameInput");
+    var nameSave = document.getElementById("nameSave");
+    var nameError = document.getElementById("nameError");
+    function nameValid() { return nameInput.value.trim().length > 0; }
+    function syncName() {
+      var ok = nameValid();
+      nameSave.disabled = !ok;
+      // only surface the inline error once the field has been touched and left empty
+      if (ok) { nameError.hidden = true; nameInput.classList.remove("hs-input--error"); }
+    }
+    var nameM = S.wireModal(nameModal, { onClose: function () {
+      nameError.hidden = true; nameInput.classList.remove("hs-input--error");
+    } });
+    nameInput.addEventListener("input", syncName);
     document.getElementById("editNameBtn").addEventListener("click", function () {
       nameInput.value = nameDisplay.textContent.trim();
+      nameError.hidden = true; nameInput.classList.remove("hs-input--error");
+      syncName();
       nameM.open();
     });
-    document.getElementById("nameSave").addEventListener("click", function () {
-      var v = nameInput.value.trim();
-      if (v) nameDisplay.textContent = v;
+    nameSave.addEventListener("click", function () {
+      if (!nameValid()) {
+        nameError.hidden = false; nameInput.classList.add("hs-input--error"); nameInput.focus();
+        return;
+      }
+      nameDisplay.textContent = nameInput.value.trim();
       nameM.close();
       S.toast("Profile updated");
     });
 
-    // Change photo (inert)
+    // ---- Change photo (inert placeholder, confirm via toast) ----
     document.getElementById("changePhotoBtn").addEventListener("click", function () {
       S.toast("Photo updated");
     });
 
-    // Change email
+    // ---- Change email (Save disabled until a valid email; inline error) ----
     var emailModal = document.getElementById("emailModal");
-    var emailM = S.wireModal(emailModal);
     var emailDisplay = document.getElementById("profileEmail");
     var emailInput = document.getElementById("emailInput");
+    var emailSave = document.getElementById("emailSave");
+    var emailError = document.getElementById("emailError");
+    // pragmatic email shape: something@something.tld, no spaces
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    function emailValid() { return EMAIL_RE.test(emailInput.value.trim()); }
+    function syncEmail() {
+      var ok = emailValid();
+      emailSave.disabled = !ok;
+      if (ok) { emailError.hidden = true; emailInput.classList.remove("hs-input--error"); }
+    }
+    var emailM = S.wireModal(emailModal, { onClose: function () {
+      emailError.hidden = true; emailInput.classList.remove("hs-input--error");
+    } });
+    emailInput.addEventListener("input", syncEmail);
     document.getElementById("changeEmailBtn").addEventListener("click", function () {
       emailInput.value = emailDisplay.textContent.trim();
+      emailError.hidden = true; emailInput.classList.remove("hs-input--error");
+      syncEmail();
       emailM.open();
     });
-    document.getElementById("emailSave").addEventListener("click", function () {
-      var v = emailInput.value.trim();
-      if (v) emailDisplay.textContent = v;
+    emailSave.addEventListener("click", function () {
+      if (!emailValid()) {
+        emailError.hidden = false; emailInput.classList.add("hs-input--error"); emailInput.focus();
+        return;
+      }
+      emailDisplay.textContent = emailInput.value.trim();
       emailM.close();
       S.toast("Email updated");
     });

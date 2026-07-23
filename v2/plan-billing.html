@@ -74,9 +74,9 @@
             <div class="kv"><div class="k">Email</div><div class="v">melanie@somos.co</div></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Selected plan</div><div class="v">Standard (up to 10 social accounts, 3 users).</div></div>
+            <div class="kv"><div class="k">Selected plan</div><div class="v" id="selectedPlanDesc">Standard (up to 10 social accounts, 3 users).</div></div>
             <div class="trail">
-              <span class="hs-badge hs-badge--neutral">Trial</span>
+              <span class="hs-badge hs-badge--neutral" id="planBadge">Trial</span>
               <button class="hs-btn hs-btn--outlined" id="changePlanBtn">Change plan</button>
               <button class="hs-btn hs-btn--outlined" id="manageSubBtn">Manage subscription</button>
             </div>
@@ -261,6 +261,14 @@
     var planModal = document.getElementById("planModal");
     var planM = S.wireModal(planModal);
     var planOptions = document.getElementById("planOptions");
+    var selectedPlanDesc = document.getElementById("selectedPlanDesc");
+    var planBadge = document.getElementById("planBadge");
+    var currentPlan = "Standard"; // starting plan (trial), not one of the PLANS above
+    var planRows = [];
+
+    function markSelected() {
+      planRows.forEach(function (r) { r.el.classList.toggle("selected", r.name === currentPlan); });
+    }
     PLANS.forEach(function (p, i) {
       var o = S.el("div", "opt");
       o.setAttribute("role", "button");
@@ -270,12 +278,21 @@
         '<span class="lead"><span class="material-symbols-outlined">workspace_premium</span></span>' +
         '<div class="txt"><div class="n">' + S.esc(p.name) + '</div><div class="d">' + S.esc(p.desc) + '</div></div>' +
         '<span class="material-symbols-outlined check">check</span>';
-      function pick() { planM.close(); S.toast("Plan changed to " + p.name); }
+      function pick() {
+        currentPlan = p.name;
+        // reflect the chosen plan on the page
+        if (selectedPlanDesc) selectedPlanDesc.textContent = p.name + " (" + p.desc.charAt(0).toLowerCase() + p.desc.slice(1) + ")";
+        if (planBadge) planBadge.textContent = "Active";
+        markSelected();
+        planM.close();
+        S.toast("Plan changed to " + p.name);
+      }
       o.addEventListener("click", pick);
       o.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
       planOptions.appendChild(o);
+      planRows.push({ name: p.name, el: o });
     });
-    document.getElementById("changePlanBtn").addEventListener("click", function () { planM.open(); });
+    document.getElementById("changePlanBtn").addEventListener("click", function () { markSelected(); planM.open(); });
 
     // Manage subscription
     document.getElementById("manageSubBtn").addEventListener("click", function () {

@@ -108,8 +108,15 @@
             <div class="trail"><span class="status">Required</span><button class="hs-btn hs-btn--outlined" id="ssoConfigBtn">Configure</button></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Enforce two-factor authentication (2FA)</div><div class="v">Require every member to set up 2FA before they can access the organization.</div></div>
-            <div class="trail"><span class="hs-toggle" role="switch" aria-checked="false" tabindex="0" aria-label="Enforce two-factor authentication (2FA)"></span></div>
+            <div class="kv">
+              <div class="k">Enforce two-factor authentication (2FA)</div>
+              <div class="v">Require every member to set up 2FA before they can access the organization.</div>
+              <div class="hs-alert saved-note" id="twoFaNote" hidden role="status">
+                <span class="material-symbols-outlined">info</span>
+                <span data-2fa-text></span>
+              </div>
+            </div>
+            <div class="trail"><span class="hs-toggle" id="enforce2fa" role="switch" aria-checked="false" tabindex="0" aria-label="Enforce two-factor authentication (2FA)"></span></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Session timeout</div><div class="v">How long a member can stay signed in before they are asked to sign in again.</div></div>
@@ -218,21 +225,53 @@
       wireSelect(sel, function () { S.toast("Saved"); });
     });
 
-    // Org name inline edit
+    // Org name inline edit (Save disabled until the field is non-empty)
     var orgNameModal = document.getElementById("orgNameModal");
     var orgM = S.wireModal(orgNameModal);
     var orgNameStatus = document.getElementById("orgNameStatus");
     var orgNameInput = document.getElementById("orgNameInput");
+    var orgNameSave = document.getElementById("orgNameSave");
+    function syncOrgNameSave() {
+      var empty = orgNameInput.value.trim() === "";
+      orgNameSave.disabled = empty;
+      orgNameSave.setAttribute("aria-disabled", empty ? "true" : "false");
+    }
+    orgNameInput.addEventListener("input", syncOrgNameSave);
+    orgNameInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !orgNameSave.disabled) orgNameSave.click();
+    });
     document.getElementById("editOrgNameBtn").addEventListener("click", function () {
       orgNameInput.value = orgNameStatus.textContent.trim();
+      orgNameInput.classList.remove("hs-input--error");
+      syncOrgNameSave();
       orgM.open();
     });
-    document.getElementById("orgNameSave").addEventListener("click", function () {
+    orgNameSave.addEventListener("click", function () {
       var v = orgNameInput.value.trim();
-      if (v) orgNameStatus.textContent = v;
+      if (!v) { syncOrgNameSave(); return; } // guard: never save an empty name
+      orgNameStatus.textContent = v;
       orgM.close();
       S.toast("Organization updated");
     });
+
+    // Enforce 2FA: dependent note reflects the toggle state (flip is handled globally)
+    var enforce2fa = document.getElementById("enforce2fa");
+    var twoFaNote = document.getElementById("twoFaNote");
+    if (enforce2fa && twoFaNote) {
+      var twoFaText = twoFaNote.querySelector("[data-2fa-text]");
+      function syncTwoFa() {
+        var on = enforce2fa.classList.contains("is-on");
+        twoFaNote.hidden = !on;
+        if (on) twoFaText.textContent =
+          "Members without 2FA will be prompted to set it up at their next sign-in.";
+      }
+      // run after the global toggle handler has flipped the class
+      enforce2fa.addEventListener("click", function () { setTimeout(syncTwoFa, 0); });
+      enforce2fa.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") setTimeout(syncTwoFa, 0);
+      });
+      syncTwoFa();
+    }
 
     // Configure SSO
     document.getElementById("ssoConfigBtn").addEventListener("click", function () {

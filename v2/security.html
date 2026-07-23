@@ -109,16 +109,17 @@
       <div class="modal-body">
         <form id="pwForm" autocomplete="off">
           <label for="pwCurrent" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Current password</label>
-          <input id="pwCurrent" type="password" data-autofocus placeholder="Enter current password" style="width:100%; margin:0 0 14px">
+          <input id="pwCurrent" class="hs-input" type="password" data-autofocus placeholder="Enter current password" style="width:100%; margin:0 0 14px">
           <label for="pwNew" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">New password</label>
-          <input id="pwNew" type="password" placeholder="Enter new password" style="width:100%; margin:0 0 14px">
+          <input id="pwNew" class="hs-input" type="password" placeholder="Enter new password" style="width:100%; margin:0 0 14px">
           <label for="pwConfirm" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Confirm new password</label>
-          <input id="pwConfirm" type="password" placeholder="Re-enter new password" style="width:100%">
+          <input id="pwConfirm" class="hs-input" type="password" placeholder="Re-enter new password" style="width:100%">
+          <p id="pwError" class="hs-field-hint" style="color:var(--bento-theme-color-text-negative); margin:8px 0 0" hidden>Passwords do not match.</p>
         </form>
       </div>
       <div class="modal-foot">
         <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
-        <button class="hs-btn hs-btn--primary" id="pwSave">Update password</button>
+        <button class="hs-btn hs-btn--primary" id="pwSave" disabled>Update password</button>
       </div>
     </div>
   </div>
@@ -150,13 +151,57 @@
   (function () {
     var S = window.SSV2;
 
-    // Update password (inert placeholders only)
+    // ---- Update password ----
+    // SECURITY: these fields are INERT placeholders. Nothing is submitted, sent,
+    // or stored anywhere. Values only live in the DOM to drive local validation,
+    // and the form is reset on both submit and close.
     var pwModal = document.getElementById("pwModal");
-    var pwM = S.wireModal(pwModal, { onClose: function () { document.getElementById("pwForm").reset(); } });
-    document.getElementById("updatePwBtn").addEventListener("click", function () { pwM.open(); });
-    document.getElementById("pwSave").addEventListener("click", function () {
-      // Prototype stub: no validation, no submission, nothing stored.
-      document.getElementById("pwForm").reset();
+    var pwForm = document.getElementById("pwForm");
+    var pwCurrent = document.getElementById("pwCurrent");
+    var pwNew = document.getElementById("pwNew");
+    var pwConfirm = document.getElementById("pwConfirm");
+    var pwSave = document.getElementById("pwSave");
+    var pwError = document.getElementById("pwError");
+
+    function pwClearErr() {
+      pwError.hidden = true;
+      pwNew.classList.remove("hs-input--error");
+      pwConfirm.classList.remove("hs-input--error");
+    }
+    function pwReset() { pwForm.reset(); pwClearErr(); pwSave.disabled = true; }
+
+    // Enable submit only when all three are filled AND New === Confirm.
+    function pwSync() {
+      var cur = pwCurrent.value, nw = pwNew.value, cf = pwConfirm.value;
+      var allFilled = cur.length > 0 && nw.length > 0 && cf.length > 0;
+      var match = nw === cf;
+      pwSave.disabled = !(allFilled && match);
+      // show the mismatch hint only once the confirm field has content
+      if (cf.length > 0 && nw.length > 0 && !match) {
+        pwError.hidden = false;
+        pwNew.classList.add("hs-input--error");
+        pwConfirm.classList.add("hs-input--error");
+      } else {
+        pwClearErr();
+      }
+    }
+    [pwCurrent, pwNew, pwConfirm].forEach(function (i) { i.addEventListener("input", pwSync); });
+
+    var pwM = S.wireModal(pwModal, { onClose: pwReset });
+    document.getElementById("updatePwBtn").addEventListener("click", function () {
+      pwReset();
+      pwM.open();
+    });
+    pwSave.addEventListener("click", function () {
+      // Guard (button is already disabled unless valid). Never stores or sends anything.
+      if (pwSave.disabled) return;
+      if (pwNew.value !== pwConfirm.value) {
+        pwError.hidden = false;
+        pwNew.classList.add("hs-input--error");
+        pwConfirm.classList.add("hs-input--error");
+        return;
+      }
+      pwReset();
       pwM.close();
       S.toast("Password updated");
     });

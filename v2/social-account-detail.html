@@ -48,6 +48,14 @@
     .acclist li { display:flex; align-items:center; gap:8px; font: var(--hs-type-body-md); }
     .acclist li .nm { flex:1; min-width:0; }
     .acclist li .lv { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+    /* inline hint under the manage-access rows when nobody has access */
+    .accesshint { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin: 12px 0 0; }
+    /* per-account notification settings rows (toggles handled by app.js global handler) */
+    .setrow { display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px solid var(--hs-border); }
+    .setrow:last-child { border-bottom:0; }
+    .setrow .txt { flex:1; min-width:0; }
+    .setrow .txt .k { font: var(--hs-type-body-md-b); color: var(--hs-fg); }
+    .setrow .txt .d { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); margin-top:2px; }
   </style>
 </head>
 <body class="suite-app">
@@ -137,6 +145,22 @@
         </section>
 
         <section class="card">
+          <h2 class="card-title">Notifications</h2>
+          <div class="setrow">
+            <div class="txt"><div class="k">Comment and mention alerts</div><div class="d" id="mentionsDesc">On. The account owner is notified of new comments and mentions on @somos.</div></div>
+            <div class="trail"><span class="hs-toggle is-on" id="mentionsToggle" role="switch" aria-checked="true" tabindex="0" aria-label="Comment and mention alerts for @somos"></span></div>
+          </div>
+          <div class="setrow">
+            <div class="txt"><div class="k">Publishing failure alerts</div><div class="d" id="failuresDesc">On. The account owner is emailed if a scheduled post fails to publish.</div></div>
+            <div class="trail"><span class="hs-toggle is-on" id="failuresToggle" role="switch" aria-checked="true" tabindex="0" aria-label="Publishing failure alerts for @somos"></span></div>
+          </div>
+          <div class="setrow">
+            <div class="txt"><div class="k">Weekly performance digest</div><div class="d" id="digestDesc">Off. Turn on to email a weekly analytics summary for @somos.</div></div>
+            <div class="trail"><span class="hs-toggle" id="digestToggle" role="switch" aria-checked="false" tabindex="0" aria-label="Weekly performance digest for @somos"></span></div>
+          </div>
+        </section>
+
+        <section class="card">
           <h2 class="card-title">Danger zone</h2>
           <div class="row first">
             <div class="kv"><div class="k">Disconnect account</div><div class="v" id="dangerValue">Removes it from Somos and stops all scheduling.</div></div>
@@ -194,8 +218,9 @@
       <div class="mb">
         <p class="subhead">Set what each person can do with @somos on this social account. These roles apply to this account only.</p>
         <div id="accessRows"></div>
+        <p class="accesshint" id="accessHint" hidden>Give at least one person access before saving.</p>
       </div>
-      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeManageAccess()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="saveManageAccess()">Save</button></div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeManageAccess()">Cancel</button><button class="hs-btn hs-btn--primary" id="accessSaveBtn" onclick="saveManageAccess()">Save</button></div>
     </div>
   </div>
 
@@ -287,12 +312,23 @@
       return '<div class="accrow">'
         + '<span class="lead"><span class="material-symbols-outlined">person</span></span>'
         + '<span class="who"><span class="n">'+esc(m.name)+'</span><span class="d">'+esc(m.email)+'</span></span>'
-        + '<select class="rolesel" data-mid="'+m.id+'" aria-label="Access level for '+esc(m.name)+'">'+opts+'</select>'
+        + '<select class="rolesel" data-mid="'+m.id+'" aria-label="Access level for '+esc(m.name)+'" onchange="updateAccessSaveState()">'+opts+'</select>'
         + '</div>';
     }).join('');
+    updateAccessSaveState();
     document.getElementById('accessOvl').classList.add('open');
   }
   function closeManageAccess(){ document.getElementById('accessOvl').classList.remove('open'); }
+  // Save is disabled until at least one person has a non-None level, so the
+  // account can never be saved into a state where nobody can act on it.
+  function updateAccessSaveState(){
+    var anyAccess = false;
+    document.querySelectorAll('#accessRows select.rolesel').forEach(function(sel){ if(sel.value!=='None') anyAccess = true; });
+    var btn = document.getElementById('accessSaveBtn');
+    if(btn){ btn.disabled = !anyAccess; btn.setAttribute('aria-disabled', anyAccess?'false':'true'); }
+    var hint = document.getElementById('accessHint');
+    if(hint) hint.hidden = anyAccess;
+  }
   function saveManageAccess(){
     // Read each select back into the model
     document.querySelectorAll('#accessRows select.rolesel').forEach(function(sel){
@@ -300,6 +336,9 @@
       var m = accessMembers.filter(function(x){ return x.id===id; })[0];
       if(m) m.level = sel.value;
     });
+    // Guard: never save an account with no one able to act on it.
+    var anyAccess = accessMembers.some(function(m){ return m.level!=='None'; });
+    if(!anyAccess){ updateAccessSaveState(); return; }
     renderAccessList();
     closeManageAccess();
     toast('Access updated for this account');
@@ -363,6 +402,39 @@
   document.addEventListener('click', function(e){ var t=e.target;
     if(!(t.closest && (t.closest('#floatMenu')||t.closest('#headerMoreBtn')))) closeMenus();
   });
+
+  // ---------- per-account notification toggles ----------
+  // app.js's global handler flips .hs-toggle is-on/aria-checked on click and
+  // Space/Enter (any toggle without data-managed). We update the dependent
+  // description text + a toast AFTER that flip, so we read state on a timeout.
+  var TOGGLE_TEXT = {
+    mentionsToggle: { el:'mentionsDesc',
+      on:'On. The account owner is notified of new comments and mentions on @somos.',
+      off:'Off. No alerts are sent for new comments or mentions on @somos.',
+      label:'Comment and mention alerts' },
+    failuresToggle: { el:'failuresDesc',
+      on:'On. The account owner is emailed if a scheduled post fails to publish.',
+      off:'Off. No email is sent if a scheduled post fails to publish.',
+      label:'Publishing failure alerts' },
+    digestToggle: { el:'digestDesc',
+      on:'On. A weekly analytics summary for @somos is emailed each Monday.',
+      off:'Off. Turn on to email a weekly analytics summary for @somos.',
+      label:'Weekly performance digest' }
+  };
+  function syncToggleText(tg){
+    var cfg = TOGGLE_TEXT[tg.id]; if(!cfg) return;
+    var on = tg.classList.contains('is-on');
+    var d = document.getElementById(cfg.el);
+    if(d) d.textContent = on ? cfg.on : cfg.off;
+    toast(cfg.label + (on ? ' turned on' : ' turned off'));
+  }
+  // Fires on real clicks and on the synthetic click app.js dispatches for
+  // Space/Enter, so keyboard toggling updates the text too (no double-toast).
+  document.addEventListener('click', function(e){
+    var tg = e.target.closest && e.target.closest('.hs-toggle');
+    if(tg && TOGGLE_TEXT[tg.id]) setTimeout(function(){ syncToggleText(tg); }, 0);
+  });
 </script>
+<script src="app.js"></script>
 </body>
 </html>

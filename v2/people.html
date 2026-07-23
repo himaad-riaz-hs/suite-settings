@@ -536,22 +536,29 @@
       var s=parseInt(q.get('seats'),10); if(isNaN(s)||s<0) s=5;
       return {flow:f, role:r, seats:s}; }
     function openInvite(){ var p=invParams(); inv.flow=p.flow; inv.role=p.role; inv.step='form'; inv.available=p.seats; inv.buyQty=1;
-      var start = inv.role==='member' ? 2 : (p.seats===0 ? 1 : 3); inv.rows=[]; for(var i=0;i<start;i++) inv.rows.push({perm:'View only'});
+      var start = inv.role==='member' ? 2 : (p.seats===0 ? 1 : 3); inv.rows=[]; for(var i=0;i<start;i++) inv.rows.push({email:'', perm:'View only'});
       renderInvite(); document.getElementById('inviteOvl').classList.add('open'); }
     function closeInvite(){ document.getElementById('inviteOvl').classList.remove('open'); }
-    function addInvRow(){ inv.rows.push({perm:'View only'}); renderInvite(); }
+    function addInvRow(){ inv.rows.push({email:'', perm:'View only'}); renderInvite(); }
     function rmInvRow(i){ if(inv.rows.length>1){ inv.rows.splice(i,1); renderInvite(); } }
     function invOverflow(){ return Math.max(0, inv.rows.length - inv.available); }
+    function validEmail(e){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(e||'').trim()); }
+    function inviteValidCount(){ return inv.rows.filter(function(r){ return validEmail(r.email); }).length; }
+    function updateInviteValidity(){ var b=document.getElementById('invPrimary'); if(!b) return; var ok=inviteValidCount()>0; b.disabled=!ok; b.setAttribute('aria-disabled', ok?'false':'true'); }
+    function inviteRoleOptions(){ try{ if(window.SSV2) return window.SSV2.allRoles(window.SSV2.getState()); }catch(e){} return ['Super admin','Admin','Editor','View only']; }
+    function openInvPerm(e,i,anchor){ e.stopPropagation(); showMenu(anchor, inviteRoleOptions().map(function(p){ return {label:p, icon:'shield_person', on:inv.rows[i].perm===p, fn:'setInvPerm('+i+',\''+String(p).replace(/'/g,"\\'")+'\')'}; })); }
+    function setInvPerm(i,perm){ inv.rows[i].perm=perm; closeMenus(); renderInvite(); }
     function rowHTML(i, removable){
       var rm = removable ? '<button class="rm" aria-label="Remove" onclick="rmInvRow('+i+')"><span class="material-symbols-outlined">close</span></button>' : '<span class="rmspace"></span>';
-      return '<div class="invrow"><input type="email" placeholder="name@company.com">'
-        + '<button class="sel"><span>'+esc(inv.rows[i].perm)+'</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>'
+      return '<div class="invrow"><input type="email" placeholder="name@company.com" value="'+esc(inv.rows[i].email||'')+'" oninput="inv.rows['+i+'].email=this.value;updateInviteValidity()">'
+        + '<button type="button" class="sel" aria-haspopup="menu" onclick="openInvPerm(event,'+i+',this)"><span>'+esc(inv.rows[i].perm)+'</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>'
         + rm + '</div>'; }
     function colsHTML(){ return '<div class="invcols"><span class="c1">Who are you inviting?</span><span class="c2">Permission</span><span class="rmspace"></span></div>'; }
     function renderInvite(){
       var title=document.getElementById('invTitle'), body=document.getElementById('invBody'), foot=document.getElementById('invFoot');
       var n=inv.rows.length;
       if(inv.step==='sent'){
+        n=inviteValidCount()||n;
         title.textContent = inv.role==='member' ? 'Request sent' : 'Invitations sent';
         var msg = inv.role==='member'
           ? '<strong>'+n+'</strong> member request'+(n>1?'s were':' was')+' sent to Marisol Chen, the billing owner, to approve. You will be notified once it is reviewed.'
@@ -609,9 +616,10 @@
       if(inv.role==='member') primary='Send request';
       else if(inv.flow==='a' && invOverflow()>0){ var o=invOverflow(); primary='Add '+o+' seat'+(o>1?'s':'')+' and invite '+n; }
       else primary='Invite members';
-      foot.innerHTML = '<button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="invSubmit()">'+esc(primary)+'</button>';
+      foot.innerHTML = '<button class="hs-btn hs-btn--ghost" onclick="closeInvite()">Cancel</button><button class="hs-btn hs-btn--primary" id="invPrimary" onclick="invSubmit()">'+esc(primary)+'</button>';
+      updateInviteValidity();
     }
-    function invSubmit(){ inv.step='sent'; renderInvite(); }
+    function invSubmit(){ if(inviteValidCount()<1) return; inv.step='sent'; renderInvite(); }
     function invBuy(){ inv.available = inv.available + inv.buyQty; inv.step='bought'; renderInvite(); }
     document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInvite(); });
   </script>

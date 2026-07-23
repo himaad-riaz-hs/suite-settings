@@ -71,25 +71,81 @@
           </div>
         </section>
 
-        <section class="card">
+        <section class="card" id="emailCard">
           <h2 class="card-title">Email notifications</h2>
+          <div class="tglrow" id="muteRow">
+            <span class="k"><strong>Mute all email notifications</strong><span class="mute-sub">Pause every email below. You can turn individual emails back on any time.</span></span>
+            <span class="hs-toggle" id="muteAll" data-managed role="switch" aria-checked="false" tabindex="0" aria-label="Mute all email notifications"></span>
+          </div>
 
           <div class="subgroup">Scheduled messages</div>
-          <div class="tglrow"><span class="k">Approvals and pre-review</span><span class="hs-toggle is-on" role="switch" aria-checked="true" tabindex="0" aria-label="Approvals and pre-review"></span></div>
+          <div class="tglrow"><span class="k">Approvals and pre-review</span><span class="hs-toggle is-on" data-email role="switch" aria-checked="true" tabindex="0" aria-label="Approvals and pre-review"></span></div>
 
           <div class="subgroup">Organization and teams</div>
-          <div class="tglrow"><span class="k">When a message is created that requires approval</span><span class="hs-toggle is-on" role="switch" aria-checked="true" tabindex="0" aria-label="When a message is created that requires approval"></span></div>
-          <div class="tglrow"><span class="k">When a message is rejected in pre-review</span><span class="hs-toggle is-on" role="switch" aria-checked="true" tabindex="0" aria-label="When a message is rejected in pre-review"></span></div>
+          <div class="tglrow"><span class="k">When a message is created that requires approval</span><span class="hs-toggle is-on" data-email role="switch" aria-checked="true" tabindex="0" aria-label="When a message is created that requires approval"></span></div>
+          <div class="tglrow"><span class="k">When a message is rejected in pre-review</span><span class="hs-toggle is-on" data-email role="switch" aria-checked="true" tabindex="0" aria-label="When a message is rejected in pre-review"></span></div>
 
           <div class="subgroup">Internal comments</div>
-          <div class="tglrow"><span class="k">Mentions and replies</span><span class="hs-toggle is-on" role="switch" aria-checked="true" tabindex="0" aria-label="Mentions and replies"></span></div>
-          <div class="tglrow"><span class="k">Comments on all posts or drafts I've created</span><span class="hs-toggle is-on" role="switch" aria-checked="true" tabindex="0" aria-label="Comments on all posts or drafts I've created"></span></div>
-          <div class="tglrow"><span class="k">Conversations I'm a part of</span><span class="hs-toggle is-on" role="switch" aria-checked="true" tabindex="0" aria-label="Conversations I'm a part of"></span></div>
+          <div class="tglrow"><span class="k">Mentions and replies</span><span class="hs-toggle is-on" data-email role="switch" aria-checked="true" tabindex="0" aria-label="Mentions and replies"></span></div>
+          <div class="tglrow"><span class="k">Comments on all posts or drafts I've created</span><span class="hs-toggle is-on" data-email role="switch" aria-checked="true" tabindex="0" aria-label="Comments on all posts or drafts I've created"></span></div>
+          <div class="tglrow"><span class="k">Conversations I'm a part of</span><span class="hs-toggle is-on" data-email role="switch" aria-checked="true" tabindex="0" aria-label="Conversations I'm a part of"></span></div>
         </section>
+
+        <div class="save-bar">
+          <button class="hs-btn hs-btn--primary" id="saveNotifs">Save preferences</button>
+        </div>
       </div>
     </div>
   </main>
 
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    var muteAll = document.getElementById("muteAll");
+    var emailToggles = Array.prototype.slice.call(document.querySelectorAll(".hs-toggle[data-email]"));
+
+    function setToggle(t, on) {
+      t.classList.toggle("is-on", on);
+      t.setAttribute("aria-checked", on ? "true" : "false");
+    }
+    // Master reflects the group: on only when every email is muted (all off).
+    function syncMaster() {
+      var allOff = emailToggles.every(function (t) { return !t.classList.contains("is-on"); });
+      setToggle(muteAll, allOff);
+    }
+
+    // Master is self-managed (data-managed opts it out of the global flip) so it
+    // can cascade to the group instead of just flipping itself.
+    function toggleMaster() {
+      var mute = !muteAll.classList.contains("is-on"); // desired next state
+      setToggle(muteAll, mute);
+      emailToggles.forEach(function (t) { setToggle(t, !mute); });
+    }
+    muteAll.addEventListener("click", toggleMaster);
+    muteAll.addEventListener("keydown", function (e) {
+      if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggleMaster(); }
+    });
+
+    // Each email toggle flips via the global handler; re-derive the master after.
+    emailToggles.forEach(function (t) {
+      t.addEventListener("click", function () { setTimeout(syncMaster, 0); });
+      t.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") setTimeout(syncMaster, 0);
+      });
+    });
+    syncMaster();
+
+    document.getElementById("saveNotifs").addEventListener("click", function () {
+      S.toast("Notification preferences saved");
+    });
+  })();
+</script>
+<style>
+  .mute-sub { display:block; font:var(--hs-type-body-sm); color:var(--bento-theme-color-text-subtle); margin-top:2px; font-weight:400; }
+  #muteRow { border-bottom:1px solid var(--bento-theme-color-border-subtle); padding-bottom:12px; margin-bottom:4px; }
+  .save-bar { display:flex; justify-content:flex-end; margin-top:var(--bento-space-04); }
+</style>
 </body>
 </html>
