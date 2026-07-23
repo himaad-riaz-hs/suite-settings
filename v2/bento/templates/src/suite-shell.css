@@ -135,8 +135,8 @@
 /* ── Product column ──────────────────────────────────────────────── */
 .suite-main { display: flex; flex-direction: column; min-width: 0; background: var(--suite-page); }
 .suite-topbar {
-  height: 64px; background: var(--suite-surface); border-bottom: 1px solid var(--suite-border);
-  display: flex; align-items: center; gap: 20px; padding: 12px 24px; flex-shrink: 0;
+  height: 64px; box-sizing: border-box; background: var(--suite-surface); border-bottom: 1px solid var(--suite-border);
+  display: flex; align-items: center; gap: 20px; padding: 0 24px; flex-shrink: 0;
 }
 .suite-topbar h1 { font-family: var(--suite-font); font-weight: 700; font-size: 26px; line-height: 32px; color: var(--suite-ink); margin: 0; }
 .suite-topbar .spacer { flex: 1; }
