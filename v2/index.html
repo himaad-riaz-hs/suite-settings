@@ -54,21 +54,24 @@
     .wk-body { flex:1; min-height:0; overflow:auto; display:grid; grid-template-columns:56px repeat(7,1fr); }
     .wk-gutter { border-right:1px solid var(--hs-border); }
     .wk-col { border-left:1px solid var(--hs-border); padding:8px; display:flex; flex-direction:column; gap:8px; }
-    .pcard { border:1px solid var(--hs-border); border-radius:8px; background:var(--bento-theme-color-bg-surface); overflow:hidden; }
-    .pcard .thumb { height:78px; background:var(--bento-system-sys-neutral-alt-200); background-size:cover; background-position:center; }
-    .pcard .body { padding:8px; }
-    .pc-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-    .pc-net { width:20px; height:20px; border-radius:999px; display:grid; place-items:center; color:#fff; font:700 10px var(--hs-font-body); flex:0 0 auto; }
+    /* comp-card-calendar-portrait (Figma node 13250-128882): 104px image + 104px content,
+       network badge straddling the divide, author 16/24 + time, body 14/20, footer status + comment. */
+    .pcard { border:1px solid var(--hs-global-color-border-subtle,#ebebeb); border-radius:8px; background:#fdfdfd; overflow:hidden; }
+    .pcard .pc-img { height:104px; background-size:cover; background-position:center; }
+    .pcard .pc-body { padding:8px; }
+    .pc-net { width:20px; height:20px; border-radius:5px; display:inline-grid; place-items:center; color:#fff; font:700 11px/1 var(--hs-font-body); flex:0 0 auto; }
     .pc-net.fb { background:#1877f2; } .pc-net.li { background:#0a66c2; } .pc-net.x { background:#1c1c1c; } .pc-net.ig { background:#c1274a; }
-    .pc-auth { font:var(--hs-type-body-sm-b); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .pc-time { margin-left:auto; font:var(--hs-type-meta); color:var(--bento-theme-color-text-subtle); }
-    .pc-text { font:var(--hs-type-body-sm); color:var(--hs-fg); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
-    .pc-foot { display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-top:1px solid var(--hs-border); }
-    .pc-status { display:inline-flex; align-items:center; gap:5px; font:var(--hs-type-meta-b); border-radius:6px; padding:3px 8px; }
-    .pc-status.pub { background:var(--bento-theme-color-bg-mint,#dfffde); color:#0a5f2c; }
-    .pc-status.draft { background:var(--bento-system-sys-neutral-alt-100); color:var(--bento-theme-color-text-subtle); }
+    .pcard.has-img .pc-net { margin-top:-22px; margin-bottom:4px; box-shadow:0 0 0 2px #fdfdfd; }
+    .pc-titlerow { display:flex; align-items:center; gap:8px; }
+    .pc-author { font:600 16px/24px var(--hs-font-body); color:#1c1c1c; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pc-time { margin-left:auto; font:400 14px/24px var(--hs-font-body); color:#5c5c5c; white-space:nowrap; flex:0 0 auto; }
+    .pc-text { font:400 14px/20px var(--hs-font-body); color:#1c1c1c; margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .pc-foot { display:flex; align-items:center; margin-top:8px; min-height:28px; }
+    .pc-status { display:inline-flex; align-items:center; gap:5px; font:600 12px/16px var(--hs-font-body); border-radius:4px; padding:4px 8px; }
+    .pc-status.pub { background:#e6f3e9; color:#01781b; }
+    .pc-status.draft { background:#eef1f2; color:#5c5c5c; }
     .pc-status .material-symbols-outlined { font-size:14px; }
-    .pc-foot .cmt { color:var(--bento-theme-color-icon-subtle); font-size:18px; }
+    .pc-foot .cmt { margin-left:auto; color:#5c5c5c; font-size:20px; }
     /* account menu (avatar -> Settings) */
     .acctmenu { position:fixed; left:74px; bottom:14px; width:264px; z-index:80; background:var(--bento-theme-color-bg-surface);
       border:1px solid var(--hs-border); border-radius:12px; box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); padding:6px; display:none; }
@@ -234,11 +237,19 @@
         var cards=d.posts.map(function(p){
           var st = p.status==='pubv' ? '<span class="pc-status pub"><span class="material-symbols-outlined">check_circle</span>Published vi...</span>'
                  : p.status==='pub' ? '<span class="pc-status pub"><span class="material-symbols-outlined">check_circle</span>Published</span>'
-                 : p.status==='draft' ? '<span class="pc-status draft">Draft</span>' : '<span></span>';
-          return '<div class="pcard">'+(p.thumb?'<div class="thumb" style="background:'+p.thumb+'"></div>':'')+
-            '<div class="body"><div class="pc-top"><span class="pc-net '+p.net+'">'+netLabel(p.net)+'</span><span class="pc-auth">'+esc(p.auth)+'</span><span class="pc-time">'+esc(p.time)+'</span></div>'+
-            '<div class="pc-text">'+esc(p.text)+'</div></div>'+
-            '<div class="pc-foot">'+st+'<span class="material-symbols-outlined cmt">chat_bubble_outline</span></div></div>';
+                 : p.status==='draft' ? '<span class="pc-status draft">Draft</span>' : '';
+          var net='<span class="pc-net '+p.net+'">'+netLabel(p.net)+'</span>';
+          var foot='<div class="pc-foot">'+st+'<span class="material-symbols-outlined cmt">chat_bubble_outline</span></div>';
+          var text='<div class="pc-text">'+esc(p.text)+'</div>';
+          if(p.thumb){
+            return '<div class="pcard has-img"><div class="pc-img" style="background:'+p.thumb+'"></div>'+
+              '<div class="pc-body">'+net+
+              '<div class="pc-titlerow"><span class="pc-author">'+esc(p.auth)+'</span><span class="pc-time">'+esc(p.time)+'</span></div>'+
+              text+foot+'</div></div>';
+          }
+          return '<div class="pcard"><div class="pc-body">'+
+            '<div class="pc-titlerow">'+net+'<span class="pc-author">'+esc(p.auth)+'</span><span class="pc-time">'+esc(p.time)+'</span></div>'+
+            text+foot+'</div></div>';
         }).join('');
         body+='<div class="wk-col">'+cards+'</div>';
       });
