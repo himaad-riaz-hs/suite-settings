@@ -64,7 +64,7 @@
           <h2 class="card-title">Organization profile</h2>
           <div class="row first">
             <div class="kv"><div class="k">Organization name</div><div class="v">Shown across Hootsuite and on invitations to new members.</div></div>
-            <div class="trail"><span class="status">Somos</span><button class="hs-btn hs-btn--outlined">Edit</button></div>
+            <div class="trail"><span class="status" id="orgNameStatus">Somos</span><button class="hs-btn hs-btn--outlined" id="editOrgNameBtn">Edit</button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Organization ID</div><div class="v">Use this when you contact support. Read-only.</div></div>
@@ -72,15 +72,15 @@
           </div>
           <div class="row">
             <div class="kv"><div class="k">Region and data residency</div><div class="v">Where your organization's data is stored. Changing this can take up to 48 hours.</div></div>
-            <div class="trail"><button class="sel"><span>Canada (Central)</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" data-options="Canada (Central)|United States (East)|Europe (Frankfurt)|Asia Pacific (Sydney)"><span>Canada (Central)</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Default language</div><div class="v">The starting language for new members. Each member can change their own.</div></div>
-            <div class="trail"><button class="sel"><span>English</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" data-options="English|French (Canada)|Spanish|German|Portuguese (Brazil)"><span>English</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Default time zone</div><div class="v">Sets when posts publish and how reports bucket the day for new members.</div></div>
-            <div class="trail"><button class="sel"><span>(UTC&#8722;08:00) Vancouver</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" data-options="(UTC&#8722;08:00) Vancouver|(UTC&#8722;06:00) Winnipeg|(UTC&#8722;05:00) Toronto|(UTC+00:00) London"><span>(UTC&#8722;08:00) Vancouver</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
         </section>
 
@@ -88,7 +88,7 @@
           <h2 class="card-title">Membership defaults</h2>
           <div class="row first">
             <div class="kv"><div class="k">Default role for new members</div><div class="v">The role applied when someone joins, until an admin changes it.</div></div>
-            <div class="trail"><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" data-options="Super admin|Admin|Editor|View only"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Allow team admins to invite members</div><div class="v">Team admins can send invitations without going through an organization admin.</div></div>
@@ -105,7 +105,7 @@
           <p class="card-sub">Organization wide controls that apply to every member. Members see these on their Security and privacy page.</p>
           <div class="row first">
             <div class="kv"><div class="k">Single sign-on (SSO)</div><div class="v">Members sign in through your identity provider. Managed with your provider.</div></div>
-            <div class="trail"><span class="status">Required</span><button class="hs-btn hs-btn--outlined">Configure</button></div>
+            <div class="trail"><span class="status">Required</span><button class="hs-btn hs-btn--outlined" id="ssoConfigBtn">Configure</button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Enforce two-factor authentication (2FA)</div><div class="v">Require every member to set up 2FA before they can access the organization.</div></div>
@@ -113,7 +113,7 @@
           </div>
           <div class="row">
             <div class="kv"><div class="k">Session timeout</div><div class="v">How long a member can stay signed in before they are asked to sign in again.</div></div>
-            <div class="trail"><button class="sel"><span>8 hours</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" data-options="1 hour|4 hours|8 hours|24 hours|Never"><span>8 hours</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
         </section>
 
@@ -121,12 +121,142 @@
           <h2 class="card-title">Danger zone</h2>
           <div class="row first">
             <div class="kv"><div class="k">Delete organization</div><div class="v">Permanently removes Somos, all teams, and all connected accounts. This cannot be undone, and active seats are billed until the end of the current period.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Delete organization</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="deleteOrgBtn">Delete organization</button></div>
           </div>
         </section>
       </div>
     </div>
   </main>
+
+  <!-- Edit organization name modal -->
+  <div id="orgNameModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="orgNameModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="orgNameModalTitle">Edit organization name</h2>
+          <p class="modal-sub">Shown across Hootsuite and on invitations to new members.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <label for="orgNameInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Organization name</label>
+        <input id="orgNameInput" type="text" data-autofocus style="width:100%">
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="orgNameSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete organization confirm (outlined confirm, never red) -->
+  <div id="deleteOrgModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteOrgModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="deleteOrgModalTitle">Delete organization?</h2>
+          <p class="modal-sub">This permanently removes Somos, all teams, and all connected accounts. This cannot be undone.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0">Active seats are billed until the end of the current period.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--outlined" id="deleteOrgConfirm">Delete organization</button>
+      </div>
+    </div>
+  </div>
+
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    /* Turn a Bento .sel trigger into a click-to-open option list (inert). */
+    function wireSelect(sel, onPick) {
+      if (!sel) return;
+      var opts = (sel.getAttribute("data-options") || "").split("|").filter(Boolean);
+      var menu = null;
+      function labelEl() { return sel.querySelector("span:first-child"); }
+      function close() {
+        if (menu) { menu.remove(); menu = null; }
+        sel.setAttribute("aria-expanded", "false");
+        document.removeEventListener("mousedown", onDoc, true);
+      }
+      function onDoc(e) { if (!sel.contains(e.target) && (!menu || !menu.contains(e.target))) close(); }
+      sel.setAttribute("aria-haspopup", "listbox");
+      sel.setAttribute("aria-expanded", "false");
+      sel.addEventListener("click", function () {
+        if (menu) { close(); return; }
+        menu = S.el("div", "sel-menu");
+        menu.setAttribute("role", "listbox");
+        var current = labelEl().innerHTML;
+        opts.forEach(function (o) {
+          var item = S.el("div", "sel-menu-item" + (o === current ? " on" : ""), o);
+          item.setAttribute("role", "option");
+          item.addEventListener("click", function () {
+            var changed = o !== labelEl().innerHTML;
+            labelEl().innerHTML = o;
+            close();
+            if (changed && onPick) onPick(o);
+          });
+          menu.appendChild(item);
+        });
+        sel.parentNode.style.position = "relative";
+        sel.parentNode.appendChild(menu);
+        sel.setAttribute("aria-expanded", "true");
+        document.addEventListener("mousedown", onDoc, true);
+      });
+    }
+
+    // Every select on this page saves on change
+    Array.prototype.forEach.call(document.querySelectorAll(".sel"), function (sel) {
+      wireSelect(sel, function () { S.toast("Saved"); });
+    });
+
+    // Org name inline edit
+    var orgNameModal = document.getElementById("orgNameModal");
+    var orgM = S.wireModal(orgNameModal);
+    var orgNameStatus = document.getElementById("orgNameStatus");
+    var orgNameInput = document.getElementById("orgNameInput");
+    document.getElementById("editOrgNameBtn").addEventListener("click", function () {
+      orgNameInput.value = orgNameStatus.textContent.trim();
+      orgM.open();
+    });
+    document.getElementById("orgNameSave").addEventListener("click", function () {
+      var v = orgNameInput.value.trim();
+      if (v) orgNameStatus.textContent = v;
+      orgM.close();
+      S.toast("Organization updated");
+    });
+
+    // Configure SSO
+    document.getElementById("ssoConfigBtn").addEventListener("click", function () {
+      S.toast("Opening SSO configuration");
+    });
+
+    // Delete organization (outlined confirm, does not clear anything)
+    var deleteOrgModal = document.getElementById("deleteOrgModal");
+    var delOrgM = S.wireModal(deleteOrgModal);
+    document.getElementById("deleteOrgBtn").addEventListener("click", function () { delOrgM.open(); });
+    document.getElementById("deleteOrgConfirm").addEventListener("click", function () {
+      delOrgM.close();
+      S.toast("Organization scheduled for deletion");
+    });
+  })();
+</script>
+<style>
+  .sel-menu { position:absolute; top:calc(100% + 4px); right:0; min-width:220px; max-width:320px;
+    background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border);
+    border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20));
+    padding:6px; z-index:50; }
+  .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
+  .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
+  .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
+</style>
 </body>
 </html>

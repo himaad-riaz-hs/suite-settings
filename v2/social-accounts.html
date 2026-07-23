@@ -184,6 +184,27 @@
   <!-- Floating menu (row actions + toolbar filters), mirrors people.html .menu -->
   <div class="menu" id="floatMenu" hidden></div>
 
+  <!-- Reassign owner modal (row action): pick a new owner from org members -->
+  <div class="ovl" id="reassignOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="reassignTitle">
+      <div class="mh"><h2 id="reassignTitle">Reassign owner</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeReassign()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb">
+        <p class="subhead" id="reassignSub">Choose who owns this account. The owner manages the connection and its access.</p>
+        <div id="reassignOptions" role="radiogroup" aria-label="Select an owner"></div>
+      </div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeReassign()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="saveReassign()">Save</button></div>
+    </div>
+  </div>
+
+  <!-- Disconnect confirm modal (row action): outlined confirm, never red -->
+  <div class="ovl" id="disconnectOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="disconnectTitle">
+      <div class="mh"><h2 id="disconnectTitle">Disconnect account</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeDisconnect()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb"><p class="subhead" id="disconnectSub">Disconnecting removes this account from Somos and stops all scheduling. You can reconnect it later.</p></div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeDisconnect()">Cancel</button><button class="hs-btn hs-btn--outlined" onclick="confirmDisconnect()">Disconnect account</button></div>
+    </div>
+  </div>
+
   <!-- Reconnect modal (T5): restore the expired @somos Instagram connection -->
   <div class="ovl" id="reconnectOvl">
     <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="reconnectTitle">
@@ -220,23 +241,120 @@
     t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800); }
 
   // ---------- row action menu ----------
+  // The host (tr or .ecard) the menu was opened from; row actions operate on it.
+  var _activeHost = null;
   function openRowMenu(e, btn){ e.stopPropagation();
     var host = btn.closest('tr') || btn.closest('.ecard');
-    var acct = host ? (host.getAttribute('data-account') || 'this account') : 'this account';
+    _activeHost = host;
     var needsReconnect = host && host.getAttribute('data-reconnect')==='1';
     var items = [];
-    if(needsReconnect) items.push({label:'Reconnect', icon:'sync', fn:'rowReconnect(this)'});
-    items.push({label:'Reassign owner', icon:'person', fn:'rowReassign(\''+esc(acct)+'\')'});
+    if(needsReconnect) items.push({label:'Reconnect', icon:'sync', fn:'rowReconnect()'});
+    items.push({label:'Reassign owner', icon:'person', fn:'rowReassign()'});
     items.push({label:'View details', icon:'open_in_new', fn:'rowViewDetails()'});
     items.push({sep:true});
-    items.push({label:'Disconnect', icon:'link_off', fn:'rowDisconnect(\''+esc(acct)+'\')'});
+    items.push({label:'Disconnect', icon:'link_off', fn:'rowDisconnect()'});
     showMenu(btn, items);
   }
-  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function esc(s){ return (window.SSV2 && window.SSV2.esc) ? window.SSV2.esc(s)
+    : String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function rowReconnect(){ closeMenus(); openReconnect(); }
-  function rowReassign(acct){ closeMenus(); toast('Reassign owner for '+acct); }
   function rowViewDetails(){ closeMenus(); window.location.href='social-account-detail.html'; }
-  function rowDisconnect(acct){ closeMenus(); toast(acct+' disconnected'); }
+
+  // Return the display label for the host account (used in copy + toasts).
+  function hostAccount(host){ return (host && host.getAttribute('data-account')) || 'this account'; }
+  // Set the owner name on a host, in both column (td.hs-small) and card (.e "Network · Owner") layouts.
+  function setHostOwner(host, name){
+    if(!host) return;
+    if(host.tagName === 'TR'){
+      // Owner is the 4th cell (checkbox, account, network, owner, status, actions).
+      var cell = host.querySelectorAll('td.hs-small')[1];
+      if(cell) cell.textContent = name;
+    } else {
+      var e = host.querySelector('.e');
+      if(e){ var net = (host.getAttribute('data-network')||'').trim();
+        e.textContent = (net ? net + ' · ' : '') + name; }
+    }
+  }
+  // Find the matching host in the OTHER view (table<->grid) so both stay in sync.
+  function twinHost(host){
+    if(!host) return null;
+    var acct = host.getAttribute('data-account'), net = host.getAttribute('data-network');
+    var sel = (host.tagName === 'TR') ? '#gridView .ecard' : '#tableView tbody tr';
+    var list = document.querySelectorAll(sel);
+    for(var i=0;i<list.length;i++){
+      if(list[i].getAttribute('data-account')===acct && list[i].getAttribute('data-network')===net) return list[i];
+    }
+    return null;
+  }
+
+  // ---------- Reassign owner (row action) ----------
+  var _reassignHost = null;
+  function rowReassign(){
+    closeMenus();
+    _reassignHost = _activeHost;
+    var sub = document.getElementById('reassignSub');
+    if(sub) sub.textContent = 'Choose who owns ' + hostAccount(_reassignHost) + '. The owner manages the connection and its access.';
+    var box = document.getElementById('reassignOptions');
+    var people = (window.SSV2 && window.SSV2.PEOPLE) || {};
+    box.innerHTML = Object.keys(people).map(function(id){
+      var p = people[id];
+      return '<div class="opt" role="radio" aria-checked="false" tabindex="0" data-name="'+esc(p.name)+'" onclick="selectReassign(this)" onkeydown="reassignKey(event,this)">'
+        + '<span class="lead"><span class="material-symbols-outlined">person</span></span>'
+        + '<span class="txt"><span class="n">'+esc(p.name)+'</span><span class="d">'+esc(p.email)+'</span></span>'
+        + '<span class="material-symbols-outlined check">check</span></div>';
+    }).join('');
+    document.getElementById('reassignOvl').classList.add('open');
+  }
+  function closeReassign(){ document.getElementById('reassignOvl').classList.remove('open'); }
+  function selectReassign(el){
+    document.querySelectorAll('#reassignOptions .opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-checked','false'); });
+    el.classList.add('selected'); el.setAttribute('aria-checked','true');
+  }
+  function reassignKey(e, el){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selectReassign(el); } }
+  function saveReassign(){
+    var sel = document.querySelector('#reassignOptions .opt.selected');
+    if(!sel) return; // nothing picked
+    var name = sel.getAttribute('data-name');
+    setHostOwner(_reassignHost, name);
+    setHostOwner(twinHost(_reassignHost), name);
+    closeReassign();
+    toast('Owner changed to ' + name);
+  }
+
+  // ---------- Disconnect (row action) ----------
+  var _disconnectHost = null;
+  function rowDisconnect(){
+    closeMenus();
+    _disconnectHost = _activeHost;
+    var sub = document.getElementById('disconnectSub');
+    if(sub) sub.textContent = 'Disconnecting removes ' + hostAccount(_disconnectHost) + ' from Somos and stops all scheduling. You can reconnect it later.';
+    document.getElementById('disconnectOvl').classList.add('open');
+  }
+  function closeDisconnect(){ document.getElementById('disconnectOvl').classList.remove('open'); }
+  // Displayed baseline counts (the table renders a page of the full 15-account set,
+  // so we adjust these numbers by deltas rather than recounting only visible rows).
+  var _connected = 12, _needReconnect = 3;
+  function renderCounts(){
+    var meta = document.getElementById('countMeta');
+    if(meta) meta.innerHTML = _connected + ' connected &#183; ' + _needReconnect + ' need to reconnect';
+  }
+  function confirmDisconnect(){
+    var host = _disconnectHost;
+    var wasNeed = host && (host.getAttribute('data-status')||'')==='Needs reconnect';
+    var twin = twinHost(host);
+    if(host && host.parentNode) host.parentNode.removeChild(host);
+    if(twin && twin.parentNode) twin.parentNode.removeChild(twin);
+    if(wasNeed) _needReconnect = Math.max(0, _needReconnect - 1);
+    else _connected = Math.max(0, _connected - 1);
+    renderCounts();
+    closeDisconnect();
+    toast('Account disconnected');
+  }
+  // A reconnect moves one account from "need reconnect" to "connected".
+  function updateCounts(){
+    if(_needReconnect > 0){ _needReconnect--; _connected++; }
+    renderCounts();
+  }
 
   // ---------- toolbar filters + view ----------
   var networkF='All', statusF='All';
@@ -281,12 +399,22 @@
       // Remove the row-level Reconnect button now that it is connected
       var btn = row.querySelector('.hs-btn--outlined');
       if(btn) btn.remove();
+      // Reflect the new state so filters and the count line stay accurate
+      row.setAttribute('data-status','Connected');
+      row.removeAttribute('data-reconnect');
     }
-    // Update the count line (one fewer needs to reconnect)
-    var meta = document.getElementById('countMeta');
-    if(meta) meta.innerHTML = '13 connected &#183; 2 need to reconnect';
+    // Keep the grid twin in sync (pill + state) if present
+    var twin = document.querySelector('#gridView .ecard[data-account="@somos"][data-network="Instagram"]');
+    if(twin){
+      var tpill = twin.querySelector('.hs-badge');
+      if(tpill){ tpill.className='hs-badge hs-badge--positive'; tpill.innerHTML='<span class="material-symbols-outlined">check</span>Connected'; }
+      twin.setAttribute('data-status','Connected');
+      twin.removeAttribute('data-reconnect');
+    }
+    // Recompute the count line from the current rows
+    updateCounts();
   }
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReconnect(); closeMenus(); } });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReconnect(); closeReassign(); closeDisconnect(); closeMenus(); } });
   // close floating menu on outside click (keep open when clicking the menu or its anchors)
   document.addEventListener('click', function(e){
     var t=e.target;

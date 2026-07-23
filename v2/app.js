@@ -14,7 +14,6 @@
     sam:     { name: "Sam Rivera",   email: "sam@somos.co",     initials: "SR", role: "Editor",      status: "Active"  },
     aisha:   { name: "Aisha Patel",  email: "aisha@somos.co",   initials: "AP", role: "Admin",       status: "Pending" },
     devin:   { name: "Devin Okafor", email: "devin@somos.co",   initials: "DO", role: "Editor",      status: "Active"  },
-    priya:   { name: "Priya Anand",  email: "priya@somos.co",   initials: "PA", role: "Editor",      status: "Active"  },
     marco:   { name: "Marco Silva",  email: "marco@somos.co",   initials: "MS", role: "Admin",       status: "Active"  },
     yuki:    { name: "Yuki Tanaka",  email: "yuki@somos.co",    initials: "YT", role: "Editor",      status: "Pending" },
     bryn:    { name: "Bryn Morales", email: "bryn@somos.co",    initials: "BM", role: "Editor",      status: "Active"  }
@@ -92,11 +91,21 @@
     var role = (ov && ov.role) || base.role;
     var scope = (ov && ov.scope) || scopeForRole(state, role);
     return { id: id, name: base.name, email: base.email, initials: base.initials,
-             status: base.status, role: role, scope: scope };
+             status: base.status, role: role, scope: scope,
+             removed: !!(ov && ov.removed) };
   }
   function setPerson(id, role, scope) {
     var state = getState();
-    state.overrides[id] = { role: role, scope: scope };
+    var ov = state.overrides[id] || {};
+    ov.role = role; ov.scope = scope;
+    state.overrides[id] = ov;
+    save(state);
+  }
+  function removePerson(id) {
+    var state = getState();
+    var ov = state.overrides[id] || {};
+    ov.removed = true;
+    state.overrides[id] = ov;
     save(state);
   }
 
@@ -341,6 +350,7 @@
       if (!id) return;
       link.setAttribute("href", "person-detail.html?p=" + id);
       var p = getPerson(state, id);
+      if (p && p.removed) { card.style.display = "none"; return; }
       var roleSpan = card.querySelector(".foot > span:first-child");
       if (roleSpan && p) roleSpan.textContent = p.role;
     });
@@ -349,6 +359,7 @@
     rows.forEach(function (tr) {
       var id = tr.getAttribute("data-pid");
       var p = getPerson(state, id);
+      if (p && p.removed) { tr.style.display = "none"; return; }
       var roleCell = tr.querySelector("[data-role-cell]");
       if (roleCell && p) roleCell.textContent = p.role;
     });
@@ -399,6 +410,7 @@
       if (countH) countH.textContent = rows.length + " roles in Somos";
     }
     render();
+    if (window.SSV2) window.SSV2.rerenderRoles = render;
 
     // create-role modal
     var wrap = document.getElementById("createRoleModal");
@@ -455,6 +467,22 @@
   }
 
   /* ---- boot ------------------------------------------------------------- */
+  /* ---- shared API: inline page scripts persist through the SAME store ----
+     (bulk actions, offboarding, teams, etc. all read/write via window.SSV2 so
+     changes survive a reload and stay consistent across pages). ---- */
+  window.SSV2 = {
+    STORE_KEY: STORE_KEY,
+    PEOPLE: PEOPLE, CAPS: CAPS, LEVELS: LEVELS,
+    PRESETS: PRESETS, PRESET_ORDER: PRESET_ORDER, PRESET_DESC: PRESET_DESC,
+    getState: getState, save: save,
+    getPerson: getPerson, setPerson: setPerson, removePerson: removePerson,
+    allRoles: allRoles, scopeForRole: scopeForRole, roleDesc: roleDesc,
+    customRoleByName: customRoleByName,
+    buildPermEditor: buildPermEditor, wireModal: wireModal,
+    toast: toast, esc: esc, el: el,
+    rerenderRoles: function () {}
+  };
+
   function boot() {
     initPersonDetail();
     initPeopleList();
@@ -492,17 +520,28 @@
       var lbl=(b.getAttribute("aria-label")||"").trim().toLowerCase();
       if(GEN.indexOf(lbl)>=0){ var row=b.closest("tr")||b.closest(".ecard")||b.closest(".listrow"); var n=rowName(row); if(n) b.setAttribute("aria-label","Actions for "+n); b.setAttribute("aria-haspopup","menu"); b.setAttribute("aria-expanded","false"); }
     });
+    // toggles behave as switches (settings pages ship them static; make them real)
+    document.querySelectorAll(".hs-toggle").forEach(function(t){
+      if(!t.getAttribute("role")) t.setAttribute("role","switch");
+      if(!t.hasAttribute("tabindex")) t.setAttribute("tabindex","0");
+      if(!t.hasAttribute("aria-checked")) t.setAttribute("aria-checked", t.classList.contains("is-on")?"true":"false");
+    });
   }
   document.addEventListener("keydown", function(e){
     if(e.key!==" " && e.key!=="Enter") return;
     var c=e.target.closest && e.target.closest("table.hs-table .hs-check");
-    if(c){ e.preventDefault(); c.click(); }
+    if(c){ e.preventDefault(); c.click(); return; }
+    var t=e.target.closest && e.target.closest(".hs-toggle");
+    if(t && !t.hasAttribute("data-managed")){ e.preventDefault(); t.click(); }
   });
   document.addEventListener("click", function(e){
     var a=e.target.closest && e.target.closest("nav.tabs a");
     if(a){ setTimeout(function(){ var nav=a.closest("nav.tabs"); if(nav) nav.querySelectorAll("a").forEach(function(x){ x.setAttribute("aria-selected", x.classList.contains("on") ? "true" : "false"); }); },0); }
     var c=e.target.closest && e.target.closest("table.hs-table .hs-check");
     if(c){ setTimeout(function(){ c.setAttribute("aria-checked", c.classList.contains("is-on") ? "true" : "false"); },0); }
+    // flip any toggle the page hasn't explicitly claimed (data-managed opts out)
+    var t=e.target.closest && e.target.closest(".hs-toggle");
+    if(t && !t.hasAttribute("data-managed")){ var on=t.classList.toggle("is-on"); t.setAttribute("aria-checked", on?"true":"false"); }
   });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", decorate);
   else decorate();

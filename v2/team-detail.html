@@ -10,6 +10,26 @@
   <link rel="stylesheet" href="bento/templates/src/suite-drawer.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0..200&display=block">
   <link rel="stylesheet" href="app.css">
+  <style>
+    /* Add members modal + floating menu (tokens only, mirrors teams.html) */
+    .ovl { position:fixed; inset:0; background:var(--bento-theme-color-overlay-scrim, rgba(1,43,58,.32)); display:none; align-items:flex-start; justify-content:center; padding:64px 16px; z-index:50; }
+    .ovl.open { display:flex; }
+    .invmodal { width:520px; max-width:100%; background: var(--bento-theme-color-bg-surface); border-radius: var(--hs-radii-xl); box-shadow: var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20)); overflow:hidden; }
+    .invmodal .mh { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--hs-border); }
+    .invmodal .mh h2 { font: var(--hs-type-title-sub); margin:0; }
+    .invmodal .mb { padding:14px 20px; max-height:56vh; overflow:auto; }
+    .invmodal .mf { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 20px; border-top:1px solid var(--hs-border); }
+    .ctopt { display:flex; align-items:center; gap:10px; min-height:44px; padding:0 8px; border-radius: var(--hs-radii-md); cursor:pointer; user-select:none; }
+    .ctopt:hover { background: var(--bento-system-sys-neutral-alt-100); }
+    .ctopt .ctkv { flex:1; min-width:0; }
+    .ctopt .ctkv .k { font: var(--hs-type-body-md); color: var(--hs-fg); }
+    .ctopt .ctkv .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
+    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+  </style>
 </head>
 <body class="suite-app">
 <aside class="suite-rail">
@@ -54,15 +74,15 @@
       <button class="backbtn" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></button>
       <h1>Growth Team</h1>
       <div class="spacer"></div>
-      <button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
-      <button class="hs-btn hs-btn--outlined">Add members</button>
-      <button class="hs-btn hs-btn--primary">Assign social account</button>
+      <button class="icon-btn ne-tooltipbtn" id="tdMoreBtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button>
+      <button class="hs-btn hs-btn--outlined" onclick="openAddMembers()">Add members</button>
+      <button class="hs-btn hs-btn--primary" id="tdAssignBtn">Assign social account</button>
     </header>
 
     <div class="pagebar">
       <nav class="tabs" aria-label="Team sections">
-        <a class="on" href="#" aria-current="page">Members</a>
-        <a href="#">Social accounts</a>
+        <a class="on" href="#" data-tab="members" aria-current="page">Members</a>
+        <a href="#" data-tab="social">Social accounts</a>
       </nav>
       <div class="grow"></div>
       <div class="searchbox">
@@ -75,8 +95,9 @@
 
     <div class="content">
       <div class="inner wide">
+       <div data-panel="members">
         <div class="count-h">
-          <h2>12 members in Growth Team</h2>
+          <h2 id="memberCount">12 members in Growth Team</h2>
           <div class="meta">3 admins &#183; 9 editors</div>
         </div>
 
@@ -93,7 +114,7 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="memberRows">
             <tr>
               <td><span class="hs-check"></span></td>
               <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">MT</span><span>Melanie Torres</span></div></td>
@@ -166,22 +187,261 @@
             <button class="pg-btn">Next<span class="material-symbols-outlined">chevron_right</span></button>
           </div>
         </div>
+       </div>
+
+       <div data-panel="social" hidden>
+        <div class="count-h">
+          <h2 id="socialCount">3 social accounts in Growth Team</h2>
+          <div class="meta">Accounts this team can publish to</div>
+        </div>
+        <div class="table-card">
+          <table class="hs-table">
+            <thead>
+              <tr>
+                <th style="width:48px"><span class="hs-check"></span></th>
+                <th>Account</th>
+                <th>Network</th>
+                <th>Added on</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-2-bg); color: var(--hs-cat-2-fg)">IG</span><span>@somos</span></div></td>
+                <td class="hs-small">Instagram</td>
+                <td class="hs-small">Jan 12, 2026</td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-1-bg); color: var(--hs-cat-1-fg)">LI</span><span>Somos</span></div></td>
+                <td class="hs-small">LinkedIn</td>
+                <td class="hs-small">Feb 03, 2026</td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+              <tr>
+                <td><span class="hs-check"></span></td>
+                <td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-7-bg); color: var(--hs-cat-7-fg)">TT</span><span>@somos</span></div></td>
+                <td class="hs-small">TikTok</td>
+                <td class="hs-small">Mar 09, 2026</td>
+                <td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+       </div>
       </div>
     </div>
   </main>
+
+  <!-- Add members modal -->
+  <div class="ovl" id="addMembersOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="amTitle">
+      <div class="mh">
+        <h2 id="amTitle">Add members</h2>
+        <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeAddMembers()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="mb">
+        <div class="searchbox" style="min-width:auto; margin-bottom:8px">
+          <span class="material-symbols-outlined">search</span>
+          <input type="search" id="amSearch" placeholder="Search people" aria-label="Search people">
+        </div>
+        <div id="amList"></div>
+      </div>
+      <div class="mf">
+        <button class="hs-btn hs-btn--ghost" onclick="closeAddMembers()">Cancel</button>
+        <button class="hs-btn hs-btn--primary" onclick="submitAddMembers()">Add selected</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu" id="tdMenu" hidden></div>
   <script>
-    /* a11y decoration (this page does not load app.js): tabs + table checkboxes */
-    (function(){
-      document.querySelectorAll("nav.tabs").forEach(function(nav){ nav.setAttribute("role","tablist");
-        nav.querySelectorAll("a").forEach(function(a){ a.setAttribute("role","tab"); a.setAttribute("aria-selected", a.classList.contains("on")?"true":"false"); }); });
-      document.querySelectorAll("table.hs-table .hs-check").forEach(function(c){ c.setAttribute("role","checkbox"); if(!c.hasAttribute("tabindex")) c.setAttribute("tabindex","0");
-        c.setAttribute("aria-checked", c.classList.contains("is-on")?"true":"false");
-        if(!c.getAttribute("aria-label")){ var head=c.closest("thead"), tr=c.closest("tr"); var nameEl=tr&&tr.querySelector(".cell-with-thumb a, .cell-with-thumb span:last-child"); c.setAttribute("aria-label", head?"Select all":("Select "+(nameEl?nameEl.textContent.trim():"row"))); } });
-      document.querySelectorAll(".th-sort .material-symbols-outlined").forEach(function(i){ i.setAttribute("aria-hidden","true"); });
-      var GEN=["more actions","actions","role actions","account actions","team actions"];
-      document.querySelectorAll(".icon-btn, .hs-btn--icon").forEach(function(b){ var lbl=(b.getAttribute("aria-label")||"").trim().toLowerCase(); if(GEN.indexOf(lbl)>=0){ var row=b.closest("tr")||b.closest(".ecard")||b.closest(".listrow"); var e=row&&(row.querySelector(".cell-with-thumb a, .cell-with-thumb span:last-child, .nm .n, .n")||row.querySelector("td:nth-child(2), td")); if(e&&e.textContent.trim()) b.setAttribute("aria-label","Actions for "+e.textContent.trim()); b.setAttribute("aria-haspopup","menu"); b.setAttribute("aria-expanded","false"); } });
-      document.addEventListener("keydown", function(e){ if(e.key!==" "&&e.key!=="Enter") return; var c=e.target.closest&&e.target.closest("table.hs-table .hs-check"); if(c){ e.preventDefault(); c.click(); c.setAttribute("aria-checked", c.classList.contains("is-on")?"true":"false"); } });
-    })();
+    /* ------------------------------------------------------------------
+       Team detail interactivity. app.js is loaded below, so window.SSV2
+       (toast, PEOPLE, esc) plus the shared a11y decoration + tab aria-sync
+       + checkbox click delegation run for us. The old inline a11y block was
+       removed to avoid double-running. Behaviour unique to this page lives
+       here: tab panel switching, add/remove members, role menus, and the
+       header action menus. ---------------------------------------------- */
+    function tdToast(msg){
+      if(window.SSV2 && window.SSV2.toast){ window.SSV2.toast(msg); return; }
+      var t=document.getElementById('tdToast');
+      if(!t){ t=document.createElement('div'); t.id='tdToast';
+        t.setAttribute('role','status'); t.setAttribute('aria-live','polite');
+        t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s';
+        document.body.appendChild(t); }
+      t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800);
+    }
+    function tdEsc(s){ if(window.SSV2 && window.SSV2.esc) return window.SSV2.esc(s);
+      return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+    /* ---- tab switching (toggle .on + panel hidden) ------------------- */
+    function showTab(key){
+      document.querySelectorAll('nav.tabs a[data-tab]').forEach(function(a){
+        var on = a.getAttribute('data-tab') === key;
+        a.classList.toggle('on', on);
+        if(on){ a.setAttribute('aria-current','page'); a.setAttribute('aria-selected','true'); }
+        else { a.removeAttribute('aria-current'); a.setAttribute('aria-selected','false'); }
+      });
+      document.querySelectorAll('[data-panel]').forEach(function(p){ p.hidden = p.getAttribute('data-panel') !== key; });
+    }
+    document.querySelectorAll('nav.tabs a[data-tab]').forEach(function(a){
+      a.addEventListener('click', function(e){ e.preventDefault(); showTab(a.getAttribute('data-tab')); });
+    });
+
+    /* ---- member count sync ------------------------------------------- */
+    function refreshMemberCount(){
+      var n = document.querySelectorAll('#memberRows tr').length;
+      var h = document.getElementById('memberCount');
+      if(h){ var name = (document.querySelector('.suite-topbar h1')||{}).textContent || 'this team';
+        h.textContent = n + ' member' + (n===1?'':'s') + ' in ' + name; }
+    }
+
+    /* ---- floating menu ------------------------------------------------ */
+    function closeTdMenu(){ var m=document.getElementById('tdMenu'); if(m) m.hidden=true; }
+    function showTdMenu(anchor, items){
+      var m=document.getElementById('tdMenu');
+      m.innerHTML = items.map(function(it){ return it.sep ? '<div class="sep"></div>'
+        : '<button onclick="'+it.fn+'"><span class="material-symbols-outlined">'+it.icon+'</span>'+it.label+'</button>'; }).join('');
+      var r=anchor.getBoundingClientRect();
+      m.style.left=Math.min(r.left, window.innerWidth-224)+'px'; m.style.top=(r.bottom+4)+'px'; m.hidden=false;
+    }
+
+    /* ---- add members picker ------------------------------------------ */
+    /* org members: from window.SSV2.PEOPLE if available, else a small list */
+    function orgPeople(){
+      if(window.SSV2 && window.SSV2.PEOPLE){
+        var out=[]; var P=window.SSV2.PEOPLE;
+        for(var id in P){ if(P.hasOwnProperty(id)) out.push({ id:id, name:P[id].name, email:P[id].email, initials:P[id].initials }); }
+        return out;
+      }
+      return [
+        { id:'marco', name:'Marco Silva', email:'marco@somos.co', initials:'MS' },
+        { id:'yuki',  name:'Yuki Tanaka', email:'yuki@somos.co',  initials:'YT' },
+        { id:'sam',   name:'Sam Rivera',  email:'sam@somos.co',   initials:'SR' },
+        { id:'devin', name:'Devin Okafor',email:'devin@somos.co', initials:'DO' },
+        { id:'priya', name:'Priya Anand', email:'priya@somos.co', initials:'PA' }
+      ];
+    }
+    function currentMemberNames(){
+      var set={}; document.querySelectorAll('#memberRows .cell-with-thumb span:last-child').forEach(function(s){ set[s.textContent.trim().toLowerCase()]=true; });
+      return set;
+    }
+    function renderAmList(){
+      var wrap=document.getElementById('amList'); if(!wrap) return;
+      var have=currentMemberNames();
+      var q=(document.getElementById('amSearch').value||'').trim().toLowerCase();
+      wrap.innerHTML='';
+      orgPeople().forEach(function(p){
+        if(have[p.name.toLowerCase()]) return; // already a member
+        if(q && p.name.toLowerCase().indexOf(q)<0 && (p.email||'').toLowerCase().indexOf(q)<0) return;
+        var row=document.createElement('div'); row.className='ctopt';
+        row.setAttribute('data-name', p.name); row.setAttribute('data-initials', p.initials||'');
+        row.innerHTML='<span class="hs-check"></span>'+
+          '<span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)">'+tdEsc(p.initials||'')+'</span>'+
+          '<span class="ctkv"><div class="k">'+tdEsc(p.name)+'</div><div class="m">'+tdEsc(p.email||'')+'</div></span>';
+        row.addEventListener('click', function(){ var c=row.querySelector('.hs-check'); if(c) c.classList.toggle('is-on'); });
+        wrap.appendChild(row);
+      });
+      if(!wrap.children.length){ wrap.innerHTML='<div class="hs-small" style="padding:10px 8px;color:var(--bento-theme-color-text-subtle)">Everyone is already on this team.</div>'; }
+    }
+    function openAddMembers(){
+      var s=document.getElementById('amSearch'); if(s) s.value='';
+      renderAmList();
+      document.getElementById('addMembersOvl').classList.add('open');
+      if(s) s.focus();
+    }
+    function closeAddMembers(){ document.getElementById('addMembersOvl').classList.remove('open'); }
+    function memberRowHTML(name, initials){
+      return '<td><span class="hs-check"></span></td>'+
+        '<td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background: var(--hs-cat-3-bg); color: var(--hs-cat-3-fg)">'+tdEsc(initials)+'</span><span>'+tdEsc(name)+'</span></div></td>'+
+        '<td><button class="sel"><span>Editor</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>'+
+        '<td class="hs-small">Just now</td>'+
+        '<td>0</td>'+
+        '<td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td>'+
+        '<td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+    }
+    function submitAddMembers(){
+      var picked=[].slice.call(document.querySelectorAll('#amList .ctopt')).filter(function(r){ return r.querySelector('.hs-check.is-on'); });
+      if(!picked.length){ closeAddMembers(); return; }
+      var tbody=document.getElementById('memberRows');
+      picked.forEach(function(r){
+        var tr=document.createElement('tr');
+        tr.innerHTML=memberRowHTML(r.getAttribute('data-name'), r.getAttribute('data-initials'));
+        tbody.appendChild(tr);
+      });
+      refreshMemberCount();
+      closeAddMembers();
+      tdToast(picked.length===1 ? ('Added '+picked[0].getAttribute('data-name')) : ('Added '+picked.length+' members'));
+    }
+
+    /* ---- member row: remove + role change ---------------------------- */
+    function memberName(tr){ var e=tr.querySelector('.cell-with-thumb span:last-child'); return e?e.textContent.trim():'this member'; }
+    function removeMemberRow(tr){ var name=memberName(tr); tr.remove(); refreshMemberCount(); tdToast('Removed '+name); }
+    function openMemberMenu(anchor){
+      var tr=anchor.closest('tr'); if(!tr) return;
+      showTdMenu(anchor, [
+        {label:'Change role', icon:'badge', fn:'memberDo(\'role\')'},
+        {label:'Assign social account', icon:'share', fn:'memberDo(\'social\')'},
+        {sep:true},
+        {label:'Remove from team', icon:'person_remove', fn:'memberDo(\'remove\')'}
+      ]);
+      _menuRow=tr;
+    }
+    var _menuRow=null, _roleBtn=null;
+    function memberDo(k){
+      var tr=_menuRow; closeTdMenu(); _menuRow=null;
+      if(!tr) return;
+      if(k==='remove'){ removeMemberRow(tr); return; }
+      if(k==='role'){ var b=tr.querySelector('.sel'); if(b) openRoleMenu(b); return; }
+      if(k==='social'){ tdToast('Assign a social account to '+memberName(tr)); return; }
+    }
+    function openRoleMenu(btn){
+      _roleBtn=btn;
+      showTdMenu(btn, ['Admin','Editor','Viewer'].map(function(r){
+        return {label:r, icon:'shield_person', fn:'pickRole(\''+r+'\')'};
+      }));
+    }
+    function pickRole(r){
+      closeTdMenu();
+      if(_roleBtn){ var lbl=_roleBtn.querySelector('span:first-child'); if(lbl) lbl.textContent=r; _roleBtn=null; }
+      tdToast('Role updated');
+    }
+
+    /* ---- header: More actions + Assign social account ---------------- */
+    var moreBtn=document.getElementById('tdMoreBtn');
+    if(moreBtn){ moreBtn.addEventListener('click', function(e){ e.stopPropagation();
+      showTdMenu(moreBtn, [
+        {label:'Rename team', icon:'edit', fn:'headerDo(\'rename\')'},
+        {label:'Manage social accounts', icon:'share', fn:'headerDo(\'social\')'},
+        {sep:true},
+        {label:'Delete team', icon:'delete', fn:'headerDo(\'delete\')'}
+      ]); }); }
+    function headerDo(k){
+      closeTdMenu();
+      if(k==='rename'){ tdToast('Rename this team from the Teams list'); return; }
+      if(k==='social'){ showTab('social'); return; }
+      if(k==='delete'){ tdToast('Delete this team from the Teams list'); return; }
+    }
+    var assignBtn=document.getElementById('tdAssignBtn');
+    if(assignBtn){ assignBtn.addEventListener('click', function(){ tdToast('Social account assigned to '+((document.querySelector('.suite-topbar h1')||{}).textContent||'this team')); }); }
+
+    /* ---- delegated clicks -------------------------------------------- */
+    document.addEventListener('click', function(e){
+      var t=e.target;
+      /* member role dropdown buttons open the role menu */
+      var sel=t.closest && t.closest('#memberRows .sel');
+      if(sel){ e.stopPropagation(); openRoleMenu(sel); return; }
+      /* member row action buttons */
+      var act=t.closest && t.closest('#memberRows .icon-btn[aria-label], #memberRows .icon-btn[aria-label^="Actions for"]');
+      if(act){ e.stopPropagation(); openMemberMenu(act); return; }
+      /* clicking outside the menu closes it */
+      if(!(t.closest && (t.closest('#tdMenu')||t.closest('#tdMoreBtn')))) closeTdMenu();
+    });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeAddMembers(); closeTdMenu(); } });
   </script>
+  <script src="app.js"></script>
 </body>
 </html>

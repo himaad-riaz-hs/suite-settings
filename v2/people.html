@@ -164,7 +164,7 @@
         <!-- MEMBERS -->
         <section data-panel="members">
           <div class="filterbar">
-            <div class="searchbox" style="min-width:240px"><span class="material-symbols-outlined">search</span><input type="search" placeholder="Filter members" aria-label="Filter members"></div>
+            <div class="searchbox" style="min-width:240px"><span class="material-symbols-outlined">search</span><input type="search" id="memberSearch" placeholder="Filter members" aria-label="Filter members" oninput="applyFilters()"></div>
             <button class="sel" id="roleFilter" style="min-width:120px" onclick="openRoleMenu(event)"><span>Role</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
             <button class="sel" id="teamFilter" style="min-width:120px" onclick="openTeamMenu(event)"><span>Team</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
             <div class="grow" style="flex:1"></div>
@@ -174,20 +174,20 @@
           <div class="bulkbar" id="bulkbar">
             <span class="n" id="bulkCount">0 selected</span>
             <div class="grow"></div>
-            <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkAction('role')">Change role</button>
-            <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkAction('team')">Add to team</button>
-            <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkAction('remove')">Remove</button>
+            <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkAction('role',event)">Change role</button>
+            <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkAction('team',event)">Add to team</button>
+            <button class="hs-btn hs-btn--outlined hs-btn--sm" onclick="bulkAction('remove',event)">Remove</button>
             <button class="hs-btn hs-btn--ghost hs-btn--sm" onclick="clearSel()">Clear</button>
           </div>
 
           <div id="gridView" class="grid" hidden>
-            <div class="ecard"><div class="top"><span class="av">AP</span><div class="nm"><div class="n"><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div><div class="e">aisha@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip super">Super Admin</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 1 account</div></div>
-            <div class="ecard"><div class="top"><span class="av">BM</span><div class="nm"><div class="n"><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div><div class="e">bryn@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Admin</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Growth Team &#183; 3 accounts</div></div>
-            <div class="ecard"><div class="top"><span class="av">SR</span><div class="nm"><div class="n"><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div><div class="e">sam@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 2 accounts</div></div>
-            <div class="ecard"><div class="top"><span class="av">DO</span><div class="nm"><div class="n"><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div><div class="e">devin@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Content Team &#183; 4 accounts</div></div>
-            <div class="ecard"><div class="top"><span class="av">MC</span><div class="nm"><div class="n"><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div><div class="e">marisol@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Admin</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; billing owner</div></div>
-            <div class="ecard"><div class="top"><span class="av">MS</span><div class="nm"><div class="n"><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div><div class="e">marco@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 2 accounts</div></div>
-            <div class="ecard"><div class="top"><span class="av">YT</span><div class="nm"><div class="n"><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div><div class="e">yuki@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></div><div class="access"><span class="material-symbols-outlined">link</span>Invited &#183; seat held</div></div>
+            <div class="ecard" data-pid="aisha"><div class="top"><span class="av">AP</span><div class="nm"><div class="n"><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div><div class="e">aisha@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip super">Super Admin</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 1 account</div></div>
+            <div class="ecard" data-pid="bryn"><div class="top"><span class="av">BM</span><div class="nm"><div class="n"><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div><div class="e">bryn@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Admin</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Growth Team &#183; 3 accounts</div></div>
+            <div class="ecard" data-pid="sam"><div class="top"><span class="av">SR</span><div class="nm"><div class="n"><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div><div class="e">sam@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 2 accounts</div></div>
+            <div class="ecard" data-pid="devin"><div class="top"><span class="av">DO</span><div class="nm"><div class="n"><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div><div class="e">devin@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">groups</span>via Content Team &#183; 4 accounts</div></div>
+            <div class="ecard" data-pid="marisol"><div class="top"><span class="av">MC</span><div class="nm"><div class="n"><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div><div class="e">marisol@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Admin</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; billing owner</div></div>
+            <div class="ecard" data-pid="marco"><div class="top"><span class="av">MS</span><div class="nm"><div class="n"><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div><div class="e">marco@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></div><div class="access"><span class="material-symbols-outlined">link</span>Direct &#183; 2 accounts</div></div>
+            <div class="ecard" data-pid="yuki"><div class="top"><span class="av">YT</span><div class="nm"><div class="n"><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div><div class="e">yuki@somos.co</div></div><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></div><div class="foot"><span class="rolechip">Editor</span><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></div><div class="access"><span class="material-symbols-outlined">link</span>Invited &#183; seat held</div></div>
             
           </div>
 
@@ -195,13 +195,13 @@
             <div class="table-card"><table class="hs-table">
               <thead><tr><th style="width:48px"><span class="hs-check"></span></th><th><span class="th-sort">Name<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th><th>Email</th><th><span class="th-sort">Role<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th><th><span class="th-sort">Access<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th><th><span class="th-sort">Status<span class="material-symbols-outlined">keyboard_arrow_down</span></span></th><th style="width:56px"></th></tr></thead>
               <tbody>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)">AP</span><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div></td><td class="hs-small">aisha@somos.co</td><td>Super Admin</td><td class="hs-small">Direct &#183; 1</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-5-bg);color:var(--hs-cat-5-fg)">BM</span><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div></td><td class="hs-small">bryn@somos.co</td><td>Admin</td><td class="hs-small">via Growth Team &#183; 3</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-8-bg);color:var(--hs-cat-8-fg)">SR</span><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div></td><td class="hs-small">sam@somos.co</td><td>Editor</td><td class="hs-small">Direct &#183; 2</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-9-bg);color:var(--hs-cat-9-fg)">DO</span><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div></td><td class="hs-small">devin@somos.co</td><td>Editor</td><td class="hs-small">via Content Team &#183; 4</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-1-bg);color:var(--hs-cat-1-fg)">MC</span><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div></td><td class="hs-small">marisol@somos.co</td><td>Admin</td><td class="hs-small">Direct &#183; owner</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-6-bg);color:var(--hs-cat-6-fg)">MS</span><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div></td><td class="hs-small">marco@somos.co</td><td>Editor</td><td class="hs-small">Direct &#183; 2</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
-                <tr><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-2-bg);color:var(--hs-cat-2-fg)">YT</span><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div></td><td class="hs-small">yuki@somos.co</td><td>Editor</td><td class="hs-small">Invited</td><td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="aisha"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-3-bg);color:var(--hs-cat-3-fg)">AP</span><a href="person-detail.html?p=aisha" data-pid="aisha">Aisha Patel</a></div></td><td class="hs-small">aisha@somos.co</td><td data-role-cell>Super Admin</td><td class="hs-small">Direct &#183; 1</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="bryn"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-5-bg);color:var(--hs-cat-5-fg)">BM</span><a href="person-detail.html?p=bryn" data-pid="bryn">Bryn Morales</a></div></td><td class="hs-small">bryn@somos.co</td><td data-role-cell>Admin</td><td class="hs-small">via Growth Team &#183; 3</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="sam"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-8-bg);color:var(--hs-cat-8-fg)">SR</span><a href="person-detail.html?p=sam" data-pid="sam">Sam Rivera</a></div></td><td class="hs-small">sam@somos.co</td><td data-role-cell>Editor</td><td class="hs-small">Direct &#183; 2</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="devin"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-9-bg);color:var(--hs-cat-9-fg)">DO</span><a href="person-detail.html?p=devin" data-pid="devin">Devin Okafor</a></div></td><td class="hs-small">devin@somos.co</td><td data-role-cell>Editor</td><td class="hs-small">via Content Team &#183; 4</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="marisol"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-1-bg);color:var(--hs-cat-1-fg)">MC</span><a href="person-detail.html?p=marisol" data-pid="marisol">Marisol Chen</a></div></td><td class="hs-small">marisol@somos.co</td><td data-role-cell>Admin</td><td class="hs-small">Direct &#183; owner</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="marco"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-6-bg);color:var(--hs-cat-6-fg)">MS</span><a href="person-detail.html?p=marco" data-pid="marco">Marco Silva</a></div></td><td class="hs-small">marco@somos.co</td><td data-role-cell>Editor</td><td class="hs-small">Direct &#183; 2</td><td><span class="hs-badge hs-badge--positive"><span class="material-symbols-outlined">check_circle</span>Active</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
+                <tr data-pid="yuki"><td><span class="hs-check"></span></td><td><div class="cell-with-thumb"><span class="hs-avatar hs-avatar--sm" style="background:var(--hs-cat-2-bg);color:var(--hs-cat-2-fg)">YT</span><a href="person-detail.html?p=yuki" data-pid="yuki">Yuki Tanaka</a></div></td><td class="hs-small">yuki@somos.co</td><td data-role-cell>Editor</td><td class="hs-small">Invited</td><td><span class="hs-badge hs-badge--warning"><span class="material-symbols-outlined">schedule</span>Pending</span></td><td><button class="icon-btn ne-tooltipbtn" aria-label="More actions"><span class="material-symbols-outlined">more_horiz</span></button></td></tr>
                 
               </tbody>
             </table>
@@ -273,11 +273,20 @@
   <!-- Notifications panel (rail bell) -->
   <div class="notifpanel" id="notifPanel" role="dialog" aria-label="Notifications">
     <div class="nh"><h3>Notifications</h3><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="toggleNotif()"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="notifitem"><span class="ic"><span class="material-symbols-outlined">person_add</span></span><div class="nt"><b>Sarah Kim requested to invite team members</b>Members &#183; needs approval &#183; 2h<div><button class="act" onclick="goRequested()">View request</button></div></div><span class="dot"></span></div>
-    <div class="notifitem"><span class="ic"><span class="material-symbols-outlined">event_seat</span></span><div class="nt"><b>Devin Okafor requested 2 seats</b>Approvals &#183; needs your review &#183; 1d<div><button class="act" onclick="goRequested()">View request</button></div></div><span class="dot"></span></div>
-    <div class="notifitem"><span class="ic"><span class="material-symbols-outlined">check_circle</span></span><div class="nt"><b>Marco Silva accepted your invitation</b>Members &#183; 3d</div></div>
+    <div class="notifitem" data-notif="unread"><span class="ic"><span class="material-symbols-outlined">person_add</span></span><div class="nt"><b>Sarah Kim requested to invite team members</b>Members &#183; needs approval &#183; 2h<div><button class="act" onclick="goRequested()">View request</button><button class="act" style="margin-left:14px" onclick="notifRead(this)">Mark read</button><button class="act" style="margin-left:14px" onclick="notifDismiss(this)">Dismiss</button></div></div><span class="dot"></span></div>
+    <div class="notifitem" data-notif="unread"><span class="ic"><span class="material-symbols-outlined">event_seat</span></span><div class="nt"><b>Devin Okafor requested 2 seats</b>Approvals &#183; needs your review &#183; 1d<div><button class="act" onclick="goRequested()">View request</button><button class="act" style="margin-left:14px" onclick="notifRead(this)">Mark read</button><button class="act" style="margin-left:14px" onclick="notifDismiss(this)">Dismiss</button></div></div><span class="dot"></span></div>
+    <div class="notifitem" data-notif="read"><span class="ic"><span class="material-symbols-outlined">check_circle</span></span><div class="nt"><b>Marco Silva accepted your invitation</b>Members &#183; 3d<div><button class="act" onclick="notifDismiss(this)">Dismiss</button></div></div></div>
   </div>
   <div class="menu" id="floatMenu" hidden></div>
+
+  <!-- Confirm-remove dialog (bulk + row). Outlined confirm, never a red filled button. -->
+  <div class="ovl" id="removeOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="rmTitle" style="width:440px">
+      <div class="mh"><h2 id="rmTitle">Remove members</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeRemove()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb"><p class="subhead" id="rmBody">Remove these members from Somos?</p></div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeRemove()">Cancel</button><button class="hs-btn hs-btn--outlined" id="rmConfirm" data-autofocus>Remove</button></div>
+    </div>
+  </div>
 
   <script>
     // ---------- interactivity: menus, filters, bulk select, notifications ----------
@@ -304,34 +313,130 @@
       showMenu(document.getElementById('teamFilter'), ['All','Growth Team','Content Team'].map(function(t){return {label:t,icon:'groups',on:teamF===t,fn:'pickTeam(\''+t+'\')'};})); }
     function pickTeam(t){ teamF=t; document.querySelector('#teamFilter span').textContent=(t==='All'?'Team':t); applyFilters(); closeMenus(); }
     function applyFilters(){
+      var q=((document.getElementById('memberSearch')||{value:''}).value||'').trim().toLowerCase();
       document.querySelectorAll('#gridView .ecard').forEach(function(c){
         var role=((c.querySelector('.rolechip')||{}).textContent||'').trim(); var acc=((c.querySelector('.access')||{}).textContent||'');
-        var ok=(roleF==='All'||role===roleF)&&(teamF==='All'||acc.indexOf(teamF)>=0); c.classList.toggle('filtered-out',!ok); });
+        var name=((c.querySelector('.nm .n a')||{}).textContent||''); var email=((c.querySelector('.nm .e')||{}).textContent||'');
+        var text=(name+' '+email).toLowerCase();
+        var ok=(roleF==='All'||role===roleF)&&(teamF==='All'||acc.indexOf(teamF)>=0)&&(!q||text.indexOf(q)>=0); c.classList.toggle('filtered-out',!ok); });
       document.querySelectorAll('#tableView tbody tr').forEach(function(tr){
         var td=tr.querySelectorAll('td'); var role=td[3]?td[3].textContent.trim():''; var acc=td[4]?td[4].textContent:'';
-        var ok=(roleF==='All'||role===roleF)&&(teamF==='All'||acc.indexOf(teamF)>=0); tr.classList.toggle('filtered-out',!ok); }); }
+        var name=((tr.querySelector('.cell-with-thumb a')||{}).textContent||''); var email=td[2]?td[2].textContent:'';
+        var text=(name+' '+email).toLowerCase();
+        var ok=(roleF==='All'||role===roleF)&&(teamF==='All'||acc.indexOf(teamF)>=0)&&(!q||text.indexOf(q)>=0); tr.classList.toggle('filtered-out',!ok); }); }
+    // shared-store accessor: use window.SSV2 when present, degrade gracefully if a
+    // cached app.js loads without it (DOM changes still work; persistence is skipped).
+    function SS(){ return window.SSV2 || null; }
+    // rows/cards keyed by data-pid
+    function tableRowFor(pid){ return document.querySelector('#tableView tbody tr[data-pid="'+pid+'"]'); }
+    function cardFor(pid){ return document.querySelector('#gridView .ecard[data-pid="'+pid+'"]'); }
     // bulk select (column view)
     function rowChecks(){ return [].slice.call(document.querySelectorAll('#tableView tbody .hs-check')); }
+    function checkRow(c){ return c.closest('tr'); }
     function selCount(){ return rowChecks().filter(function(c){return c.classList.contains('is-on');}).length; }
+    // pids of every currently-selected row
+    function selPids(){ return rowChecks().filter(function(c){return c.classList.contains('is-on');})
+      .map(function(c){ var tr=checkRow(c); return tr && tr.getAttribute('data-pid'); })
+      .filter(function(id){return !!id;}); }
     function updateBulk(){ var n=selCount(), total=rowChecks().length;
       document.getElementById('bulkbar').classList.toggle('show', n>0);
       document.getElementById('bulkCount').textContent=n+' selected';
       var head=document.querySelector('#tableView thead .hs-check'); if(head){ head.classList.remove('is-on','indeterminate'); if(n>0 && n===total){ head.classList.add('is-on'); } else if(n>0){ head.classList.add('indeterminate'); } } }
     function toggleSelectAll(){ var all=rowChecks(); var target=!all.every(function(c){return c.classList.contains('is-on');}); all.forEach(function(c){c.classList.toggle('is-on',target);}); updateBulk(); }
     function clearSel(){ rowChecks().forEach(function(c){c.classList.remove('is-on');}); updateBulk(); }
-    function bulkAction(kind){ var n=selCount(); if(!n) return;
-      toast(kind==='remove'?(n+' member'+(n>1?'s':'')+' removed'):(kind==='role'?('Role updated for '+n+' member'+(n>1?'s':'')):('Added '+n+' member'+(n>1?'s':'')+' to a team'))); clearSel(); }
-    // row action menu
-    function rowMenu(anchor){ showMenu(anchor, [
-      {label:'Change role', icon:'badge', fn:'rowDo(\'role\')'},
+    function plural(n){ return n>1?'s':''; }
+
+    // roles available in the shared store (fallback to the built-in preset names)
+    function availableRoles(){ var s=SS(); return s ? s.allRoles(s.getState()) : ['Super admin','Admin','Editor','View only']; }
+    // teams visible on the Teams tab, plus any well-known ones
+    function availableTeams(){ var names=[];
+      document.querySelectorAll('[data-panel="teams"] .ecard .nm .n a').forEach(function(a){ var t=a.textContent.trim(); if(t && names.indexOf(t)<0) names.push(t); });
+      if(!names.length) names=['Growth Team','Content Team']; return names; }
+
+    // apply a role to one pid: update its visible cell + card chip, persist via SSV2
+    function applyRole(pid, role){
+      var s=SS();
+      var tr=tableRowFor(pid); if(tr){ var cell=tr.querySelector('[data-role-cell]'); if(cell) cell.textContent=role; }
+      var card=cardFor(pid); if(card){ var chip=card.querySelector('.rolechip'); if(chip) chip.textContent=role; }
+      if(s) s.setPerson(pid, role, s.scopeForRole(s.getState(), role));
+    }
+    // remove one pid from the DOM (both views) + persist via SSV2
+    function purgePid(pid){
+      var tr=tableRowFor(pid); if(tr) tr.remove();
+      var card=cardFor(pid); if(card) card.remove();
+      var s=SS(); if(s) s.removePerson(pid);
+    }
+    // decrement the visible member counts by n
+    function decMemberCounts(n){
+      if(!n) return;
+      function bump(txt){ return txt.replace(/\b(\d+)\b/, function(m){ return Math.max(0, parseInt(m,10)-n); }); }
+      var tabCnt=document.querySelector('.tabs a[data-tab="members"] .cnt'); if(tabCnt) tabCnt.textContent=bump(tabCnt.textContent);
+      var h2=document.querySelector('.count-h h2'); if(h2) h2.textContent=bump(h2.textContent);
+    }
+
+    // ---- bulk actions (DX-3748 contextual header) ----
+    function bulkAction(kind, e){ if(e&&e.stopPropagation) e.stopPropagation();
+      var anchor=(e&&e.currentTarget)||null; if(!selCount()) return;
+      if(kind==='role') bulkRoleMenu(anchor);
+      else if(kind==='team') bulkTeamMenu(anchor);
+      else if(kind==='remove') openRemove(selPids(), true); }
+    function bulkRoleMenu(anchor){
+      anchor=anchor||document.querySelector('.bulkbar button');
+      showMenu(anchor, availableRoles().map(function(r){ return {label:r, icon:'badge', fn:'bulkPickRole('+JSON.stringify(r).replace(/"/g,'&quot;')+')'}; })); }
+    function bulkPickRole(role){ closeMenus(); var pids=selPids(); if(!pids.length) return;
+      pids.forEach(function(pid){ applyRole(pid, role); });
+      var n=pids.length; clearSel(); toast('Role updated for '+n+' member'+plural(n)); }
+    function bulkTeamMenu(anchor){
+      anchor=anchor||document.querySelector('.bulkbar button');
+      showMenu(anchor, availableTeams().map(function(t){ return {label:t, icon:'groups', fn:'bulkPickTeam('+JSON.stringify(t).replace(/"/g,'&quot;')+')'}; })); }
+    function bulkPickTeam(team){ closeMenus(); var n=selCount(); if(!n) return;
+      clearSel(); toast('Added '+n+' member'+plural(n)+' to '+team); }
+
+    // ---- confirm-remove dialog (bulk + row); outlined confirm button ----
+    var _rmPids=[], _rmBulk=false;
+    function openRemove(pids, isBulk){ _rmPids=pids||[]; _rmBulk=!!isBulk; if(!_rmPids.length) return;
+      var n=_rmPids.length;
+      document.getElementById('rmBody').textContent='Remove '+n+' member'+plural(n)+' from Somos?';
+      document.getElementById('removeOvl').classList.add('open');
+      var b=document.getElementById('rmConfirm'); if(b) b.focus(); }
+    function closeRemove(){ document.getElementById('removeOvl').classList.remove('open'); _rmPids=[]; }
+    (function(){ var b=document.getElementById('rmConfirm'); if(b) b.addEventListener('click', function(){
+      var pids=_rmPids.slice(), bulk=_rmBulk; closeRemove();
+      pids.forEach(function(pid){ purgePid(pid); });
+      var n=pids.length; decMemberCounts(n);
+      if(bulk){ clearSel(); }
+      toast(n+' member'+plural(n)+' removed'); });
+      // scrim click + Escape close (mirrors the invite modal's dismiss behaviour)
+      var ovl=document.getElementById('removeOvl');
+      if(ovl) ovl.addEventListener('mousedown', function(e){ if(e.target===ovl) closeRemove(); });
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape' && ovl && ovl.classList.contains('open')) closeRemove(); }); })();
+
+    // ---- row "More actions" menu ----
+    var _rowPid=null;
+    function rowMenu(anchor){ var host=anchor.closest('tr[data-pid]')||anchor.closest('.ecard[data-pid]'); _rowPid=host?host.getAttribute('data-pid'):null;
+      showMenu(anchor, [
+      {label:'Change role', icon:'badge', fn:'rowRoleMenu(event)'},
       {label:'Add to teams', icon:'groups', fn:'rowDo(\'team\')'},
       {label:'Assign social account', icon:'share', fn:'rowDo(\'social\')'},
       {sep:true},
       {label:'Remove from organization', icon:'person_remove', fn:'rowDo(\'remove\')'} ]); }
-    function rowDo(k){ closeMenus(); toast(k==='remove'?'Member removed':'Done'); }
+    function rowRoleMenu(e){ if(e&&e.stopPropagation) e.stopPropagation(); var pid=_rowPid; if(!pid){ closeMenus(); return; }
+      var anchor=document.querySelector('#tableView tbody tr[data-pid="'+pid+'"] .icon-btn')
+        || document.querySelector('#gridView .ecard[data-pid="'+pid+'"] .icon-btn')
+        || document.getElementById('floatMenu');
+      showMenu(anchor, availableRoles().map(function(r){ return {label:r, icon:'badge', fn:'rowPickRole('+JSON.stringify(r).replace(/"/g,'&quot;')+','+JSON.stringify(pid).replace(/"/g,'&quot;')+')'}; })); }
+    function rowPickRole(role, pid){ closeMenus(); if(!pid) return; applyRole(pid, role);
+      var nm=SS()?SS().getPerson(SS().getState(),pid):null; toast((nm?nm.name:'Member')+' is now '+role); }
+    function rowDo(k){ closeMenus();
+      if(k==='remove'){ if(_rowPid) openRemove([_rowPid], false); return; }
+      // add-to-team / assign-social stay in-DOM + toast for the prototype
+      toast(k==='team'?'Added to team':'Social account assigned'); }
     // notifications
     function toggleNotif(e){ if(e) e.stopPropagation(); document.getElementById('notifPanel').classList.toggle('open'); }
     function goRequested(){ setTab({preventDefault:function(){}},'requested'); document.getElementById('notifPanel').classList.remove('open'); }
+    function notifRead(btn){ var item=btn.closest('.notifitem'); if(!item) return;
+      item.dataset.notif='read'; var dot=item.querySelector('.dot'); if(dot) dot.remove(); btn.remove(); }
+    function notifDismiss(btn){ var item=btn.closest('.notifitem'); if(item) item.remove(); }
     // Task 3: approve join requests, run out of free seats, buy more, continue
     var reqFree=4, _apRow=null;
     function reqRows(){ return [].slice.call(document.querySelectorAll('#reqList .listrow')); }
@@ -358,7 +463,14 @@
       var t=e.target;
       var rc=t.closest && t.closest('#tableView tbody .hs-check'); if(rc){ rc.classList.toggle('is-on'); updateBulk(); return; }
       var hc=t.closest && t.closest('#tableView thead .hs-check'); if(hc){ toggleSelectAll(); return; }
-      var act=t.closest && t.closest('.icon-btn[aria-label="More actions"]'); if(act){ e.stopPropagation(); rowMenu(act); return; }
+      // row/card "More actions": match the original label OR the a11y-decorated
+      // "Actions for …"/aria-haspopup that app.js applies after load. Scope to a
+      // members row or card so modal Close buttons never trigger the menu.
+      var act=t.closest && t.closest('.icon-btn');
+      if(act && (act.closest('#tableView tbody tr') || act.closest('#gridView .ecard'))){
+        var lbl=(act.getAttribute('aria-label')||'').toLowerCase();
+        if(lbl==='more actions' || lbl.indexOf('actions for')===0 || act.getAttribute('aria-haspopup')==='menu'){
+          e.stopPropagation(); rowMenu(act); return; } }
       if(!(t.closest && (t.closest('#floatMenu')||t.closest('#viewBtn')||t.closest('#roleFilter')||t.closest('#teamFilter')))) closeMenus();
       if(!(t.closest && (t.closest('#notifPanel')||t.closest('[aria-label="Notifications"]')))) document.getElementById('notifPanel').classList.remove('open');
     });

@@ -31,6 +31,12 @@
     .ctopt .ctkv { flex:1; min-width:0; }
     .ctopt .ctkv .k { font: var(--hs-type-body-md); color: var(--hs-fg); }
     .ctopt .ctkv .m { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+    /* floating row-action menu (mirrors people.html) */
+    .menu { position:absolute; z-index:60; background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16)); min-width:210px; padding:6px; }
+    .menu button { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:9px 12px; border-radius:8px; font:var(--hs-type-body-md); color:var(--hs-fg); cursor:pointer; }
+    .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
+    .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
+    .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
   </style>
 </head>
 <body class="suite-app">
@@ -231,7 +237,141 @@
     </div>
   </div>
 
+  <!-- Rename team modal -->
+  <div class="ovl" id="renameTeamOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="rtTitle">
+      <div class="mh">
+        <h2 id="rtTitle">Rename team</h2>
+        <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeRenameTeam()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="mb">
+        <div class="ctfield">
+          <label for="renameInput">Team name</label>
+          <input type="text" id="renameInput" placeholder="Team name" autocomplete="off">
+        </div>
+      </div>
+      <div class="mf">
+        <button class="hs-btn hs-btn--ghost" onclick="closeRenameTeam()">Cancel</button>
+        <button class="hs-btn hs-btn--primary" onclick="submitRenameTeam()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete team confirm modal (destructive action uses an outlined button, never red) -->
+  <div class="ovl" id="deleteTeamOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="dtTitle">
+      <div class="mh">
+        <h2 id="dtTitle">Delete team</h2>
+        <button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeDeleteTeam()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="mb">
+        <p style="margin:0; font:var(--hs-type-body-md); color:var(--hs-fg)">Delete <strong id="dtName"></strong>? Members stay in Somos, but this team and its account assignments are removed. This cannot be undone.</p>
+      </div>
+      <div class="mf">
+        <button class="hs-btn hs-btn--ghost" onclick="closeDeleteTeam()">Cancel</button>
+        <button class="hs-btn hs-btn--outlined" onclick="submitDeleteTeam()">Delete team</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu" id="teamMenu" hidden></div>
+
 <script>
+  /* ---------------------------------------------------------------------
+     Teams: persistence + views + row actions + search/filter.
+     State lives in localStorage key "ssv2_teams" (array of
+     {id,name,members,accounts,created,admins}). The store seeds lazily from
+     the pre-seeded table rows so nothing is lost on first load. Both the
+     table and card views are rendered from the same store so they stay in
+     sync. app.js is loaded on this page, so window.SSV2.toast is used when
+     present, with a tiny inline fallback otherwise. ------------------- */
+  var TEAMS_KEY = 'ssv2_teams';
+
+  function tToast(msg){
+    if(window.SSV2 && window.SSV2.toast){ window.SSV2.toast(msg); return; }
+    var t=document.getElementById('teamsToast');
+    if(!t){ t=document.createElement('div'); t.id='teamsToast';
+      t.setAttribute('role','status'); t.setAttribute('aria-live','polite');
+      t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s';
+      document.body.appendChild(t); }
+    t.textContent=msg; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},1800);
+  }
+  function tEsc(s){ if(window.SSV2 && window.SSV2.esc) return window.SSV2.esc(s);
+    return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  function loadTeams(){
+    try { var a = JSON.parse(localStorage.getItem(TEAMS_KEY)); return Array.isArray(a) ? a : null; }
+    catch(e){ return null; }
+  }
+  function saveTeams(list){
+    try { localStorage.setItem(TEAMS_KEY, JSON.stringify(list)); } catch(e){}
+  }
+  /* Seed the store from the pre-seeded table rows the first time only. */
+  function seedFromDom(){
+    var list = [];
+    document.querySelectorAll('#tableView tbody tr').forEach(function(tr){
+      var td = tr.querySelectorAll('td');
+      var link = tr.querySelector('.cell-with-thumb a');
+      if(!link) return;
+      var admins = [];
+      tr.querySelectorAll('.av-stack .av').forEach(function(a){ admins.push(a.textContent.trim()); });
+      list.push({
+        id: 't' + (list.length + 1) + '_' + Date.now(),
+        name: link.textContent.trim(),
+        created: td[2] ? td[2].textContent.trim() : '',
+        admins: admins,
+        members: td[4] ? (parseInt(td[4].textContent, 10) || 0) : 0,
+        accounts: td[5] ? (parseInt(td[5].textContent, 10) || 0) : 0
+      });
+    });
+    return list;
+  }
+  function getTeams(){
+    var list = loadTeams();
+    if(!list){ list = seedFromDom(); saveTeams(list); }
+    return list;
+  }
+
+  /* ---- rendering ------------------------------------------------------- */
+  function teamRowHTML(t){
+    var admins = (t.admins && t.admins.length) ? t.admins : ['You'];
+    var av = admins.map(function(a){ return '<span class="av">' + tEsc(a) + '</span>'; }).join('');
+    return '<td><span class="hs-check"></span></td>' +
+      '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span>' +
+        '<a href="team-detail.html?t=' + tEsc(t.id) + '">' + tEsc(t.name) + '</a></div></td>' +
+      '<td class="hs-small">' + tEsc(t.created || 'Just now') + '</td>' +
+      '<td><span class="av-stack">' + av + '</span></td>' +
+      '<td>' + (t.members || 0) + '</td><td>' + (t.accounts || 0) + '</td>' +
+      '<td><button class="icon-btn ne-tooltipbtn" aria-label="Actions" data-tid="' + tEsc(t.id) + '"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+  }
+  function teamCardHTML(t){
+    return '<div class="top"><div class="av"><span class="material-symbols-outlined">groups</span></div>' +
+      '<div class="nm"><div class="n"><a href="team-detail.html?t=' + tEsc(t.id) + '">' + tEsc(t.name) + '</a></div>' +
+      '<div class="e">' + (t.members || 0) + ' members · ' + (t.accounts || 0) + ' accounts</div></div>' +
+      '<button class="icon-btn ne-tooltipbtn" aria-label="Actions" data-tid="' + tEsc(t.id) + '"><span class="material-symbols-outlined">more_horiz</span></button></div>' +
+      '<div class="foot"><span>Created ' + tEsc(t.created || 'Just now') + '</span></div>';
+  }
+  function renderTeams(){
+    var list = getTeams();
+    var tbody = document.querySelector('#tableView tbody');
+    if(tbody){
+      tbody.innerHTML = '';
+      list.forEach(function(t){ var tr = document.createElement('tr'); tr.setAttribute('data-tid', t.id); tr.innerHTML = teamRowHTML(t); tbody.appendChild(tr); });
+    }
+    var grid = document.getElementById('gridView');
+    if(grid){
+      grid.innerHTML = '';
+      list.forEach(function(t){ var c = document.createElement('div'); c.className = 'ecard'; c.setAttribute('data-tid', t.id); c.innerHTML = teamCardHTML(t); grid.appendChild(c); });
+    }
+    updateCount(list.length);
+    applyFilter();
+  }
+  function updateCount(n){
+    var h = document.querySelector('.count-h h2');
+    if(h) h.textContent = n + ' team' + (n === 1 ? '' : 's') + ' in Somos';
+  }
+
+  /* ---- view toggle ----------------------------------------------------- */
   function toggleView(){
     var t=document.getElementById('tableView'), g=document.getElementById('gridView'), l=document.getElementById('viewPickLabel');
     var toCard = !t.hidden;
@@ -239,7 +379,7 @@
     if(l) l.textContent = toCard ? 'Card view' : 'Column view';
   }
 
-  /* Create team flow */
+  /* ---- Create team flow ------------------------------------------------ */
   function ctToggle(row){
     var chk = row.querySelector('.hs-check');
     if(chk) chk.classList.toggle('is-on');
@@ -264,29 +404,136 @@
     var memberCount = document.querySelectorAll('#ctMembers .hs-check.is-on').length;
     var accountCount = document.querySelectorAll('#ctAccounts .hs-check.is-on').length;
 
-    var tbody = document.querySelector('#tableView .hs-table tbody');
-    if(tbody){
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td><span class="hs-check"></span></td>' +
-        '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><a href="team-detail.html"></a></div></td>' +
-        '<td class="hs-small">Just now</td>' +
-        '<td><span class="av-stack"><span class="av">You</span></span></td>' +
-        '<td>' + memberCount + '</td><td>' + accountCount + '</td>' +
-        '<td><button class="icon-btn ne-tooltipbtn" aria-label="Actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
-      tr.querySelector('a').textContent = name;
-      tbody.insertBefore(tr, tbody.firstChild);
-    }
-
-    var heading = document.querySelector('.count-h h2');
-    if(heading){
-      var m = heading.textContent.match(/(\d+)/);
-      if(m){ heading.textContent = heading.textContent.replace(/\d+/, (parseInt(m[1],10) + 1)); }
-    }
-
+    var list = getTeams();
+    list.unshift({
+      id: 't_' + Date.now(),
+      name: name,
+      created: 'Just now',
+      admins: ['You'],
+      members: memberCount,
+      accounts: accountCount
+    });
+    saveTeams(list);
+    renderTeams();
     closeCreateTeam();
+    tToast('Team "' + name + '" created');
   }
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCreateTeam(); });
+
+  /* ---- row action menu ------------------------------------------------- */
+  var _menuTid = null;
+  function closeTeamMenu(){ var m=document.getElementById('teamMenu'); if(m) m.hidden=true; _menuTid=null; }
+  function openTeamMenu(anchor, tid){
+    _menuTid = tid;
+    var m = document.getElementById('teamMenu');
+    var items = [
+      {label:'Manage members', icon:'group', fn:'teamAction(\'manage\')'},
+      {label:'Rename', icon:'edit', fn:'teamAction(\'rename\')'},
+      {sep:true},
+      {label:'Delete', icon:'delete', fn:'teamAction(\'delete\')'}
+    ];
+    m.innerHTML = items.map(function(it){ return it.sep ? '<div class="sep"></div>'
+      : '<button onclick="' + it.fn + '"><span class="material-symbols-outlined">' + it.icon + '</span>' + it.label + '</button>'; }).join('');
+    var r = anchor.getBoundingClientRect();
+    m.style.left = Math.min(r.left, window.innerWidth - 224) + 'px';
+    m.style.top = (r.bottom + 4) + 'px';
+    m.hidden = false;
+  }
+  function teamById(tid){ var list = getTeams(); for(var i=0;i<list.length;i++){ if(list[i].id===tid) return list[i]; } return null; }
+  function teamAction(kind){
+    var tid = _menuTid;
+    closeTeamMenu();
+    if(!tid) return;
+    if(kind === 'manage'){ location.href = 'team-detail.html?t=' + encodeURIComponent(tid); return; }
+    if(kind === 'rename'){ openRenameTeam(tid); return; }
+    if(kind === 'delete'){ openDeleteTeam(tid); return; }
+  }
+
+  /* ---- rename ---------------------------------------------------------- */
+  var _renameTid = null;
+  function openRenameTeam(tid){
+    var t = teamById(tid); if(!t) return;
+    _renameTid = tid;
+    var input = document.getElementById('renameInput'); if(input) input.value = t.name;
+    document.getElementById('renameTeamOvl').classList.add('open');
+    if(input){ input.focus(); input.select(); }
+  }
+  function closeRenameTeam(){ document.getElementById('renameTeamOvl').classList.remove('open'); _renameTid = null; }
+  function submitRenameTeam(){
+    var input = document.getElementById('renameInput');
+    var name = input ? input.value.trim() : '';
+    if(!name){ if(input) input.focus(); return; }
+    var list = getTeams();
+    var found = null;
+    for(var i=0;i<list.length;i++){ if(list[i].id===_renameTid){ list[i].name = name; found = list[i]; break; } }
+    saveTeams(list);
+    renderTeams();
+    closeRenameTeam();
+    if(found) tToast('Team renamed to "' + name + '"');
+  }
+
+  /* ---- delete (destructive, outlined confirm, never red) --------------- */
+  var _deleteTid = null;
+  function openDeleteTeam(tid){
+    var t = teamById(tid); if(!t) return;
+    _deleteTid = tid;
+    var nm = document.getElementById('dtName'); if(nm) nm.textContent = t.name;
+    document.getElementById('deleteTeamOvl').classList.add('open');
+  }
+  function closeDeleteTeam(){ document.getElementById('deleteTeamOvl').classList.remove('open'); _deleteTid = null; }
+  function submitDeleteTeam(){
+    var list = getTeams();
+    var name = '';
+    var next = [];
+    for(var i=0;i<list.length;i++){ if(list[i].id===_deleteTid){ name = list[i].name; } else { next.push(list[i]); } }
+    saveTeams(next);
+    renderTeams();
+    closeDeleteTeam();
+    if(name) tToast('Team "' + name + '" deleted');
+  }
+
+  /* ---- search + filter (both filter rows/cards by team name) ----------- */
+  var _query = '';
+  function applyFilter(){
+    var q = _query.trim().toLowerCase();
+    document.querySelectorAll('#tableView tbody tr').forEach(function(tr){
+      var a = tr.querySelector('.cell-with-thumb a');
+      var name = a ? a.textContent.toLowerCase() : '';
+      tr.style.display = (!q || name.indexOf(q) >= 0) ? '' : 'none';
+    });
+    document.querySelectorAll('#gridView .ecard').forEach(function(c){
+      var a = c.querySelector('.nm .n a');
+      var name = a ? a.textContent.toLowerCase() : '';
+      c.style.display = (!q || name.indexOf(q) >= 0) ? '' : 'none';
+    });
+  }
+
+  /* ---- boot ------------------------------------------------------------ */
+  (function initTeams(){
+    renderTeams();
+
+    var searchInput = document.querySelector('.pagebar .searchbox input');
+    if(searchInput){ searchInput.addEventListener('input', function(){ _query = this.value; applyFilter(); }); }
+
+    /* Filter button: filter to teams whose name contains the current search. */
+    var filterBtn = null;
+    document.querySelectorAll('.pagebar .sel').forEach(function(b){
+      if(b.id === 'viewPick') return;
+      if((b.textContent || '').trim().indexOf('Filter') === 0) filterBtn = b;
+    });
+    if(filterBtn){ filterBtn.addEventListener('click', function(){ if(searchInput) _query = searchInput.value; applyFilter(); }); }
+
+    /* delegated clicks: open row-action menu; close menu on outside click. */
+    document.addEventListener('click', function(e){
+      var act = e.target.closest && e.target.closest('.icon-btn[data-tid]');
+      if(act){ e.stopPropagation(); openTeamMenu(act, act.getAttribute('data-tid')); return; }
+      if(!(e.target.closest && e.target.closest('#teamMenu'))) closeTeamMenu();
+    });
+  })();
+
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    closeCreateTeam(); closeRenameTeam(); closeDeleteTeam(); closeTeamMenu();
+  });
 </script>
 <script src="app.js"></script>
 </body>

@@ -67,11 +67,11 @@
           <h2 class="card-title">Authentication methods</h2>
           <div class="row first">
             <div class="kv"><div class="k">Password</div><div class="v">Last changed 4 months ago.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Update password</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="updatePwBtn">Update password</button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Two-factor authentication (2FA)</div><div class="v">A code from your authenticator app at every sign-in.</div></div>
-            <div class="trail"><span class="status">Off</span><button class="hs-btn hs-btn--outlined">Turn on 2FA</button></div>
+            <div class="trail"><span class="status" id="twofaStatus">Off</span><button class="hs-btn hs-btn--outlined" id="twofaBtn">Turn on 2FA</button></div>
           </div>
         </section>
 
@@ -88,13 +88,97 @@
           <h2 class="card-title">Privacy</h2>
           <div class="row first">
             <div class="kv"><div class="k">Your data and privacy</div><div class="v">What we store and why. Read-only, applies to everyone.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">open_in_new</span>View policy</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="viewPolicyBtn"><span class="material-symbols-outlined">open_in_new</span>View policy</button></div>
           </div>
         </section>
       </div>
     </div>
   </main>
 
+  <!-- Update password modal. Fields are inert placeholders: no submission, nothing stored. -->
+  <div id="pwModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pwModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="pwModalTitle">Update password</h2>
+          <p class="modal-sub">Choose a new password for signing in.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <form id="pwForm" autocomplete="off">
+          <label for="pwCurrent" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Current password</label>
+          <input id="pwCurrent" type="password" data-autofocus placeholder="Enter current password" style="width:100%; margin:0 0 14px">
+          <label for="pwNew" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">New password</label>
+          <input id="pwNew" type="password" placeholder="Enter new password" style="width:100%; margin:0 0 14px">
+          <label for="pwConfirm" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Confirm new password</label>
+          <input id="pwConfirm" type="password" placeholder="Re-enter new password" style="width:100%">
+        </form>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="pwSave">Update password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Turn on 2FA modal -->
+  <div id="twofaModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="twofaModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="twofaModalTitle">Turn on two-factor authentication</h2>
+          <p class="modal-sub">Add a second step at sign-in using an authenticator app.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0 0 10px">Scan the code below in your authenticator app (for example Google Authenticator or 1Password), then confirm to finish setup.</p>
+        <div style="display:grid; place-items:center; width:132px; height:132px; margin:8px auto; border:1px solid var(--hs-border); border-radius:var(--hs-radii-md); color:var(--bento-theme-color-icon-subtle)"><span class="material-symbols-outlined" style="font-size:64px">qr_code_2</span></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="twofaConfirm" data-autofocus>Enable 2FA</button>
+      </div>
+    </div>
+  </div>
+
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    // Update password (inert placeholders only)
+    var pwModal = document.getElementById("pwModal");
+    var pwM = S.wireModal(pwModal, { onClose: function () { document.getElementById("pwForm").reset(); } });
+    document.getElementById("updatePwBtn").addEventListener("click", function () { pwM.open(); });
+    document.getElementById("pwSave").addEventListener("click", function () {
+      // Prototype stub: no validation, no submission, nothing stored.
+      document.getElementById("pwForm").reset();
+      pwM.close();
+      S.toast("Password updated");
+    });
+
+    // Turn on 2FA
+    var twofaModal = document.getElementById("twofaModal");
+    var twofaM = S.wireModal(twofaModal);
+    document.getElementById("twofaBtn").addEventListener("click", function () { twofaM.open(); });
+    document.getElementById("twofaConfirm").addEventListener("click", function () {
+      var status = document.getElementById("twofaStatus");
+      if (status) status.textContent = "On";
+      var btn = document.getElementById("twofaBtn");
+      if (btn) btn.textContent = "Manage 2FA";
+      twofaM.close();
+      S.toast("Two-factor authentication enabled");
+    });
+
+    // View policy
+    document.getElementById("viewPolicyBtn").addEventListener("click", function () {
+      S.toast("Opening privacy policy");
+    });
+  })();
+</script>
 </body>
 </html>

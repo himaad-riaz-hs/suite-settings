@@ -80,11 +80,20 @@
       <span class="rolechip" id="pdRole"><span class="material-symbols-outlined">shield_person</span>Super admin</span>
       <div class="spacer"></div>
       <button class="hs-btn hs-btn--outlined" id="changeRoleBtn">Change role</button>
-      <button class="hs-btn hs-btn--outlined">Add to teams</button>
-      <button class="hs-btn hs-btn--primary">Assign social account</button>
+      <button class="hs-btn hs-btn--outlined" id="addTeamsBtn" aria-haspopup="menu" aria-expanded="false" onclick="toggleAddMenu('team', event)">Add to teams</button>
+      <button class="hs-btn hs-btn--primary" id="assignAcctBtn" aria-haspopup="menu" aria-expanded="false" onclick="toggleAddMenu('acct', event)">Assign social account</button>
       <button class="icon-btn ne-tooltipbtn" id="pdMoreBtn" aria-label="More actions" onclick="togglePdMenu(event)"><span class="material-symbols-outlined">more_horiz</span></button>
       <div class="pdmenu" id="pdMenu" hidden>
         <button onclick="openOffboard()"><span class="material-symbols-outlined">person_remove</span>Remove from organization</button>
+      </div>
+      <div class="pdmenu" id="teamMenu" role="menu" aria-label="Add to team" hidden>
+        <button role="menuitem" onclick="addToTeam('Growth Team')"><span class="material-symbols-outlined">groups</span>Growth Team</button>
+        <button role="menuitem" onclick="addToTeam('Content Team')"><span class="material-symbols-outlined">groups</span>Content Team</button>
+        <button role="menuitem" onclick="addToTeam('Paid Media')"><span class="material-symbols-outlined">groups</span>Paid Media</button>
+      </div>
+      <div class="pdmenu" id="acctMenu" role="menu" aria-label="Assign social account" hidden>
+        <button role="menuitem" onclick="assignAccount('@somos','Instagram','photo_camera')"><span class="material-symbols-outlined">photo_camera</span>@somos on Instagram</button>
+        <button role="menuitem" onclick="assignAccount('@somos','X','forum')"><span class="material-symbols-outlined">forum</span>@somos on X</button>
       </div>
     </header>
 
@@ -286,26 +295,125 @@
             <div class="ofopt" data-name="Marisol Chen" onclick="pickReassign(this)"><span class="av">MC</span><span class="nm"><span class="n">Marisol Chen</span><span class="e">marisol@somos.co</span></span><span class="material-symbols-outlined chk">check</span></div>
           </div>
         </div>
-        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeOffboard()">Cancel</button><button class="hs-btn hs-btn--primary" id="ofConfirmBtn" onclick="submitOffboard()">Remove and reassign</button></div>
+        <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeOffboard()">Cancel</button><button class="hs-btn hs-btn--secondary" id="ofConfirmBtn" onclick="submitOffboard()">Remove and reassign</button></div>
       </div>
       <div data-ofstep="2" hidden>
         <div class="mh"><h2>Done</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeOffboard()"><span class="material-symbols-outlined">close</span></button></div>
-        <div class="mb"><div class="ofsent"><div class="big"><span class="material-symbols-outlined">check</span></div><p><strong id="ofDoneName">This person</strong> has been removed from Somos. Their teams and social accounts moved to <strong id="ofDoneTo">the new owner</strong>, and their seat is now free.</p></div></div>
+        <div class="mb"><div class="ofsent"><div class="big"><span class="material-symbols-outlined">check</span></div><p><span id="ofDoneName">This person</span>'s social accounts and teams were moved to <strong id="ofDoneTo">the new owner</strong>. <span id="ofDoneName2">This person</span> was removed from Somos. Their seat is now free.</p></div></div>
         <div class="mf"><button class="hs-btn hs-btn--primary" onclick="location.href='people.html'">Back to People</button></div>
       </div>
     </div>
   </div>
   <script>
-    function togglePdMenu(e){ if(e) e.stopPropagation(); var m=document.getElementById('pdMenu'); m.hidden=!m.hidden; }
-    document.addEventListener('click', function(e){ var m=document.getElementById('pdMenu'), b=document.getElementById('pdMoreBtn'); if(m && !m.hidden && b && !m.contains(e.target) && e.target!==b && !b.contains(e.target)) m.hidden=true; });
+    /* current person id: mirror app.js (?p= param, default jordan) so removePerson targets the right record */
+    function currentPersonId(){
+      var id=new URLSearchParams(location.search).get('p');
+      var P=(window.SSV2 && window.SSV2.PEOPLE) || null;
+      if(P && !P[id]) id='jordan';
+      return id || 'jordan';
+    }
     function ofPersonName(){ var el=document.getElementById('pdName'); return el ? el.textContent.trim() : 'this person'; }
+
+    /* ---- header dropdown menus (More / Add to teams / Assign social account) ---- */
+    function closeAllPdMenus(except){
+      ['pdMenu','teamMenu','acctMenu'].forEach(function(mid){
+        if(mid===except) return;
+        var m=document.getElementById(mid); if(m) m.hidden=true;
+      });
+      ['addTeamsBtn','assignAcctBtn'].forEach(function(bid){
+        var b=document.getElementById(bid); if(b) b.setAttribute('aria-expanded','false');
+      });
+    }
+    /* position a .pdmenu under its trigger button (avoids the shared right:40px overlap) */
+    function positionMenu(menu, btn){
+      var hdr=btn.offsetParent || document.querySelector('.suite-topbar');
+      var hr=hdr.getBoundingClientRect(), br=btn.getBoundingClientRect();
+      menu.style.right='auto';
+      menu.style.top=(br.bottom-hr.top+8)+'px';
+      menu.style.left=(br.left-hr.left)+'px';
+    }
+    function togglePdMenu(e){ if(e) e.stopPropagation(); var m=document.getElementById('pdMenu'); var willOpen=m.hidden; closeAllPdMenus('pdMenu'); m.hidden=!willOpen; }
+    function toggleAddMenu(kind, e){
+      if(e) e.stopPropagation();
+      var mid=kind==='team'?'teamMenu':'acctMenu';
+      var bid=kind==='team'?'addTeamsBtn':'assignAcctBtn';
+      var m=document.getElementById(mid), b=document.getElementById(bid);
+      var willOpen=m.hidden;
+      closeAllPdMenus(willOpen?mid:null);
+      m.hidden=!willOpen;
+      if(b) b.setAttribute('aria-expanded', willOpen?'true':'false');
+      if(willOpen) positionMenu(m, b);
+    }
+    document.addEventListener('click', function(e){
+      var open=[document.getElementById('pdMenu'),document.getElementById('teamMenu'),document.getElementById('acctMenu')]
+        .filter(function(m){return m && !m.hidden;});
+      if(!open.length) return;
+      var trigger=e.target.closest('#pdMoreBtn,#addTeamsBtn,#assignAcctBtn,.pdmenu');
+      if(trigger) return;
+      closeAllPdMenus();
+    });
+
+    /* ---- Add to teams: insert an in-DOM row into the Teams panel table ---- */
+    function addToTeam(name){
+      closeAllPdMenus();
+      var tbody=document.querySelector('[data-panel="teams"] .hs-table tbody');
+      if(tbody){
+        var tr=document.createElement('tr');
+        tr.innerHTML=
+          '<td><span class="hs-check"></span></td>'+
+          '<td><div class="cell-with-thumb"><span class="thumb"><span class="material-symbols-outlined">groups</span></span><span>'+esc(name)+'</span></div></td>'+
+          '<td>'+esc(todayLabel())+'</td>'+
+          '<td><span class="av-stack"><span class="av">'+esc(currentInitials())+'</span></span></td>'+
+          '<td>1</td><td>0</td>'+
+          '<td><button class="sel"><span>Member</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></td>'+
+          '<td><button class="icon-btn ne-tooltipbtn" aria-label="Team actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+        tbody.insertBefore(tr, tbody.firstChild);
+      }
+      ssvToast('Added to '+name);
+    }
+
+    /* ---- Assign social account: insert an in-DOM row into the Social accounts panel ---- */
+    function assignAccount(handle, network, icon){
+      closeAllPdMenus();
+      var tbody=document.querySelector('[data-panel="social"] .hs-table tbody');
+      if(tbody){
+        var tr=document.createElement('tr');
+        tr.innerHTML=
+          '<td><span class="thumb"><span class="material-symbols-outlined">'+esc(icon)+'</span></span></td>'+
+          '<td>'+esc(handle)+'</td><td>'+esc(network)+'</td><td>Can publish</td>'+
+          '<td><button class="icon-btn ne-tooltipbtn" aria-label="Account actions"><span class="material-symbols-outlined">more_horiz</span></button></td>';
+        tbody.appendChild(tr);
+      }
+      ssvToast('Assigned '+handle+' on '+network);
+    }
+
+    /* ---- helpers ---- */
+    function esc(s){ return (window.SSV2 && window.SSV2.esc) ? window.SSV2.esc(s) : String(s==null?'':s); }
+    function ssvToast(msg){ if(window.SSV2 && window.SSV2.toast) window.SSV2.toast(msg); }
+    function todayLabel(){ try{ return new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}); }catch(e){ return 'Today'; } }
+    function currentInitials(){
+      var P=(window.SSV2 && window.SSV2.PEOPLE)||null, id=currentPersonId();
+      if(P && P[id] && P[id].initials) return P[id].initials;
+      var nm=ofPersonName().split(/\s+/); return ((nm[0]||'')[0]||'')+((nm[1]||'')[0]||'');
+    }
+
+    /* ---- offboard flow ---- */
     function openOffboard(){ document.getElementById('pdMenu').hidden=true; var nm=ofPersonName(); document.getElementById('ofName').textContent=nm; document.getElementById('ofTitle').textContent='Remove '+nm+' from Somos'; document.querySelectorAll('#ofList .ofopt').forEach(function(o){o.classList.remove('sel');}); ofPick=null; ofStep(1); document.getElementById('offboardOvl').classList.add('open'); }
     function closeOffboard(){ document.getElementById('offboardOvl').classList.remove('open'); }
     function ofStep(s){ document.querySelectorAll('#offboardOvl [data-ofstep]').forEach(function(d){ d.hidden = (+d.dataset.ofstep)!==s; }); }
     var ofPick=null;
     function pickReassign(el){ document.querySelectorAll('#ofList .ofopt').forEach(function(o){o.classList.remove('sel');}); el.classList.add('sel'); ofPick=el.dataset.name; }
-    function submitOffboard(){ if(!ofPick) return; document.getElementById('ofDoneName').textContent=ofPersonName(); document.getElementById('ofDoneTo').textContent=ofPick; ofStep(2); }
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeOffboard(); });
+    function submitOffboard(){
+      if(!ofPick) return;                 // reassign target gates the confirm
+      var nm=ofPersonName();
+      if(window.SSV2 && window.SSV2.removePerson) window.SSV2.removePerson(currentPersonId()); // persist the removal
+      document.getElementById('ofDoneName').textContent=nm;
+      document.getElementById('ofDoneName2').textContent=nm;
+      document.getElementById('ofDoneTo').textContent=ofPick;
+      ofStep(2);
+      ssvToast(nm+' was removed. Their seat is now free.');
+    }
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeOffboard(); closeAllPdMenus(); } });
   </script>
 <script src="app.js"></script>
 </body>

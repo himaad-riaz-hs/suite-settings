@@ -31,6 +31,23 @@
     .menu button:hover { background:var(--bento-system-sys-neutral-alt-100); }
     .menu button .material-symbols-outlined { font-size:20px; color:var(--bento-theme-color-icon-subtle); }
     .menu .sep { height:1px; background:var(--hs-border); margin:6px 4px; }
+    /* Manage-access modal rows: member on the left, role select on the right */
+    .accrow { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--hs-border); }
+    .accrow:last-child { border-bottom:0; }
+    .accrow .lead { width:32px; height:32px; border-radius:999px; background:var(--bento-system-sys-neutral-alt-100); display:grid; place-items:center; color:var(--bento-theme-color-icon-subtle); flex-shrink:0; }
+    .accrow .lead .material-symbols-outlined { font-size:18px; }
+    .accrow .who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+    .accrow .who .n { font: var(--hs-type-body-md-b); }
+    .accrow .who .d { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
+    /* native select styled to match the Bento Select trigger, tokens only */
+    .rolesel { font: var(--hs-type-body-md); color: var(--hs-fg); background: var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border-input); border-radius: var(--hs-radii-md); padding:7px 30px 7px 12px; min-width:132px; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231c1c1c'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat:no-repeat; background-position:right 8px center; background-size:18px; }
+    .rolesel:hover { border-color: var(--bento-theme-color-text-base); }
+    .rolesel:focus-visible { border-color: var(--hs-border-focus); box-shadow:0 0 0 2px var(--hs-focus-halo); outline:none; }
+    /* on-page "People with access" list reflecting the chosen levels */
+    .acclist { list-style:none; margin:6px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
+    .acclist li { display:flex; align-items:center; gap:8px; font: var(--hs-type-body-md); }
+    .acclist li .nm { flex:1; min-width:0; }
+    .acclist li .lv { font: var(--hs-type-body-sm); color: var(--bento-theme-color-text-subtle); }
   </style>
 </head>
 <body class="suite-app">
@@ -109,15 +126,21 @@
           </div>
           <div class="row">
             <div class="kv"><div class="k">Teams with access</div><div class="v">Growth Team, Content Team, Paid Media</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Manage access</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="manageAccessBtn" onclick="openManageAccess()">Manage access</button></div>
+          </div>
+          <div class="row" id="accessListRow" hidden>
+            <div class="kv" style="flex:1">
+              <div class="k">People with access</div>
+              <div class="v"><ul class="acclist" id="accessList"></ul></div>
+            </div>
           </div>
         </section>
 
         <section class="card">
           <h2 class="card-title">Danger zone</h2>
           <div class="row first">
-            <div class="kv"><div class="k">Disconnect account</div><div class="v">Removes it from Somos and stops all scheduling.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Disconnect account</button></div>
+            <div class="kv"><div class="k">Disconnect account</div><div class="v" id="dangerValue">Removes it from Somos and stops all scheduling.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="disconnectBtn" onclick="openDisconnect()">Disconnect account</button></div>
           </div>
         </section>
       </div>
@@ -164,6 +187,27 @@
     </div>
   </div>
 
+  <!-- Manage access modal: per-account social roles (Advanced/Editor/Limited/Responder/None) -->
+  <div class="ovl" id="accessOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
+      <div class="mh"><h2 id="accessTitle">Manage access</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeManageAccess()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb">
+        <p class="subhead">Set what each person can do with @somos on this social account. These roles apply to this account only.</p>
+        <div id="accessRows"></div>
+      </div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeManageAccess()">Cancel</button><button class="hs-btn hs-btn--primary" onclick="saveManageAccess()">Save</button></div>
+    </div>
+  </div>
+
+  <!-- Disconnect confirm modal: outlined confirm, never red -->
+  <div class="ovl" id="disconnectOvl">
+    <div class="invmodal" role="dialog" aria-modal="true" aria-labelledby="disconnectTitle">
+      <div class="mh"><h2 id="disconnectTitle">Disconnect account</h2><button class="icon-btn ne-tooltipbtn" aria-label="Close" onclick="closeDisconnect()"><span class="material-symbols-outlined">close</span></button></div>
+      <div class="mb"><p class="subhead">Disconnecting removes @somos from Somos and stops all scheduling and analytics. You can reconnect it later.</p></div>
+      <div class="mf"><button class="hs-btn hs-btn--ghost" onclick="closeDisconnect()">Cancel</button><button class="hs-btn hs-btn--outlined" onclick="confirmDisconnect()">Disconnect account</button></div>
+    </div>
+  </div>
+
 <script>
   // ---------- floating header action menu (mirrors people.html) ----------
   function closeMenus(){ var m=document.getElementById('floatMenu'); if(m) m.hidden=true; }
@@ -187,8 +231,8 @@
   function headerDo(k){ closeMenus();
     if(k==='reconnect'){ openReconnect(); return; }
     if(k==='owner'){ openReassign(); return; }
-    if(k==='access'){ toast('Manage access'); return; }
-    if(k==='disconnect'){ toast('@somos disconnected'); return; }
+    if(k==='access'){ openManageAccess(); return; }
+    if(k==='disconnect'){ openDisconnect(); return; }
   }
   function toast(msg){ var t=document.getElementById('acctToast'); if(!t){ t=document.createElement('div'); t.id='acctToast';
     t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s'; document.body.appendChild(t); }
@@ -213,6 +257,92 @@
     closeReassign();
   }
 
+  function esc(s){ return (window.SSV2 && window.SSV2.esc) ? window.SSV2.esc(s)
+    : String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  // ---------- Manage access: per-account social roles ----------
+  // Real social-account role model (distinct from org roles): Advanced, Editor,
+  // Limited, Responder, None. Stored per member for THIS account only.
+  var ACCESS_LEVELS = ['Advanced','Editor','Limited','Responder','None'];
+  // Members shown in the editor (a few from the shared org directory) + their
+  // current per-account level. Seeded to mirror the account's existing access.
+  var accessMembers = [
+    { id:'priya',  name:'Priya Anand',  email:'priya@somos.co',  level:'Advanced' },
+    { id:'marisol',name:'Marisol Chen', email:'marisol@somos.co', level:'Editor' },
+    { id:'sam',    name:'Sam Rivera',   email:'sam@somos.co',     level:'Responder' },
+    { id:'devin',  name:'Devin Okafor', email:'devin@somos.co',   level:'None' }
+  ];
+  function seedAccessFromDirectory(){
+    // Prefer real directory names/emails from the shared API where ids match.
+    var people = (window.SSV2 && window.SSV2.PEOPLE) || {};
+    accessMembers.forEach(function(m){ var p = people[m.id]; if(p){ m.name = p.name; m.email = p.email; } });
+  }
+  function openManageAccess(){
+    seedAccessFromDirectory();
+    var box = document.getElementById('accessRows');
+    box.innerHTML = accessMembers.map(function(m){
+      var opts = ACCESS_LEVELS.map(function(lv){
+        return '<option value="'+lv+'"'+(m.level===lv?' selected':'')+'>'+lv+'</option>';
+      }).join('');
+      return '<div class="accrow">'
+        + '<span class="lead"><span class="material-symbols-outlined">person</span></span>'
+        + '<span class="who"><span class="n">'+esc(m.name)+'</span><span class="d">'+esc(m.email)+'</span></span>'
+        + '<select class="rolesel" data-mid="'+m.id+'" aria-label="Access level for '+esc(m.name)+'">'+opts+'</select>'
+        + '</div>';
+    }).join('');
+    document.getElementById('accessOvl').classList.add('open');
+  }
+  function closeManageAccess(){ document.getElementById('accessOvl').classList.remove('open'); }
+  function saveManageAccess(){
+    // Read each select back into the model
+    document.querySelectorAll('#accessRows select.rolesel').forEach(function(sel){
+      var id = sel.getAttribute('data-mid');
+      var m = accessMembers.filter(function(x){ return x.id===id; })[0];
+      if(m) m.level = sel.value;
+    });
+    renderAccessList();
+    closeManageAccess();
+    toast('Access updated for this account');
+  }
+  // Reflect chosen levels on the page (skip members set to None)
+  function renderAccessList(){
+    var list = document.getElementById('accessList');
+    var row = document.getElementById('accessListRow');
+    if(!list||!row) return;
+    var withAccess = accessMembers.filter(function(m){ return m.level!=='None'; });
+    if(!withAccess.length){ row.hidden = true; list.innerHTML=''; return; }
+    list.innerHTML = withAccess.map(function(m){
+      return '<li><span class="nm">'+esc(m.name)+'</span><span class="hs-badge hs-badge--neutral">'+esc(m.level)+'</span></li>';
+    }).join('');
+    row.hidden = false;
+  }
+
+  // ---------- Disconnect account (danger zone + header menu) ----------
+  function openDisconnect(){ document.getElementById('disconnectOvl').classList.add('open'); }
+  function closeDisconnect(){ document.getElementById('disconnectOvl').classList.remove('open'); }
+  function confirmDisconnect(){
+    // Flip the page status to Disconnected
+    var pill = document.querySelector('[data-detail-status]');
+    if(pill){ pill.className = 'hs-badge hs-badge--neutral'; pill.innerHTML = '<span class="material-symbols-outlined">link_off</span>Disconnected'; }
+    var statusV = document.getElementById('statusValue');
+    if(statusV) statusV.textContent = 'Disconnected from Somos. Scheduling and analytics are stopped.';
+    // Swap the warning banner for a disconnected note
+    var banner = document.getElementById('reconnectBanner');
+    if(banner){
+      banner.hidden = false;
+      banner.innerHTML = '<span class="material-symbols-outlined">link_off</span><p>This account is disconnected. Reconnect it to resume scheduling and analytics.</p>';
+    }
+    // The Reconnect header button no longer applies; keep the danger-zone note
+    var hdrBtn = document.getElementById('headerReconnectBtn');
+    if(hdrBtn) hdrBtn.hidden = true;
+    var danger = document.getElementById('dangerValue');
+    if(danger) danger.textContent = 'This account is disconnected from Somos.';
+    var dBtn = document.getElementById('disconnectBtn');
+    if(dBtn){ dBtn.disabled = true; }
+    closeDisconnect();
+    toast('@somos disconnected');
+  }
+
   // Reconnect flow (T5)
   function reconnectStep(s){ document.querySelectorAll('#reconnectOvl [data-step]').forEach(function(d){ d.hidden = (+d.dataset.step)!==s; }); }
   function openReconnect(){ reconnectStep(1); document.getElementById('reconnectOvl').classList.add('open'); }
@@ -229,7 +359,7 @@
     var hdrBtn = document.getElementById('headerReconnectBtn');
     if(hdrBtn) hdrBtn.hidden = true;
   }
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReassign(); closeReconnect(); closeMenus(); } });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeReassign(); closeReconnect(); closeManageAccess(); closeDisconnect(); closeMenus(); } });
   document.addEventListener('click', function(e){ var t=e.target;
     if(!(t.closest && (t.closest('#floatMenu')||t.closest('#headerMoreBtn')))) closeMenus();
   });

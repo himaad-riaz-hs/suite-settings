@@ -77,8 +77,8 @@
             <div class="kv"><div class="k">Selected plan</div><div class="v">Standard (up to 10 social accounts, 3 users).</div></div>
             <div class="trail">
               <span class="hs-badge hs-badge--neutral">Trial</span>
-              <button class="hs-btn hs-btn--outlined">Change plan</button>
-              <button class="hs-btn hs-btn--outlined">Manage subscription</button>
+              <button class="hs-btn hs-btn--outlined" id="changePlanBtn">Change plan</button>
+              <button class="hs-btn hs-btn--outlined" id="manageSubBtn">Manage subscription</button>
             </div>
           </div>
         </section>
@@ -88,7 +88,7 @@
           <div class="row first">
             <div class="kv"><div class="k">Billing cycle</div><div class="v">Annual saves 20%. Applies from the next invoice, no mid-cycle charge.</div></div>
             <div class="trail">
-              <button class="sel"><span>Monthly</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
+              <button class="sel" id="cycleSel" data-options="Monthly|Annual"><span>Monthly</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button>
             </div>
           </div>
           <div class="row">
@@ -96,11 +96,11 @@
               <div class="k">Payment method</div>
               <div class="v">Visa ending in 4242 (expires 08/2028). Charged automatically each cycle.</div>
             </div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Update payment method</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="updatePaymentBtn">Update payment method</button></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Billing owner</div><div class="v">Marisol Chen &#183; marisol@somos.co. Receives receipts and seat requests.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Transfer</button></div>
+            <div class="kv"><div class="k">Billing owner</div><div class="v"><span id="billingOwnerName">Marisol Chen</span> &#183; marisol@somos.co. Receives receipts and seat requests.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="transferOwnerBtn">Transfer</button></div>
           </div>
         </section>
 
@@ -165,6 +165,174 @@
       </div>
     </div>
   </main>
+
+  <!-- Change plan modal -->
+  <div id="planModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="planModalTitle">Change plan</h2>
+          <p class="modal-sub">Pick the plan that fits your team. You keep your trial until it ends.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div id="planOptions"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transfer billing owner modal -->
+  <div id="transferModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="transferModalTitle">Transfer billing owner</h2>
+          <p class="modal-sub">The new billing owner receives receipts and seat requests.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div id="transferOptions"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    /* Turn a Bento .sel trigger into a click-to-open option list (inert). */
+    function wireSelect(sel, onPick) {
+      if (!sel) return;
+      var opts = (sel.getAttribute("data-options") || "").split("|").filter(Boolean);
+      var menu = null;
+      function labelEl() { return sel.querySelector("span:first-child"); }
+      function close() {
+        if (menu) { menu.remove(); menu = null; }
+        sel.setAttribute("aria-expanded", "false");
+        document.removeEventListener("mousedown", onDoc, true);
+      }
+      function onDoc(e) { if (!sel.contains(e.target) && (!menu || !menu.contains(e.target))) close(); }
+      sel.setAttribute("aria-haspopup", "listbox");
+      sel.setAttribute("aria-expanded", "false");
+      sel.addEventListener("click", function () {
+        if (menu) { close(); return; }
+        menu = S.el("div", "sel-menu");
+        menu.setAttribute("role", "listbox");
+        var current = labelEl().innerHTML;
+        opts.forEach(function (o) {
+          var item = S.el("div", "sel-menu-item" + (o === current ? " on" : ""), o);
+          item.setAttribute("role", "option");
+          item.addEventListener("click", function () {
+            var changed = o !== labelEl().innerHTML;
+            labelEl().innerHTML = o;
+            close();
+            if (changed && onPick) onPick(o);
+          });
+          menu.appendChild(item);
+        });
+        sel.parentNode.style.position = "relative";
+        sel.parentNode.appendChild(menu);
+        sel.setAttribute("aria-expanded", "true");
+        document.addEventListener("mousedown", onDoc, true);
+      });
+    }
+
+    // Billing cycle select
+    wireSelect(document.getElementById("cycleSel"), function () { S.toast("Billing cycle saved"); });
+
+    // Change plan modal
+    var PLANS = [
+      { name: "Professional", desc: "1 user, up to 10 social accounts." },
+      { name: "Team",         desc: "3 users, up to 20 social accounts." },
+      { name: "Business",     desc: "5+ users, unlimited social accounts." },
+      { name: "Enterprise",   desc: "Custom seats, SSO, and advanced security." }
+    ];
+    var planModal = document.getElementById("planModal");
+    var planM = S.wireModal(planModal);
+    var planOptions = document.getElementById("planOptions");
+    PLANS.forEach(function (p, i) {
+      var o = S.el("div", "opt");
+      o.setAttribute("role", "button");
+      o.setAttribute("tabindex", "0");
+      if (i === 0) o.setAttribute("data-autofocus", "");
+      o.innerHTML =
+        '<span class="lead"><span class="material-symbols-outlined">workspace_premium</span></span>' +
+        '<div class="txt"><div class="n">' + S.esc(p.name) + '</div><div class="d">' + S.esc(p.desc) + '</div></div>' +
+        '<span class="material-symbols-outlined check">check</span>';
+      function pick() { planM.close(); S.toast("Plan changed to " + p.name); }
+      o.addEventListener("click", pick);
+      o.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      planOptions.appendChild(o);
+    });
+    document.getElementById("changePlanBtn").addEventListener("click", function () { planM.open(); });
+
+    // Manage subscription
+    document.getElementById("manageSubBtn").addEventListener("click", function () {
+      S.toast("Opening subscription options");
+    });
+
+    // Update payment method: toast ONLY, no card capture
+    document.getElementById("updatePaymentBtn").addEventListener("click", function () {
+      S.toast("Opening payment method update");
+    });
+
+    // Invoice downloads
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.hs-table [aria-label^="Download invoice"]'),
+      function (btn) { btn.addEventListener("click", function () { S.toast("Downloading invoice"); }); }
+    );
+
+    // Transfer billing owner
+    var MEMBERS = [
+      { name: "Jordan Lee",  email: "jordan@somos.co",  initials: "JL" },
+      { name: "Sam Rivera",  email: "sam@somos.co",     initials: "SR" },
+      { name: "Devin Okafor", email: "devin@somos.co",  initials: "DO" },
+      { name: "Aisha Patel", email: "aisha@somos.co",   initials: "AP" }
+    ];
+    var transferModal = document.getElementById("transferModal");
+    var transferM = S.wireModal(transferModal);
+    var transferOptions = document.getElementById("transferOptions");
+    var ownerName = document.getElementById("billingOwnerName");
+    MEMBERS.forEach(function (mbr, i) {
+      var o = S.el("div", "opt");
+      o.setAttribute("role", "button");
+      o.setAttribute("tabindex", "0");
+      if (i === 0) o.setAttribute("data-autofocus", "");
+      o.innerHTML =
+        '<span class="lead">' + S.esc(mbr.initials) + '</span>' +
+        '<div class="txt"><div class="n">' + S.esc(mbr.name) + '</div><div class="d">' + S.esc(mbr.email) + '</div></div>' +
+        '<span class="material-symbols-outlined check">check</span>';
+      function pick() {
+        if (ownerName) ownerName.textContent = mbr.name;
+        transferM.close();
+        S.toast("Billing owner transferred to " + mbr.name);
+      }
+      o.addEventListener("click", pick);
+      o.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      transferOptions.appendChild(o);
+    });
+    document.getElementById("transferOwnerBtn").addEventListener("click", function () { transferM.open(); });
+  })();
+</script>
+<style>
+  .sel-menu { position:absolute; top:calc(100% + 4px); right:0; min-width:200px; max-width:320px;
+    background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border);
+    border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20));
+    padding:6px; z-index:50; }
+  .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
+  .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
+  .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
+</style>
 </body>
 </html>

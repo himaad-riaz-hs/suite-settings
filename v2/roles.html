@@ -128,47 +128,119 @@
     </div>
   </div>
 
+  <!-- Rename role modal (custom roles only) -->
+  <div id="renameRoleModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="renameRoleTitle" style="width:480px">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="renameRoleTitle">Rename role</h2>
+          <p class="modal-sub" id="renameRoleSub">Give this role a new name. People keep their access.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="hs-field">
+          <label class="hs-field-label" for="renameRoleName">Role name</label>
+          <input class="hs-input" id="renameRoleName" type="text" data-autofocus>
+          <div class="hs-field-hint" id="renameRoleErr" hidden style="color: var(--bento-theme-color-text-negative)"></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="renameRoleSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete role confirm modal (custom roles only). Outlined confirm button, never red filled. -->
+  <div id="deleteRoleModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteRoleTitle" style="width:480px">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="deleteRoleTitle">Delete role</h2>
+          <p class="modal-sub" id="deleteRoleSub"></p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--outlined" id="deleteRoleConfirm">Delete role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View permissions modal (read-only; used for built-in roles) -->
+  <div id="viewRoleModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="viewRoleTitle" style="width:640px">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="viewRoleTitle">View permissions</h2>
+          <p class="modal-sub" id="viewRoleSub">Built-in roles can't be changed. Duplicate it to customize.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="perm-list" id="viewRolePerms"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Close</button>
+        <button class="hs-btn hs-btn--primary" id="viewRoleDuplicate"><span class="material-symbols-outlined">content_copy</span>Duplicate</button>
+      </div>
+    </div>
+  </div>
+
 <div class="menu" id="rolesMenu" hidden></div>
 
 <script src="app.js"></script>
 <script>
-  // Roles page-local interactivity: row action menus, confirmation toasts, and role search.
-  // Self-contained. Does not touch app.js or app.css.
+  // Roles page-local interactivity: row action menus + full role management
+  // (Edit / Duplicate / Rename / Delete + read-only View permissions for presets).
+  // Self-contained. Reads and writes only through the window.SSV2 shared API.
+  // Does not touch app.js or app.css.
   (function () {
     var menu = document.getElementById("rolesMenu");
+    var API = window.SSV2 || {};
 
-    function closeMenu() { if (menu) menu.hidden = true; }
-
-    function showMenu(anchor, items) {
-      menu.innerHTML = items.map(function (it) {
-        return it.sep
-          ? '<div class="sep"></div>'
-          : '<button type="button" data-act="' + it.act + '"><span class="material-symbols-outlined">' + it.icon + '</span>' + it.label + "</button>";
-      }).join("");
-      var r = anchor.getBoundingClientRect();
-      menu.style.left = Math.min(r.left, window.innerWidth - 226) + "px";
-      menu.style.top = (r.bottom + 4) + "px";
-      menu.hidden = false;
-      menu._roleName = anchor.getAttribute("data-role-name") || "this role";
+    function isPreset(name) {
+      return (API.PRESET_ORDER || []).indexOf(name) >= 0;
     }
-
-    // Reuse app.js's toast styling if present; otherwise show a brief page-local toast.
-    function roleToast(msg) {
-      var t = document.getElementById("rolesToast");
-      if (!t) {
-        t = document.createElement("div");
-        t.id = "rolesToast";
-        t.setAttribute("role", "status");
-        t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--hs-bg-positive);color:var(--hs-fg-positive);padding:12px 16px;border-radius:8px;font:var(--hs-type-body-md-b);z-index:90;box-shadow:var(--hs-elev-overlay-bot, 0 8px 24px rgba(1,43,58,.16));transition:opacity .16s";
-        document.body.appendChild(t);
+    function toast(msg) {
+      if (API.toast) API.toast(msg);
+    }
+    // Repaint the app.js-rendered table + count after any change.
+    function repaint() {
+      if (API.rerenderRoles) API.rerenderRoles();
+    }
+    // Caps for a role: preset caps from PRESETS, custom caps from its record.
+    function capsFor(name) {
+      if (isPreset(name)) return Object.assign({}, (API.PRESETS || {})[name]);
+      var cr = API.customRoleByName ? API.customRoleByName(API.getState(), name) : null;
+      return cr ? Object.assign({}, cr.caps) : {};
+    }
+    // Migrate any person override whose role === oldName to newName.
+    function migrateOverrides(state, oldName, newName) {
+      if (oldName === newName) return;
+      var ov = state.overrides || {};
+      for (var id in ov) {
+        if (!ov.hasOwnProperty(id)) continue;
+        if (ov[id] && ov[id].role === oldName) ov[id].role = newName;
       }
-      t.textContent = msg;
-      t.style.opacity = "1";
-      clearTimeout(t._t);
-      t._t = setTimeout(function () { t.style.opacity = "0"; }, 1800);
     }
 
-    function roleMenuItems() {
+    /* ---- row action menu ------------------------------------------------- */
+    function closeMenu() { if (menu) menu.hidden = true; menu._anchor = null; }
+
+    function menuItemsFor(name) {
+      if (isPreset(name)) {
+        // Built-in roles: read-only. Offer View permissions + Duplicate only.
+        return [
+          { act: "view", icon: "visibility", label: "View permissions" },
+          { act: "duplicate", icon: "content_copy", label: "Duplicate" }
+        ];
+      }
       return [
         { act: "edit", icon: "edit", label: "Edit role" },
         { act: "duplicate", icon: "content_copy", label: "Duplicate" },
@@ -178,47 +250,285 @@
       ];
     }
 
+    function showMenu(anchor, name) {
+      var items = menuItemsFor(name);
+      menu.innerHTML = items.map(function (it) {
+        return it.sep
+          ? '<div class="sep"></div>'
+          : '<button type="button" data-act="' + it.act + '"><span class="material-symbols-outlined">' + it.icon + '</span>' + it.label + "</button>";
+      }).join("");
+      var r = anchor.getBoundingClientRect();
+      menu.style.left = Math.min(r.left, window.innerWidth - 226) + "px";
+      menu.style.top = (r.bottom + 4) + "px";
+      menu.hidden = false;
+      menu._roleName = name;
+      menu._anchor = anchor;
+    }
+
+    // Read the role name out of a row, dropping any trailing badge ("Custom") text.
+    function roleNameFromRow(tr) {
+      var nameEl = tr && tr.querySelector("td:first-child .cell-with-thumb > span:not(.thumb)");
+      if (!nameEl) return "this role";
+      var first = nameEl.firstChild;
+      return (first && first.nodeType === 3 ? first.textContent : nameEl.textContent).trim();
+    }
+
+    // The a11y layer in app.js relabels the row button to "Actions for X" and adds
+    // aria-haspopup="menu"; match on any of those so this keeps working either way.
+    function rowActionBtn(t) {
+      if (!t.closest) return null;
+      return t.closest('#rolesBody [aria-label="Role actions"], #rolesBody [aria-haspopup="menu"], #rolesBody .icon-btn');
+    }
+
+    /* ---- shared perm-editor modal (Create is reused for Edit) ------------ */
+    var createWrap = document.getElementById("createRoleModal");
+    var createTitle = document.getElementById("createRoleTitle");
+    var createSub = createWrap ? createWrap.querySelector(".modal-sub") : null;
+    var createName = document.getElementById("newRoleName");
+    var createPerms = document.getElementById("newRolePerms");
+    var createErr = document.getElementById("newRoleErr");
+    var createBtn = document.getElementById("newRoleCreate");
+
+    var CREATE_TITLE = createTitle ? createTitle.textContent : "Create role";
+    var CREATE_SUB = createSub ? createSub.textContent : "";
+    var CREATE_CTA = createBtn ? createBtn.textContent : "Create role";
+
+    // Own the create modal here so we can flip it into edit mode without touching
+    // app.js. app.js still opens/validates for a fresh create; we only intercept
+    // the CTA when editMode is on, and reset chrome whenever the modal opens.
+    var editEditor = null; // the buildPermEditor handle, built lazily on Edit open
+    var editState = { mode: null, roleName: null }; // mode: null | "edit"
+
+    function resetCreateChrome() {
+      if (createTitle) createTitle.textContent = CREATE_TITLE;
+      if (createSub) createSub.textContent = CREATE_SUB;
+      if (createBtn) createBtn.textContent = CREATE_CTA;
+      editState.mode = null;
+      editState.roleName = null;
+    }
+
+    // When the built-in Create button opens the modal, make sure we are NOT in
+    // edit mode (app.js resets the fields; we reset our chrome + flag).
+    var openCreateBtn = document.getElementById("createRoleBtn");
+    if (openCreateBtn) {
+      openCreateBtn.addEventListener("click", function () { resetCreateChrome(); });
+    }
+    // Restore chrome after the modal closes (Cancel / scrim / Esc / close X).
+    if (createWrap) {
+      var createClosers = createWrap.querySelectorAll("[data-close]");
+      for (var ci = 0; ci < createClosers.length; ci++) {
+        createClosers[ci].addEventListener("click", function () { setTimeout(resetCreateChrome, 0); });
+      }
+      createWrap.addEventListener("mousedown", function (e) {
+        if (e.target.classList && e.target.classList.contains("scrim")) setTimeout(resetCreateChrome, 0);
+      });
+    }
+
+    function openEdit(name) {
+      if (!createWrap || !API.buildPermEditor) { toast("Built-in roles can't be changed."); return; }
+      var cr = API.customRoleByName ? API.customRoleByName(API.getState(), name) : null;
+      if (!cr) { toast("Built-in roles can't be changed. Duplicate it to customize."); return; }
+      editState.mode = "edit";
+      editState.roleName = name;
+      // Retitle + prefill, then reuse the same editor container as Create.
+      if (createTitle) createTitle.textContent = "Edit role";
+      if (createSub) createSub.textContent = "Update the name and permissions. Changes apply to everyone who has this role.";
+      if (createBtn) createBtn.textContent = "Save changes";
+      if (createErr) createErr.hidden = true;
+      if (createName) { createName.value = name; createName.classList.remove("hs-input--error"); }
+      editEditor = API.buildPermEditor(createPerms, Object.assign({}, cr.caps));
+      createWrap.hidden = false;
+      if (createName) createName.focus();
+    }
+
+    // Intercept the Create modal CTA in edit mode (capture phase so we run before
+    // app.js's own create handler, and stop it from also firing).
+    if (createBtn) {
+      createBtn.addEventListener("click", function (e) {
+        if (editState.mode !== "edit") return; // let app.js handle a fresh create
+        e.stopImmediatePropagation();
+        var name = (createName ? createName.value : "").trim();
+        var scope = editEditor ? editEditor.read() : {};
+        var any = (API.CAPS || []).some(function (c) { return scope[c.key] !== "none"; });
+        if (!name || !any) {
+          if (createErr) {
+            createErr.hidden = false;
+            createErr.textContent = !name ? "Give the role a name." : "Grant at least one permission.";
+          }
+          if (createName) createName.classList.toggle("hs-input--error", !name);
+          return;
+        }
+        var oldName = editState.roleName;
+        var st = API.getState();
+        // Guard against colliding with another role's name.
+        if (name !== oldName) {
+          var clashesPreset = isPreset(name);
+          var clashesCustom = st.customRoles.some(function (r) { return r.name === name; });
+          if (clashesPreset || clashesCustom) {
+            if (createErr) { createErr.hidden = false; createErr.textContent = "A role with that name already exists."; }
+            if (createName) createName.classList.add("hs-input--error");
+            return;
+          }
+        }
+        var cr = st.customRoles.filter(function (r) { return r.name === oldName; })[0];
+        if (cr) { cr.name = name; cr.caps = scope; }
+        migrateOverrides(st, oldName, name);
+        API.save(st);
+        createWrap.hidden = true;
+        resetCreateChrome();
+        repaint();
+        toast('Role "' + name + '" updated');
+      }, true);
+    }
+
+    /* ---- duplicate (any role, incl. presets) ----------------------------- */
+    function duplicateRole(name) {
+      var st = API.getState();
+      var base = name + " copy";
+      var newName = base, i = 2;
+      var taken = function (n) {
+        return isPreset(n) || st.customRoles.some(function (r) { return r.name === n; });
+      };
+      while (taken(newName)) { newName = base + " " + i; i++; }
+      st.customRoles.push({ id: "cr" + (Date.now().toString(36)), name: newName, caps: capsFor(name) });
+      API.save(st);
+      repaint();
+      toast('Duplicated to "' + newName + '"');
+    }
+
+    /* ---- rename (custom only) -------------------------------------------- */
+    var renameWrap = document.getElementById("renameRoleModal");
+    var renameName = document.getElementById("renameRoleName");
+    var renameErr = document.getElementById("renameRoleErr");
+    var renameSaveBtn = document.getElementById("renameRoleSave");
+    var renameModal = (renameWrap && API.wireModal) ? API.wireModal(renameWrap) : null;
+    var renameTarget = null;
+
+    function openRename(name) {
+      renameTarget = name;
+      if (renameName) { renameName.value = name; renameName.classList.remove("hs-input--error"); }
+      if (renameErr) renameErr.hidden = true;
+      if (renameModal) renameModal.open(); else if (renameWrap) renameWrap.hidden = false;
+    }
+    if (renameSaveBtn) {
+      renameSaveBtn.addEventListener("click", function () {
+        var newName = (renameName ? renameName.value : "").trim();
+        var oldName = renameTarget;
+        if (!newName) {
+          if (renameErr) { renameErr.hidden = false; renameErr.textContent = "Give the role a name."; }
+          if (renameName) renameName.classList.add("hs-input--error");
+          return;
+        }
+        var st = API.getState();
+        if (newName !== oldName) {
+          var clash = isPreset(newName) || st.customRoles.some(function (r) { return r.name === newName; });
+          if (clash) {
+            if (renameErr) { renameErr.hidden = false; renameErr.textContent = "A role with that name already exists."; }
+            if (renameName) renameName.classList.add("hs-input--error");
+            return;
+          }
+        }
+        var cr = st.customRoles.filter(function (r) { return r.name === oldName; })[0];
+        if (cr) cr.name = newName;
+        migrateOverrides(st, oldName, newName);
+        API.save(st);
+        if (renameModal) renameModal.close(); else if (renameWrap) renameWrap.hidden = true;
+        repaint();
+        toast('Renamed to "' + newName + '"');
+      });
+    }
+
+    /* ---- delete (custom only) -------------------------------------------- */
+    var deleteWrap = document.getElementById("deleteRoleModal");
+    var deleteSub = document.getElementById("deleteRoleSub");
+    var deleteConfirm = document.getElementById("deleteRoleConfirm");
+    var deleteModal = (deleteWrap && API.wireModal) ? API.wireModal(deleteWrap) : null;
+    var deleteTarget = null;
+
+    function openDelete(name) {
+      deleteTarget = name;
+      if (deleteSub) deleteSub.textContent =
+        "Delete the role " + name + "? People who have it keep their current access until you reassign them.";
+      if (deleteModal) deleteModal.open(); else if (deleteWrap) deleteWrap.hidden = false;
+    }
+    if (deleteConfirm) {
+      deleteConfirm.addEventListener("click", function () {
+        var name = deleteTarget;
+        var st = API.getState();
+        st.customRoles = st.customRoles.filter(function (r) { return r.name !== name; });
+        API.save(st);
+        if (deleteModal) deleteModal.close(); else if (deleteWrap) deleteWrap.hidden = true;
+        repaint();
+        toast('"' + name + '" deleted');
+      });
+    }
+
+    /* ---- view permissions (read-only; presets) --------------------------- */
+    var viewWrap = document.getElementById("viewRoleModal");
+    var viewTitle = document.getElementById("viewRoleTitle");
+    var viewPerms = document.getElementById("viewRolePerms");
+    var viewDuplicate = document.getElementById("viewRoleDuplicate");
+    var viewModal = (viewWrap && API.wireModal) ? API.wireModal(viewWrap) : null;
+    var viewTarget = null;
+
+    function openView(name) {
+      viewTarget = name;
+      if (viewTitle) viewTitle.textContent = name + " permissions";
+      if (viewPerms && API.buildPermEditor) {
+        var ed = API.buildPermEditor(viewPerms, capsFor(name));
+        // Read-only: disable every segmented-control button so it reads clearly.
+        var btns = viewPerms.querySelectorAll("button[data-lvl]");
+        for (var i = 0; i < btns.length; i++) {
+          btns[i].disabled = true;
+          btns[i].style.cursor = "default";
+        }
+      }
+      if (viewModal) viewModal.open(); else if (viewWrap) viewWrap.hidden = false;
+    }
+    if (viewDuplicate) {
+      viewDuplicate.addEventListener("click", function () {
+        if (viewModal) viewModal.close(); else if (viewWrap) viewWrap.hidden = true;
+        if (viewTarget) duplicateRole(viewTarget);
+      });
+    }
+
+    /* ---- dispatch -------------------------------------------------------- */
     document.addEventListener("click", function (e) {
       var t = e.target;
-      // Open menu when a row's action button is clicked (app.js renders it with aria-label "Role actions").
-      var btn = t.closest && t.closest('#rolesBody [aria-label="Role actions"]');
+
+      // Open / toggle the row action menu.
+      var btn = rowActionBtn(t);
       if (btn) {
         e.stopPropagation();
-        var open = !menu.hidden && menu._anchor === btn;
-        if (open) { closeMenu(); menu._anchor = null; return; }
-        var tr = btn.closest("tr");
-        var nameEl = tr && tr.querySelector("td:first-child .cell-with-thumb > span:not(.thumb)");
-        // Take the name text only, dropping any trailing badge ("Custom") text.
-        var roleName = "this role";
-        if (nameEl) {
-          var first = nameEl.firstChild;
-          roleName = (first && first.nodeType === 3 ? first.textContent : nameEl.textContent).trim();
-        }
-        btn.setAttribute("data-role-name", roleName);
-        menu._anchor = btn;
-        showMenu(btn, roleMenuItems());
+        if (!menu.hidden && menu._anchor === btn) { closeMenu(); return; }
+        showMenu(btn, roleNameFromRow(btn.closest("tr")));
         return;
       }
-      // Act on a menu option.
+
+      // A menu option was chosen.
       var opt = t.closest && t.closest("#rolesMenu button[data-act]");
       if (opt) {
+        var act = opt.getAttribute("data-act");
         var name = menu._roleName || "this role";
-        var msgs = {
-          edit: 'Editing "' + name + '"',
-          duplicate: '"' + name + '" duplicated',
-          rename: 'Renaming "' + name + '"',
-          delete: '"' + name + '" deleted'
-        };
         closeMenu();
-        menu._anchor = null;
-        roleToast(msgs[opt.getAttribute("data-act")] || "Done");
+        // Presets can only be viewed or duplicated; guard the rest with a note.
+        if (isPreset(name) && (act === "edit" || act === "rename" || act === "delete")) {
+          toast("Built-in roles can't be changed. Duplicate it to customize.");
+          return;
+        }
+        if (act === "edit") openEdit(name);
+        else if (act === "duplicate") duplicateRole(name);
+        else if (act === "rename") openRename(name);
+        else if (act === "delete") openDelete(name);
+        else if (act === "view") openView(name);
         return;
       }
-      // Click elsewhere closes the menu.
-      if (!(t.closest && t.closest("#rolesMenu"))) { closeMenu(); menu._anchor = null; }
+
+      // Click outside the menu closes it (but not when interacting with a modal).
+      if (!(t.closest && t.closest("#rolesMenu"))) closeMenu();
     });
 
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeMenu(); menu._anchor = null; } });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
 
     // Search: filter role rows by name or by what the role can do.
     var search = document.getElementById("rolesSearch");

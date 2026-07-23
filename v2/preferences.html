@@ -67,18 +67,18 @@
           <h2 class="card-title">Language &amp; region</h2>
           <div class="row first">
             <div class="kv"><div class="k">Language</div><div class="v">Applies to menus and emails from Hootsuite.</div></div>
-            <div class="trail"><button class="sel"><span>English</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" id="langSel" data-options="English|French (Canada)|Spanish|German|Portuguese (Brazil)"><span>English</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
           <div class="row">
             <div class="kv"><div class="k">Time zone</div><div class="v">Sets when posts publish and how reports bucket your days.</div></div>
-            <div class="trail"><button class="sel"><span>(UTC&#8722;08:00) Vancouver</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
+            <div class="trail"><button class="sel" id="tzSel" data-options="(UTC&#8722;08:00) Vancouver|(UTC&#8722;07:00) Denver|(UTC&#8722;06:00) Winnipeg|(UTC&#8722;05:00) Toronto|(UTC+00:00) London"><span>(UTC&#8722;08:00) Vancouver</span><span class="material-symbols-outlined chev">keyboard_arrow_down</span></button></div>
           </div>
-          <div class="nudge">
+          <div class="nudge" id="tzNudge">
             <span class="material-symbols-outlined">location_on</span>
             <span class="txt">Your device says (UTC&#8722;05:00) Toronto, use that instead?</span>
             <span class="acts">
-              <button class="hs-btn hs-btn--secondary hs-btn--sm">Use detected</button>
-              <button class="hs-btn hs-btn--ghost hs-btn--sm">Dismiss</button>
+              <button class="hs-btn hs-btn--secondary hs-btn--sm" id="nudgeUse">Use detected</button>
+              <button class="hs-btn hs-btn--ghost hs-btn--sm" id="nudgeDismiss">Dismiss</button>
             </span>
           </div>
         </section>
@@ -87,5 +87,74 @@
   </main>
 
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    /* Turn a Bento .sel trigger into a click-to-open option list.
+       onPick(label) fires when a new option is chosen. Options come from
+       data-options ("A|B|C"). Inert: nothing is stored server-side. */
+    function wireSelect(sel, onPick) {
+      if (!sel) return;
+      var opts = (sel.getAttribute("data-options") || "").split("|").filter(Boolean);
+      var menu = null;
+      function labelEl() { return sel.querySelector("span:first-child"); }
+      function close() {
+        if (menu) { menu.remove(); menu = null; }
+        sel.setAttribute("aria-expanded", "false");
+        document.removeEventListener("mousedown", onDoc, true);
+      }
+      function onDoc(e) { if (!sel.contains(e.target) && (!menu || !menu.contains(e.target))) close(); }
+      sel.setAttribute("aria-haspopup", "listbox");
+      sel.setAttribute("aria-expanded", "false");
+      sel.addEventListener("click", function () {
+        if (menu) { close(); return; }
+        menu = S.el("div", "sel-menu");
+        menu.setAttribute("role", "listbox");
+        var current = labelEl().innerHTML;
+        opts.forEach(function (o) {
+          var item = S.el("div", "sel-menu-item" + (o === current ? " on" : ""), o);
+          item.setAttribute("role", "option");
+          item.addEventListener("click", function () {
+            var changed = o !== labelEl().innerHTML;
+            labelEl().innerHTML = o;
+            close();
+            if (changed && onPick) onPick(o);
+          });
+          menu.appendChild(item);
+        });
+        sel.parentNode.style.position = "relative";
+        sel.parentNode.appendChild(menu);
+        sel.setAttribute("aria-expanded", "true");
+        document.addEventListener("mousedown", onDoc, true);
+      });
+    }
+
+    wireSelect(document.getElementById("langSel"), function () { S.toast("Preferences saved"); });
+    var tzSel = document.getElementById("tzSel");
+    wireSelect(tzSel, function () { S.toast("Preferences saved"); });
+
+    // Detected time-zone nudge
+    var nudge = document.getElementById("tzNudge");
+    document.getElementById("nudgeUse").addEventListener("click", function () {
+      tzSel.querySelector("span:first-child").innerHTML = "(UTC&#8722;05:00) Toronto";
+      if (nudge) nudge.hidden = true;
+      S.toast("Preferences saved");
+    });
+    document.getElementById("nudgeDismiss").addEventListener("click", function () {
+      if (nudge) nudge.hidden = true;
+      S.toast("Nudge dismissed");
+    });
+  })();
+</script>
+<style>
+  .sel-menu { position:absolute; top:calc(100% + 4px); right:0; min-width:220px; max-width:320px;
+    background:var(--bento-theme-color-bg-surface); border:1px solid var(--hs-border);
+    border-radius:var(--hs-radii-md); box-shadow:var(--hs-elev-overlay-bot, 0 12px 36px rgba(1,43,58,.20));
+    padding:6px; z-index:50; }
+  .sel-menu-item { padding:8px 10px; border-radius:8px; cursor:pointer; font:var(--hs-type-body-md); color:var(--hs-fg); white-space:nowrap; }
+  .sel-menu-item:hover { background:var(--bento-system-sys-neutral-alt-100); }
+  .sel-menu-item.on { background:var(--hs-bg-info); font:var(--hs-type-body-md-b); }
+</style>
 </body>
 </html>

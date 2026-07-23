@@ -76,15 +76,15 @@
           <div class="row first">
             <div class="avatar-lg"><span class="material-symbols-outlined">person</span></div>
             <div class="kv"><div class="k">Profile photo</div><div class="v">JPG or PNG, we crop it square for you.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined"><span class="material-symbols-outlined">photo_camera</span>Change photo</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="changePhotoBtn"><span class="material-symbols-outlined">photo_camera</span>Change photo</button></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Name</div><div class="v">Melanie Torres, the name teammates see across Hootsuite.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Edit name</button></div>
+            <div class="kv"><div class="k">Name</div><div class="v"><span id="profileName">Melanie Torres</span>, the name teammates see across Hootsuite.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="editNameBtn">Edit name</button></div>
           </div>
           <div class="row">
-            <div class="kv"><div class="k">Email</div><div class="v">melanie@somos.co, used for sign-in and account notifications.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Change email</button></div>
+            <div class="kv"><div class="k">Email</div><div class="v"><span id="profileEmail">melanie@somos.co</span>, used for sign-in and account notifications.</div></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="changeEmailBtn">Change email</button></div>
           </div>
         </section>
 
@@ -92,13 +92,129 @@
           <h2 class="card-title">Danger zone</h2>
           <div class="row first">
             <div class="kv"><div class="k">Delete my account</div><div class="v">Blocked while you own social accounts or the org.</div></div>
-            <div class="trail"><button class="hs-btn hs-btn--outlined">Delete account</button></div>
+            <div class="trail"><button class="hs-btn hs-btn--outlined" id="deleteAccountBtn">Delete account</button></div>
           </div>
         </section>
       </div>
     </div>
   </main>
 
+  <!-- Edit name modal -->
+  <div id="nameModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="nameModalTitle">Edit name</h2>
+          <p class="modal-sub">The name teammates see across Hootsuite.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <label for="nameInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">Full name</label>
+        <input id="nameInput" type="text" data-autofocus style="width:100%">
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="nameSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change email modal -->
+  <div id="emailModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="emailModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="emailModalTitle">Change email</h2>
+          <p class="modal-sub">Used for sign-in and account notifications.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <label for="emailInput" style="display:block; font:var(--hs-type-body-md-b); margin:0 0 6px">New email address</label>
+        <input id="emailInput" type="email" data-autofocus placeholder="name@company.com" style="width:100%">
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--primary" id="emailSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete account confirm modal (outlined confirm, never red) -->
+  <div id="deleteModal" hidden>
+    <div class="scrim"></div>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+      <div class="modal-head">
+        <div style="flex:1">
+          <h2 class="modal-title" id="deleteModalTitle">Delete account?</h2>
+          <p class="modal-sub">Your account is scheduled for deletion and can be restored while the request is pending.</p>
+        </div>
+        <button class="hs-btn hs-btn--ghost hs-btn--icon" aria-label="Close" data-close style="width:32px;height:32px"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0">We schedule the deletion rather than removing everything at once, so you have time to change your mind.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="hs-btn hs-btn--ghost" data-close>Cancel</button>
+        <button class="hs-btn hs-btn--outlined" id="deleteConfirm">Schedule deletion</button>
+      </div>
+    </div>
+  </div>
+
 <script src="app.js"></script>
+<script>
+  (function () {
+    var S = window.SSV2;
+
+    // Edit name
+    var nameModal = document.getElementById("nameModal");
+    var nameM = S.wireModal(nameModal);
+    var nameDisplay = document.getElementById("profileName");
+    var nameInput = document.getElementById("nameInput");
+    document.getElementById("editNameBtn").addEventListener("click", function () {
+      nameInput.value = nameDisplay.textContent.trim();
+      nameM.open();
+    });
+    document.getElementById("nameSave").addEventListener("click", function () {
+      var v = nameInput.value.trim();
+      if (v) nameDisplay.textContent = v;
+      nameM.close();
+      S.toast("Profile updated");
+    });
+
+    // Change photo (inert)
+    document.getElementById("changePhotoBtn").addEventListener("click", function () {
+      S.toast("Photo updated");
+    });
+
+    // Change email
+    var emailModal = document.getElementById("emailModal");
+    var emailM = S.wireModal(emailModal);
+    var emailDisplay = document.getElementById("profileEmail");
+    var emailInput = document.getElementById("emailInput");
+    document.getElementById("changeEmailBtn").addEventListener("click", function () {
+      emailInput.value = emailDisplay.textContent.trim();
+      emailM.open();
+    });
+    document.getElementById("emailSave").addEventListener("click", function () {
+      var v = emailInput.value.trim();
+      if (v) emailDisplay.textContent = v;
+      emailM.close();
+      S.toast("Email updated");
+    });
+
+    // Delete account (confirm, does not navigate or clear anything)
+    var deleteModal = document.getElementById("deleteModal");
+    var deleteM = S.wireModal(deleteModal);
+    document.getElementById("deleteAccountBtn").addEventListener("click", function () { deleteM.open(); });
+    document.getElementById("deleteConfirm").addEventListener("click", function () {
+      deleteM.close();
+      S.toast("Account scheduled for deletion");
+    });
+  })();
+</script>
 </body>
 </html>
